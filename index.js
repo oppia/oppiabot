@@ -107,28 +107,18 @@ module.exports = (robot) => {
           }
 
           var params;
-          console.log('hasUserSignedCla details');
-          console.log(hasUserSignedCla);
           if (hasUserSignedCla == true) {
-            console.log('Inside if');
-            console.log(context.issue());
             const labels = context.github.issues.getIssueLabels(context.issue());
             var labelData, CLAFlag = false;
             labels.then((resp)=>{
-              console.log('1.' + resp);
-              console.log('2.' + resp.data);
               labelDataJSON = JSON.stringify(resp);
-              console.log('3.' + labelDataJSON);
-              //labelData = labelDataJSON.data
               labelData = resp.data;
-              console.log('4.' + labelData);
               for (var labelIndex = 0; labelIndex < labelData.length; labelIndex++) {
                 if (labelData[labelIndex].name == cla_label[0]) {
                   CLAFlag = true;
                   break;
                 }
               }
-              console.log('5.' + CLAFlag);
               if (CLAFlag == true) {
                 context.github.issues.removeLabel(context.issue({
                   name: cla_label[0]
@@ -137,9 +127,8 @@ module.exports = (robot) => {
             });
             return;
           } else {
-            console.log('Inside else');
             var linkText = 'here';
-            var linkResult = linkText.link('https://tinyurl.com/claformoppia');
+            var linkResult = linkText.link('https://goo.gl/forms/AttNH80OV0');
             params = context.issue({body: 'Hi! @' + userName +
             '. Welcome to Oppia! Please could you follow the instructions ' + linkResult +
             ' to get started ? You\'ll need to do this before we can accept your PR. Thanks!'});
@@ -149,8 +138,6 @@ module.exports = (robot) => {
               }));
             }
           }
-          console.log('Here are the params!');
-          console.log(params);
           return context.github.issues.createComment(params);
         }
       });
