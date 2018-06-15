@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "author": "Apurv Bajaj <apurvabajaj007@gmail.com>",
-  "license": "ISC",
+  "license": "Apache 2.0",
   "repository": "https://github.com/apb7/oppia-bot.git",
   "scripts": {
     "start": "probot run ./index.js",

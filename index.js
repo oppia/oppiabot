@@ -1,6 +1,6 @@
 module.exports = (robot) => {
-  function APIForSheets(userName, context, isPullRequest) {
-    var cla_label = ['Needs CLA'];
+  var apiForSheets = function(userName, context, isPullRequest) {
+    var claLabel = ['Needs CLA'];
     var hasUserSignedCla = false;
     // Google Sheets API v4
     var fs = require('fs');
@@ -11,41 +11,44 @@ module.exports = (robot) => {
     // If modifying these scopes, delete your previously saved credentials
     // at ~/.credentials/sheets.googleapis.com-nodejs-quickstart.json
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
-
-    var client_secret = process.env.CLIENT_SECRET;
+    var clientSecret = process.env.CLIENT_SECRET;
     // Authorize a client with the loaded credentials, then call the
     // Google Sheets API.
-    authorize(JSON.parse(client_secret), checkCLASheet);
+    authorize(JSON.parse(clientSecret), checkClaSheet);
+
     /**
-         * Create an OAuth2 client with the given credentials, and then execute the
-         * given callback function.
-         *
-         * @param {Object} credentials The authorization client credentials.
-         * @param {function} callback The callback to call with the authorized client.
-         */
-    function authorize(credentials, callback) {
-      var clientSecret = credentials.installed.client_secret;
+      * Create an OAuth2 client with the given credentials, and then execute the
+      * given callback function.
+      *
+      * @param {Object} credentials The authorization client credentials.
+      * @param {function} callback The callback to call with the
+      *   authorized client.
+      */
+    var authorize = function(credentials, callback) {
+      var clientSecret = credentials.installed.clientSecret;
       var clientId = credentials.installed.client_id;
       var redirectUrl = credentials.installed.redirect_uris[0];
       var auth = new googleAuth();
       var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
       oauth2Client.credentials = JSON.parse(process.env.CREDENTIALS);
       callback(oauth2Client);
-    }
+    };
 
     /**
-         * Get and store new token after prompting for user authorization, and then
-         * execute the given callback with the authorized OAuth2 client.
-         *
-         * @param {google.auth.OAuth2} oauth2Client The OAuth2 client to get token for.
-         * @param {getEventsCallback} callback The callback to call with the authorized
-         *     client.
-         */
-    function getNewToken(oauth2Client, callback) {
+      * Get and store new token after prompting for user authorization, and then
+      * execute the given callback with the authorized OAuth2 client.
+      *
+      * @param {google.auth.OAuth2} oauth2Client The OAuth2 client to get
+      *   token for.
+      * @param {getEventsCallback} callback The callback to call with
+      *    the authorized client.
+      */
+    var getNewToken = function(oauth2Client, callback) {
       var authUrl = oauth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: SCOPES
       });
+      // eslint-disable-next-line no-console
       console.log('Authorize this app by visiting this url: ', authUrl);
       var rl = readline.createInterface({
         input: process.stdin,
@@ -55,6 +58,7 @@ module.exports = (robot) => {
         rl.close();
         oauth2Client.getToken(code, function(err, token) {
           if (err) {
+            // eslint-disable-next-line no-console
             console.log('Error while trying to retrieve access token', err);
             return;
           }
@@ -63,27 +67,28 @@ module.exports = (robot) => {
           callback(oauth2Client);
         });
       });
-    }
+    };
 
     /**
-         * Store token to disk be used in later program executions.
-         *
-         * @param {Object} token The token to store to disk.
-         */
-    function storeToken(token) {
+      * Store token to disk be used in later program executions.
+      *
+      * @param {Object} token The token to store to disk.
+      */
+    var storeToken = function(token) {
       try {
         fs.mkdirSync(TOKEN_DIR);
       } catch (err) {
-        if (err.code != 'EEXIST') {
+        if (err.code !== 'EEXIST') {
           throw err;
         }
       }
       fs.writeFile(TOKEN_PATH, JSON.stringify(token));
+      // eslint-disable-next-line no-console
       console.log('Token stored to ' + TOKEN_PATH);
-    }
+    };
 
-    
-    function checkCLASheet(auth) {
+
+    var checkClaSheet = function(auth) {
       var sheets = google.sheets('v4');
       sheets.spreadsheets.values.get({
         auth: auth,
@@ -91,37 +96,43 @@ module.exports = (robot) => {
         range: 'Usernames!A:A',
       }, function(err, response) {
         if (err) {
+          // eslint-disable-next-line no-console
           console.log('The API returned an error: ' + err);
           return;
         }
         var rows = response.values;
-        if (rows.length == 0) {
+        if (rows.length === 0) {
+          // eslint-disable-next-line no-console
           console.log('No data found.');
         } else {
           for (var i = 0; i < rows.length; i++) {
             var rowUserName = rows[i][0];
-            if (rowUserName == userName) {
+            if (rowUserName === userName) {
               hasUserSignedCla = true;
               break;
             }
           }
 
           var params;
-          if (hasUserSignedCla == true) {
-            const labels = context.github.issues.getIssueLabels(context.issue());
-            var labelData, CLAFlag = false;
+          if (hasUserSignedCla === true) {
+            const labels = context.github.issues.getIssueLabels(
+              context.issue());
+            var labelData, claFlag = false;
             labels.then((resp)=>{
               labelDataJSON = JSON.stringify(resp);
               labelData = resp.data;
-              for (var labelIndex = 0; labelIndex < labelData.length; labelIndex++) {
-                if (labelData[labelIndex].name == cla_label[0]) {
-                  CLAFlag = true;
+              for (
+                var labelIndex = 0;
+                labelIndex < labelData.length;
+                labelIndex++) {
+                if (labelData[labelIndex].name === claLabel[0]) {
+                  claFlag = true;
                   break;
                 }
               }
-              if (CLAFlag == true) {
+              if (claFlag === true) {
                 context.github.issues.removeLabel(context.issue({
-                  name: cla_label[0]
+                  name: claLabel[0]
                 }));
               }
             });
@@ -129,39 +140,40 @@ module.exports = (robot) => {
           } else {
             var linkText = 'here';
             var linkResult = linkText.link('https://goo.gl/forms/AttNH80OV0');
-            params = context.issue({body: 'Hi! @' + userName +
-            '. Welcome to Oppia! Please could you follow the instructions ' + linkResult +
-            ' to get started ? You\'ll need to do this before we can accept your PR. Thanks!'});
-            if (isPullRequest == true) {
+            params = context.issue({
+              body: 'Hi! @' + userName +
+              '. Welcome to Oppia! Please could you ' +
+              'follow the instructions ' + linkResult +
+              ' to get started ? You\'ll need to do ' +
+              'this before we can accept your PR. Thanks!'});
+            if (isPullRequest === true) {
               context.github.issues.addLabels(context.issue({
-                labels: cla_label
+                labels: claLabel
               }));
             }
           }
           return context.github.issues.createComment(params);
         }
       });
-    }
-  }
+    };
+  };
 
   /*
-  Remember: Use GitHub Webhook Payloads and not REST APIs
-  Link:  https://octokit.github.io/rest.js/
+    Please use GitHub Webhook Payloads and not REST APIs.
+    Link:  https://octokit.github.io/rest.js/
   */
 
   robot.on('issue_comment.created', async context => {
-    if (context.isBot == false){
+    if (context.isBot === false){
       const userName = context.payload.comment.user.login;
-      APIForSheets(userName, context, false);
+      apiForSheets(userName, context, false);
     }
   });
 
   robot.on('pull_request.opened', async context => {
-    if (context.isBot == false){
+    if (context.isBot === false){
       const userName = context.payload.pull_request.user.login;
-      APIForSheets(userName, context, true);
+      apiForSheets(userName, context, true);
     }
   });
-
 };
-
