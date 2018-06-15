@@ -2,6 +2,7 @@ module.exports = (robot) => {
   var apiForSheets = function(userName, context, isPullRequest) {
     var claLabel = ['Needs CLA'];
     var hasUserSignedCla = false;
+    var spreadsheetId = process.env.SPREADSHEET_ID;
     // Google Sheets API v4
     var fs = require('fs');
     var readline = require('readline');
@@ -92,7 +93,7 @@ module.exports = (robot) => {
       var sheets = google.sheets('v4');
       sheets.spreadsheets.values.get({
         auth: auth,
-        spreadsheetId: '1FEE3yW9K71n0yLA5nRipHg3ml8EF0z-AqOaRBK7XIaY',
+        spreadsheetId: spreadsheetId,
         range: 'Usernames!A:A',
       }, function(err, response) {
         if (err) {
