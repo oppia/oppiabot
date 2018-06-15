@@ -119,7 +119,7 @@ module.exports = (robot) => {
             const labels = context.github.issues.getIssueLabels(
               context.issue());
             var labelData, claFlag = false;
-            labels.then((resp)=>{
+            labels.then((resp) => {
               labelDataJSON = JSON.stringify(resp);
               labelData = resp.data;
               for (
