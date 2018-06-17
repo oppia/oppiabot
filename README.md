@@ -14,6 +14,7 @@ The bot currently performs the following functions:
 
 3. Closes stale pull requests.
 
+
 ## Getting started
 
 Please refer to the following instructions to setup Oppiabot for the first time on your machine:
@@ -50,9 +51,11 @@ Please refer to the following instructions to setup Oppiabot for the first time 
     <img src="images/sample-app-id.png">
 </p>
 
+
 ## Installing the bot on a repository
 
 You'll need to create a test repository and install the bot by clicking the **Install** button on the settings page of your app, e.g `https://github.com/apps/your-app-name`
+
 
 ## Running the bot locally
 
@@ -63,6 +66,18 @@ The `dev` script will start the bot using [nodemon](https://github.com/remy/node
 
 `$ npm start` to start the bot without watching files.
 
+
 ## Debugging
 Always run `$ npm install` and restart the server if `package.json` has changed.
 To turn on verbose logging, start server by running: `$ LOG_LEVEL=trace npm start`.
+
+
+## Support
+
+If you have any feature requests or bug reports, please log them on our [issue tracker](https://github.com/oppia/oppiabot/issues/new?title=Describe%20your%20feature%20request%20or%20bug%20report%20succinctly&body=If%20you%27d%20like%20to%20propose%20a%20feature,%20describe%20what%20you%27d%20like%20to%20see.%20Mock%20ups%20would%20be%20great!%0A%0AIf%20you%27re%20reporting%20a%20bug,%20please%20be%20sure%20to%20include%20the%20expected%20behaviour,%20the%20observed%20behaviour,%20and%20steps%20to%20reproduce%20the%20problem.%20Console%20copy-pastes%20and%20any%20background%20on%20the%20environment%20would%20also%20be%20helpful.%0A%0AThanks!).
+
+Please report security issues directly to admin@oppia.org.
+
+## License
+
+The Oppiabot code is released under the [Apache v2 license](https://github.com/oppia/oppiabot/blob/master/LICENSE).
