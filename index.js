@@ -13,9 +13,6 @@ module.exports = (robot) => {
     // at ~/.credentials/sheets.googleapis.com-nodejs-quickstart.json
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
     var clientSecret = process.env.CLIENT_SECRET;
-    // Authorize a client with the loaded credentials, then call the
-    // Google Sheets API.
-    authorize(JSON.parse(clientSecret), checkClaSheet);
 
     /**
       * Create an OAuth2 client with the given credentials, and then execute the
@@ -26,7 +23,7 @@ module.exports = (robot) => {
       *   authorized client.
       */
     var authorize = function(credentials, callback) {
-      var clientSecret = credentials.installed.clientSecret;
+      var clientSecret = credentials.installed.client_secret;
       var clientId = credentials.installed.client_id;
       var redirectUrl = credentials.installed.redirect_uris[0];
       var auth = new googleAuth();
@@ -157,6 +154,10 @@ module.exports = (robot) => {
         }
       });
     };
+
+    // Authorize a client with the loaded credentials, then call the
+    // Google Sheets API.
+    authorize(JSON.parse(clientSecret), checkClaSheet);
   };
 
   /*
