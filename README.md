@@ -55,7 +55,7 @@ Please refer to the following instructions to setup Oppiabot for the first time 
 
 ## Installing the bot on a repository
 
-You'll need to create a target repository and install the bot by clicking the **Install** button on the settings page of your app, e.g `https://github.com/apps/your-app-name`
+You'll need to identify a target repository and install the bot by clicking the **Install** button on the settings page of your app, e.g `https://github.com/apps/your-app-name`
 
 
 ## Running the bot locally
