@@ -27,13 +27,14 @@ Please refer to the following instructions to setup Oppiabot for the first time 
     sudo apt-get install nodejs
     sudo apt-get install npm
   ```
+  For MacOS, run `sudo brew install node` to install Node.Js and NPM.
 
 3. Setup probot and other dependencies by running the following command:
   ```bash
     npm install
   ```
 
-4. The Oppiabot uses environment variables. These are configured in the server settings. To deploy the bot locally, create a `.env` file and copy the contents of `.env.example` to it.
+4. The Oppiabot uses environment variables. These are configured in the server settings. To deploy the bot locally, create a `.env` file and copy the contents of `.env.example` to it. You will need to adjust these variables accordingly following the instructions in the subsequent steps.
 
 5. Go to [smee.io](https://smee.io/) and click **Start a new channel**. Set `WEBHOOK_PROXY_URL` in `.env` to the URL that you are redirected to.
 
@@ -43,7 +44,7 @@ Please refer to the following instructions to setup Oppiabot for the first time 
     * **Permissions & events** is located lower down the page and will depend on what data you want the bot to have access to. Currently, the bot requires read and write access to issues and pull requests and read-only access to the file in the path `.github/stale.yml`.  
     If, for example, you only enable issue events, you will not be able to listen on pull request webhooks with the bot.
 
-7. Download the private key. It will be a `.pem` file. Move it to the root directory. As long as it's in the root directory, it will be automatically detected regardless of the filename.
+7. Download the private key. It will be a `.pem` file. Move it to the root directory of the project. As long as it's in the root directory, it will be automatically detected regardless of the filename.
 
 8. Edit `.env` and set `APP_ID` to the ID of the app you just created. The App ID can be found in your app settings page here.
 
@@ -74,7 +75,7 @@ To turn on verbose logging, start server by running: `$ LOG_LEVEL=trace npm star
 
 ## Support
 
-If you have any feature requests or bug reports, please log them on our [issue tracker](https://github.com/oppia/oppiabot/issues/new?title=Describe%20your%20feature%20request%20or%20bug%20report%20succinctly&body=If%20you%27d%20like%20to%20propose%20a%20feature,%20describe%20what%20you%27d%20like%20to%20see.%20Mock%20ups%20would%20be%20great!%0A%0AIf%20you%27re%20reporting%20a%20bug,%20please%20be%20sure%20to%20include%20the%20expected%20behaviour,%20the%20observed%20behaviour,%20and%20steps%20to%20reproduce%20the%20problem.%20Console%20copy-pastes%20and%20any%20background%20on%20the%20environment%20would%20also%20be%20helpful.%0A%0AThanks!).
+If you have any feature requests or bug reports, please log them on our [issue tracker](https://github.com/oppia/oppiabot/issues/new?title=Describe%20your%20feature%20request%20or%20bug%20report%20succinctly&body=If%20you%27d%20like%20to%20propose%20a%20feature,%20describe%20what%20you%27d%20like%20to%20see.%20Mockups%20would%20be%20great!%0A%0AIf%20you%27re%20reporting%20a%20bug,%20please%20be%20sure%20to%20include%20the%20expected%20behaviour,%20the%20observed%20behaviour,%20and%20steps%20to%20reproduce%20the%20problem.%20Console%20copy-pastes%20and%20any%20background%20on%20the%20environment%20would%20also%20be%20helpful.%0A%0AIf%20the%20issue%20you%27re%20facing%20is%20probot-specific,%20it%20should%20be%20logged%20to%20the%20probot%20repository.%0A%0AThanks!).
 
 Please report security issues directly to admin@oppia.org.
 
