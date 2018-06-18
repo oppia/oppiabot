@@ -1,0 +1,37 @@
+{
+  "name": "oppia-bot",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Apurv Bajaj <apurvabajaj007@gmail.com>",
+  "license": "Apache 2.0",
+  "repository": "https://github.com/apb7/oppia-bot.git",
+  "scripts": {
+    "start": "probot run ./index.js",
+    "test": "jest && standard"
+  },
+  "dependencies": {
+    "google-auth-library": "^0.12.0",
+    "googleapis": "^25.0.0",
+    "probot": "^5.0.0",
+    "probot-stale": "probot/stale"
+  },
+  "probot": {
+    "apps": [
+      "probot-stale"
+    ]
+  },
+  "devDependencies": {
+    "jest": "^21.2.1",
+    "smee-client": "^1.0.1",
+    "standard": "^10.0.3"
+  },
+  "engines": {
+    "node": ">= 7.7.0",
+    "npm": ">= 4.0.0"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ]
+  }
+}
