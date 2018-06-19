@@ -169,7 +169,7 @@ module.exports = (robot) => {
 
   var checkMergeConflicts = function(context) {
     console.log('LIST OF ALL PRs');
-    console.log(context.pullRequests.getAll(context.repo()));
+    console.log(context.github.pullRequests.getAll(context.repo()));
   };
 
   /*
