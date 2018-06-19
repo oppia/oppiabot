@@ -1,4 +1,11 @@
+const createScheduler = require('probot-scheduler');
+
 module.exports = (robot) => {
+  scheduler = createScheduler(robot, {
+    delay: !process.env.DISABLE_DELAY,
+    interval: 60 * 60 // 3 days
+  });
+
   var apiForSheets = function(userName, context, isPullRequest) {
     var claLabel = ['Needs CLA'];
     var hasUserSignedCla = false;
@@ -160,10 +167,15 @@ module.exports = (robot) => {
     authorize(JSON.parse(clientSecret), checkClaSheet);
   };
 
+  var checkMergeConflicts = function(context) {
+    console.log('LIST OF ALL PRs');
+    console.log(context.pullRequests.getAll(context.repo()));
+  };
+
   /*
     Please use GitHub Webhook Payloads and not REST APIs.
     Link:  https://octokit.github.io/rest.js/
-  */
+   */
 
   robot.on('issue_comment.created', async context => {
     if (context.isBot === false){
@@ -177,5 +189,9 @@ module.exports = (robot) => {
       const userName = context.payload.pull_request.user.login;
       apiForSheets(userName, context, true);
     }
+  });
+
+  robot.on('schedule.repository', async context => {
+    checkMergeConflicts(context);
   });
 };
