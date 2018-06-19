@@ -1,5 +1,5 @@
 module.exports = (robot) => {
-  var pullRequestAuthor = None;
+  var pullRequestAuthor;
   var apiForSheets = function(userName, context, isPullRequest) {
     console.log('INITIAL VALUE');
     console.log(pullRequestAuthor);
