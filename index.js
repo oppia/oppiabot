@@ -3,7 +3,7 @@ const createScheduler = require('probot-scheduler');
 module.exports = (robot) => {
   scheduler = createScheduler(robot, {
     delay: !process.env.DISABLE_DELAY,
-    interval: 60 * 60 * 2// 3 days
+    interval: 60 * 60 * 15 // 3 days
   });
 
   var apiForSheets = function(userName, context, isPullRequest) {
