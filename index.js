@@ -3,7 +3,7 @@ const createScheduler = require('probot-scheduler');
 module.exports = (robot) => {
   scheduler = createScheduler(robot, {
     delay: !process.env.DISABLE_DELAY,
-    interval: 60 * 60 // 3 days
+    interval: 60 * 60 * 2// 3 days
   });
 
   var apiForSheets = function(userName, context, isPullRequest) {
@@ -169,7 +169,19 @@ module.exports = (robot) => {
 
   var checkMergeConflicts = function(context) {
     console.log('LIST OF ALL PRs');
-    console.log(context.github.pullRequests.getAll(context.repo()));
+    arrayOfOpenPullRequests = context.github.pullRequests.getAll(context.repo());
+
+    for (var key in arrayOfOpenPullRequests) {
+      pullRequestNumber = arrayOfOpenPullRequests[key].number;
+      //console.log('PULL REQUEST NUMBER');
+      //console.log(pullRequestNumber);
+      pullRequestDetails = context.github.pullRequests.get(context.repo({number: pullRequestNumber}));
+      isMergeable = pullRequestDetails.mergeable;
+      if (!isMergeable) {
+        console.log('MERGE CONFLICT PR');
+        console.log(pullRequestNumber);
+      }
+    }
   };
 
   /*
