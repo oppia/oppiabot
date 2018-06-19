@@ -179,7 +179,7 @@ module.exports = (robot) => {
       isMergeable = pullRequestDetails.mergeable;
       if (!isMergeable) {
         console.log('MERGE CONFLICT PR');
-        console.log(pullRequestNumber);
+        console.log(typeof pullRequestNumber);
       }
     }
   };
