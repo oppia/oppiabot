@@ -1,8 +1,6 @@
 module.exports = (robot) => {
   var pullRequestAuthor;
   var apiForSheets = function(userName, context, isPullRequest) {
-    console.log('INITIAL VALUE');
-    console.log(pullRequestAuthor);
     var claLabel = ['Needs CLA'];
     var hasUserSignedCla = false;
     var spreadsheetId = process.env.SPREADSHEET_ID;
