@@ -3,7 +3,7 @@ const createScheduler = require('probot-scheduler');
 module.exports = (robot) => {
   scheduler = createScheduler(robot, {
     delay: !process.env.DISABLE_DELAY,
-    interval: 60 * 60 * 5 // 3 days
+    interval: 60 * 60 * 1000 * 24 * 3 // 3 days
   });
 
   var pullRequestAuthor;
@@ -177,20 +177,19 @@ module.exports = (robot) => {
   };
 
   var checkMergeConflicts = function(context) {
-    /*
     arrayOfOpenPullRequests = (
       context.github.pullRequests.getAll(context.repo()));
-    */
-    // for (var index in arrayOfOpenPullRequests) {
-      // pullRequestNumber = arrayOfOpenPullRequests[index].number;
+    for (var index in arrayOfOpenPullRequests) {
+      pullRequestNumber = arrayOfOpenPullRequests[index].number;
       console.log('INSIDE THE BLOCK');
       pullRequestDetails = context.github.pullRequests.get(
-        context.repo({number: 4740}));
+        context.repo({number: pullRequestNumber}));
       isMergeable = pullRequestDetails.mergeable;
       if (!isMergeable) {
         console.log('MERGE CONFLICT PR');
         console.log(pullRequestNumber);
       }
+    }
   };
 
   /*
