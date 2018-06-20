@@ -183,8 +183,7 @@ module.exports = (robot) => {
     for (var index in arrayOfOpenPullRequests) {
       pullRequestNumber = arrayOfOpenPullRequests[index].number;
       pullRequestDetails = context.github.pullRequests.get(
-        context.repo(
-          {number: pullRequestNumber}));
+        context.repo({number: pullRequestNumber}));
       isMergeable = pullRequestDetails.mergeable;
       if (!isMergeable) {
         console.log('MERGE CONFLICT PR');
