@@ -1,4 +1,5 @@
 module.exports = (robot) => {
+  var pullRequestAuthor;
   var apiForSheets = function(userName, context, isPullRequest) {
     var claLabel = ['Needs CLA'];
     var hasUserSignedCla = false;
@@ -103,54 +104,62 @@ module.exports = (robot) => {
           // eslint-disable-next-line no-console
           console.log('No data found.');
         } else {
-          for (var i = 0; i < rows.length; i++) {
-            var rowUserName = rows[i][0];
-            if (rowUserName === userName) {
-              hasUserSignedCla = true;
-              break;
-            }
-          }
-
           var params;
-          if (hasUserSignedCla === true) {
-            const labels = context.github.issues.getIssueLabels(
-              context.issue());
-            var labelData, claFlag = false;
-            labels.then((resp) => {
-              labelDataJSON = JSON.stringify(resp);
-              labelData = resp.data;
-              for (
-                var labelIndex = 0;
-                labelIndex < labelData.length;
-                labelIndex++) {
-                if (labelData[labelIndex].name === claLabel[0]) {
-                  claFlag = true;
+
+          const labels = context.github.issues.getIssueLabels(
+            context.issue());
+          var labelData;
+          var claFlag = false;
+          labels.then((resp) => {
+            labelData = resp.data;
+            for (var label in labelData) {
+              if (labelData[label].name === claLabel[0]) {
+                claFlag = true;
+                break;
+              }
+            }
+
+            if (claFlag === true) {
+              for (var row in rows) {
+                var rowUserName = rows[row][0];
+                if (rowUserName === userName) {
+                  hasUserSignedCla = true;
                   break;
                 }
               }
-              if (claFlag === true) {
+              if (hasUserSignedCla === true) {
                 context.github.issues.removeLabel(context.issue({
                   name: claLabel[0]
                 }));
               }
-            });
-            return;
-          } else {
-            var linkText = 'here';
-            var linkResult = linkText.link('https://goo.gl/forms/AttNH80OV0');
-            params = context.issue({
-              body: 'Hi! @' + userName +
-              '. Welcome to Oppia! Please could you ' +
-              'follow the instructions ' + linkResult +
-              ' to get started ? You\'ll need to do ' +
-              'this before we can accept your PR. Thanks!'});
-            if (isPullRequest === true) {
-              context.github.issues.addLabels(context.issue({
-                labels: claLabel
-              }));
+              return;
             }
-          }
-          return context.github.issues.createComment(params);
+
+            if (isPullRequest === true) {
+              for (var row in rows) {
+                var rowUserName = rows[row][0];
+                if (rowUserName === userName) {
+                  hasUserSignedCla = true;
+                  break;
+                }
+              }
+              if (hasUserSignedCla !== true) {
+                var linkText = 'here';
+                var linkResult = linkText.link(
+                  'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up');
+                params = context.issue({
+                  body: 'Hi! @' + userName +
+                  '. Welcome to Oppia! Please could you ' +
+                  'follow the instructions ' + linkResult +
+                  ' to get started ? You\'ll need to do ' +
+                  'this before we can accept your PR. Thanks!'});
+                context.github.issues.addLabels(context.issue({
+                  labels: claLabel
+                }));
+                return context.github.issues.createComment(params);
+              }
+            }
+          });
         }
       });
     };
@@ -166,15 +175,18 @@ module.exports = (robot) => {
   */
 
   robot.on('issue_comment.created', async context => {
-    if (context.isBot === false){
+    if (context.isBot === false) {
       const userName = context.payload.comment.user.login;
-      apiForSheets(userName, context, false);
+      if (pullRequestAuthor === userName) {
+        apiForSheets(userName, context, false);
+      }
     }
   });
 
   robot.on('pull_request.opened', async context => {
-    if (context.isBot === false){
+    if (context.isBot === false) {
       const userName = context.payload.pull_request.user.login;
+      pullRequestAuthor = userName;
       apiForSheets(userName, context, true);
     }
   });
