@@ -108,22 +108,20 @@ module.exports = (robot) => {
 
           const labels = context.github.issues.getIssueLabels(
             context.issue());
-          var labelData, claFlag = false;
+          var labelData;
+          var claFlag = false;
           labels.then((resp) => {
             labelData = resp.data;
-            for (
-              var labelIndex = 0;
-              labelIndex < labelData.length;
-              labelIndex++) {
-              if (labelData[labelIndex].name === claLabel[0]) {
+            for (var label in labelData) {
+              if (label.name === claLabel[0]) {
                 claFlag = true;
                 break;
               }
             }
 
             if (claFlag === true) {
-              for (var i = 0; i < rows.length; i++) {
-                var rowUserName = rows[i][0];
+              for (var row in rows) {
+                var rowUserName = row[0];
                 if (rowUserName === userName) {
                   hasUserSignedCla = true;
                   break;
@@ -138,8 +136,8 @@ module.exports = (robot) => {
             }
 
             if (isPullRequest === true) {
-              for (var i = 0; i < rows.length; i++) {
-                var rowUserName = rows[i][0];
+              for (var row in rows) {
+                var rowUserName = row[0];
                 if (rowUserName === userName) {
                   hasUserSignedCla = true;
                   break;
