@@ -3,7 +3,7 @@ const createScheduler = require('probot-scheduler');
 module.exports = (robot) => {
   scheduler = createScheduler(robot, {
     delay: !process.env.DISABLE_DELAY,
-    interval: 60 * 60 * 1000 // 3 days
+    interval: 60 * 60 * 3 // 3 days
   });
 
   var pullRequestAuthor;
@@ -178,6 +178,7 @@ module.exports = (robot) => {
 
   var checkMergeConflicts = function(context) {
     var mergeConflictLabel = ['Has Merge Conflicts'];
+    console.log('BLOCK STARTING RANDOM CHARACTERS ARE BEING WRITTEN DOWN IN THE LOG')
     arrayOfOpenPullRequests = (
       context.github.pullRequests.getAll(context.repo()));
     for (var index in arrayOfOpenPullRequests) {
