@@ -186,8 +186,8 @@ module.exports = (robot) => {
         context.repo({number: pullRequestNumber}));
       isMergeable = pullRequestDetails.mergeable;
       if (!isMergeable) {
-        robot.log.error('MERGE CONFLICT PR');
-        robot.log.error(pullRequestNumber);
+        console.log('MERGE CONFLICT PR');
+        console.log(pullRequestNumber);
       }
     }
   };
