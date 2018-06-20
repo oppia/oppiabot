@@ -113,7 +113,7 @@ module.exports = (robot) => {
           labels.then((resp) => {
             labelData = resp.data;
             for (var label in labelData) {
-              if (label.name === claLabel[0]) {
+              if (labelData[label].name === claLabel[0]) {
                 claFlag = true;
                 break;
               }
@@ -121,7 +121,7 @@ module.exports = (robot) => {
 
             if (claFlag === true) {
               for (var row in rows) {
-                var rowUserName = row[0];
+                var rowUserName = rows[row][0];
                 if (rowUserName === userName) {
                   hasUserSignedCla = true;
                   break;
@@ -137,7 +137,7 @@ module.exports = (robot) => {
 
             if (isPullRequest === true) {
               for (var row in rows) {
-                var rowUserName = row[0];
+                var rowUserName = rows[row][0];
                 if (rowUserName === userName) {
                   hasUserSignedCla = true;
                   break;
