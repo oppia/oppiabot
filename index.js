@@ -3,7 +3,7 @@ const createScheduler = require('probot-scheduler');
 module.exports = (robot) => {
   scheduler = createScheduler(robot, {
     delay: !process.env.DISABLE_DELAY,
-    interval: 60 * 60 * 1000 * 24 * 3 // 3 days
+    interval: 60 * 60 * 5 // 3 days
   });
 
   var pullRequestAuthor;
@@ -183,6 +183,7 @@ module.exports = (robot) => {
     */
     // for (var index in arrayOfOpenPullRequests) {
       // pullRequestNumber = arrayOfOpenPullRequests[index].number;
+      console.log('INSIDE THE BLOCK');
       pullRequestDetails = context.github.pullRequests.get(
         context.repo({number: 4740}));
       isMergeable = pullRequestDetails.mergeable;
