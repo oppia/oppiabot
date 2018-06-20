@@ -3,7 +3,7 @@ const createScheduler = require('probot-scheduler');
 module.exports = (robot) => {
   scheduler = createScheduler(robot, {
     delay: !process.env.DISABLE_DELAY,
-    interval: 60 * 60 * 3 // 3 days
+    interval: 60 * 60 * 1000 * 24 * 3 // 3 days
   });
 
   var pullRequestAuthor;
@@ -194,16 +194,33 @@ module.exports = (robot) => {
         const labels = pullRequestDetails.labels;
         var labelData;
         var hasMergeConflictLabel = false;
-        labels.then((resp) => {
-          labelData = resp.data;
-          for (var label in labelData) {
-            if (labelData[label].name === mergeConflictLabel[0]) {
-              hasMergeConflictLabel = true;
-              break;
-            }
+        labelData = resp.data;
+        for (var label in labelData) {
+          if (labelData[label].name === mergeConflictLabel[0]) {
+            hasMergeConflictLabel = true;
+            break;
           }
-        });
-        break;
+        }
+
+        if (!hasMergeConflictLabel) {
+          context.github.issues.addLabels(context.repo({
+            number: pullRequestNumber,
+            labels: mergeConflictLabel
+          }));
+          userName = pullRequestDetails.user.login;
+          console.log('USER NAME');
+          console.log(userName);
+          var linkText = 'link';
+          var linkResult = linkText.link(
+            'https://help.github.com/articles/resolving-a-merge-conflict-using-the-command-line/');
+          params = context.repo({
+            number: pullRequestDetails,
+            body: 'Hi! @' + userName +
+              '. The latest commit in this PR has resulted in ' +
+              'a merge conflict. Please follow this ' + linkResult +
+              ' if you need help to resolve the conflict. Thanks!'});
+          return context.github.issues.createComment(params);
+        }
       }
     }
   };
