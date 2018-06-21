@@ -184,7 +184,7 @@ module.exports = (robot) => {
     arrayOfOpenPullRequests = pullRequestsPromiseObj.data;
     var hasMergeConflictLabel;
     for (var indexOfPullRequest in arrayOfOpenPullRequests) {
-      pullRequestNumber = await arrayOfOpenPullRequests[
+      pullRequestNumber = arrayOfOpenPullRequests[
         indexOfPullRequest].number;
       pullRequestDetailsPromiseObj = await context.github.pullRequests.get(
         context.repo({number: pullRequestNumber}));
@@ -206,7 +206,7 @@ module.exports = (robot) => {
         var linkText = 'link';
         var linkResult = linkText.link(
           'https://help.github.com/articles/resolving-a-merge-conflict-using-the-command-line/');
-        var params = await context.repo({
+        var params = context.repo({
           number: pullRequestNumber,
           body: 'Hi @' + userName +
             '. The latest commit in this PR has resulted in ' +
