@@ -8,7 +8,7 @@ module.exports = (robot) => {
 
   var pullRequestAuthor;
   var apiForSheets = function(userName, context, isPullRequest) {
-    var claLabel = ['Needs CLA'];
+    var claLabel = ['PR: don\'t merge - NEEDS CLA'];
     var hasUserSignedCla = false;
     var spreadsheetId = process.env.SPREADSHEET_ID;
     // Google Sheets API v4
@@ -176,51 +176,53 @@ module.exports = (robot) => {
     authorize(JSON.parse(clientSecret), checkClaSheet);
   };
 
-  var checkMergeConflicts = function(context) {
+  var checkMergeConflicts = async function(context) {
     var mergeConflictLabel = ['Has Merge Conflicts'];
-    console.log('BLOCK STARTING RANDOM CHARACTERS ARE BEING WRITTEN DOWN IN THE LOG')
-    arrayOfOpenPullRequests = (
-      context.github.pullRequests.getAll(context.repo()));
-    for (var index in arrayOfOpenPullRequests) {
-      pullRequestNumber = arrayOfOpenPullRequests[index].number;
-      console.log('INSIDE THE BLOCK');
-      pullRequestDetails = context.github.pullRequests.get(
+    pullRequestsPromiseObj = await context.github.pullRequests.getAll(
+      context.repo());
+
+    arrayOfOpenPullRequests = pullRequestsPromiseObj.data;
+    var hasMergeConflictLabel;
+    for (var indexOfPullRequest in arrayOfOpenPullRequests) {
+      pullRequestNumber = await arrayOfOpenPullRequests[
+        indexOfPullRequest].number;
+      pullRequestDetailsPromiseObj = await context.github.pullRequests.get(
         context.repo({number: pullRequestNumber}));
+
+      pullRequestDetails = pullRequestDetailsPromiseObj.data;
+      hasMergeConflictLabel = false;
+      labels = pullRequestDetails.labels;
+      for (var label in labels) {
+        if (labels[label].name === mergeConflictLabel[0]) {
+          hasMergeConflictLabel = true;
+          break;
+        }
+      }
+
       isMergeable = pullRequestDetails.mergeable;
-      if (!isMergeable) {
-        console.log('MERGE CONFLICT PR');
-        console.log(pullRequestNumber);
 
-        const labels = pullRequestDetails.labels;
-        var labelData;
-        var hasMergeConflictLabel = false;
-        labelData = resp.data;
-        for (var label in labelData) {
-          if (labelData[label].name === mergeConflictLabel[0]) {
-            hasMergeConflictLabel = true;
-            break;
-          }
-        }
+      if (hasMergeConflictLabel === false && isMergeable === false) {
+        userName = pullRequestDetails.user.login;
+        var linkText = 'link';
+        var linkResult = linkText.link(
+          'https://help.github.com/articles/resolving-a-merge-conflict-using-the-command-line/');
+        var params = await context.repo({
+          number: pullRequestNumber,
+          body: 'Hi @' + userName +
+            '. The latest commit in this PR has resulted in ' +
+            'a merge conflict. Please follow this ' + linkResult +
+            ' if you need help to resolve the conflict. Thanks!'});
+        labelPromiseObj = await context.github.issues.addLabels(context.repo({
+          number: pullRequestNumber,
+          labels: mergeConflictLabel}));
+        await context.github.issues.createComment(params);
+      }
 
-        if (!hasMergeConflictLabel) {
-          context.github.issues.addLabels(context.repo({
-            number: pullRequestNumber,
-            labels: mergeConflictLabel
-          }));
-          userName = pullRequestDetails.user.login;
-          console.log('USER NAME');
-          console.log(userName);
-          var linkText = 'link';
-          var linkResult = linkText.link(
-            'https://help.github.com/articles/resolving-a-merge-conflict-using-the-command-line/');
-          params = context.repo({
-            number: pullRequestDetails,
-            body: 'Hi! @' + userName +
-              '. The latest commit in this PR has resulted in ' +
-              'a merge conflict. Please follow this ' + linkResult +
-              ' if you need help to resolve the conflict. Thanks!'});
-          return context.github.issues.createComment(params);
-        }
+      if (hasMergeConflictLabel === true && isMergeable === true) {
+        await context.github.issues.removeLabel(context.repo({
+          number: pullRequestNumber,
+          name: mergeConflictLabel[0]
+        }));
       }
     }
   };
@@ -248,6 +250,6 @@ module.exports = (robot) => {
   });
 
   robot.on('schedule.repository', async context => {
-    checkMergeConflicts(context);
+    await checkMergeConflicts(context);
   });
 };
