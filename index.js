@@ -1,7 +1,14 @@
+const createScheduler = require('probot-scheduler');
+
 module.exports = (robot) => {
+  scheduler = createScheduler(robot, {
+    delay: !process.env.DISABLE_DELAY,
+    interval: 60 * 60 * 1000 * 24 * 3 // 3 days
+  });
+
   var pullRequestAuthor;
   var apiForSheets = function(userName, context, isPullRequest) {
-    var claLabel = ['Needs CLA'];
+    var claLabel = ['PR: don\'t merge - NEEDS CLA'];
     var hasUserSignedCla = false;
     var spreadsheetId = process.env.SPREADSHEET_ID;
     // Google Sheets API v4
@@ -169,10 +176,61 @@ module.exports = (robot) => {
     authorize(JSON.parse(clientSecret), checkClaSheet);
   };
 
+  var checkMergeConflicts = async function(context) {
+    var mergeConflictLabel = ['PR: don\'t merge - HAS MERGE CONFLICTS'];
+    pullRequestsPromiseObj = await context.github.pullRequests.getAll(
+      context.repo());
+
+    arrayOfOpenPullRequests = pullRequestsPromiseObj.data;
+    var hasMergeConflictLabel;
+    for (var indexOfPullRequest in arrayOfOpenPullRequests) {
+      pullRequestNumber = arrayOfOpenPullRequests[
+        indexOfPullRequest].number;
+      pullRequestDetailsPromiseObj = await context.github.pullRequests.get(
+        context.repo({number: pullRequestNumber}));
+
+      pullRequestDetails = pullRequestDetailsPromiseObj.data;
+      hasMergeConflictLabel = false;
+      labels = pullRequestDetails.labels;
+      for (var label in labels) {
+        if (labels[label].name === mergeConflictLabel[0]) {
+          hasMergeConflictLabel = true;
+          break;
+        }
+      }
+
+      isMergeable = pullRequestDetails.mergeable;
+
+      if (hasMergeConflictLabel === false && isMergeable === false) {
+        userName = pullRequestDetails.user.login;
+        var linkText = 'link';
+        var linkResult = linkText.link(
+          'https://help.github.com/articles/resolving-a-merge-conflict-using-the-command-line/');
+        var params = context.repo({
+          number: pullRequestNumber,
+          body: 'Hi @' + userName +
+            '. The latest commit in this PR has resulted in ' +
+            'a merge conflict. Please follow this ' + linkResult +
+            ' if you need help to resolve the conflict. Thanks!'});
+        labelPromiseObj = await context.github.issues.addLabels(context.repo({
+          number: pullRequestNumber,
+          labels: mergeConflictLabel}));
+        await context.github.issues.createComment(params);
+      }
+
+      if (hasMergeConflictLabel === true && isMergeable === true) {
+        await context.github.issues.removeLabel(context.repo({
+          number: pullRequestNumber,
+          name: mergeConflictLabel[0]
+        }));
+      }
+    }
+  };
+
   /*
     Please use GitHub Webhook Payloads and not REST APIs.
     Link:  https://octokit.github.io/rest.js/
-  */
+   */
 
   robot.on('issue_comment.created', async context => {
     if (context.isBot === false) {
@@ -189,5 +247,9 @@ module.exports = (robot) => {
       pullRequestAuthor = userName;
       apiForSheets(userName, context, true);
     }
+  });
+
+  robot.on('schedule.repository', async context => {
+    await checkMergeConflicts(context);
   });
 };
