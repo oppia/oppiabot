@@ -179,7 +179,7 @@ module.exports = (robot) => {
   var checkMergeConflicts = async function(context) {
     var mergeConflictLabel = ['PR: don\'t merge - HAS MERGE CONFLICTS'];
     pullRequestsPromiseObj = await context.github.pullRequests.getAll(
-      context.repo());
+      context.repo({per_page: 40}));
 
     arrayOfOpenPullRequests = pullRequestsPromiseObj.data;
     var hasMergeConflictLabel;
