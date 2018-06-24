@@ -1,6 +1,6 @@
 const createScheduler = require('probot-scheduler');
 var apiForSheetsModule = require('./lib/apiForSheets');
-var checkMergeConflicts = require('./lib/checkMergeConflicts');
+var checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 var pullRequestAuthor;
 
 module.exports = (robot) => {
@@ -27,6 +27,6 @@ module.exports = (robot) => {
   });
 
   robot.on('schedule.repository', async context => {
-    await checkMergeConflicts(context);
+    await checkMergeConflictsModule.checkMergeConflicts(context);
   });
 };
