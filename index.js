@@ -27,7 +27,7 @@ module.exports = (robot) => {
     }
   });
 
-  robot.on('schedule.repository', async context => {
+  /*robot.on('schedule.repository', async context => {
     await checkMergeConflicts(context);
-  });
+  });*/
 };
