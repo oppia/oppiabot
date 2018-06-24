@@ -1,6 +1,5 @@
 const createScheduler = require('probot-scheduler');
 var apiForSheetsModule = require('./lib/apiForSheets');
-var apiForSheets = apiForSheetsModule.apiForSheets;
 var checkMergeConflicts = require('./lib/checkMergeConflicts');
 var pullRequestAuthor;
 
@@ -14,7 +13,7 @@ module.exports = (robot) => {
     if (context.isBot === false) {
       const userName = context.payload.comment.user.login;
       if (pullRequestAuthor === userName) {
-        apiForSheets(userName, context, false);
+        apiForSheetsModule.apiForSheets(userName, context, false);
       }
     }
   });
@@ -23,7 +22,7 @@ module.exports = (robot) => {
     if (context.isBot === false) {
       const userName = context.payload.pull_request.user.login;
       pullRequestAuthor = userName;
-      apiForSheets(userName, context, true);
+      apiForSheetsModule.apiForSheets(userName, context, true);
     }
   });
 
