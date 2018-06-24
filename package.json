@@ -7,11 +7,13 @@
   "repository": "https://github.com/apb7/oppia-bot.git",
   "scripts": {
     "start": "probot run ./index.js",
-    "test": "jest && standard"
+    "test": "./node_modules/.bin/jasmine"
   },
   "dependencies": {
+    "dotenv": "^6.0.0",
     "google-auth-library": "^0.12.0",
     "googleapis": "^25.0.0",
+    "jasmine": "^3.1.0",
     "probot": "^5.0.0",
     "probot-scheduler": "^1.2.0",
     "probot-stale": "probot/stale"
