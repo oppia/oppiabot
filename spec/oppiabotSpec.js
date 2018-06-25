@@ -20,7 +20,7 @@ describe('Oppiabot\'s', () => {
         createComment: jasmine.createSpy('createComment')
       }
     };
-      robot.auth = () => Promise.resolve(github);
+    robot.auth = () => Promise.resolve(github);
     done();
   });
 
