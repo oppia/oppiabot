@@ -69,14 +69,6 @@
           "default": false
         },
         {
-          "id": 268444720,
-          "node_id": "MDU6TGFiZWwyNjg0NDQ3MjA=",
-          "url": "https://api.github.com/repos/oppia/oppia/labels/PR:%20don't%20merge%20-%20NEEDS%20CLA",
-          "name": "PR: don't merge - NEEDS CLA",
-          "color": "e11d21",
-          "default": false
-        },
-        {
           "id": 638838928,
           "node_id": "MDU6TGFiZWw2Mzg4Mzg5Mjg=",
           "url": "https://api.github.com/repos/oppia/oppia/labels/PR:%20for%20current%20release",

@@ -1,7 +1,8 @@
 require('dotenv').config();
+
 const {createRobot} = require('probot');
 // The plugin refers to the actual app in index.js.
-const plugin = require('../index');
+const oppiaBotPlugin = require('../index');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkMergeConflictsModule = require('../lib/checkMergeConflicts');
 const pullRequestpayload = require('../fixtures/pullRequestPayload.json');
@@ -12,7 +13,7 @@ describe('Oppiabot\'s', () => {
 
   beforeEach(function (done) {
     robot = createRobot();
-    plugin(robot);
+    oppiaBotPlugin(robot);
 
     github = {
       issues: {
@@ -27,12 +28,13 @@ describe('Oppiabot\'s', () => {
     beforeEach(function (done) {
       spyOn(apiForSheetsModule, 'apiForSheets').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callThrough();
-      spyOn(apiForSheetsModule, 'checkClaSheet');
+      spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
+      spyOn(apiForSheetsModule, 'generateOutput').and.callThrough();
       robot.receive(pullRequestpayload);
       done();
     });
 
-    it('should be called', () => {
+    it('should be called for the given payload', () => {
       expect(apiForSheetsModule.apiForSheets).toHaveBeenCalled();
     });
 
@@ -81,6 +83,21 @@ describe('Oppiabot\'s', () => {
     it('should further call checkClaSheet with one argument', () => {
       expect(
         apiForSheetsModule.checkClaSheet.calls.argsFor(0).length).toEqual(1);
+    });
+
+    it('should further call generateOutput', () => {
+      expect(
+        apiForSheetsModule.generateOutput).toHaveBeenCalled();
+    });
+
+    it('should further call checkClaSheet with two arguments', () => {
+      expect(
+        apiForSheetsModule.generateOutput.calls.argsFor(0).length).toEqual(2);
+    });
+
+    it('should post a comment for the given payload', () => {
+      expect(
+        github.issues.createComment).toHaveBeenCalled();
     });
   });
 });
