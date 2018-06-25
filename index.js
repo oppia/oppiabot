@@ -1,6 +1,6 @@
 const createScheduler = require('probot-scheduler');
-var apiForSheetsModule = require('./lib/apiForSheets');
-var checkMergeConflictsModule = require('./lib/checkMergeConflicts');
+const apiForSheetsModule = require('./lib/apiForSheets');
+const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 var pullRequestAuthor;
 
 module.exports = (robot) => {
