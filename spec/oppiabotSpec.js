@@ -105,12 +105,12 @@ describe('Oppiabot\'s', () => {
         apiForSheetsModule.apiForSheets.calls.argsFor(0).length).toEqual(3);
     });
 
-    it('should be called with the' +
-    'correct username for the given payload', () => {
-      expect(
-        apiForSheetsModule.apiForSheets.calls.argsFor(0)[0])
-        .toEqual('testuser7777');
-    });
+    it('should be called with the correct username for the given payload',
+      () => {
+        expect(
+          apiForSheetsModule.apiForSheets.calls.argsFor(0)[0])
+          .toEqual('testuser7777');
+      });
 
     it('should be called for a pull request for the given payload', () => {
       expect(
