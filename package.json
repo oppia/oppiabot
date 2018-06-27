@@ -7,9 +7,10 @@
   "repository": "https://github.com/apb7/oppia-bot.git",
   "scripts": {
     "start": "probot run ./index.js",
-    "test": "jest && standard"
+    "test": "./node_modules/.bin/jasmine"
   },
   "dependencies": {
+    "dotenv": "^6.0.0",
     "google-auth-library": "^0.12.0",
     "googleapis": "^25.0.0",
     "probot": "^5.0.0",
@@ -22,7 +23,7 @@
     ]
   },
   "devDependencies": {
-    "jest": "^21.2.1",
+    "jasmine": "^3.1.0",
     "smee-client": "^1.0.1",
     "standard": "^10.0.3"
   },
@@ -32,7 +33,7 @@
   },
   "standard": {
     "env": [
-      "jest"
+      "jasmine"
     ]
   }
 }
