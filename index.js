@@ -1,6 +1,8 @@
 const createScheduler = require('probot-scheduler');
 const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
+const whitelistedAccounts = (
+  (process.env.WHITELISTED_ACCOUNTS || '').toLowerCase().split(','));
 var pullRequestAuthor;
 
 module.exports = (robot) => {
@@ -10,7 +12,9 @@ module.exports = (robot) => {
   });
 
   robot.on('issue_comment.created', async context => {
-    if (context.isBot === false) {
+    if (
+      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
+      context.isBot === false) {
       const userName = context.payload.comment.user.login;
       if (pullRequestAuthor === userName) {
         apiForSheetsModule.apiForSheets(userName, context, false);
@@ -19,7 +23,9 @@ module.exports = (robot) => {
   });
 
   robot.on('pull_request.opened', async context => {
-    if (context.isBot === false) {
+    if (
+      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
+      context.isBot === false) {
       const userName = context.payload.pull_request.user.login;
       pullRequestAuthor = userName;
       apiForSheetsModule.apiForSheets(userName, context, true);
@@ -27,6 +33,8 @@ module.exports = (robot) => {
   });
 
   robot.on('schedule.repository', async context => {
-    await checkMergeConflictsModule.checkMergeConflicts(context);
+    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+      await checkMergeConflictsModule.checkMergeConflicts(context);
+    }
   });
 };
