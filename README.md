@@ -10,7 +10,7 @@ The bot currently performs the following functions:
 
 1. Checks whether a contributor creating a pull request has signed the CLA. It adds a label `Needs CLA` accordingly.
 
-2. Checks merge conflict in a pull request and notifies the author of the pull request regarding the same.
+2. Checks merge conflict in a pull request and notifies the author of the pull request if there is a merge conflict.
 
 3. Closes stale pull requests.
 
