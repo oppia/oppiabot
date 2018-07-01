@@ -4,7 +4,7 @@
     <img src="images/oppiabot-display-image.png">
 </p>
 
-Oppiabot is a GitHub app built with [probot](https://github.com/probot/probot). It acts as a helper for the Oppia code respository to maintain the development workflow. It is hosted on [Heroku](https://www.heroku.com/).
+Oppiabot is a GitHub app built with [probot](https://github.com/probot/probot). It acts as a helper for the Oppia code repository to maintain the development workflow. It is hosted on [Heroku](https://www.heroku.com/).
 
 The bot currently performs the following functions:
 
