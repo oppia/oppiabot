@@ -4,13 +4,13 @@
     <img src="images/oppiabot-display-image.png">
 </p>
 
-Oppiabot is a GitHub app built with [probot](https://github.com/probot/probot). It acts as a helper for the Oppia code respository to maintain the development workflow. It is hosted on [Heroku](https://www.heroku.com/).
+Oppiabot is a GitHub app built with [probot](https://github.com/probot/probot). It acts as a helper for the Oppia code repository to maintain the development workflow. It is hosted on [Heroku](https://www.heroku.com/).
 
 The bot currently performs the following functions:
 
 1. Checks whether a contributor creating a pull request has signed the CLA. It adds a label `Needs CLA` accordingly.
 
-2. Checks merge conflict and build status of a pull request and notifies the author as well as the maintainer-on-duty regarding the same.
+2. Checks merge conflict in a pull request and notifies the author of the pull request if there is a merge conflict.
 
 3. Closes stale pull requests.
 
