@@ -1,10 +1,10 @@
 {
-  "name": "oppia-bot",
+  "name": "oppiabot",
   "version": "1.0.0",
   "description": "",
   "author": "Apurv Bajaj <apurvabajaj007@gmail.com>",
   "license": "Apache 2.0",
-  "repository": "https://github.com/apb7/oppia-bot.git",
+  "repository": "https://github.com/oppiabot/oppiabot.git",
   "scripts": {
     "start": "probot run ./index.js",
     "test": "./node_modules/.bin/jasmine"
@@ -15,7 +15,7 @@
     "googleapis": "^25.0.0",
     "probot": "^5.0.0",
     "probot-scheduler": "^1.2.0",
-    "probot-stale": "probot/stale"
+    "probot-stale": "github:oppia/oppiabot-stale"
   },
   "probot": {
     "apps": [
