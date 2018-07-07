@@ -15,7 +15,7 @@
     "googleapis": "^25.0.0",
     "probot": "^5.0.0",
     "probot-scheduler": "^1.2.0",
-    "probot-stale": "github:apb7/stale"
+    "probot-stale": "github:oppia/oppiabot-stale"
   },
   "probot": {
     "apps": [
