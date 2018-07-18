@@ -8,7 +8,7 @@ var pullRequestAuthor;
 module.exports = (robot) => {
   scheduler = createScheduler(robot, {
     delay: !process.env.DISABLE_DELAY,
-    interval: 60 * 60 * 1000 * 24 * 3 // 3 days
+    interval: 60 * 60 * 1000 // 1 hour
   });
 
   robot.on('issue_comment.created', async context => {
