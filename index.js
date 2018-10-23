@@ -1,3 +1,4 @@
+require ('newrelic');
 const createScheduler = require('probot-scheduler');
 const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
