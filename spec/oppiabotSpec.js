@@ -4,7 +4,8 @@ const {createRobot} = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBotPlugin = require('../index');
 const apiForSheetsModule = require('../lib/apiForSheets');
-const checkMergeConflictsModule = require('../lib/checkMergeConflicts');
+const checkMergeConflictsAndAssignReviewersModule =
+  require('../lib/checkMergeConflictsAndAssignReviewers');
 const pullRequestpayload = require('../fixtures/pullRequestPayload.json');
 
 describe('Oppiabot\'s', () => {
