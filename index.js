@@ -2,6 +2,7 @@ require ('newrelic');
 const createScheduler = require('probot-scheduler');
 const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
+const assignReviewersModule = require('./lib/assignReviewers');
 const whitelistedAccounts = (
   (process.env.WHITELISTED_ACCOUNTS || '').toLowerCase().split(','));
 var pullRequestAuthor;
@@ -36,6 +37,12 @@ module.exports = (robot) => {
   robot.on('schedule.repository', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await checkMergeConflictsModule.checkMergeConflicts(context);
+    }
+  });
+
+  robot.on('schedule.repository', async context => {
+    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+      await assignReviewersModule.assignReviewers(context);
     }
   });
 };
