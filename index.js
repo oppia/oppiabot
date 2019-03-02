@@ -23,7 +23,7 @@ module.exports = (robot) => {
     }
   });
 
-  robot.on('pull_request.opened', async context => {
+  robot.on('schedule.repository', async context => {
     if (
       whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
       context.isBot === false) {
