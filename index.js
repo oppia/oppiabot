@@ -12,30 +12,19 @@ module.exports = (robot) => {
     interval: 60 * 60 * 1000 // 1 hour
   });
 
-  robot.on('issue_comment.created', async context => {
-    if (
-      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
-      context.isBot === false) {
-      const userName = context.payload.comment.user.login;
-      if (pullRequestAuthor === userName) {
-        apiForSheetsModule.apiForSheets(userName, context, false);
-      }
-    }
-  });
-
-  robot.on('pull_request.opened', async context => {
-    if (
-      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
-      context.isBot === false) {
-      const userName = context.payload.pull_request.user.login;
-      pullRequestAuthor = userName;
-      apiForSheetsModule.apiForSheets(userName, context, true);
-    }
-  });
-
   robot.on('schedule.repository', async context => {
-    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+    if (
+      whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await checkMergeConflictsModule.checkMergeConflicts(context);
+      if (context.isBot === false) {
+        const userName_issue_comment = context.payload.comment.user.login;
+        if (pullRequestAuthor === userName_issue_comment) {
+          apiForSheetsModule.apiForSheets(userName_issue_comment, context, false);
+        }
+        const userName_pull_request = context.payload.pull_request.user.login;
+        pullRequestAuthor = userName_pull_request;
+        apiForSheetsModule.apiForSheets(userName_pull_request, context, true);
+      }
     }
   });
 };
