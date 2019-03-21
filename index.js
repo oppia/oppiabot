@@ -12,24 +12,9 @@ module.exports = (robot) => {
     interval: 60 * 60 * 1000 // 1 hour
   });
 
-  robot.on('issue_comment.created', async context => {
-    if (
-      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
-      context.isBot === false) {
-      const userName = context.payload.comment.user.login;
-      if (pullRequestAuthor === userName) {
-        apiForSheetsModule.apiForSheets(userName, context, false);
-      }
-    }
-  });
-
   robot.on('schedule.repository', async context => {
-    if (
-      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
-      context.isBot === false) {
-      const userName = context.payload.pull_request.user.login;
-      pullRequestAuthor = userName;
-      apiForSheetsModule.apiForSheets(userName, context, true);
+    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+      await apiForSheetsModule.apiForSheets(context);
     }
   });
 
