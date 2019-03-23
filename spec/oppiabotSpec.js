@@ -85,7 +85,7 @@ describe('Oppiabot\'s', () => {
 
   describe('apiForSheets', () => {
     beforeEach(function (done) {
-      spyOn(apiForSheetsModule, 'apiForSheets').and.callThrough();
+      spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callThrough();
       spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
       robot.receive(pullRequestpayload);
@@ -93,28 +93,28 @@ describe('Oppiabot\'s', () => {
     });
 
     it('should be called for the given payload', () => {
-      expect(apiForSheetsModule.apiForSheets).toHaveBeenCalled();
+      expect(apiForSheetsModule.checkClaStatus).toHaveBeenCalled();
     });
 
     it('should be called once for the given payload', () => {
-      expect(apiForSheetsModule.apiForSheets.calls.count()).toEqual(1);
+      expect(apiForSheetsModule.checkClaStatus.calls.count()).toEqual(1);
     });
 
     it('should be called with three arguments for the given payload', () => {
       expect(
-        apiForSheetsModule.apiForSheets.calls.argsFor(0).length).toEqual(3);
+        apiForSheetsModule.checkClaStatus.calls.argsFor(0).length).toEqual(3);
     });
 
     it('should be called with the correct username for the given payload',
       () => {
         expect(
-          apiForSheetsModule.apiForSheets.calls.argsFor(0)[0])
+          apiForSheetsModule.checkClaStatus.calls.argsFor(0)[0])
           .toEqual('testuser7777');
       });
 
     it('should be called for a pull request for the given payload', () => {
       expect(
-        apiForSheetsModule.apiForSheets.calls.argsFor(0)[2])
+        apiForSheetsModule.checkClaStatus.calls.argsFor(0)[2])
         .toEqual(true);
     });
 

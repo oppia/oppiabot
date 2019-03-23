@@ -13,8 +13,14 @@ module.exports = (robot) => {
   });
 
   robot.on('schedule.repository', async context => {
+    // The oppiabot runs only for repositories belonging to certain
+    // whitelisted accounts. The whitelisted accounts are stored as an
+    // env variable. context.repo().owner returns the owner of the
+    // repository on which the bot has been installed.
+    // This condition checks whether the owner account is included in
+    // the whitelisted accounts.
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
-      await apiForSheetsModule.apiForSheets(context);
+      await apiForSheetsModule.checkClaStatus(context);
     }
   });
 
