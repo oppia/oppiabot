@@ -12,24 +12,15 @@ module.exports = (robot) => {
     interval: 60 * 60 * 1000 // 1 hour
   });
 
-  robot.on('issue_comment.created', async context => {
-    if (
-      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
-      context.isBot === false) {
-      const userName = context.payload.comment.user.login;
-      if (pullRequestAuthor === userName) {
-        apiForSheetsModule.apiForSheets(userName, context, false);
-      }
-    }
-  });
-
   robot.on('schedule.repository', async context => {
-    if (
-      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
-      context.isBot === false) {
-      const userName = context.payload.pull_request.user.login;
-      pullRequestAuthor = userName;
-      apiForSheetsModule.apiForSheets(userName, context, true);
+    // The oppiabot runs only for repositories belonging to certain
+    // whitelisted accounts. The whitelisted accounts are stored as an
+    // env variable. context.repo().owner returns the owner of the
+    // repository on which the bot has been installed.
+    // This condition checks whether the owner account is included in
+    // the whitelisted accounts.
+    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+      await apiForSheetsModule.checkClaStatus(context);
     }
   });
 
