@@ -24,7 +24,7 @@ module.exports = (robot) => {
     }
   });
 
-  robot.on('schedule.repository', async context => {
+  robot.on('push', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await checkMergeConflictsModule.checkMergeConflicts(context);
     }
