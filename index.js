@@ -12,7 +12,7 @@ module.exports = (robot) => {
     interval: 60 * 60 * 1000 // 1 hour
   });
 
-  robot.on('schedule.repository', async context => {
+  robot.on('pull_request.opened', async context => {
     // The oppiabot runs only for repositories belonging to certain
     // whitelisted accounts. The whitelisted accounts are stored as an
     // env variable. context.repo().owner returns the owner of the
