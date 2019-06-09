@@ -31,7 +31,8 @@ module.exports = (robot) => {
   });
 
   robot.on('push', async context => {
-    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
+      context.payload.ref === "refs/head/develop") {
       await checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(context);
     }
   });
