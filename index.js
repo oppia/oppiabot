@@ -26,13 +26,17 @@ module.exports = (robot) => {
 
   robot.on('pull_request.synchronize', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+      // eslint-disable-next-line no-console
+      console.log(' PR SYNC EVENT TRIGGERED..');
       await checkMergeConflictsModule.checkMergeConflictsInPullRequest(context, context.payload.pull_request);
     }
   });
 
-  robot.on('push', async context => {
+  robot.on('pull_request.closed', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
-      context.payload.ref === "refs/head/develop") {
+      context.payload.pull_request.merged === true) {
+      // eslint-disable-next-line no-console
+      console.log(' A PR HAS BEEN MERGED..');
       await checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(context);
     }
   });
