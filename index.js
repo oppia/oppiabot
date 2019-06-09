@@ -24,9 +24,15 @@ module.exports = (robot) => {
     }
   });
 
-  robot.on('schedule.repository', async context => {
+  robot.on('pull_request.synchronize', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
-      await checkMergeConflictsModule.checkMergeConflicts(context);
+      await checkMergeConflictsModule.checkMergeConflictsInPullRequest(context, context.payload.pull_request);
+    }
+  });
+
+  robot.on('push', async context => {
+    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+      await checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(context);
     }
   });
 };
