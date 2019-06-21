@@ -24,9 +24,20 @@ module.exports = (robot) => {
     }
   });
 
-  robot.on('schedule.repository', async context => {
+  robot.on('pull_request.synchronize', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
-      await checkMergeConflictsModule.checkMergeConflicts(context);
+      // eslint-disable-next-line no-console
+      console.log(' PR SYNC EVENT TRIGGERED..');
+      await checkMergeConflictsModule.checkMergeConflictsInPullRequest(context, context.payload.pull_request);
+    }
+  });
+
+  robot.on('pull_request.closed', async context => {
+    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
+      context.payload.pull_request.merged === true) {
+      // eslint-disable-next-line no-console
+      console.log(' A PR HAS BEEN MERGED..');
+      await checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(context);
     }
   });
 };
