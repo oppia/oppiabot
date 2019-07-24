@@ -2,6 +2,7 @@ require ('newrelic');
 const createScheduler = require('probot-scheduler');
 const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
+const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
 const whitelistedAccounts = (
   (process.env.WHITELISTED_ACCOUNTS || '').toLowerCase().split(','));
 var pullRequestAuthor;
@@ -21,6 +22,13 @@ module.exports = (robot) => {
     // the whitelisted accounts.
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await apiForSheetsModule.checkClaStatus(context);
+      await checkPullRequestLabelsModule.checkPullRequestLabels(context);
+    }
+  });
+
+  robot.on('pull_request.reopened', async context => {
+    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+      await checkPullRequestLabelsModule.checkPullRequestLabels(context);
     }
   });
 
