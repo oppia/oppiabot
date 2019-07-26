@@ -22,13 +22,19 @@ module.exports = (robot) => {
     // the whitelisted accounts.
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await apiForSheetsModule.checkClaStatus(context);
-      await checkPullRequestLabelsModule.checkPullRequestLabels(context);
+      await checkPullRequestLabelsModule.checkChangelogLabel(context);
     }
   });
 
   robot.on('pull_request.reopened', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
-      await checkPullRequestLabelsModule.checkPullRequestLabels(context);
+      await checkPullRequestLabelsModule.checkChangelogLabel(context);
+    }
+  });
+
+  robot.on('pull_request.labeled', async context => {
+    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+      await checkPullRequestLabelsModule.checkProjectLabel(context);
     }
   });
 
