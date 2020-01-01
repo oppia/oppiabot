@@ -32,12 +32,6 @@ module.exports = (robot) => {
     }
   });
 
-  robot.on('pull_request.labeled', async context => {
-    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
-      await checkPullRequestLabelsModule.checkProjectLabel(context);
-    }
-  });
-
   robot.on('pull_request.synchronize', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       // eslint-disable-next-line no-console
