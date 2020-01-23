@@ -34,7 +34,7 @@ module.exports = (robot) => {
 
   robot.on('pull_request.labeled', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
-      await checkPullRequestLabelsModule.checkChangelogLabel(context);
+      await checkPullRequestLabelsModule.checkAssignee(context);
     }
   });
 
