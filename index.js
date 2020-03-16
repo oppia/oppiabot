@@ -3,6 +3,7 @@ const createScheduler = require('probot-scheduler');
 const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
+const checkPullRequestTitleForWIPModule = require('./lib/checkTitleForWIP');
 const whitelistedAccounts = (
   (process.env.WHITELISTED_ACCOUNTS || '').toLowerCase().split(','));
 var pullRequestAuthor;
@@ -23,12 +24,20 @@ module.exports = (robot) => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await apiForSheetsModule.checkClaStatus(context);
       await checkPullRequestLabelsModule.checkChangelogLabel(context);
+      await checkPullRequestTitleForWIPModule.checkTitleForWIP(context);
     }
   });
 
   robot.on('pull_request.reopened', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await checkPullRequestLabelsModule.checkChangelogLabel(context);
+      await checkPullRequestTitleForWIPModule.checkTitleForWIP(context);
+    }
+  });
+
+  robot.on('pull_request.edited', async context => {
+    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+      await checkPullRequestTitleForWIPModule.checkTitleForWIP(context);
     }
   });
 
