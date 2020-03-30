@@ -11,8 +11,7 @@ var pullRequestAuthor;
 module.exports = (robot) => {
   scheduler = createScheduler(robot, {
     delay: !process.env.DISABLE_DELAY,
-    //interval: 60 * 60 * 1000 // 1 hour
-    interval: 1000 // 1 second
+    interval: 60 * 60 * 1000 // 1 hour
   });
 
   robot.on('pull_request.opened', async context => {
