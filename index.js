@@ -3,6 +3,7 @@ const createScheduler = require('probot-scheduler');
 const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
+const periodicChecksModule = require('./lib/periodicChecks');
 const whitelistedAccounts = (
   (process.env.WHITELISTED_ACCOUNTS || '').toLowerCase().split(','));
 var pullRequestAuthor;
@@ -10,7 +11,7 @@ var pullRequestAuthor;
 module.exports = (robot) => {
   scheduler = createScheduler(robot, {
     delay: !process.env.DISABLE_DELAY,
-    interval: 60 * 60 * 1000 // 1 hour
+    interval: 60 * 60 * 24 * 1000 // 24 hours
   });
 
   robot.on('pull_request.opened', async context => {
@@ -52,6 +53,14 @@ module.exports = (robot) => {
       // eslint-disable-next-line no-console
       console.log(' A PR HAS BEEN MERGED..');
       await checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(context);
+    }
+  });
+
+
+  robot.on('schedule.repository', async context => {
+    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+      console.log('Periodic Check...');
+      await periodicChecksModule.assignReviewers(context);
     }
   });
 };
