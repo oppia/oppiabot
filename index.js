@@ -56,9 +56,9 @@ module.exports = (robot) => {
     }
   });
 
-
   robot.on('schedule.repository', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+      // eslint-disable-next-line no-console
       console.log('Periodic Check...');
       await periodicChecksModule.assignReviewers(context);
     }
