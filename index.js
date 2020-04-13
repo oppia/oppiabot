@@ -58,8 +58,9 @@ module.exports = (robot) => {
 
   robot.on('schedule.repository', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+      // This check is triggered once every 24 hours by the scheduler.
       // eslint-disable-next-line no-console
-      console.log('Periodic Check...');
+      console.log('Periodic Checks...');
       await periodicChecksModule.assignReviewers(context);
     }
   });
