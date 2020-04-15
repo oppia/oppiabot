@@ -9,6 +9,9 @@ const pullRequestpayload = require('../fixtures/pullRequestPayload.json');
 
 describe('Oppiabot\'s', () => {
   let robot;
+  /**
+   * @type {import('probot').Octokit} context
+   */
   let github;
 
   beforeEach(function (done) {
@@ -39,42 +42,42 @@ describe('Oppiabot\'s', () => {
               'we can accept your PR. Thanks!'
           }
         }),
-        getIssueLabels: jasmine.createSpy('getIssueLabels').and.returnValue({
+        listLabelsOnIssue: jasmine.createSpy('listLabelsOnIssue').and.returnValue({
           data:
-            [
-              {
-                id: 248679580,
-                node_id: 'MDU6TGFiZWwyNDg2Nzk1ODA=',
-                url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20LGTM',
-                name: 'PR: LGTM',
-                color: '009800',
-                'default': false
-              },
-              {
-                id: 971968901,
-                node_id: 'MDU6TGFiZWw5NzE5Njg5MDE=',
-                url: "https://api.github.com/repos/oppia/oppia/labels/PR:%20don't%20merge%20-%20HAS%20MERGE%20CONFLICTS",
-                name: "PR: don't merge - HAS MERGE CONFLICTS",
-                color: 'd93f0b',
-                'default': false
-              },
-              {
-                id: 638838928,
-                node_id: 'MDU6TGFiZWw2Mzg4Mzg5Mjg=',
-                url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20for%20current%20release',
-                name: 'PR: for current release',
-                color: 'FF69B4',
-                'default': false
-              },
-              {
-                id: 638839900,
-                node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-                url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-                name: 'PR: released',
-                color: '00FF00',
-                'default': false
-              }
-            ]
+          [
+            {
+              id: 248679580,
+              node_id: 'MDU6TGFiZWwyNDg2Nzk1ODA=',
+              url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20LGTM',
+              name: 'PR: LGTM',
+              color: '009800',
+              'default': false
+            },
+            {
+              id: 971968901,
+              node_id: 'MDU6TGFiZWw5NzE5Njg5MDE=',
+              url: "https://api.github.com/repos/oppia/oppia/labels/PR:%20don't%20merge%20-%20HAS%20MERGE%20CONFLICTS",
+              name: "PR: don't merge - HAS MERGE CONFLICTS",
+              color: 'd93f0b',
+              'default': false
+            },
+            {
+              id: 638838928,
+              node_id: 'MDU6TGFiZWw2Mzg4Mzg5Mjg=',
+              url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20for%20current%20release',
+              name: 'PR: for current release',
+              color: 'FF69B4',
+              'default': false
+            },
+            {
+              id: 638839900,
+              node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+              url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+              name: 'PR: released',
+              color: '00FF00',
+              'default': false
+            }
+          ]
         }),
         removeLabel: jasmine.createSpy('removeLabel')
       }
