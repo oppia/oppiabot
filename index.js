@@ -4,9 +4,12 @@ const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
 const periodicChecksModule = require('./lib/periodicChecks');
+const handlePrReviewModule = require('./lib/handlePullRequestReview');
+
 const whitelistedAccounts = (
   (process.env.WHITELISTED_ACCOUNTS || '').toLowerCase().split(','));
 var pullRequestAuthor;
+
 
 module.exports = (robot) => {
   scheduler = createScheduler(robot, {
@@ -53,6 +56,14 @@ module.exports = (robot) => {
       // eslint-disable-next-line no-console
       console.log(' A PR HAS BEEN MERGED..');
       await checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(context);
+    }
+  });
+
+  robot.on('pull_request_review.submitted', async context => {
+    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+      // eslint-disable-next-line no-console
+      console.log('A PR HAS BEEN REVIEWED..');
+      await handlePrReviewModule.pullRequestReviewed(context);
     }
   });
 
