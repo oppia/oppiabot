@@ -14,7 +14,7 @@ describe('Oppiabot\'s', () => {
    */
   let github;
 
-  beforeEach(function (done) {
+  beforeEach(function(done) {
     robot = createRobot();
     oppiaBotPlugin(robot);
 
@@ -87,7 +87,7 @@ describe('Oppiabot\'s', () => {
   });
 
   describe('apiForSheets', () => {
-    beforeEach(function (done) {
+    beforeEach(function(done) {
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callThrough();
       spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
@@ -151,7 +151,7 @@ describe('Oppiabot\'s', () => {
       var commentCreatedStatus = await apiForSheetsModule.generateOutput(
         [['apb7'], ['kevinlee12']]);
       expect(
-        github.issues.getIssueLabels).toHaveBeenCalled();
+        github.issues.listLabelsOnIssue).toHaveBeenCalled();
       expect(
         github.issues.removeLabel).not.toHaveBeenCalled();
     });
@@ -160,7 +160,7 @@ describe('Oppiabot\'s', () => {
       var commentCreatedStatus = await apiForSheetsModule.generateOutput(
         [['apb7'], ['kevinlee12']]);
       expect(
-        github.issues.getIssueLabels).toHaveBeenCalled();
+        github.issues.listLabelsOnIssue).toHaveBeenCalled();
       expect(
         github.issues.addLabels).toHaveBeenCalled();
     });
