@@ -1,5 +1,5 @@
 require ('newrelic');
-const createScheduler = require('probot-scheduler');
+const scheduler = require('./lib/scheduler');
 const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
@@ -8,7 +8,7 @@ const whitelistedAccounts = (
 var pullRequestAuthor;
 
 module.exports = (robot) => {
-  scheduler = createScheduler(robot, {
+  scheduler.createScheduler(robot, {
     delay: !process.env.DISABLE_DELAY,
     interval: 60 * 60 * 1000 // 1 hour
   });
