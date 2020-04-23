@@ -7,7 +7,7 @@ const whitelistedAccounts = (
   (process.env.WHITELISTED_ACCOUNTS || '').toLowerCase().split(','));
 
 /**
- * This is the main entrypoint to your Probot app
+ * This is the main entrypoint to the Probot app
  * @param {import('probot').Application} app
  */
 module.exports = (app) => {
