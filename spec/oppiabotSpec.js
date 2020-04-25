@@ -1,24 +1,30 @@
 require('dotenv').config();
-const nock = require('nock');
 const {createProbot} = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkMergeConflictsModule = require('../lib/checkMergeConflicts');
+const scheduler = require('../lib/scheduler');
 const pullRequestpayload = require('../fixtures/pullRequestPayload.json');
 
 describe('Oppiabot\'s', () => {
-  let robot;
   /**
-   * @type {import('probot').Octokit} context
+   * @type {import('probot').Probot} robot
+   */
+  let robot;
+
+  /**
+   * @type {import('probot').Octokit} github
    */
   let github;
 
-  beforeEach(function (done) {
-    nock.disableNetConnect();
-    robot = createProbot({ id: 1, cert: 'test', githubToken: 'test' });
-    robot.load(oppiaBot);
+  /**
+   * @type {import('probot').Application} app
+   */
+  let app;
 
+  beforeEach(function (done) {
+    spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
       issues: {
@@ -81,10 +87,19 @@ describe('Oppiabot\'s', () => {
             }
           ]
         }),
-        removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({})
+        removeLabel: jasmine.createSpy('removeLabel').and.returnValue({})
       }
     };
-    robot.auth = () => Promise.resolve(github);
+
+    robot = createProbot({
+      id: 1,
+      cert: 'test',
+      githubToken: 'test',
+    });
+
+    app = robot.load(oppiaBot);
+    spyOn(app, 'auth').and.resolveTo(github);
+
     done();
   });
 
@@ -171,10 +186,5 @@ describe('Oppiabot\'s', () => {
         github.issues.createComment).toHaveBeenCalled();
       expect(commentCreatedStatus).toEqual(true);
     });
-
-    afterEach(() => {
-      nock.cleanAll();
-      nock.enableNetConnect();
-    })
   });
 });
