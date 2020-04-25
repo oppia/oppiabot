@@ -27,9 +27,10 @@
   },
   "devDependencies": {
     "jasmine": "^3.1.0",
+    "nock": "^12.0.3",
+    "nodemon": "^2.0.0",
     "smee-client": "^1.0.1",
-    "standard": "^10.0.3",
-    "nodemon": "^2.0.0"
+    "standard": "^10.0.3"
   },
   "engines": {
     "node": ">= 8.3.0"

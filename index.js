@@ -11,10 +11,10 @@ const whitelistedAccounts = (
  * @param {import('probot').Application} app
  */
 module.exports = (app) => {
-  scheduler = createScheduler(app, {
-    delay: !process.env.DISABLE_DELAY,
-    interval: 60 * 60 * 1000 // 1 hour
-  });
+  // scheduler = createScheduler(app, {
+  //   delay: !process.env.DISABLE_DELAY,
+  //   interval: 60 * 60 * 1000 // 1 hour
+  // });
 
   app.on('pull_request.opened', async context => {
     // The oppiabot runs only for repositories belonging to certain
@@ -23,6 +23,7 @@ module.exports = (app) => {
     // repository on which the bot has been installed.
     // This condition checks whether the owner account is included in
     // the whitelisted accounts.
+    console.log(whitelistedAccounts);
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await apiForSheetsModule.checkClaStatus(context);
       await checkPullRequestLabelsModule.checkChangelogLabel(context);

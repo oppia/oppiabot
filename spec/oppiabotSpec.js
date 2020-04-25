@@ -1,8 +1,8 @@
 require('dotenv').config();
-
-const {createRobot} = require('probot');
+const nock = require('nock');
+const {createProbot} = require('probot');
 // The plugin refers to the actual app in index.js.
-const oppiaBotPlugin = require('../index');
+const oppiaBot = require('../index');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkMergeConflictsModule = require('../lib/checkMergeConflicts');
 const pullRequestpayload = require('../fixtures/pullRequestPayload.json');
@@ -14,9 +14,11 @@ describe('Oppiabot\'s', () => {
    */
   let github;
 
-  beforeEach(function(done) {
-    robot = createRobot();
-    oppiaBotPlugin(robot);
+  beforeEach(function (done) {
+    nock.disableNetConnect();
+    robot = createProbot({ id: 1, cert: 'test', githubToken: 'test' });
+    robot.load(oppiaBot);
+
 
     github = {
       issues: {
@@ -79,7 +81,7 @@ describe('Oppiabot\'s', () => {
             }
           ]
         }),
-        removeLabel: jasmine.createSpy('removeLabel')
+        removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({})
       }
     };
     robot.auth = () => Promise.resolve(github);
@@ -103,23 +105,17 @@ describe('Oppiabot\'s', () => {
       expect(apiForSheetsModule.checkClaStatus.calls.count()).toEqual(1);
     });
 
-    it('should be called with three arguments for the given payload', () => {
+    it('should be called with one argument for the given payload', () => {
       expect(
-        apiForSheetsModule.checkClaStatus.calls.argsFor(0).length).toEqual(3);
+        apiForSheetsModule.checkClaStatus.calls.argsFor(0).length).toEqual(1);
     });
 
     it('should be called with the correct username for the given payload',
       () => {
-        expect(
-          apiForSheetsModule.checkClaStatus.calls.argsFor(0)[0])
-          .toEqual('testuser7777');
+        const context = apiForSheetsModule.checkClaStatus.calls.argsFor(0)[0];
+        expect(context.payload.pull_request.user.login).toEqual(
+          'testuser7777');
       });
-
-    it('should be called for a pull request for the given payload', () => {
-      expect(
-        apiForSheetsModule.checkClaStatus.calls.argsFor(0)[2])
-        .toEqual(true);
-    });
 
     it('should call authorize', () => {
       expect(apiForSheetsModule.authorize).toHaveBeenCalled();
@@ -149,28 +145,36 @@ describe('Oppiabot\'s', () => {
 
     it('should not remove any label for the given payload', async () => {
       var commentCreatedStatus = await apiForSheetsModule.generateOutput(
-        [['apb7'], ['kevinlee12']]);
-      expect(
-        github.issues.listLabelsOnIssue).toHaveBeenCalled();
+        [['apb7'], ['kevinlee12']],
+        pullRequestpayload.payload.pull_request.number,
+        pullRequestpayload.payload.pull_request);
       expect(
         github.issues.removeLabel).not.toHaveBeenCalled();
     });
 
     it('should add a relevant label for the given payload', async () => {
       var commentCreatedStatus = await apiForSheetsModule.generateOutput(
-        [['apb7'], ['kevinlee12']]);
-      expect(
-        github.issues.listLabelsOnIssue).toHaveBeenCalled();
+        [['apb7'], ['kevinlee12']],
+        pullRequestpayload.payload.pull_request.number,
+        pullRequestpayload.payload.pull_request);
+
       expect(
         github.issues.addLabels).toHaveBeenCalled();
     });
 
     it('should post a comment for the given payload', async () => {
       var commentCreatedStatus = await apiForSheetsModule.generateOutput(
-        [['apb7'], ['kevinlee12']]);
+        [['apb7'], ['kevinlee12']],
+        pullRequestpayload.payload.pull_request.number,
+        pullRequestpayload.payload.pull_request);
       expect(
         github.issues.createComment).toHaveBeenCalled();
       expect(commentCreatedStatus).toEqual(true);
     });
+
+    afterEach(() => {
+      nock.cleanAll();
+      nock.enableNetConnect();
+    })
   });
 });
