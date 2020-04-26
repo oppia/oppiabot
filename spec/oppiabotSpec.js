@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const {createRobot} = require('probot');
+const { createRobot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBotPlugin = require('../index');
 const apiForSheetsModule = require('../lib/apiForSheets');
@@ -10,11 +10,11 @@ const pullRequestpayload = require('../fixtures/pullRequestPayload.json');
 describe('Oppiabot\'s', () => {
   let robot;
   /**
-   * @type {import('probot').Octokit} context
+   * @type {import('probot').Octokit} github
    */
   let github;
 
-  beforeEach(function(done) {
+  beforeEach(function (done) {
     robot = createRobot();
     oppiaBotPlugin(robot);
 
@@ -43,8 +43,7 @@ describe('Oppiabot\'s', () => {
           }
         }),
         listLabelsOnIssue: jasmine.createSpy('listLabelsOnIssue').and.returnValue({
-          data:
-          [
+          data: [
             {
               id: 248679580,
               node_id: 'MDU6TGFiZWwyNDg2Nzk1ODA=',
@@ -87,7 +86,7 @@ describe('Oppiabot\'s', () => {
   });
 
   describe('apiForSheets', () => {
-    beforeEach(function(done) {
+    beforeEach(function (done) {
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callThrough();
       spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
