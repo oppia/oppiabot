@@ -42,8 +42,7 @@
   "nodemonConfig": {
     "exec": "npm start",
     "watch": [
-      ".env",
-      "."
+      ".env"
     ]
   }
 }
