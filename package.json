@@ -7,7 +7,7 @@
   "repository": "https://github.com/oppiabot/oppiabot.git",
   "scripts": {
     "dev": "nodemon",
-    "lint": "standard --fix",
+    "lint": "standard",
     "start": "probot run ./index.js",
     "test": "./node_modules/.bin/jasmine"
   },
