@@ -22,7 +22,7 @@ describe('Oppiabot\'s', () => {
    */
   let app;
 
-  beforeEach(function (done) {
+  beforeEach(function(done) {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
