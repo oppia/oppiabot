@@ -8,15 +8,15 @@ const whitelistedAccounts = (
 
 /**
  * This is the main entrypoint to the Probot app
- * @param {import('probot').Application} app
+ * @param {import('probot').Application} oppiabot
  */
-module.exports = (app) => {
-  scheduler.createScheduler(app, {
+module.exports = (oppiabot) => {
+  scheduler.createScheduler(oppiabot, {
     delay: !process.env.DISABLE_DELAY,
     interval: 60 * 60 * 1000 // 1 hour
   });
 
-  app.on('pull_request.opened', async context => {
+  oppiabot.on('pull_request.opened', async context => {
     // The oppiabot runs only for repositories belonging to certain
     // whitelisted accounts. The whitelisted accounts are stored as an
     // env variable. context.repo().owner returns the owner of the
@@ -29,19 +29,19 @@ module.exports = (app) => {
     }
   });
 
-  app.on('pull_request.reopened', async context => {
+  oppiabot.on('pull_request.reopened', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await checkPullRequestLabelsModule.checkChangelogLabel(context);
     }
   });
 
-  app.on('pull_request.labeled', async context => {
+  oppiabot.on('pull_request.labeled', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await checkPullRequestLabelsModule.checkAssignee(context);
     }
   });
 
-  app.on('pull_request.synchronize', async context => {
+  oppiabot.on('pull_request.synchronize', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       // eslint-disable-next-line no-console
       console.log(' PR SYNC EVENT TRIGGERED..');
@@ -50,7 +50,7 @@ module.exports = (app) => {
     }
   });
 
-  app.on('pull_request.closed', async context => {
+  oppiabot.on('pull_request.closed', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
       context.payload.pull_request.merged === true) {
       // eslint-disable-next-line no-console

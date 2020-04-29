@@ -12,7 +12,6 @@ describe('Oppiabot\'s', () => {
    * @type {import('probot').Probot} robot
    */
   let robot;
-
   /**
    * @type {import('probot').Octokit} github
    */
