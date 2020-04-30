@@ -1,5 +1,5 @@
 require('dotenv').config();
-const {createProbot} = require('probot');
+const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
 const apiForSheetsModule = require('../lib/apiForSheets');
