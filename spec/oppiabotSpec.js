@@ -105,8 +105,8 @@ describe('Oppiabot\'s', () => {
   describe('apiForSheets', () => {
     beforeEach(function(done) {
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
-      spyOn(apiForSheetsModule, 'authorize').and.callThrough();
-      spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
+      spyOn(apiForSheetsModule, 'authorize').and.callFake(() => ({}));
+      spyOn(apiForSheetsModule, 'checkClaSheet').and.callFake(() => {});
       robot.receive(pullRequestpayload);
       done();
     });

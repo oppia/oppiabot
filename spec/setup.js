@@ -33,16 +33,23 @@ const setWhitelistedAccount = () => {
     // Replace the current whitelist with new one
     const newWhitelist = 'WHITELISTED_ACCOUNTS=oppia';
     envArray.splice(whitelistIndex, 1, newWhitelist);
-
-    // Save new env.
-    const newEnv = envArray.join(EOL);
-    console.log('Updating .env');
-    fs.writeFileSync(envPath, newEnv, (err) => {
-      if (err) {
-        throw err;
-      }
-    });
   }
+
+  // set client secret
+  const clientSecretIndex = envArray.findIndex((line) =>
+    line.startsWith('CLIENT_SECRET')
+  );
+  const newClientSecret = 'CLIENT_SECRET="{}"';
+  envArray.splice(clientSecretIndex, 1, newClientSecret);
+
+  // Save new env.
+  const newEnv = envArray.join(EOL);
+  console.log('Updating .env');
+  fs.writeFileSync(envPath, newEnv, (err) => {
+    if (err) {
+      throw err;
+    }
+  });
 };
 
 const runTest = () => {
