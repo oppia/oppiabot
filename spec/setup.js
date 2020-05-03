@@ -4,11 +4,14 @@ const path = require('path');
 const { EOL } = require('os');
 const { exec } = require('child_process');
 
+const WHITELISTED_ACCOUNTS = 'WHITELISTED_ACCOUNTS';
+const CLIENT_SECRET = 'CLIENT_SECRET';
 const envPath = path.join(__dirname, '..', '.env');
 let envData = '';
 
+
 const setWhitelistedAccount = () => {
-  // Load env
+  // Load env.
   const data = fs.readFileSync(envPath, (err) => {
     if (err) {
       throw err;
@@ -16,7 +19,7 @@ const setWhitelistedAccount = () => {
   });
   envData = data.toString();
 
-  // Parse and remove comments
+  // Parse and remove comments.
   let envArray = data.toString().split(EOL);
   envArray = envArray.filter((line) => {
     if (line && !line.startsWith('#')) {
@@ -24,22 +27,22 @@ const setWhitelistedAccount = () => {
     }
   });
 
-  // check for whtelisted_account
+  // Check for whitelisted_account.
   const whitelist = envArray.find((line) =>
-    line.startsWith('WHITELISTED_ACCOUNTS')
+    line.startsWith(WHITELISTED_ACCOUNTS)
   );
   const whitelistIndex = envArray.indexOf(whitelist);
   if (!whitelist.includes('oppia')) {
-    // Replace the current whitelist with new one
-    const newWhitelist = 'WHITELISTED_ACCOUNTS=oppia';
+    // Replace the current whitelist with new one.
+    const newWhitelist = WHITELISTED_ACCOUNTS + '=oppia';
     envArray.splice(whitelistIndex, 1, newWhitelist);
   }
 
-  // set client secret
+  // Set client secret.
   const clientSecretIndex = envArray.findIndex((line) =>
-    line.startsWith('CLIENT_SECRET')
+    line.startsWith(CLIENT_SECRET)
   );
-  const newClientSecret = 'CLIENT_SECRET="{}"';
+  const newClientSecret = CLIENT_SECRET + '="{}"';
   envArray.splice(clientSecretIndex, 1, newClientSecret);
 
   // Save new env.

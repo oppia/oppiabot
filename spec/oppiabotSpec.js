@@ -139,9 +139,9 @@ describe('Oppiabot\'s', () => {
       expect(apiForSheetsModule.authorize.calls.count()).toEqual(1);
     });
 
-    it('should call authorize with two arguments', () => {
+    it('should call authorize with one argument', () => {
       expect(
-        apiForSheetsModule.authorize.calls.argsFor(0).length).toEqual(2);
+        apiForSheetsModule.authorize.calls.argsFor(0).length).toEqual(1);
     });
 
     it('should further call checkClaSheet', () => {
