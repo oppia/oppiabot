@@ -25,16 +25,18 @@ const { exec } = require('child_process');
 const WHITELISTED_ACCOUNTS = 'WHITELISTED_ACCOUNTS';
 const CLIENT_SECRET = 'CLIENT_SECRET';
 const envPath = path.join(__dirname, '..', '.env');
+const envExamplePath = path.join(__dirname, '..', '.env.example');
 let envData = '';
-
 
 const setWhitelistedAccount = () => {
   // Load env.
-  const data = fs.readFileSync(envPath, (err) => {
-    if (err) {
-      throw err;
-    }
-  });
+  let data = '';
+  if (fs.existsSync(envPath)) {
+    data = fs.readFileSync(envPath);
+  } else {
+    data = fs.readFileSync(envExamplePath);
+  }
+
   envData = data.toString();
 
   // Parse and remove comments.
@@ -74,13 +76,8 @@ const setWhitelistedAccount = () => {
 };
 
 const runTest = () => {
-  const jasminePath = path.join(
-    __dirname,
-    '..',
-    'node_modules',
-    '.bin',
-    'jasmine'
-  );
+  const jasminePath = path.join(__dirname, '..', 'node_modules',
+    '.bin', 'jasmine');
 
   return new Promise((resolve, reject) => {
     exec('"' + jasminePath + '"', (error, stdout, stderr) => {
