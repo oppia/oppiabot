@@ -24,6 +24,8 @@ const { exec } = require('child_process');
 
 const WHITELISTED_ACCOUNTS = 'WHITELISTED_ACCOUNTS';
 const CLIENT_SECRET = 'CLIENT_SECRET';
+const NEW_RELIC = 'NEW_RELIC_NO_CONFIG_FILE';
+const NEW_RELIC_APP = 'NEW_RELIC_APP_NAME';
 const envPath = path.join(__dirname, '..', '.env');
 const envExamplePath = path.join(__dirname, '..', '.env.example');
 let envData = '';
@@ -64,6 +66,27 @@ const setWhitelistedAccount = () => {
   );
   const newClientSecret = CLIENT_SECRET + '="{}"';
   envArray.splice(clientSecretIndex, 1, newClientSecret);
+
+  // Update new relic config.
+  const newRelicConfigIndex = envArray.findIndex((line) =>
+    line.startsWith(NEW_RELIC)
+  );
+  const newRelicConfig = 'NEW_RELIC_NO_CONFIG_FILE=true';
+  if (newRelicConfigIndex !== -1) {
+    envArray.splice(newRelicConfigIndex, 1, newRelicConfig);
+  } else {
+    envArray.push(newRelicConfig);
+  }
+
+  const newRelicAppIndex = envArray.findIndex((line) =>
+    line.startsWith(NEW_RELIC_APP)
+  );
+  const newRelicConfigApp = 'NEW_RELIC_APP_NAME=oppiabot';
+  if (newRelicAppIndex !== -1) {
+    envArray.splice(newRelicAppIndex, 1, newRelicConfigApp);
+  } else {
+    envArray.push(newRelicConfigApp);
+  }
 
   // Save new env.
   const newEnv = envArray.join(EOL);

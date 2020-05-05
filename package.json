@@ -15,7 +15,7 @@
     "dotenv": "^6.0.0",
     "google-auth-library": "^0.12.0",
     "googleapis": "^25.0.0",
-    "newrelic": "^4.9.0",
+    "newrelic": "^6.6.0",
     "probot": "^9.11.3",
     "probot-scheduler": "^2.0.0-beta.1",
     "probot-stale": "github:oppia/oppiabot-stale"
