@@ -24,7 +24,7 @@ const { exec } = require('child_process');
 
 const WHITELISTED_ACCOUNTS = 'WHITELISTED_ACCOUNTS';
 const CLIENT_SECRET = 'CLIENT_SECRET';
-const NEW_RELIC = 'NEW_RELIC_NO_CONFIG_FILE';
+const NEW_RELIC_NO_CONFIG = 'NEW_RELIC_NO_CONFIG_FILE';
 const NEW_RELIC_APP = 'NEW_RELIC_APP_NAME';
 const envPath = path.join(__dirname, '..', '.env');
 const envExamplePath = path.join(__dirname, '..', '.env.example');
@@ -35,8 +35,11 @@ const setWhitelistedAccount = () => {
   let data = '';
   if (fs.existsSync(envPath)) {
     data = fs.readFileSync(envPath);
-  } else {
+  } else if (fs.existsSync(envExamplePath)) {
     data = fs.readFileSync(envExamplePath);
+  } else {
+    throw new Error(
+      '.env.example could not be found. Please update your branch with master');
   }
 
   envData = data.toString();
@@ -69,9 +72,9 @@ const setWhitelistedAccount = () => {
 
   // Update new relic config.
   const newRelicConfigIndex = envArray.findIndex((line) =>
-    line.startsWith(NEW_RELIC)
+    line.startsWith(NEW_RELIC_NO_CONFIG)
   );
-  const newRelicConfig = 'NEW_RELIC_NO_CONFIG_FILE=true';
+  const newRelicConfig = NEW_RELIC_NO_CONFIG + '=true';
   if (newRelicConfigIndex !== -1) {
     envArray.splice(newRelicConfigIndex, 1, newRelicConfig);
   } else {
@@ -81,7 +84,7 @@ const setWhitelistedAccount = () => {
   const newRelicAppIndex = envArray.findIndex((line) =>
     line.startsWith(NEW_RELIC_APP)
   );
-  const newRelicConfigApp = 'NEW_RELIC_APP_NAME=oppiabot';
+  const newRelicConfigApp = NEW_RELIC_APP + '=oppiabot';
   if (newRelicAppIndex !== -1) {
     envArray.splice(newRelicAppIndex, 1, newRelicConfigApp);
   } else {
@@ -99,8 +102,8 @@ const setWhitelistedAccount = () => {
 };
 
 const runTest = () => {
-  const jasminePath = path.join(__dirname, '..', 'node_modules',
-    '.bin', 'jasmine');
+  const jasminePath = path.join(
+    __dirname, '..', 'node_modules', '.bin', 'jasmine');
 
   return new Promise((resolve, reject) => {
     exec('"' + jasminePath + '"', (error, stdout, stderr) => {
