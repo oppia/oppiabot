@@ -39,7 +39,8 @@ const setWhitelistedAccount = () => {
     data = fs.readFileSync(envExamplePath);
   } else {
     throw new Error(
-      '.env.example could not be found. Please update your branch with master');
+      '.env.example could not be found.' +
+      'Please update your branch with master.');
   }
 
   envData = data.toString();
