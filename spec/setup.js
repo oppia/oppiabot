@@ -107,7 +107,7 @@ const runTest = () => {
     __dirname, '..', 'node_modules', '.bin', 'jasmine');
 
   return new Promise((resolve, reject) => {
-    exec('"' + jasminePath + '"', (error, stdout, stderr) => {
+    exec('nyc "' + jasminePath + '"', (error, stdout, stderr) => {
       if (error) {
         console.warn(error);
       }

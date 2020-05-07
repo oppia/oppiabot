@@ -3,3 +3,4 @@ npm-debug.log
 *.pem
 .env
 newrelic_agent.log
+.nyc_output
