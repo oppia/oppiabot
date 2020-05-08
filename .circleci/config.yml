@@ -1,0 +1,36 @@
+version: 2.1
+
+workflows:
+  circleci_tests:
+    # The following jobs run in the following stages:
+    # - Setup runs first.
+    # - After setup passes, frontend tests and coverage tests run.
+    jobs:
+      - setup
+      - frontend_tests:
+          requires:
+            - setup
+
+var_for_docker_image: &docker_image circleci/node:7
+
+anchor_for_job_defaults: &job_defaults
+  working_directory: /home/circleci/oppiabot
+  docker:
+    - image: *docker_image
+
+jobs:
+  setup:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: npm install
+
+  frontend_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run:
+          name: Run frontend tests
+          command: npm run test
