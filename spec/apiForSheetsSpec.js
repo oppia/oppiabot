@@ -3,15 +3,16 @@ const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
 const apiForSheetsModule = require('../lib/apiForSheets');
-const checkMergeConflictsModule = require('../lib/checkMergeConflicts');
 const scheduler = require('../lib/scheduler');
 const pullRequestpayload = require('../fixtures/pullRequestPayload.json');
+const google = require('googleapis');
 
-describe('Oppiabot\'s', () => {
+describe('Api For Sheets Module', () => {
   /**
    * @type {import('probot').Probot} robot
    */
   let robot;
+
   /**
    * @type {import('probot').Octokit} github
    */
@@ -98,6 +99,15 @@ describe('Oppiabot\'s', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
+    spyOn(google, 'sheets').and.returnValue({
+      spreadsheets: {
+        values: {
+          get: jasmine.createSpy('get').and.callFake(async(obj, cb) => {
+            await cb(null, {values: [['test']]});
+          })
+        }
+      }
+    });
 
     done();
   });
@@ -106,7 +116,7 @@ describe('Oppiabot\'s', () => {
     beforeEach(function(done) {
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callFake(() => ({}));
-      spyOn(apiForSheetsModule, 'checkClaSheet').and.callFake(() => {});
+      spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
       robot.receive(pullRequestpayload);
       done();
     });
