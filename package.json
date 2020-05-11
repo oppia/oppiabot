@@ -18,7 +18,8 @@
     "newrelic": "^6.6.0",
     "probot": "^9.11.3",
     "probot-scheduler": "^2.0.0-beta.1",
-    "probot-stale": "github:oppia/oppiabot-stale"
+    "probot-stale": "github:oppia/oppiabot-stale",
+    "probot-config": "^1.1.0"
   },
   "probot": {
     "apps": [
