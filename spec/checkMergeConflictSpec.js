@@ -4,7 +4,7 @@ const { createProbot } = require('probot');
 const oppiaBot = require('../index');
 const checkMergeConflictModule = require('../lib/checkMergeConflicts');
 const scheduler = require('../lib/scheduler');
-let payload = require('../fixtures/pullRequestPayload.json');
+let payloadData = require('../fixtures/pullRequestPayload.json');
 
 describe('Merge Conflict Check', () => {
   /**
@@ -61,14 +61,15 @@ describe('Merge Conflict Check', () => {
     ).and.callThrough();
   });
 
-  describe('when pull request gets merged', () => {
+  describe('pull request merge results in merge conflict', () => {
     beforeEach(async () => {
-      // Simulate a merged conflict in pull request.
-      payload.payload.pull_request.merged = true;
-      payload.payload.action = 'closed';
+      // Simulate a merged pull request.
+      payloadData.payload.pull_request.merged = true;
+      payloadData.payload.action = 'closed';
 
-      const pullRequest = { ...payload.payload.pull_request };
+      const pullRequest = { ...payloadData.payload.pull_request };
       pullRequest.merged = false;
+      // Simulate merge conflict in PR.
       pullRequest.mergeable = false;
 
       github.pulls = {
@@ -80,7 +81,7 @@ describe('Merge Conflict Check', () => {
         }),
       };
 
-      await robot.receive(payload);
+      await robot.receive(payloadData);
     });
 
     it('should check for merge conflict', () => {
@@ -96,15 +97,16 @@ describe('Merge Conflict Check', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
 
       const link = 'link'.link(
-        'https://help.github.com/articles/resolving-a-merge-conflict-using-the-command-line/'
+        'https://help.github.com/articles/resolving-a-merge' +
+          '-conflict-using-the-command-line/'
       );
       const params = {
-        repo: payload.payload.repository.name,
-        owner: payload.payload.repository.owner.login,
-        number: payload.payload.pull_request.number,
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        number: payloadData.payload.pull_request.number,
         body:
           'Hi @' +
-          payload.payload.pull_request.user.login +
+          payloadData.payload.pull_request.user.login +
           '. Due to recent changes in the "develop" branch, ' +
           'this PR now has a merge conflict. ' +
           'Please follow this ' +
@@ -118,22 +120,22 @@ describe('Merge Conflict Check', () => {
     it('adds merge conflict label', () => {
       expect(github.issues.addLabels).toHaveBeenCalled();
       const params = {
-        repo: payload.payload.repository.name,
-        owner: payload.payload.repository.owner.login,
-        number: payload.payload.pull_request.number,
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        number: payloadData.payload.pull_request.number,
         labels: [mergeConflictLabel.name],
       };
       expect(github.issues.addLabels).toHaveBeenCalledWith(params);
     });
   });
 
-  describe("when pull request that doesn't cause merge conflict gets merged", () => {
+  describe('pull request merge does not result in merge conflict', () => {
     beforeEach(async () => {
-      // Simulate a merged conflict in pull request.
-      payload.payload.pull_request.merged = true;
-      payload.payload.action = 'closed';
+      // Simulate a merged pull request.
+      payloadData.payload.pull_request.merged = true;
+      payloadData.payload.action = 'closed';
 
-      const pullRequest = { ...payload.payload.pull_request };
+      const pullRequest = { ...payloadData.payload.pull_request };
       pullRequest.merged = false;
       pullRequest.mergeable = true;
 
@@ -146,7 +148,7 @@ describe('Merge Conflict Check', () => {
         }),
       };
 
-      await robot.receive(payload);
+      await robot.receive(payloadData);
     });
 
     it('checks for merge conflict', () => {
@@ -166,12 +168,12 @@ describe('Merge Conflict Check', () => {
     });
   });
 
-  describe('when pull request already has merge conflict label', () => {
+  describe('pull request already has merge conflict label', () => {
     beforeEach(async () => {
-      // Simulate a merged conflict in pull request.
-      payload.payload.action = 'synchronize';
+      // Simulate synchronize event.
+      payloadData.payload.action = 'synchronize';
 
-      const pullRequest = { ...payload.payload.pull_request };
+      const pullRequest = { ...payloadData.payload.pull_request };
       pullRequest.merged = false;
       pullRequest.mergeable = true;
       pullRequest.labels.push(mergeConflictLabel);
@@ -185,7 +187,7 @@ describe('Merge Conflict Check', () => {
         }),
       };
 
-      await robot.receive(payload);
+      await robot.receive(payloadData);
     });
 
     it('should check for merge conflict', () => {
@@ -205,12 +207,53 @@ describe('Merge Conflict Check', () => {
     it('removes merge conflict label', () => {
       expect(github.issues.removeLabel).toHaveBeenCalled();
       const params = {
-        repo: payload.payload.repository.name,
-        owner: payload.payload.repository.owner.login,
-        number: payload.payload.pull_request.number,
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        number: payloadData.payload.pull_request.number,
         name: mergeConflictLabel.name,
       };
       expect(github.issues.removeLabel).toHaveBeenCalledWith(params);
+    });
+  });
+
+  describe('pull request already has merge conflict label and merge conflict isnt fixed', () => {
+    beforeEach(async () => {
+      // Simulate synchronize event.
+      payloadData.payload.action = 'synchronize';
+
+      const pullRequest = { ...payloadData.payload.pull_request };
+      pullRequest.merged = false;
+      pullRequest.mergeable = false;
+      pullRequest.labels.push(mergeConflictLabel);
+
+      github.pulls = {
+        get: jasmine.createSpy('get').and.resolveTo({
+          data: pullRequest,
+        }),
+        list: jasmine.createSpy('list').and.resolveTo({
+          data: [pullRequest],
+        }),
+      };
+
+      await robot.receive(payloadData);
+    });
+
+    it('should check for merge conflict', () => {
+      expect(
+        checkMergeConflictModule.checkMergeConflictsInPullRequest
+      ).toHaveBeenCalled();
+    });
+
+    it('does not ping pr author', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('does not add merge conflict label', () => {
+      expect(github.issues.addLabels).not.toHaveBeenCalled();
+    });
+
+    it('does not remove merge conflict label', () => {
+      expect(github.issues.removeLabel).not.toHaveBeenCalled();
     });
   });
 });
