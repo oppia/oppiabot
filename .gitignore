@@ -4,3 +4,4 @@ npm-debug.log
 .env
 newrelic_agent.log
 .nyc_output
+coverage

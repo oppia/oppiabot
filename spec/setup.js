@@ -107,17 +107,19 @@ const runTest = () => {
     __dirname, '..', 'node_modules', '.bin', 'jasmine');
 
   return new Promise((resolve, reject) => {
-    exec('nyc "' + jasminePath + '"', (error, stdout, stderr) => {
-      if (error) {
-        console.warn(error);
-      }
-      if (stderr) {
-        console.log(stderr);
+    exec(
+      'nyc --reporter=lcov --reporter=text "' + jasminePath + '"',
+      (error, stdout, stderr) => {
+        if (error) {
+          console.warn(error);
+        }
+        if (stderr) {
+          console.log(stderr);
+          resolve();
+        }
+        console.log(stdout);
         resolve();
-      }
-      console.log(stdout);
-      resolve();
-    });
+      });
   });
 };
 

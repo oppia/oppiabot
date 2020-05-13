@@ -4,7 +4,9 @@ const { createProbot } = require('probot');
 const oppiaBot = require('../index');
 const checkMergeConflictModule = require('../lib/checkMergeConflicts');
 const scheduler = require('../lib/scheduler');
-let payloadData = require('../fixtures/pullRequestPayload.json');
+let payloadData = JSON.parse(
+  JSON.stringify(require('../fixtures/pullRequestPayload.json'))
+);
 
 describe('Merge Conflict Check', () => {
   /**

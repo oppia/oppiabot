@@ -4,7 +4,9 @@ const { createProbot } = require('probot');
 const oppiaBot = require('../index');
 const checkPullRequestLabelModule = require('../lib/checkPullRequestLabels');
 const scheduler = require('../lib/scheduler');
-let payloadData = require('../fixtures/pullRequestPayload.json');
+let payloadData = JSON.parse(
+  JSON.stringify(require('../fixtures/pullRequestPayload.json'))
+);
 
 describe('Pull Request Label Check', () => {
   /**
@@ -182,7 +184,6 @@ describe('Pull Request Label Check', () => {
         name: 'PR CHANGELOG: Server Errors -- @kevintab95',
         color: '00FF00',
       };
-
       payloadData.payload.action = 'reopened';
 
       spyOn(
