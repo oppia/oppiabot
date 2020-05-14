@@ -28,7 +28,8 @@ describe('Merge Conflict Check', () => {
     id: 971968901,
     node_id: 'MDU6TGFiZWw5NzE5Njg5MDE=',
     url:
-      "https://api.github.com/repos/oppia/oppia/labels/PR:%20don't%20merge%20-%20HAS%20MERGE%20CONFLICTS",
+      "https://api.github.com/repos/oppia/oppia/labels/" +
+      "PR:%20don't%20merge%20-%20HAS%20MERGE%20CONFLICTS",
     name: "PR: don't merge - HAS MERGE CONFLICTS",
     color: 'd93f0b',
     default: false,
@@ -95,7 +96,7 @@ describe('Merge Conflict Check', () => {
       ).toHaveBeenCalled();
     });
 
-    it('ping pr author regarding merge conflict', () => {
+    it('pings pr author regarding merge conflict', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
 
       const link = 'link'.link(
@@ -170,9 +171,9 @@ describe('Merge Conflict Check', () => {
     });
   });
 
-  describe('pull request already has merge conflict label', () => {
+  describe('pull request with resolved merge conflicts has merge conflict label', () => {
     beforeEach(async () => {
-      // Simulate synchronize event.
+      // Set event to pull_request.synchronize.
       payloadData.payload.action = 'synchronize';
 
       const pullRequest = { ...payloadData.payload.pull_request };
@@ -218,9 +219,9 @@ describe('Merge Conflict Check', () => {
     });
   });
 
-  describe('pull request already has merge conflict label and merge conflict isnt fixed', () => {
+  describe('pull request with unresolved merge conflicts has merge conflict label', () => {
     beforeEach(async () => {
-      // Simulate synchronize event.
+      // Set event to pull_request.synchronize.
       payloadData.payload.action = 'synchronize';
 
       const pullRequest = { ...payloadData.payload.pull_request };

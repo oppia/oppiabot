@@ -105,7 +105,7 @@ describe('Api For Sheets Module', () => {
     done();
   });
 
-  describe('apiForSheets', () => {
+  describe('cla check without any errors', () => {
     beforeEach(function (done) {
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callFake(() => ({}));
@@ -154,22 +154,22 @@ describe('Api For Sheets Module', () => {
       expect(apiForSheetsModule.authorize.calls.argsFor(0).length).toEqual(1);
     });
 
-    it('should further call checkClaSheet', () => {
+    it('should call checkClaSheet', () => {
       expect(apiForSheetsModule.checkClaSheet).toHaveBeenCalled();
     });
 
-    it('should further call checkClaSheet once', () => {
+    it('should call checkClaSheet once', () => {
       expect(apiForSheetsModule.checkClaSheet.calls.count()).toEqual(1);
     });
 
-    it('should further call checkClaSheet with one argument', () => {
+    it('should call checkClaSheet with one argument', () => {
       expect(apiForSheetsModule.checkClaSheet.calls.argsFor(0).length).toEqual(
         1
       );
     });
   });
 
-  describe('error from google sheets', () => {
+  describe('cla check with error in fetching data from sheets', () => {
     beforeEach((done) => {
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callFake(() => ({}));
@@ -179,7 +179,7 @@ describe('Api For Sheets Module', () => {
         spreadsheets: {
           values: {
             get: jasmine.createSpy('get').and.callFake(async (obj, cb) => {
-              // Make sheet throw error.
+              // Throw a mock error while accessing sheets.
               await cb(true, { values: [['test']] });
             }),
           },
@@ -200,9 +200,9 @@ describe('Api For Sheets Module', () => {
     });
   });
 
-  describe('generate output without cla label', () => {
+  describe('output generation', () => {
     const claData = [['abp'], ['kevinlee']];
-    describe('without cla label', () => {
+    describe('output generation without cla label', () => {
       beforeEach(function (done) {
         pullRequestpayload.payload.pull_request.labels.push({
           name: 'PR CHANGELOG: Server Errors -- @kevintab95',
@@ -242,7 +242,7 @@ describe('Api For Sheets Module', () => {
       });
 
       it('should not add label if user has signed cla', async () => {
-        // Add user to cla.
+        // Add username to CLA sheet.
         await apiForSheetsModule.generateOutput(
           [...claData, ['testuser7777']],
           pullRequestpayload.payload.pull_request.number,
@@ -252,7 +252,7 @@ describe('Api For Sheets Module', () => {
         expect(github.issues.addLabels).not.toHaveBeenCalled();
       });
 
-      it('should do nothing if no data is gotten from sheet', async () => {
+      it('should do nothing if no data is obtained from sheet', async () => {
         await apiForSheetsModule.generateOutput(
           [],
           pullRequestpayload.payload.pull_request.number,
@@ -264,13 +264,12 @@ describe('Api For Sheets Module', () => {
       });
     });
 
-    describe('with cla label', () => {
+    describe('output generation with cla label', () => {
       beforeEach(function (done) {
         pullRequestpayload.payload.pull_request.labels.push(
           {
             name: 'PR CHANGELOG: Server Errors -- @kevintab95',
-          },
-          {
+          }, {
             name: "PR: don't merge - NEEDS CLA",
           }
         );
