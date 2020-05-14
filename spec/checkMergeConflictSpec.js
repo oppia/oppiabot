@@ -70,17 +70,18 @@ describe('Merge Conflict Check', () => {
       payloadData.payload.pull_request.merged = true;
       payloadData.payload.action = 'closed';
 
-      const pullRequest = { ...payloadData.payload.pull_request };
-      pullRequest.merged = false;
-      // Simulate merge conflict in PR.
-      pullRequest.mergeable = false;
+      // Create new pull request from payload data.
+      const pullRequest2 = { ...payloadData.payload.pull_request };
+      pullRequest2.merged = false;
+      // Simulate merge conflict in new PR.
+      pullRequest2.mergeable = false;
 
       github.pulls = {
         get: jasmine.createSpy('get').and.resolveTo({
-          data: pullRequest,
+          data: pullRequest2,
         }),
         list: jasmine.createSpy('list').and.resolveTo({
-          data: [pullRequest],
+          data: [pullRequest2],
         }),
       };
 
@@ -138,16 +139,17 @@ describe('Merge Conflict Check', () => {
       payloadData.payload.pull_request.merged = true;
       payloadData.payload.action = 'closed';
 
-      const pullRequest = { ...payloadData.payload.pull_request };
-      pullRequest.merged = false;
-      pullRequest.mergeable = true;
+      // Create new pull request from payload data.
+      const pullRequest2 = { ...payloadData.payload.pull_request };
+      pullRequest2.merged = false;
+      pullRequest2.mergeable = true;
 
       github.pulls = {
         get: jasmine.createSpy('get').and.resolveTo({
-          data: pullRequest,
+          data: pullRequest2,
         }),
         list: jasmine.createSpy('list').and.resolveTo({
-          data: [pullRequest],
+          data: [pullRequest2],
         }),
       };
 
@@ -163,10 +165,10 @@ describe('Merge Conflict Check', () => {
       ).toHaveBeenCalled();
     });
 
-    it('does not ping pr author', () => {
+    it('should not ping pr author', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
     });
-    it('does not add merge conflict label', () => {
+    it('should not add merge conflict label', () => {
       expect(github.issues.addLabels).not.toHaveBeenCalled();
     });
   });
@@ -176,17 +178,20 @@ describe('Merge Conflict Check', () => {
       // Set event to pull_request.synchronize.
       payloadData.payload.action = 'synchronize';
 
-      const pullRequest = { ...payloadData.payload.pull_request };
-      pullRequest.merged = false;
-      pullRequest.mergeable = true;
-      pullRequest.labels.push(mergeConflictLabel);
+      // Create new pull request from payload data.
+      const pullRequest2 = { ...payloadData.payload.pull_request };
+      pullRequest2.merged = false;
+      pullRequest2.mergeable = true;
+
+      // Add merge conflict label to new pull request.
+      pullRequest2.labels.push(mergeConflictLabel);
 
       github.pulls = {
         get: jasmine.createSpy('get').and.resolveTo({
-          data: pullRequest,
+          data: pullRequest2,
         }),
         list: jasmine.createSpy('list').and.resolveTo({
-          data: [pullRequest],
+          data: [pullRequest2],
         }),
       };
 
@@ -199,11 +204,11 @@ describe('Merge Conflict Check', () => {
       ).toHaveBeenCalled();
     });
 
-    it('does not ping pr author', () => {
+    it('should not ping pr author', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
     });
 
-    it('does not add merge conflict label', () => {
+    it('should not add merge conflict label', () => {
       expect(github.issues.addLabels).not.toHaveBeenCalled();
     });
 
@@ -224,17 +229,20 @@ describe('Merge Conflict Check', () => {
       // Set event to pull_request.synchronize.
       payloadData.payload.action = 'synchronize';
 
-      const pullRequest = { ...payloadData.payload.pull_request };
-      pullRequest.merged = false;
-      pullRequest.mergeable = false;
-      pullRequest.labels.push(mergeConflictLabel);
+      // Create new pull request from payload data.
+      const pullRequest2 = { ...payloadData.payload.pull_request };
+      pullRequest2.merged = false;
+      pullRequest2.mergeable = false;
+
+      // Add merge conflict label to new pull request.
+      pullRequest2.labels.push(mergeConflictLabel);
 
       github.pulls = {
         get: jasmine.createSpy('get').and.resolveTo({
-          data: pullRequest,
+          data: pullRequest2,
         }),
         list: jasmine.createSpy('list').and.resolveTo({
-          data: [pullRequest],
+          data: [pullRequest2],
         }),
       };
 
@@ -247,15 +255,15 @@ describe('Merge Conflict Check', () => {
       ).toHaveBeenCalled();
     });
 
-    it('does not ping pr author', () => {
+    it('should not ping pr author', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
     });
 
-    it('does not add merge conflict label', () => {
+    it('should not add merge conflict label', () => {
       expect(github.issues.addLabels).not.toHaveBeenCalled();
     });
 
-    it('does not remove merge conflict label', () => {
+    it('should not remove merge conflict label', () => {
       expect(github.issues.removeLabel).not.toHaveBeenCalled();
     });
   });
