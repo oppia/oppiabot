@@ -42,15 +42,9 @@
       "merged_at": null,
       "merge_commit_sha": null,
       "assignee": null,
-      "assignees": [
-
-      ],
-      "requested_reviewers": [
-
-      ],
-      "requested_teams": [
-
-      ],
+      "assignees": [],
+      "requested_reviewers": [],
+      "requested_teams": [],
       "labels": [
         {
           "id": 248679580,
@@ -58,14 +52,6 @@
           "url": "https://api.github.com/repos/oppia/oppia/labels/PR:%20LGTM",
           "name": "PR: LGTM",
           "color": "009800",
-          "default": false
-        },
-        {
-          "id": 971968901,
-          "node_id": "MDU6TGFiZWw5NzE5Njg5MDE=",
-          "url": "https://api.github.com/repos/oppia/oppia/labels/PR:%20don't%20merge%20-%20HAS%20MERGE%20CONFLICTS",
-          "name": "PR: don't merge - HAS MERGE CONFLICTS",
-          "color": "d93f0b",
           "default": false
         },
         {
