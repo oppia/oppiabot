@@ -28,7 +28,7 @@ describe('Merge Conflict Check', () => {
     id: 971968901,
     node_id: 'MDU6TGFiZWw5NzE5Njg5MDE=',
     url:
-      "https://api.github.com/repos/oppia/oppia/labels/" +
+      'https://api.github.com/repos/oppia/oppia/labels/' +
       "PR:%20don't%20merge%20-%20HAS%20MERGE%20CONFLICTS",
     name: "PR: don't merge - HAS MERGE CONFLICTS",
     color: 'd93f0b',
@@ -71,17 +71,17 @@ describe('Merge Conflict Check', () => {
       payloadData.payload.action = 'closed';
 
       // Create new pull request from payload data.
-      const pullRequest2 = { ...payloadData.payload.pull_request };
-      pullRequest2.merged = false;
+      const pullRequestToBeChecked = { ...payloadData.payload.pull_request };
+      pullRequestToBeChecked.merged = false;
       // Simulate merge conflict in new PR.
-      pullRequest2.mergeable = false;
+      pullRequestToBeChecked.mergeable = false;
 
       github.pulls = {
         get: jasmine.createSpy('get').and.resolveTo({
-          data: pullRequest2,
+          data: pullRequestToBeChecked,
         }),
         list: jasmine.createSpy('list').and.resolveTo({
-          data: [pullRequest2],
+          data: [pullRequestToBeChecked],
         }),
       };
 
@@ -140,16 +140,16 @@ describe('Merge Conflict Check', () => {
       payloadData.payload.action = 'closed';
 
       // Create new pull request from payload data.
-      const pullRequest2 = { ...payloadData.payload.pull_request };
-      pullRequest2.merged = false;
-      pullRequest2.mergeable = true;
+      const pullRequestToBeChecked = { ...payloadData.payload.pull_request };
+      pullRequestToBeChecked.merged = false;
+      pullRequestToBeChecked.mergeable = true;
 
       github.pulls = {
         get: jasmine.createSpy('get').and.resolveTo({
-          data: pullRequest2,
+          data: pullRequestToBeChecked,
         }),
         list: jasmine.createSpy('list').and.resolveTo({
-          data: [pullRequest2],
+          data: [pullRequestToBeChecked],
         }),
       };
 
@@ -179,19 +179,19 @@ describe('Merge Conflict Check', () => {
       payloadData.payload.action = 'synchronize';
 
       // Create new pull request from payload data.
-      const pullRequest2 = { ...payloadData.payload.pull_request };
-      pullRequest2.merged = false;
-      pullRequest2.mergeable = true;
+      const pullRequestToBeChecked = { ...payloadData.payload.pull_request };
+      pullRequestToBeChecked.merged = false;
+      pullRequestToBeChecked.mergeable = true;
 
       // Add merge conflict label to new pull request.
-      pullRequest2.labels.push(mergeConflictLabel);
+      pullRequestToBeChecked.labels.push(mergeConflictLabel);
 
       github.pulls = {
         get: jasmine.createSpy('get').and.resolveTo({
-          data: pullRequest2,
+          data: pullRequestToBeChecked,
         }),
         list: jasmine.createSpy('list').and.resolveTo({
-          data: [pullRequest2],
+          data: [pullRequestToBeChecked],
         }),
       };
 
@@ -230,19 +230,19 @@ describe('Merge Conflict Check', () => {
       payloadData.payload.action = 'synchronize';
 
       // Create new pull request from payload data.
-      const pullRequest2 = { ...payloadData.payload.pull_request };
-      pullRequest2.merged = false;
-      pullRequest2.mergeable = false;
+      const pullRequestToBeChecked = { ...payloadData.payload.pull_request };
+      pullRequestToBeChecked.merged = false;
+      pullRequestToBeChecked.mergeable = false;
 
       // Add merge conflict label to new pull request.
-      pullRequest2.labels.push(mergeConflictLabel);
+      pullRequestToBeChecked.labels.push(mergeConflictLabel);
 
       github.pulls = {
         get: jasmine.createSpy('get').and.resolveTo({
-          data: pullRequest2,
+          data: pullRequestToBeChecked,
         }),
         list: jasmine.createSpy('list').and.resolveTo({
-          data: [pullRequest2],
+          data: [pullRequestToBeChecked],
         }),
       };
 

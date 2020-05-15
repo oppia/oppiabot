@@ -108,7 +108,7 @@ const runTest = () => {
 
   return new Promise((resolve, reject) => {
     exec(
-      'nyc --reporter=lcov --reporter=text "' + jasminePath + '"',
+      'nyc "' + jasminePath + '"',
       (error, stdout, stderr) => {
         if (error) {
           console.warn(error);
