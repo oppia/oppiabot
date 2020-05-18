@@ -4,7 +4,7 @@ const { createProbot } = require('probot');
 const oppiaBot = require('../index');
 const checkWipDraftPRModule = require('../lib/checkWipDraftPR');
 const scheduler = require('../lib/scheduler');
-const payload = require('../fixtures/pullRequest.edited.json');
+const pullRequestEditedPayload = require('../fixtures/pullRequest.edited.json');
 
 describe('Oppiabot\'s', () => {
   /**
@@ -46,7 +46,7 @@ describe('Oppiabot\'s', () => {
   describe('WIP PRs', () => {
     beforeEach((done) => {
       spyOn(checkWipDraftPRModule, 'checkWIP').and.callThrough();
-      robot.receive(payload);
+      robot.receive(pullRequestEditedPayload);
       done();
     });
 
@@ -63,8 +63,10 @@ describe('Oppiabot\'s', () => {
       expect(github.issues.createComment).toHaveBeenCalledTimes(1);
 
       // Comment on Pull Request.
-      const link = 'here'.link('url-to-draftPR');
-      const author = payload.payload.pull_request.user.login;
+      const link = 'here'.link(
+        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
+        '#wip--draft-pull-requests');
+      const author = pullRequestEditedPayload.payload.pull_request.user.login;
       const commentBody = (
         'Hi @' + author + ', WIP/Draft PRs are highly discouraged. You can ' +
         'learn more about it ' + link + '. Do well to reopen it when it\'s ' +
@@ -72,9 +74,9 @@ describe('Oppiabot\'s', () => {
         'Thanks!');
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
-        issue_number: payload.payload.pull_request.number,
-        owner: payload.payload.repository.owner.login,
-        repo: payload.payload.repository.name,
+        issue_number: pullRequestEditedPayload.payload.pull_request.number,
+        owner: pullRequestEditedPayload.payload.repository.owner.login,
+        repo: pullRequestEditedPayload.payload.repository.name,
         body: commentBody
       });
     });
@@ -84,9 +86,9 @@ describe('Oppiabot\'s', () => {
       expect(github.issues.update).toHaveBeenCalledTimes(1);
 
       expect(github.issues.update).toHaveBeenCalledWith({
-        issue_number: payload.payload.pull_request.number,
-        owner: payload.payload.repository.owner.login,
-        repo: payload.payload.repository.name,
+        issue_number: pullRequestEditedPayload.payload.pull_request.number,
+        owner: pullRequestEditedPayload.payload.repository.owner.login,
+        repo: pullRequestEditedPayload.payload.repository.name,
         state: 'closed'
       });
     });
@@ -96,9 +98,9 @@ describe('Oppiabot\'s', () => {
     beforeEach((done) => {
       spyOn(checkWipDraftPRModule, 'checkWIP').and.callThrough();
       // Receive a draft payload and remove WIP from title.
-      payload.payload.pull_request.draft = true;
-      payload.payload.pull_request.title = 'Testing Draft';
-      robot.receive(payload);
+      pullRequestEditedPayload.payload.pull_request.draft = true;
+      pullRequestEditedPayload.payload.pull_request.title = 'Testing Draft';
+      robot.receive(pullRequestEditedPayload);
       done();
     });
 
@@ -120,8 +122,10 @@ describe('Oppiabot\'s', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledTimes(1);
 
-      const link = 'here'.link('url-to-draftPR');
-      const author = payload.payload.pull_request.user.login;
+      const link = 'here'.link(
+        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
+        '#wip--draft-pull-requests');
+      const author = pullRequestEditedPayload.payload.pull_request.user.login;
       const commentBody = (
         'Hi @' + author + ', WIP/Draft PRs are highly discouraged. You can ' +
         'learn more about it ' + link + '. Do well to reopen it when it\'s ' +
@@ -129,9 +133,9 @@ describe('Oppiabot\'s', () => {
         'Thanks!');
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
-        issue_number: payload.payload.pull_request.number,
-        owner: payload.payload.repository.owner.login,
-        repo: payload.payload.repository.name,
+        issue_number: pullRequestEditedPayload.payload.pull_request.number,
+        owner: pullRequestEditedPayload.payload.repository.owner.login,
+        repo: pullRequestEditedPayload.payload.repository.name,
         body: commentBody
       });
     });
@@ -141,9 +145,9 @@ describe('Oppiabot\'s', () => {
       expect(github.issues.update).toHaveBeenCalledTimes(1);
 
       expect(github.issues.update).toHaveBeenCalledWith({
-        issue_number: payload.payload.pull_request.number,
-        owner: payload.payload.repository.owner.login,
-        repo: payload.payload.repository.name,
+        issue_number: pullRequestEditedPayload.payload.pull_request.number,
+        owner: pullRequestEditedPayload.payload.repository.owner.login,
+        repo: pullRequestEditedPayload.payload.repository.name,
         state: 'closed'
       });
     });
@@ -153,9 +157,9 @@ describe('Oppiabot\'s', () => {
     beforeEach((done) => {
       spyOn(checkWipDraftPRModule, 'checkWIP').and.callThrough();
       // Receive a neither draft nor WIP payload.
-      payload.payload.pull_request.draft = false;
-      payload.payload.pull_request.title = 'Testing';
-      robot.receive(payload);
+      pullRequestEditedPayload.payload.pull_request.draft = false;
+      pullRequestEditedPayload.payload.pull_request.title = 'Testing';
+      robot.receive(pullRequestEditedPayload);
       done();
     });
 
