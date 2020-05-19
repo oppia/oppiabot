@@ -65,7 +65,8 @@ module.exports = (oppiabot) => {
   });
 
   oppiabot.on('pull_request.edited', async context => {
-    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
+    if (
+      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
       context.payload.pull_request.state === 'open') {
       // eslint-disable-next-line no-console
       console.log('A PR HAS BEEN EDITED...');
