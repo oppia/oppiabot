@@ -3,6 +3,7 @@ const scheduler = require('./lib/scheduler');
 const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
+const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
 const whitelistedAccounts = (
   (process.env.WHITELISTED_ACCOUNTS || '').toLowerCase().split(','));
 
@@ -26,12 +27,14 @@ module.exports = (oppiabot) => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await apiForSheetsModule.checkClaStatus(context);
       await checkPullRequestLabelsModule.checkChangelogLabel(context);
+      await checkPullRequestBranchModule.checkBranch(context);
     }
   });
 
   oppiabot.on('pull_request.reopened', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await checkPullRequestLabelsModule.checkChangelogLabel(context);
+      await checkPullRequestBranchModule.checkBranch(context);
     }
   });
 
