@@ -68,7 +68,15 @@ const setWhitelistedAccount = () => {
   const clientSecretIndex = envArray.findIndex((line) =>
     line.startsWith(CLIENT_SECRET)
   );
-  const newClientSecret = CLIENT_SECRET + '="{}"';
+  const clientSecretObj = {
+    installed: {
+      client_id: '',
+      project_id: '',
+      redirect_uris: [],
+    }
+  };
+  const newClientSecret = (
+    CLIENT_SECRET + '="' + JSON.stringify(clientSecretObj) + '"');
   envArray.splice(clientSecretIndex, 1, newClientSecret);
 
   // Update new relic config.

@@ -7,7 +7,8 @@ const scheduler = require('../lib/scheduler');
 const pullRequestpayload = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
-const google = require('googleapis');
+const {google} = require('googleapis');
+const {OAuth2Client} = require('google-auth-library');
 
 describe('Api For Sheets Module', () => {
   /**
@@ -101,20 +102,25 @@ describe('Api For Sheets Module', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-
+    // Mock google auth
+    Object.setPrototypeOf(OAuth2Client, function () {
+      return {};
+    });
     done();
   });
 
   describe('cla check without any errors', () => {
     beforeEach(function (done) {
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
-      spyOn(apiForSheetsModule, 'authorize').and.callFake(() => ({}));
+      spyOn(apiForSheetsModule, 'authorize').and.callThrough({});
       spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
       spyOn(google, 'sheets').and.returnValue({
         spreadsheets: {
           values: {
             get: jasmine.createSpy('get').and.callFake(async (obj, cb) => {
-              await cb(null, { values: [['test']] });
+              await cb(null, {
+                data : {values: [['test']]},
+              });
             }),
           },
         },
