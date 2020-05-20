@@ -19,6 +19,8 @@ const oppiaBot = require('../index');
 const checkWipDraftPRModule = require('../lib/checkWipDraftPR');
 const scheduler = require('../lib/scheduler');
 const pullRequestEditedPayload = require('../fixtures/pullRequest.edited.json');
+const apiForSheetsModule = require('../lib/apiForSheets');
+const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 
 describe('Oppiabot\'s', () => {
   /**
@@ -38,6 +40,13 @@ describe('Oppiabot\'s', () => {
 
   beforeEach((done) => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => {});
+
+    // Spy on other modules that will be triggered by the payload.
+    spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => {});
+    spyOn(
+      checkPullRequestLabelsModule, 'checkChangelogLabel')
+      .and.callFake(() => {});
+
     github = {
       issues: {
         createComment: jasmine.createSpy('createComment').and.resolveTo({}),
@@ -83,9 +92,9 @@ describe('Oppiabot\'s', () => {
       const author = pullRequestEditedPayload.payload.pull_request.user.login;
       const commentBody = (
         'Hi @' + author + ', WIP/Draft PRs are highly discouraged. You can ' +
-        'learn more about it ' + link + '. Do well to reopen it when it\'s ' +
-        'ready to be reviewed and ensure that it is without any WIP text. ' +
-        'Thanks!');
+        'learn more about it ' + link + '. You can reopen it when it\'s ' +
+        'ready to be reviewed and ensure that it is without any WIP phrase ' +
+        'in title or body. Thanks!');
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: pullRequestEditedPayload.payload.pull_request.number,
@@ -105,6 +114,37 @@ describe('Oppiabot\'s', () => {
         repo: pullRequestEditedPayload.payload.repository.name,
         state: 'closed'
       });
+    });
+  });
+
+
+  describe('Checks when PR is opened or reopened', () => {
+    it('should check when PR is opened', async () => {
+      spyOn(checkWipDraftPRModule, 'checkWIP').and.callThrough();
+
+      // Trigger pull_request.opened event.
+      pullRequestEditedPayload.payload.action = 'opened';
+      await robot.receive(pullRequestEditedPayload);
+
+      expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalledTimes(1);
+      expect(github.issues.update).toHaveBeenCalled();
+      expect(github.issues.update).toHaveBeenCalledTimes(1);
+    });
+
+    it('should check when PR is reopnend', async() => {
+      spyOn(checkWipDraftPRModule, 'checkWIP').and.callThrough();
+
+      // Trigger pull_request.opened event.
+      pullRequestEditedPayload.payload.action = 'reopened';
+      await robot.receive(pullRequestEditedPayload);
+
+      expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalledTimes(1);
+      expect(github.issues.update).toHaveBeenCalled();
+      expect(github.issues.update).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -142,9 +182,9 @@ describe('Oppiabot\'s', () => {
       const author = pullRequestEditedPayload.payload.pull_request.user.login;
       const commentBody = (
         'Hi @' + author + ', WIP/Draft PRs are highly discouraged. You can ' +
-        'learn more about it ' + link + '. Do well to reopen it when it\'s ' +
-        'ready to be reviewed and ensure that it is without any WIP text. ' +
-        'Thanks!');
+        'learn more about it ' + link + '. You can reopen it when it\'s ' +
+        'ready to be reviewed and ensure that it is without any WIP phrase ' +
+        'in title or body. Thanks!');
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: pullRequestEditedPayload.payload.pull_request.number,
@@ -187,4 +227,5 @@ describe('Oppiabot\'s', () => {
       expect(github.issues.update).not.toHaveBeenCalled();
     });
   });
+
 });
