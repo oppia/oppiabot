@@ -1,0 +1,11 @@
+name: Oppiabot
+
+description: Handles user interactions with issues.
+inputs:
+  repo-token: # Repository token.
+    description: 'The repository token needed to create comments.'
+    required: true
+
+runs:
+  using: "node12"
+  main: "dist/index.js"
