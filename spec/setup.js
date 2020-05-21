@@ -113,10 +113,12 @@ const setWhitelistedAccount = () => {
 const runTest = () => {
   const jasminePath = path.join(
     __dirname, '..', 'node_modules', '.bin', 'jasmine');
+  const nycPath = path.join(
+    __dirname, '..', 'node_modules', 'nyc', 'bin', 'nyc.js');
 
   return new Promise((resolve, reject) => {
     exec(
-      'nyc "' + jasminePath + '"',
+      nycPath + ' "' + jasminePath + '"',
       (error, stdout, stderr) => {
         if (error) {
           console.warn(error);
