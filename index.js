@@ -4,6 +4,8 @@ const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
+const checkWIPModule = require('./lib/checkWipDraftPR');
+
 const whitelistedAccounts = (
   (process.env.WHITELISTED_ACCOUNTS || '').toLowerCase().split(','));
 
@@ -28,6 +30,7 @@ module.exports = (oppiabot) => {
       await apiForSheetsModule.checkClaStatus(context);
       await checkPullRequestLabelsModule.checkChangelogLabel(context);
       await checkPullRequestBranchModule.checkBranch(context);
+      await checkWIPModule.checkWIP(context);
     }
   });
 
@@ -35,6 +38,7 @@ module.exports = (oppiabot) => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await checkPullRequestLabelsModule.checkChangelogLabel(context);
       await checkPullRequestBranchModule.checkBranch(context);
+      await checkWIPModule.checkWIP(context);
     }
   });
 
@@ -60,6 +64,16 @@ module.exports = (oppiabot) => {
       console.log(' A PR HAS BEEN MERGED..');
       await checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(
         context);
+    }
+  });
+
+  oppiabot.on('pull_request.edited', async context => {
+    if (
+      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
+      context.payload.pull_request.state === 'open') {
+      // eslint-disable-next-line no-console
+      console.log('A PR HAS BEEN EDITED...');
+      await checkWIPModule.checkWIP(context);
     }
   });
 };
