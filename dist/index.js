@@ -4171,132 +4171,6 @@ function coerce (version) {
 
 /***/ }),
 
-/***/ 293:
-/***/ (function(module, __unusedexports, __webpack_require__) {
-
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-/**
- * @fileoverview Handles issues getting labeled.
- */
-
-const core = __webpack_require__(470);
-const { context, GitHub } = __webpack_require__(469);
-const whitelist = __webpack_require__(616);
-const GOOD_FIRST_LABEL = 'good first issue';
-const prLabels = ['dependencies', 'critical', 'stale'];
-
-const checkLabels = async () => {
-  core.info('Checking newly added label...');
-  const token = core.getInput('repo-token');
-  const label = context.payload.label;
-  const octokit = new GitHub(token);
-  const user = context.payload.sender.login;
-
-  if (label.name === GOOD_FIRST_LABEL &&
-      !whitelist.goodFirstIssue.includes(user)) {
-    core.info('Good first issue label got added by non whitelisted user.');
-    await handleGoodFirstIssue(octokit, user);
-  } else if (prLabels.includes(label.name) || label.name.startsWith('PR')) {
-    core.info('PR label got added on an issue');
-    await handlePRLabel(octokit, label.name, user);
-  }
-};
-
-/**
- * Handles cases when a good first issue gets added by a non whitelisted user.
- *
- * @param {import('@actions/github').GitHub} octokit
- * @param {String} user - Username of the user that added the label.
- */
-const handleGoodFirstIssue = async (octokit, user) => {
-  const issueNumber = context.payload.issue.number;
-  // Comment on the issue and ping the onboarding team lead.
-  await octokit.issues.createComment(
-    {
-      body:'Hi @' + user + ', thanks for proposing this as a good first ' +
-          'issue. Looping in @' + whitelist.teamLeads.onboardingTeam +
-          ' to confirm, removing the label until he does so.',
-      issue_number: issueNumber,
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-    }
-  );
-  // Remove the label.
-  core.info('Removing the label.');
-  await octokit.issues.removeLabel({
-    issue_number:issueNumber,
-    name: GOOD_FIRST_LABEL,
-    owner: context.repo.owner,
-    repo: context.repo.repo
-  });
-};
-
-/**
- * Handles cases when a PR label gets added to an issue.
- *
- * @param {import('@actions/github').GitHub} octokit
- * @param {String} label - Name of label that got added.
- * @param {String} user - Username of the user that added the label.
- */
-const handlePRLabel = async (octokit, label, user) => {
-  const issueNumber = context.payload.issue.number;
-  const linkText = 'here';
-  // Add link to wiki.
-  const link = linkText.link(
-    'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-    'labeling-issues-and-pull-requests');
-  let commentBody = '';
-  if (label.startsWith('PR CHANGELOG')) {
-    // Handle case for a changelog label.
-    commentBody = (
-      'Hi @' + user + ', changelog labels should not be used on issues.' +
-      ' I’m removing the label. You can learn more about labels ' + link);
-  } else {
-    commentBody = (
-      'Hi @' + user + ', the ' + label + ' label should only be used in ' +
-      'pull requests. I’m removing the label. You can learn more about ' +
-      'labels ' + link);
-  }
-
-  await octokit.issues.createComment(
-    {
-      body:commentBody,
-      issue_number: issueNumber,
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-    }
-  );
-
-  // Remove the label.
-  core.info('Removing the label.');
-  await octokit.issues.removeLabel({
-    issue_number:issueNumber,
-    name: label,
-    owner: context.repo.owner,
-    repo: context.repo.repo
-  });
-};
-
-module.exports = {
-  checkLabels,
-};
-
-
-/***/ }),
-
 /***/ 297:
 /***/ (function(module) {
 
@@ -8462,13 +8336,6 @@ module.exports = require("events");
 
 /***/ }),
 
-/***/ 616:
-/***/ (function(module) {
-
-module.exports = {"goodFirstIssue":["U8NWXD","kevintab95","seanlip","ankita240796","Showtim3","bansalnitish","vojtechjelinek","marianazangrossi","brianrodri","nithusha21","aks681"],"teamLeads":{"onboardingTeam":"Showtim3"}};
-
-/***/ }),
-
 /***/ 621:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -9058,7 +8925,6 @@ exports.request = request;
  */
 
 const core = __webpack_require__(470);
-const issueLabelsModule = __webpack_require__(293);
 
 const EVENTS = {
   ISSUES: 'issues',
@@ -9071,7 +8937,7 @@ module.exports = {
     core.info(`Received Event:${event} Action:${action}.`);
     if (event === EVENTS.ISSUES) {
       if (action === ACTIONS.LABELLED) {
-        await issueLabelsModule.checkLabels();
+        // Handle Labelled Action
       }
     }
   }

@@ -17,7 +17,6 @@
  */
 
 const core = require('@actions/core');
-const issueLabelsModule = require('./issues/checkIssueLabels');
 
 const EVENTS = {
   ISSUES: 'issues',
@@ -30,7 +29,7 @@ module.exports = {
     core.info(`Received Event:${event} Action:${action}.`);
     if (event === EVENTS.ISSUES) {
       if (action === ACTIONS.LABELLED) {
-        await issueLabelsModule.checkLabels();
+        // Handle Labelled Action
       }
     }
   }
