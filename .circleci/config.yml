@@ -35,6 +35,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - attach_workspace:
+          at: /home/circleci/
       - run:
           name: Run frontend tests
           command: npm run test
