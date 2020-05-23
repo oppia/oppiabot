@@ -37,6 +37,7 @@ module.exports = (oppiabot) => {
   oppiabot.on('pull_request.reopened', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await checkPullRequestLabelsModule.checkChangelogLabel(context);
+      // Prevent user from reopening the PR.
       await checkPullRequestBranchModule.checkBranch(context);
       await checkWIPModule.checkWIP(context);
     }
