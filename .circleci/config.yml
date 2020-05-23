@@ -14,7 +14,7 @@ workflows:
 anchor_for_job_defaults: &job_defaults
   working_directory: /home/circleci/oppiabot
   docker:
-    - image: node:8.0
+    - image: node:12.16.1
 
 jobs:
   setup:
