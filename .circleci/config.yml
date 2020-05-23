@@ -11,12 +11,10 @@ workflows:
           requires:
             - setup
 
-var_for_docker_image: &docker_image circleci/node:12
-
 anchor_for_job_defaults: &job_defaults
   working_directory: /home/circleci/oppiabot
   docker:
-    - image: *docker_image
+    - image: node:8.0
 
 jobs:
   setup:
