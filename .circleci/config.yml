@@ -4,10 +4,13 @@ workflows:
   circleci_tests:
     # The following jobs run in the following stages:
     # - Setup runs first.
-    # - After setup passes, frontend tests and coverage tests run.
+    # - After setup passes, frontend tests, coverage tests and actions tests run.
     jobs:
       - setup
       - frontend_tests:
+          requires:
+            - setup
+      - actions_build_test:
           requires:
             - setup
 
