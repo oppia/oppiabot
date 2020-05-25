@@ -38,3 +38,13 @@ jobs:
       - run:
           name: Run frontend tests
           command: npm run test
+
+  actions_build_test:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          name: Run Actions build tests
+          command: npm run actions-build-test
