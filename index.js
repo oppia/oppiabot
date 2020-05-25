@@ -3,6 +3,7 @@ const scheduler = require('./lib/scheduler');
 const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
+const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
 const checkWIPModule = require('./lib/checkWipDraftPR');
 
 const whitelistedAccounts = (
@@ -28,6 +29,7 @@ module.exports = (oppiabot) => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await apiForSheetsModule.checkClaStatus(context);
       await checkPullRequestLabelsModule.checkChangelogLabel(context);
+      await checkPullRequestBranchModule.checkBranch(context);
       await checkWIPModule.checkWIP(context);
     }
   });
@@ -35,6 +37,8 @@ module.exports = (oppiabot) => {
   oppiabot.on('pull_request.reopened', async context => {
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await checkPullRequestLabelsModule.checkChangelogLabel(context);
+      // Prevent user from reopening the PR.
+      await checkPullRequestBranchModule.checkBranch(context);
       await checkWIPModule.checkWIP(context);
     }
   });
