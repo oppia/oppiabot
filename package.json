@@ -11,7 +11,8 @@
     "start": "probot run ./index.js",
     "test": "node ./spec/setup.js",
     "actions-build": "ncc build actions/main.js",
-    "actions-build-test": "node ./spec/actionsBuild.js"
+    "actions-build-test": "node ./spec/actionsBuild.js",
+    "update-actions-build": "node actions/build.js"
   },
   "dependencies": {
     "@actions/core": "^1.2.4",
@@ -54,9 +55,14 @@
       ".env"
     ]
   },
+  "lint-staged": {
+    "actions/**/*.+(js|json)": [
+      "npm run update-actions-build"
+    ]
+  },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run actions-build && git add ."
+      "pre-commit": "lint-staged && git add ."
     }
   }
 }

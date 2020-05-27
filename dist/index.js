@@ -8513,7 +8513,6 @@ const core = __webpack_require__(470);
 const { context } = __webpack_require__(469);
 const dispatcher = __webpack_require__(760);
 
-console.log('Testing hooks');
 core.info(
   `About to dispatch:${context.eventName} and ${context.payload.action}.`
 );
