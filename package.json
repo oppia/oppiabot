@@ -32,7 +32,9 @@
   },
   "devDependencies": {
     "@zeit/ncc": "^0.22.2",
+    "husky": "^4.2.5",
     "jasmine": "^3.1.0",
+    "lint-staged": "^10.2.6",
     "nodemon": "^2.0.0",
     "nyc": "^15.0.1",
     "smee-client": "^1.0.1",
@@ -51,5 +53,16 @@
     "watch": [
       ".env"
     ]
+  },
+  "lint-staged": {
+    "actions/**/*.+(js|json)": [
+      "npm run actions-build",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }
