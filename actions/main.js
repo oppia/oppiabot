@@ -19,7 +19,7 @@
 const core = require('@actions/core');
 const { context } = require('@actions/github');
 const dispatcher = require('./src/dispatcher');
-// Testing new changes
+
 core.info(
   `About to dispatch:${context.eventName} and ${context.payload.action}.`
 );
