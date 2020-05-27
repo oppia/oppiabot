@@ -1,3 +1,4 @@
-const { exec } = require('child_process');
+const { execSync } = require('child_process');
 
-exec('npm run actions-build');
+execSync('npm run actions-build');
+execSync('git add dist/index.js');
