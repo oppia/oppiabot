@@ -56,13 +56,12 @@
   },
   "lint-staged": {
     "actions/**/*.+(js|json)": [
-      "npm run actions-build",
-      "git add"
+      "npm run actions-build"
     ]
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "npm run actions-build"
     }
   }
 }
