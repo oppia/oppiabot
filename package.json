@@ -54,14 +54,9 @@
       ".env"
     ]
   },
-  "lint-staged": {
-    "actions/**/*.+(js|json)": [
-      "npm run actions-build"
-    ]
-  },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run actions-build"
+      "pre-commit": "npm run actions-build && git add ."
     }
   }
 }
