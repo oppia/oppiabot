@@ -8,6 +8,8 @@ const checkWIPModule = require('./lib/checkWipDraftPR');
 
 const whitelistedAccounts = (
   (process.env.WHITELISTED_ACCOUNTS || '').toLowerCase().split(','));
+const reposWithOnlyCLACheck = (
+  (process.env.ONLY_CLA_CHECK_ENABLED_REPOS || '').toLowerCase().split(','));
 
 /**
  * This is the main entrypoint to the Probot app
@@ -26,16 +28,21 @@ module.exports = (oppiabot) => {
     // repository on which the bot has been installed.
     // This condition checks whether the owner account is included in
     // the whitelisted accounts.
+    console.log(JSON.stringify(context.repo()));
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await apiForSheetsModule.checkClaStatus(context);
-      await checkPullRequestLabelsModule.checkChangelogLabel(context);
-      await checkPullRequestBranchModule.checkBranch(context);
-      await checkWIPModule.checkWIP(context);
+      if (!reposWithOnlyCLACheck.includes(context.repo().repo.toLowerCase())) {
+        await checkPullRequestLabelsModule.checkChangelogLabel(context);
+        await checkPullRequestBranchModule.checkBranch(context);
+        await checkWIPModule.checkWIP(context);
+      }
     }
   });
 
   oppiabot.on('pull_request.reopened', async context => {
-    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+    if (
+      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
+      !reposWithOnlyCLACheck.includes(context.repo().repo.toLowerCase)) {
       await checkPullRequestLabelsModule.checkChangelogLabel(context);
       // Prevent user from reopening the PR.
       await checkPullRequestBranchModule.checkBranch(context);
@@ -44,13 +51,17 @@ module.exports = (oppiabot) => {
   });
 
   oppiabot.on('pull_request.labeled', async context => {
-    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+     if (
+      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
+      !reposWithOnlyCLACheck.includes(context.repo().repo.toLowerCase)) {
       await checkPullRequestLabelsModule.checkAssignee(context);
     }
   });
 
   oppiabot.on('pull_request.synchronize', async context => {
-    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+    if (
+      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
+      !reposWithOnlyCLACheck.includes(context.repo().repo.toLowerCase)) {
       // eslint-disable-next-line no-console
       console.log(' PR SYNC EVENT TRIGGERED..');
       await checkMergeConflictsModule.checkMergeConflictsInPullRequest(
@@ -59,7 +70,9 @@ module.exports = (oppiabot) => {
   });
 
   oppiabot.on('pull_request.closed', async context => {
-    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
+     if (
+      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
+      !reposWithOnlyCLACheck.includes(context.repo().repo.toLowerCase) &&
       context.payload.pull_request.merged === true) {
       // eslint-disable-next-line no-console
       console.log(' A PR HAS BEEN MERGED..');
@@ -71,6 +84,7 @@ module.exports = (oppiabot) => {
   oppiabot.on('pull_request.edited', async context => {
     if (
       whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
+      !reposWithOnlyCLACheck.includes(context.repo().repo.toLowerCase) &&
       context.payload.pull_request.state === 'open') {
       // eslint-disable-next-line no-console
       console.log('A PR HAS BEEN EDITED...');

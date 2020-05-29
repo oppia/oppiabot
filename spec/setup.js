@@ -23,6 +23,7 @@ const { EOL } = require('os');
 const { exec } = require('child_process');
 
 const WHITELISTED_ACCOUNTS = 'WHITELISTED_ACCOUNTS';
+const ONLY_CLA_CHECK_ENABLED_REPOS = 'ONLY_CLA_CHECK_ENABLED_REPOS';
 const CLIENT_SECRET = 'CLIENT_SECRET';
 const CREDENTIALS = 'CREDENTIALS';
 const NEW_RELIC_NO_CONFIG = 'NEW_RELIC_NO_CONFIG_FILE';
@@ -32,7 +33,7 @@ const envPath = path.join(__dirname, '..', '.env');
 const envExamplePath = path.join(__dirname, '..', '.env.example');
 let envData = '';
 
-const setWhitelistedAccount = () => {
+const setEnvVariables = () => {
   // Load env.
   let data = '';
   if (fs.existsSync(envPath)) {
@@ -65,6 +66,14 @@ const setWhitelistedAccount = () => {
     const newWhitelist = WHITELISTED_ACCOUNTS + '=oppia';
     envArray.splice(whitelistIndex, 1, newWhitelist);
   }
+
+  // Add only cla enabled repos.
+  const claEnabledReposIndex =  envArray.findIndex((line) =>
+    line.startsWith(ONLY_CLA_CHECK_ENABLED_REPOS)
+  );
+  const newClaEnabledRepos = (
+    ONLY_CLA_CHECK_ENABLED_REPOS + '=oppia-android');
+  envArray.splice(claEnabledReposIndex, 1, newClaEnabledRepos);
 
   // Set client secret.
   const clientSecretIndex = envArray.findIndex((line) =>
@@ -139,7 +148,7 @@ const runTest = () => {
 
   return new Promise((resolve, reject) => {
     exec(
-      nycPath + ' "' + jasminePath + '"',
+      nycPath + ' ' + jasminePath,
       (error, stdout, stderr) => {
         console.log(stdout);
         if (error) {
@@ -160,7 +169,7 @@ const revertEnv = () => {
   fs.writeFileSync(envPath, envData);
 };
 
-setWhitelistedAccount();
+setEnvVariables();
 runTest().then(
   () => {
     revertEnv();
