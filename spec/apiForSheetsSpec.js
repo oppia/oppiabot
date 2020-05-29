@@ -136,7 +136,7 @@ describe('Api For Sheets Module', () => {
       done();
     });
 
-    it('should not call other checks', () => {
+    it('should call other checks', () => {
       expect(
         checkPullRequestLabelsModule.checkChangelogLabel).toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).toHaveBeenCalled();
