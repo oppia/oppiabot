@@ -28,7 +28,6 @@ module.exports = (oppiabot) => {
     // repository on which the bot has been installed.
     // This condition checks whether the owner account is included in
     // the whitelisted accounts.
-    console.log(JSON.stringify(context.repo()));
     if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
       await apiForSheetsModule.checkClaStatus(context);
       if (!reposWithOnlyCLACheck.includes(context.repo().repo.toLowerCase())) {
