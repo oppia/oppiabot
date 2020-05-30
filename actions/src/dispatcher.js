@@ -27,10 +27,5 @@ const ACTIONS = {
 module.exports = {
   async dispatch(event, action) {
     core.info(`Received Event:${event} Action:${action}.`);
-    if (event === EVENTS.ISSUES) {
-      if (action === ACTIONS.LABELLED) {
-        // Handle Labelled Action
-      }
-    }
   }
 };
