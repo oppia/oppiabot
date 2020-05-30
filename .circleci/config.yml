@@ -11,12 +11,10 @@ workflows:
           requires:
             - setup
 
-var_for_docker_image: &docker_image circleci/node:7
-
 anchor_for_job_defaults: &job_defaults
   working_directory: /home/circleci/oppiabot
   docker:
-    - image: *docker_image
+    - image: node:12.16.1
 
 jobs:
   setup:
@@ -26,11 +24,17 @@ jobs:
       - run:
           name: Install dependencies
           command: npm install
+      - persist_to_workspace:
+          root: /home/circleci/
+          paths:
+            - oppiabot/node_modules/
 
   frontend_tests:
     <<: *job_defaults
     steps:
       - checkout
+      - attach_workspace:
+          at: /home/circleci/
       - run:
           name: Run frontend tests
           command: npm run test

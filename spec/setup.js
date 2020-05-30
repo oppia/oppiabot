@@ -24,6 +24,7 @@ const { exec } = require('child_process');
 
 const WHITELISTED_ACCOUNTS = 'WHITELISTED_ACCOUNTS';
 const CLIENT_SECRET = 'CLIENT_SECRET';
+const CREDENTIALS = 'CREDENTIALS';
 const NEW_RELIC_NO_CONFIG = 'NEW_RELIC_NO_CONFIG_FILE';
 const NEW_RELIC_APP = 'NEW_RELIC_APP_NAME';
 const NEW_RELIC_ENABLED = 'NEW_RELIC_ENABLED';
@@ -79,6 +80,15 @@ const setWhitelistedAccount = () => {
   const newClientSecret = (
     CLIENT_SECRET + '="' + JSON.stringify(clientSecretObj) + '"');
   envArray.splice(clientSecretIndex, 1, newClientSecret);
+
+  // Set credentials.
+  const credentialsIndex = envArray.findIndex((line) =>
+    line.startsWith(CREDENTIALS)
+  );
+  const credentialsObj = {};
+  const newCredentials = (
+    CREDENTIALS + '="' + JSON.stringify(credentialsObj) + '"');
+  envArray.splice(credentialsIndex, 1, newCredentials);
 
   // Update new relic config.
   const newRelicConfigIndex = envArray.findIndex((line) =>
