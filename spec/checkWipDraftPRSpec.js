@@ -71,7 +71,7 @@ describe('Oppiabot\'s', () => {
       github.git = {
         getCommit: jasmine.createSpy('getCommit').and.resolveTo({
           data: {
-            message: 'changes'
+            message: 'commit without skip prefix'
           }
         })
       };
@@ -109,8 +109,9 @@ describe('Oppiabot\'s', () => {
       const author = pullRequestEditedPayload.payload.pull_request.user.login;
       const commentBody = (
         'Hi @' + author + ', when creating WIP/Draft PRs, ensure that ' +
-        'your commit messages are prefixed with **[ci skip]** to prevent CI ' +
-        'checks from running. You can learn more about it ' + link + '.');
+        'your commit messages are prefixed with **[ci skip]** or ' +
+        '**[skip ci]** to prevent CI checks from running. ' +
+        'You can learn more about it ' + link + '.');
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: pullRequestEditedPayload.payload.pull_request.number,
@@ -138,7 +139,7 @@ describe('Oppiabot\'s', () => {
       github.git = {
         getCommit: jasmine.createSpy('getCommit').and.resolveTo({
           data: {
-            message: '[ci skip] changes'
+            message: '[ci skip] commit with skip prefix'
           }
         })
       };
@@ -201,7 +202,7 @@ describe('Oppiabot\'s', () => {
       github.git = {
         getCommit: jasmine.createSpy('getCommit').and.resolveTo({
           data: {
-            message: 'changes'
+            message: 'commit without skip prefix'
           }
         })
       };
@@ -223,7 +224,7 @@ describe('Oppiabot\'s', () => {
       github.git = {
         getCommit: jasmine.createSpy('getCommit').and.resolveTo({
           data: {
-            message: 'changes'
+            message: 'commit without skip prefix'
           }
         })
       };
@@ -269,8 +270,9 @@ describe('Oppiabot\'s', () => {
       const author = pullRequestEditedPayload.payload.pull_request.user.login;
       const commentBody = (
         'Hi @' + author + ', when creating WIP/Draft PRs, ensure that ' +
-        'your commit messages are prefixed with **[ci skip]** to prevent CI ' +
-        'checks from running. You can learn more about it ' + link + '.');
+        'your commit messages are prefixed with **[ci skip]** or ' +
+        '**[skip ci]** to prevent CI checks from running. ' +
+        'You can learn more about it ' + link + '.');
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: pullRequestEditedPayload.payload.pull_request.number,
@@ -298,7 +300,7 @@ describe('Oppiabot\'s', () => {
       github.git = {
         getCommit: jasmine.createSpy('getCommit').and.resolveTo({
           data: {
-            message: '[skip ci] changes'
+            message: '[skip ci] commit with skip prefix'
           }
         })
       };
@@ -348,7 +350,7 @@ describe('Oppiabot\'s', () => {
       github.git = {
         getCommit: jasmine.createSpy('getCommit').and.resolveTo({
           data: {
-            message: '[skip ci] changes'
+            message: '[skip ci] commit with skip prefix'
           }
         })
       };
