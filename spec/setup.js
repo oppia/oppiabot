@@ -67,14 +67,6 @@ const setEnvVariables = () => {
     envArray.splice(whitelistIndex, 1, newWhitelist);
   }
 
-  // Add only cla enabled repos.
-  const claEnabledReposIndex =  envArray.findIndex((line) =>
-    line.startsWith(ONLY_CLA_CHECK_ENABLED_REPOS)
-  );
-  const newClaEnabledRepos = (
-    ONLY_CLA_CHECK_ENABLED_REPOS + '=oppia-android');
-  envArray.splice(claEnabledReposIndex, 1, newClaEnabledRepos);
-
   // Set client secret.
   const clientSecretIndex = envArray.findIndex((line) =>
     line.startsWith(CLIENT_SECRET)
