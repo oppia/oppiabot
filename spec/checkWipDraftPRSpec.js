@@ -21,6 +21,7 @@ const scheduler = require('../lib/scheduler');
 const pullRequestEditedPayload = require('../fixtures/pullRequest.edited.json');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
+const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 
 describe('Oppiabot\'s', () => {
   /**
@@ -46,6 +47,7 @@ describe('Oppiabot\'s', () => {
     spyOn(
       checkPullRequestLabelsModule, 'checkChangelogLabel')
       .and.callFake(() => {});
+    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
 
     github = {
       issues: {

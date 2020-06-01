@@ -22,6 +22,7 @@ const pullRequestPayload = require('../fixtures/pullRequestPayload.json');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
+const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 
 describe('Pull Request Branch Check', () => {
   /**
@@ -49,6 +50,7 @@ describe('Pull Request Branch Check', () => {
       'checkChangelogLabel'
     ).and.callFake(() => {});
     spyOn(checkWipDraftPRModule, 'checkWIP').and.callFake(() => {});
+    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
 
     github = {
       issues: {

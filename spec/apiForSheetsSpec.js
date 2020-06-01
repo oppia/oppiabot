@@ -7,6 +7,7 @@ const scheduler = require('../lib/scheduler');
 const pullRequestpayload = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
+const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const {google} = require('googleapis');
 const {OAuth2Client} = require('google-auth-library');
 
@@ -28,6 +29,7 @@ describe('Api For Sheets Module', () => {
 
   beforeEach(function (done) {
     spyOn(scheduler, 'createScheduler').and.callFake(() => {});
+    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
 
     github = {
       issues: {

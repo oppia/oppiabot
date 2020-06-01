@@ -4,6 +4,7 @@ const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
+const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
 const checkWIPModule = require('./lib/checkWipDraftPR');
 
 const whitelistedAccounts = (
@@ -31,6 +32,7 @@ module.exports = (oppiabot) => {
       await checkPullRequestLabelsModule.checkChangelogLabel(context);
       await checkPullRequestBranchModule.checkBranch(context);
       await checkWIPModule.checkWIP(context);
+      await checkPullRequestJobModule.checkForNewJob(context);
     }
   });
 
@@ -55,6 +57,7 @@ module.exports = (oppiabot) => {
       console.log(' PR SYNC EVENT TRIGGERED..');
       await checkMergeConflictsModule.checkMergeConflictsInPullRequest(
         context, context.payload.pull_request);
+      await checkPullRequestJobModule.checkForNewJob(context);
     }
   });
 
