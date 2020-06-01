@@ -19,7 +19,7 @@
 
 const { execSync } = require('child_process');
 
-// Build the actions file
+// Build the actions file.
 execSync('npm run actions-build');
-// Automatically add the build file to the commit index
+// Automatically add the build file to the commit index.
 execSync('git add dist/index.js');
