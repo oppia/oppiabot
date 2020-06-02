@@ -91,8 +91,8 @@ describe('Pull Request Job Spec', () => {
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
-        body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR. ' +
-        'It adds/modifies a server job. Also @' + author + ', please ' +
+        body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR, ' +
+        'it adds/modifies a server job. Also @' + author + ', please ' +
         'endeavour to fill the ' + formText + ' for the new job ' +
         'to get tested on the test server. Thanks!',
         repo: payloadData.payload.repository.name,
@@ -135,8 +135,8 @@ describe('Pull Request Job Spec', () => {
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
-        body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR. ' +
-        'It adds/modifies a server job. Also @' + author + ', please ' +
+        body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR, ' +
+        'it adds/modifies a server job. Also @' + author + ', please ' +
         'endeavour to fill the ' + formText + ' for the new job ' +
         'to get tested on the test server. Thanks!',
         repo: payloadData.payload.repository.name,
