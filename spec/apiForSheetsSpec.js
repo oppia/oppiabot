@@ -2,10 +2,11 @@ require('dotenv').config();
 const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
+const constants = require('../constants');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
-const checkWIPModule = require('../lib/checkWipDraftPR');
+const checkWipModule = require('../lib/checkWipDraftPR');
 const scheduler = require('../lib/scheduler');
 const pullRequestpayload = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
@@ -120,7 +121,7 @@ describe('Api For Sheets Module', () => {
       spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
       spyOn(checkPullRequestLabelsModule, 'checkChangelogLabel').and.callThrough();
       spyOn(checkPullRequestBranchModule, 'checkBranch').and.callThrough();
-      spyOn(checkWIPModule, 'checkWIP').and.callThrough();
+      spyOn(checkWipModule, 'checkWIP').and.callThrough();
       spyOn(google, 'sheets').and.returnValue({
         spreadsheets: {
           values: {
@@ -140,7 +141,7 @@ describe('Api For Sheets Module', () => {
       expect(
         checkPullRequestLabelsModule.checkChangelogLabel).toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).toHaveBeenCalled();
-      expect(checkWIPModule.checkWIP).toHaveBeenCalled();
+      expect(checkWipModule.checkWIP).toHaveBeenCalled();
     });
 
     it('should be called for the given payload', () => {
@@ -320,14 +321,14 @@ describe('Api For Sheets Module', () => {
     });
   });
 
-  describe('cla check for only cla check enabled repos', () => {
+  describe('checks are run per the whitelist', () => {
     beforeEach(function (done) {
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callThrough({});
       spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
       spyOn(checkPullRequestLabelsModule, 'checkChangelogLabel').and.callThrough();
       spyOn(checkPullRequestBranchModule, 'checkBranch').and.callThrough();
-      spyOn(checkWIPModule, 'checkWIP').and.callThrough();
+      spyOn(checkWipModule, 'checkWIP').and.callThrough();
       spyOn(google, 'sheets').and.returnValue({
         spreadsheets: {
           values: {
@@ -339,16 +340,20 @@ describe('Api For Sheets Module', () => {
           },
         },
       });
-      pullRequestpayload.payload.repository.name = 'oppia-android';
+      spyOn(constants, 'getChecksWhitelist').and.returnValue({
+        'oppia': {
+          'opened': ['cla-check']
+        }
+      });
       robot.receive(pullRequestpayload);
       done();
     });
 
-    it('should not call other checks', () => {
+    it('should not call non whitelisted checks', () => {
       expect(
         checkPullRequestLabelsModule.checkChangelogLabel).not.toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
-      expect(checkWIPModule.checkWIP).not.toHaveBeenCalled();
+      expect(checkWipModule.checkWIP).not.toHaveBeenCalled();
     });
 
     it('should be called for the given payload', () => {
