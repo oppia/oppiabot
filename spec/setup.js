@@ -32,7 +32,7 @@ const envPath = path.join(__dirname, '..', '.env');
 const envExamplePath = path.join(__dirname, '..', '.env.example');
 let envData = '';
 
-const setWhitelistedAccount = () => {
+const setEnvVariables = () => {
   // Load env.
   let data = '';
   if (fs.existsSync(envPath)) {
@@ -139,7 +139,7 @@ const runTest = () => {
 
   return new Promise((resolve, reject) => {
     exec(
-      nycPath + ' "' + jasminePath + '"',
+      nycPath + ' ' + jasminePath,
       (error, stdout, stderr) => {
         console.log(stdout);
         if (error) {
@@ -160,7 +160,7 @@ const revertEnv = () => {
   fs.writeFileSync(envPath, envData);
 };
 
-setWhitelistedAccount();
+setEnvVariables();
 runTest().then(
   () => {
     revertEnv();

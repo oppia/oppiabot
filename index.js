@@ -4,10 +4,54 @@ const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
-const checkWIPModule = require('./lib/checkWipDraftPR');
+const checkWipModule = require('./lib/checkWipDraftPR');
+const constants = require('./constants');
 
 const whitelistedAccounts = (
   (process.env.WHITELISTED_ACCOUNTS || '').toLowerCase().split(','));
+
+async function runChecks(context, checkEvent) {
+  const repoName = context.repo().repo.toLowerCase();
+  const checksWhitelist = constants.getChecksWhitelist();
+  if (checksWhitelist.hasOwnProperty(repoName)) {
+    const checks = checksWhitelist[repoName];
+    if (checks.hasOwnProperty(checkEvent)) {
+      const checkList = checks[checkEvent];
+      for (var i = 0; i < checkList.length; i++) {
+        switch (checkList[i]) {
+          case constants.claCheck:
+            await apiForSheetsModule.checkClaStatus(context);
+            break;
+          case constants.changelogCheck:
+            await checkPullRequestLabelsModule.checkChangelogLabel(context);
+            break;
+          case constants.branchCheck:
+            await checkPullRequestBranchModule.checkBranch(context);
+            break;
+          case constants.wipCheck:
+            await checkWipModule.checkWIP(context);
+            break;
+          case constants.assigneeCheck:
+            await checkPullRequestLabelsModule.checkAssignee(context);
+            break;
+          case constants.mergeConflictCheck:
+            await checkMergeConflictsModule.checkMergeConflictsInPullRequest(
+              context, context.payload.pull_request);
+            break;
+          case constants.allMergeConflictCheck:
+            await (
+              checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(
+                context));
+            break;
+        }
+      }
+    }
+  }
+}
+
+function checkWhitelistedAccounts(context) {
+  return whitelistedAccounts.includes(context.repo().owner.toLowerCase());
+}
 
 /**
  * This is the main entrypoint to the Probot app
@@ -26,55 +70,48 @@ module.exports = (oppiabot) => {
     // repository on which the bot has been installed.
     // This condition checks whether the owner account is included in
     // the whitelisted accounts.
-    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
-      await apiForSheetsModule.checkClaStatus(context);
-      await checkPullRequestLabelsModule.checkChangelogLabel(context);
-      await checkPullRequestBranchModule.checkBranch(context);
-      await checkWIPModule.checkWIP(context);
+    if (checkWhitelistedAccounts(context)) {
+      await runChecks(context, constants.openEvent);
     }
   });
 
   oppiabot.on('pull_request.reopened', async context => {
-    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
-      await checkPullRequestLabelsModule.checkChangelogLabel(context);
-      // Prevent user from reopening the PR.
-      await checkPullRequestBranchModule.checkBranch(context);
-      await checkWIPModule.checkWIP(context);
+    if (checkWhitelistedAccounts(context)) {
+      await runChecks(context, constants.reopenEvent);
     }
   });
 
   oppiabot.on('pull_request.labeled', async context => {
-    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
-      await checkPullRequestLabelsModule.checkAssignee(context);
+     if (checkWhitelistedAccounts(context)) {
+      await runChecks(context, constants.labelEvent);
     }
   });
 
   oppiabot.on('pull_request.synchronize', async context => {
-    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase())) {
+    if (checkWhitelistedAccounts(context)) {
       // eslint-disable-next-line no-console
       console.log(' PR SYNC EVENT TRIGGERED..');
-      await checkMergeConflictsModule.checkMergeConflictsInPullRequest(
-        context, context.payload.pull_request);
+      await runChecks(context, constants.synchronizeEvent);
     }
   });
 
   oppiabot.on('pull_request.closed', async context => {
-    if (whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
+     if (
+      checkWhitelistedAccounts(context) &&
       context.payload.pull_request.merged === true) {
       // eslint-disable-next-line no-console
       console.log(' A PR HAS BEEN MERGED..');
-      await checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(
-        context);
+      await runChecks(context, constants.closeEvent);
     }
   });
 
   oppiabot.on('pull_request.edited', async context => {
     if (
-      whitelistedAccounts.includes(context.repo().owner.toLowerCase()) &&
+      checkWhitelistedAccounts(context) &&
       context.payload.pull_request.state === 'open') {
       // eslint-disable-next-line no-console
       console.log('A PR HAS BEEN EDITED...');
-      await checkWIPModule.checkWIP(context);
+      await runChecks(context, constants.editEvent);
     }
   });
 };

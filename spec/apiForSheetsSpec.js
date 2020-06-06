@@ -2,7 +2,11 @@ require('dotenv').config();
 const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
+const constants = require('../constants');
 const apiForSheetsModule = require('../lib/apiForSheets');
+const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
+const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
+const checkWipModule = require('../lib/checkWipDraftPR');
 const scheduler = require('../lib/scheduler');
 const pullRequestpayload = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
@@ -47,7 +51,8 @@ describe('Api For Sheets Module', () => {
             body:
               'Hi! @tester7777. Welcome to Oppia! ' +
               'Please could you follow the instructions' +
-              '<a href="https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up">here</a>' +
+              '<a href="https://github.com/oppia/oppia/wiki/' +
+              'Contributing-code-to-Oppia#setting-things-up">here</a>' +
               "to get started ? You'll need to do this before" +
               'we can accept your PR. Thanks!',
           },
@@ -114,6 +119,9 @@ describe('Api For Sheets Module', () => {
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callThrough({});
       spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
+      spyOn(checkPullRequestLabelsModule, 'checkChangelogLabel').and.callThrough();
+      spyOn(checkPullRequestBranchModule, 'checkBranch').and.callThrough();
+      spyOn(checkWipModule, 'checkWIP').and.callThrough();
       spyOn(google, 'sheets').and.returnValue({
         spreadsheets: {
           values: {
@@ -127,6 +135,13 @@ describe('Api For Sheets Module', () => {
       });
       robot.receive(pullRequestpayload);
       done();
+    });
+
+    it('should call other checks', () => {
+      expect(
+        checkPullRequestLabelsModule.checkChangelogLabel).toHaveBeenCalled();
+      expect(checkPullRequestBranchModule.checkBranch).toHaveBeenCalled();
+      expect(checkWipModule.checkWIP).toHaveBeenCalled();
     });
 
     it('should be called for the given payload', () => {
@@ -303,6 +318,87 @@ describe('Api For Sheets Module', () => {
         );
         expect(github.issues.addLabels).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('checks are run per the whitelist', () => {
+    beforeEach(function (done) {
+      spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
+      spyOn(apiForSheetsModule, 'authorize').and.callThrough({});
+      spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
+      spyOn(checkPullRequestLabelsModule, 'checkChangelogLabel').and.callThrough();
+      spyOn(checkPullRequestBranchModule, 'checkBranch').and.callThrough();
+      spyOn(checkWipModule, 'checkWIP').and.callThrough();
+      spyOn(google, 'sheets').and.returnValue({
+        spreadsheets: {
+          values: {
+            get: jasmine.createSpy('get').and.callFake(async (obj, cb) => {
+              await cb(null, {
+                data : {values: [['test']]},
+              });
+            }),
+          },
+        },
+      });
+      spyOn(constants, 'getChecksWhitelist').and.returnValue({
+        'oppia': {
+          'opened': ['cla-check']
+        }
+      });
+      robot.receive(pullRequestpayload);
+      done();
+    });
+
+    it('should not call non whitelisted checks', () => {
+      expect(
+        checkPullRequestLabelsModule.checkChangelogLabel).not.toHaveBeenCalled();
+      expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
+      expect(checkWipModule.checkWIP).not.toHaveBeenCalled();
+    });
+
+    it('should be called for the given payload', () => {
+      expect(apiForSheetsModule.checkClaStatus).toHaveBeenCalled();
+    });
+
+    it('should be called once for the given payload', () => {
+      expect(apiForSheetsModule.checkClaStatus.calls.count()).toEqual(1);
+    });
+
+    it('should be called with one argument for the given payload', () => {
+      expect(apiForSheetsModule.checkClaStatus.calls.argsFor(0).length).toEqual(
+        1
+      );
+    });
+
+    it('should be called with the correct username for the given payload', () => {
+      const context = apiForSheetsModule.checkClaStatus.calls.argsFor(0)[0];
+      expect(context.payload.pull_request.user.login).toEqual('testuser7777');
+    });
+
+    it('should call authorize', () => {
+      expect(apiForSheetsModule.authorize).toHaveBeenCalled();
+    });
+
+    it('should call authorize once', () => {
+      expect(apiForSheetsModule.authorize.calls.count()).toEqual(1);
+    });
+
+    it('should call authorize with one argument', () => {
+      expect(apiForSheetsModule.authorize.calls.argsFor(0).length).toEqual(1);
+    });
+
+    it('should call checkClaSheet', () => {
+      expect(apiForSheetsModule.checkClaSheet).toHaveBeenCalled();
+    });
+
+    it('should call checkClaSheet once', () => {
+      expect(apiForSheetsModule.checkClaSheet.calls.count()).toEqual(1);
+    });
+
+    it('should call checkClaSheet with one argument', () => {
+      expect(apiForSheetsModule.checkClaSheet.calls.argsFor(0).length).toEqual(
+        1
+      );
     });
   });
 });
