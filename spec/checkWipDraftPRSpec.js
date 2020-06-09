@@ -68,8 +68,15 @@ describe('Oppiabot\'s', () => {
     done();
   });
 
-  describe('WIP PRs', () => {
+  describe('WIP PRs without skip prefix', () => {
     beforeEach((done) => {
+      github.git = {
+        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
+          data: {
+            message: 'commit without skip prefix'
+          }
+        })
+      };
       spyOn(checkWipDraftPRModule, 'checkWIP').and.callThrough();
       robot.receive(pullRequestEditedPayload);
       done();
@@ -83,6 +90,16 @@ describe('Oppiabot\'s', () => {
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalledTimes(1);
     });
 
+    it('calls get commit', () => {
+      expect(github.git.getCommit).toHaveBeenCalled();
+      expect(github.git.getCommit).toHaveBeenCalledTimes(1);
+      expect(github.git.getCommit).toHaveBeenCalledWith({
+        owner: pullRequestEditedPayload.payload.repository.owner.login,
+        repo: pullRequestEditedPayload.payload.repository.name,
+        commit_sha: pullRequestEditedPayload.payload.pull_request.head.sha
+      });
+    });
+
     it('creates comment for WIP PRs', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledTimes(1);
@@ -93,10 +110,10 @@ describe('Oppiabot\'s', () => {
         '#wip--draft-pull-requests');
       const author = pullRequestEditedPayload.payload.pull_request.user.login;
       const commentBody = (
-        'Hi @' + author + ', WIP/Draft PRs are highly discouraged. You can ' +
-        'learn more about it ' + link + '. You can reopen it when it\'s ' +
-        'ready to be reviewed and ensure that it is without any WIP phrase ' +
-        'in title or body. Thanks!');
+        'Hi @' + author + ', when creating WIP/Draft PRs, ensure that ' +
+        'your commit messages are prefixed with **[ci skip]** or ' +
+        '**[skip ci]** to prevent CI checks from running. ' +
+        'You can learn more about it ' + link + '.');
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: pullRequestEditedPayload.payload.pull_request.number,
@@ -119,16 +136,63 @@ describe('Oppiabot\'s', () => {
     });
   });
 
+  describe('WIP PRs with skip prefix', () => {
+    beforeEach((done) => {
+      github.git = {
+        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
+          data: {
+            message: '[ci skip] commit with skip prefix'
+          }
+        })
+      };
+      spyOn(checkWipDraftPRModule, 'checkWIP').and.callThrough();
+      robot.receive(pullRequestEditedPayload);
+      done();
+    });
+
+    it('calls checkWIP function', () =>{
+      expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
+    });
+
+    it('calls checkWIP once', () =>{
+      expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls get commit', () => {
+      expect(github.git.getCommit).toHaveBeenCalled();
+      expect(github.git.getCommit).toHaveBeenCalledTimes(1);
+      expect(github.git.getCommit).toHaveBeenCalledWith({
+        owner: pullRequestEditedPayload.payload.repository.owner.login,
+        repo: pullRequestEditedPayload.payload.repository.name,
+        commit_sha: pullRequestEditedPayload.payload.pull_request.head.sha
+      });
+    });
+
+    it('does not create comment for WIP PRs', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('does not close WIP PRs', () => {
+      expect(github.issues.update).not.toHaveBeenCalled();
+    });
+  });
 
   describe('Checks when PR is opened or reopened', () => {
     it('should check when PR is opened', async () => {
+      github.git = {
+        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
+          data: {
+            message: 'changes'
+          }
+        })
+      };
       spyOn(checkWipDraftPRModule, 'checkWIP').and.callThrough();
-
       // Trigger pull_request.opened event.
       pullRequestEditedPayload.payload.action = 'opened';
       await robot.receive(pullRequestEditedPayload);
 
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
+      expect(github.git.getCommit).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledTimes(1);
       expect(github.issues.update).toHaveBeenCalled();
@@ -137,12 +201,19 @@ describe('Oppiabot\'s', () => {
 
     it('should check when PR is reopnend', async() => {
       spyOn(checkWipDraftPRModule, 'checkWIP').and.callThrough();
-
+      github.git = {
+        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
+          data: {
+            message: 'commit without skip prefix'
+          }
+        })
+      };
       // Trigger pull_request.opened event.
       pullRequestEditedPayload.payload.action = 'reopened';
       await robot.receive(pullRequestEditedPayload);
 
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
+      expect(github.git.getCommit).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledTimes(1);
       expect(github.issues.update).toHaveBeenCalled();
@@ -152,6 +223,13 @@ describe('Oppiabot\'s', () => {
 
   describe('Draft PRs', () => {
     beforeEach((done) => {
+      github.git = {
+        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
+          data: {
+            message: 'commit without skip prefix'
+          }
+        })
+      };
       spyOn(checkWipDraftPRModule, 'checkWIP').and.callThrough();
       // Receive a draft payload and remove WIP from title.
       pullRequestEditedPayload.payload.pull_request.draft = true;
@@ -162,6 +240,16 @@ describe('Oppiabot\'s', () => {
 
     it('calls checkWIP function', () => {
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
+    });
+
+    it('calls get commit', () => {
+      expect(github.git.getCommit).toHaveBeenCalled();
+      expect(github.git.getCommit).toHaveBeenCalledTimes(1);
+      expect(github.git.getCommit).toHaveBeenCalledWith({
+        owner: pullRequestEditedPayload.payload.repository.owner.login,
+        repo: pullRequestEditedPayload.payload.repository.name,
+        commit_sha: pullRequestEditedPayload.payload.pull_request.head.sha
+      });
     });
 
     it('calls checkWIP once', () => {
@@ -183,10 +271,10 @@ describe('Oppiabot\'s', () => {
         '#wip--draft-pull-requests');
       const author = pullRequestEditedPayload.payload.pull_request.user.login;
       const commentBody = (
-        'Hi @' + author + ', WIP/Draft PRs are highly discouraged. You can ' +
-        'learn more about it ' + link + '. You can reopen it when it\'s ' +
-        'ready to be reviewed and ensure that it is without any WIP phrase ' +
-        'in title or body. Thanks!');
+        'Hi @' + author + ', when creating WIP/Draft PRs, ensure that ' +
+        'your commit messages are prefixed with **[ci skip]** or ' +
+        '**[skip ci]** to prevent CI checks from running. ' +
+        'You can learn more about it ' + link + '.');
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: pullRequestEditedPayload.payload.pull_request.number,
@@ -209,8 +297,65 @@ describe('Oppiabot\'s', () => {
     });
   });
 
+  describe('Draft PRs with skip prefix', () => {
+    beforeEach((done) => {
+      github.git = {
+        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
+          data: {
+            message: '[skip ci] commit with skip prefix'
+          }
+        })
+      };
+      spyOn(checkWipDraftPRModule, 'checkWIP').and.callThrough();
+      // Receive a draft payload and remove WIP from title.
+      pullRequestEditedPayload.payload.pull_request.draft = true;
+      pullRequestEditedPayload.payload.pull_request.title = 'Testing Draft';
+      robot.receive(pullRequestEditedPayload);
+      done();
+    });
+
+    it('calls checkWIP function', () => {
+      expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
+    });
+
+    it('calls checkWIP once', () => {
+      expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls get commit', () => {
+      expect(github.git.getCommit).toHaveBeenCalled();
+      expect(github.git.getCommit).toHaveBeenCalledTimes(1);
+      expect(github.git.getCommit).toHaveBeenCalledWith({
+        owner: pullRequestEditedPayload.payload.repository.owner.login,
+        repo: pullRequestEditedPayload.payload.repository.name,
+        commit_sha: pullRequestEditedPayload.payload.pull_request.head.sha
+      });
+    });
+
+    it('calls with draft payload', () => {
+      const args = checkWipDraftPRModule.checkWIP.calls.argsFor(0)[0];
+      expect(args.payload.pull_request.draft).toBe(true);
+      expect(args.payload.pull_request.title).toBe('Testing Draft');
+    });
+
+    it('does not create comment for draft PRs', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('does not close draft PRs', () => {
+      expect(github.issues.update).not.toHaveBeenCalled();
+    });
+  });
+
   describe('Neither Draft nor WIP PRs', () => {
     beforeEach((done) => {
+      github.git = {
+        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
+          data: {
+            message: '[skip ci] commit with skip prefix'
+          }
+        })
+      };
       spyOn(checkWipDraftPRModule, 'checkWIP').and.callThrough();
       // Receive a neither draft nor WIP payload.
       pullRequestEditedPayload.payload.pull_request.draft = false;
@@ -222,12 +367,17 @@ describe('Oppiabot\'s', () => {
     it('calls checkWIP function', () => {
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
     });
+
+    it('does not call get commit', () => {
+      expect(github.git.getCommit).not.toHaveBeenCalled();
+    });
+
     it('does not create a comment', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
     });
+
     it('does not close the PR', ()=> {
       expect(github.issues.update).not.toHaveBeenCalled();
     });
   });
-
 });
