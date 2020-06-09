@@ -143,7 +143,8 @@ describe('Pull Request Job Spec', () => {
         'it adds a new server job. The name of the job is exp_jobs_one_off.' +
         newLineFeed + 'Also @' + author + ', endeavour to add the new job ' +
         'file to the job registry and please make sure to fill in the ' +
-        formText + ' for the new job to get tested on the test server.' +
+        formText + ' for the new job to be tested on the backup server. ' +
+        'This PR can be merged only after the test is successful.' +
         newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -209,7 +210,8 @@ describe('Pull Request Job Spec', () => {
         'it adds new server jobs. The jobs are exp_jobs_one_off, exp_jobs_oppiabot_off.' +
         newLineFeed + 'Also @' + author + ', endeavour to add the new job ' +
         'files to the job registry and please make sure to fill in the ' +
-        formText + ' for the new jobs to get tested on the test server.' +
+        formText + ' for the new jobs  to be tested on the backup server. ' +
+        'This PR can be merged only after the test is successful.' +
         newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -274,7 +276,8 @@ describe('Pull Request Job Spec', () => {
         body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR, ' +
         'it adds a new server job. The name of the job is exp_jobs_one_off.' +
         newLineFeed + 'Also @' + author + ', please make sure to fill in the ' +
-        formText + ' for the new job to get tested on the test server.' +
+        formText + ' for the new job to be tested on the backup server. ' +
+        'This PR can be merged only after the test is successful.' +
         newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
