@@ -23,7 +23,7 @@ const checksWhitelist = {
     [labelEvent]: [],
     [synchronizeEvent]: [],
     [closeEvent]: [],
-    [editEvent]: [],
+    [editEvent]: []
   },
   oppia: {
     [openEvent]: [claCheck, changelogCheck, branchCheck, wipCheck, jobCheck],
@@ -31,7 +31,7 @@ const checksWhitelist = {
     [labelEvent]: [assigneeCheck],
     [synchronizeEvent]: [mergeConflictCheck, jobCheck],
     [closeEvent]: [allMergeConflictCheck],
-    [editEvent]: [wipCheck],
+    [editEvent]: [wipCheck]
   },
 };
 
@@ -51,6 +51,6 @@ module.exports.mergeConflictCheck = mergeConflictCheck;
 module.exports.allMergeConflictCheck = allMergeConflictCheck;
 module.exports.jobCheck = jobCheck;
 
-module.exports.getChecksWhitelist = function () {
+module.exports.getChecksWhitelist = function() {
   return checksWhitelist;
 };
