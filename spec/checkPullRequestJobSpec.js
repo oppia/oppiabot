@@ -136,16 +136,19 @@ describe('Pull Request Job Spec', () => {
       const formText = 'server jobs form'.link(
         'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
       const newLineFeed = '<br>';
+      const wikiLinkText = (
+        'This PR can be merged only after the test is successful'.link(
+          'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
+          '#submitting-a-pr-with-a-new-job'));
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR, ' +
-        'it adds a new server job. The name of the job is exp_jobs_one_off.' +
-        newLineFeed + 'Also @' + author + ', endeavour to add the new job ' +
+        'it adds a new one off job. The name of the job is exp_jobs_one_off.' +
+        newLineFeed + 'Also @' + author + ', please add the new job ' +
         'file to the job registry and please make sure to fill in the ' +
         formText + ' for the new job to be tested on the backup server. ' +
-        'This PR can be merged only after the test is successful.' +
-        newLineFeed + 'Thanks!',
+        wikiLinkText + '.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
       });
@@ -203,16 +206,19 @@ describe('Pull Request Job Spec', () => {
       const formText = 'server jobs form'.link(
         'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
       const newLineFeed = '<br>';
+      const wikiLinkText = (
+        'This PR can be merged only after the test is successful'.link(
+          'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
+          '#submitting-a-pr-with-a-new-job'));
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR, ' +
-        'it adds new server jobs. The jobs are exp_jobs_one_off, exp_jobs_oppiabot_off.' +
-        newLineFeed + 'Also @' + author + ', endeavour to add the new job ' +
+        'it adds new one off jobs. The jobs are exp_jobs_one_off, exp_jobs_oppiabot_off.' +
+        newLineFeed + 'Also @' + author + ', please add the new job ' +
         'files to the job registry and please make sure to fill in the ' +
         formText + ' for the new jobs  to be tested on the backup server. ' +
-        'This PR can be merged only after the test is successful.' +
-        newLineFeed + 'Thanks!',
+        wikiLinkText + '.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
       });
@@ -270,15 +276,18 @@ describe('Pull Request Job Spec', () => {
       const formText = 'server jobs form'.link(
         'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
       const newLineFeed = '<br>';
+      const wikiLinkText = (
+        'This PR can be merged only after the test is successful'.link(
+          'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
+          '#submitting-a-pr-with-a-new-job'));
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR, ' +
-        'it adds a new server job. The name of the job is exp_jobs_one_off.' +
+        'it adds a new one off job. The name of the job is exp_jobs_one_off.' +
         newLineFeed + 'Also @' + author + ', please make sure to fill in the ' +
         formText + ' for the new job to be tested on the backup server. ' +
-        'This PR can be merged only after the test is successful.' +
-        newLineFeed + 'Thanks!',
+        wikiLinkText + '.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
       });
