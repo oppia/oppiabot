@@ -32,7 +32,7 @@ const checksWhitelist = {
     [synchronizeEvent]: [mergeConflictCheck, jobCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: [wipCheck]
-  },
+  }
 };
 
 module.exports.openEvent = openEvent;
