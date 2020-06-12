@@ -27,7 +27,7 @@ const checksWhitelist = {
   },
   oppia: {
     [openEvent]: [claCheck, changelogCheck, branchCheck, wipCheck, jobCheck],
-    [reopenEvent]: [changelogCheck, branchCheck, wipCheck],
+    [reopenEvent]: [changelogCheck, branchCheck, wipCheck, jobCheck],
     [labelEvent]: [assigneeCheck],
     [synchronizeEvent]: [mergeConflictCheck, jobCheck],
     [closeEvent]: [allMergeConflictCheck],
