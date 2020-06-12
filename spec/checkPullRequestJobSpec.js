@@ -12,7 +12,7 @@ const scheduler = require('../lib/scheduler');
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
-const {SERVER_JOBS_ADMIN} = require('../userWhitelist.json');
+const { SERVER_JOBS_ADMIN } = require('../userWhitelist.json');
 
 describe('Pull Request Job Spec', () => {
   /**
