@@ -3,6 +3,7 @@ const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
 const checkPullRequestLabelModule = require('../lib/checkPullRequestLabels');
+const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const scheduler = require('../lib/scheduler');
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
@@ -42,6 +43,7 @@ describe('Pull Request Label Check', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
+    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() =>{});
   });
 
   describe('when pull request gets labeled', () => {
