@@ -13,14 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Entry point of oppiabot github actions.
+ * @fileoverview Automatically compile github actions when
+ * actions related file changes.
  */
 
-const core = require('@actions/core');
-const { context } = require('@actions/github');
-const dispatcher = require('./src/dispatcher');
+const { execSync } = require('child_process');
 
-core.info(
-  `About to dispatch:${context.eventName} and ${context.payload.action}.`
-);
-dispatcher.dispatch(context.eventName, context.payload.action);
+// Build the actions file.
+execSync('npm run actions-build');
+// Automatically add the build file to the commit index.
+execSync('git add dist/index.js');
