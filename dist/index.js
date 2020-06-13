@@ -313,6 +313,13 @@ module.exports = require("https");
 
 /***/ }),
 
+/***/ 35:
+/***/ (function(module) {
+
+module.exports = {"goodFirstIssue":["U8NWXD","kevintab95","seanlip","ankita240796","Showtim3","bansalnitish","vojtechjelinek","marianazangrossi","brianrodri","nithusha21","aks681"],"teamLeads":{"onboardingTeam":"Showtim3"}};
+
+/***/ }),
+
 /***/ 36:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -4194,7 +4201,7 @@ function coerce (version) {
 
 const core = __webpack_require__(470);
 const { context, GitHub } = __webpack_require__(469);
-const whitelist = __webpack_require__(616);
+const whitelist = __webpack_require__(35);
 const GOOD_FIRST_LABEL = 'good first issue';
 const prLabels = ['dependencies', 'critical', 'stale'];
 
@@ -8459,13 +8466,6 @@ module.exports = require("http");
 /***/ (function(module) {
 
 module.exports = require("events");
-
-/***/ }),
-
-/***/ 616:
-/***/ (function(module) {
-
-module.exports = {"goodFirstIssue":["U8NWXD","kevintab95","seanlip","ankita240796","Showtim3","bansalnitish","vojtechjelinek","marianazangrossi","brianrodri","nithusha21","aks681"],"teamLeads":{"onboardingTeam":"Showtim3"}};
 
 /***/ }),
 

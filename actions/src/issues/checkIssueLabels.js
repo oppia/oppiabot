@@ -18,7 +18,7 @@
 
 const core = require('@actions/core');
 const { context, GitHub } = require('@actions/github');
-const whitelist = require('../../../whitelist.json');
+const whitelist = require('../../../userWhitelist.json');
 const GOOD_FIRST_LABEL = 'good first issue';
 const prLabels = ['dependencies', 'critical', 'stale'];
 

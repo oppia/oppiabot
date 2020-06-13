@@ -19,8 +19,7 @@
 const github = require('@actions/github');
 const core = require('@actions/core');
 const payload = require('../fixtures/issues.labelled.json');
-// const dispatcher = require('../../src/dispatcher');
-const whitelist = require('../whitelist.json');
+const whitelist = require('../userWhitelist.json');
 const dispatcher = require('../actions/src/dispatcher');
 const checkIssueLabelModule = require('../actions/src/issues/checkIssueLabels');
 
