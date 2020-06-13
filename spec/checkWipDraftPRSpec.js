@@ -50,7 +50,7 @@ describe('Oppiabot\'s', () => {
     github = {
       issues: {
         createComment: jasmine.createSpy('createComment').and.resolveTo({}),
-        update: jasmine.createSpy('update').and.resolveTo({})
+        addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
       }
     };
 
@@ -98,6 +98,17 @@ describe('Oppiabot\'s', () => {
       });
     });
 
+    it('assigns PR author', () => {
+      expect(github.issues.addAssignees).toHaveBeenCalled();
+      const params = {
+        repo: pullRequestEditedPayload.payload.repository.name,
+        owner: pullRequestEditedPayload.payload.repository.owner.login,
+        number: pullRequestEditedPayload.payload.pull_request.number,
+        assignees: ['testuser7777'],
+      };
+      expect(github.issues.addAssignees).toHaveBeenCalledWith(params);
+    });
+
     it('creates comment for WIP PRs', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledTimes(1);
@@ -118,18 +129,6 @@ describe('Oppiabot\'s', () => {
         owner: pullRequestEditedPayload.payload.repository.owner.login,
         repo: pullRequestEditedPayload.payload.repository.name,
         body: commentBody
-      });
-    });
-
-    it('closes WIP PRs', () => {
-      expect(github.issues.update).toHaveBeenCalled();
-      expect(github.issues.update).toHaveBeenCalledTimes(1);
-
-      expect(github.issues.update).toHaveBeenCalledWith({
-        issue_number: pullRequestEditedPayload.payload.pull_request.number,
-        owner: pullRequestEditedPayload.payload.repository.owner.login,
-        repo: pullRequestEditedPayload.payload.repository.name,
-        state: 'closed'
       });
     });
   });
@@ -166,12 +165,12 @@ describe('Oppiabot\'s', () => {
       });
     });
 
-    it('does not create comment for WIP PRs', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+    it('does not assign PR author', () => {
+      expect(github.issues.addAssignees).not.toHaveBeenCalled();
     });
 
-    it('does not close WIP PRs', () => {
-      expect(github.issues.update).not.toHaveBeenCalled();
+    it('does not create comment for WIP PRs', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
     });
   });
 
@@ -191,10 +190,10 @@ describe('Oppiabot\'s', () => {
 
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
       expect(github.git.getCommit).toHaveBeenCalled();
+      expect(github.issues.addAssignees).toHaveBeenCalled();
+      expect(github.issues.addAssignees).toHaveBeenCalledTimes(1);
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledTimes(1);
-      expect(github.issues.update).toHaveBeenCalled();
-      expect(github.issues.update).toHaveBeenCalledTimes(1);
     });
 
     it('should check when PR is reopnend', async() => {
@@ -212,10 +211,10 @@ describe('Oppiabot\'s', () => {
 
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
       expect(github.git.getCommit).toHaveBeenCalled();
+      expect(github.issues.addAssignees).toHaveBeenCalled();
+      expect(github.issues.addAssignees).toHaveBeenCalledTimes(1);
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledTimes(1);
-      expect(github.issues.update).toHaveBeenCalled();
-      expect(github.issues.update).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -260,6 +259,18 @@ describe('Oppiabot\'s', () => {
       expect(args.payload.pull_request.title).toBe('Testing Draft');
     });
 
+
+    it('assigns PR author', () => {
+      expect(github.issues.addAssignees).toHaveBeenCalled();
+      const params = {
+        repo: pullRequestEditedPayload.payload.repository.name,
+        owner: pullRequestEditedPayload.payload.repository.owner.login,
+        number: pullRequestEditedPayload.payload.pull_request.number,
+        assignees: ['testuser7777'],
+      };
+      expect(github.issues.addAssignees).toHaveBeenCalledWith(params);
+    });
+
     it('creates comment for draft PRs', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledTimes(1);
@@ -279,18 +290,6 @@ describe('Oppiabot\'s', () => {
         owner: pullRequestEditedPayload.payload.repository.owner.login,
         repo: pullRequestEditedPayload.payload.repository.name,
         body: commentBody
-      });
-    });
-
-    it('closes draft PRs', () => {
-      expect(github.issues.update).toHaveBeenCalled();
-      expect(github.issues.update).toHaveBeenCalledTimes(1);
-
-      expect(github.issues.update).toHaveBeenCalledWith({
-        issue_number: pullRequestEditedPayload.payload.pull_request.number,
-        owner: pullRequestEditedPayload.payload.repository.owner.login,
-        repo: pullRequestEditedPayload.payload.repository.name,
-        state: 'closed'
       });
     });
   });
@@ -336,12 +335,12 @@ describe('Oppiabot\'s', () => {
       expect(args.payload.pull_request.title).toBe('Testing Draft');
     });
 
-    it('does not create comment for draft PRs', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+    it('does not assign PR author', () => {
+      expect(github.issues.addAssignees).not.toHaveBeenCalled();
     });
 
-    it('does not close draft PRs', () => {
-      expect(github.issues.update).not.toHaveBeenCalled();
+    it('does not create comment for draft PRs', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
     });
   });
 
@@ -370,12 +369,12 @@ describe('Oppiabot\'s', () => {
       expect(github.git.getCommit).not.toHaveBeenCalled();
     });
 
-    it('does not create a comment', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+    it('does not assign PR author', () => {
+      expect(github.issues.addAssignees).not.toHaveBeenCalled();
     });
 
-    it('does not close the PR', ()=> {
-      expect(github.issues.update).not.toHaveBeenCalled();
+    it('does not create a comment', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
     });
   });
 });
