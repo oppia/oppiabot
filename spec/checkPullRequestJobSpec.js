@@ -170,7 +170,7 @@ describe('Pull Request Job Spec', () => {
         'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
       const newLineFeed = '<br>';
       const wikiLinkText = (
-        'Please refer to this guide for details'.link(
+        'this guide'.link(
           'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
           '#submitting-a-pr-with-a-new-job'));
       const jobRegistryLink = 'job registry'.link(
@@ -184,7 +184,7 @@ describe('Pull Request Job Spec', () => {
         'file to the ' + jobRegistryLink + ' and please make sure to fill in the ' +
         formText + ' for the new job to be tested on the backup server. ' +
         'This PR can be merged only after the test run is successful. ' +
-        wikiLinkText + '.' + newLineFeed + 'Thanks!',
+        'Please refer to ' + wikiLinkText + ' for details.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
       });
@@ -244,7 +244,7 @@ describe('Pull Request Job Spec', () => {
         'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
       const newLineFeed = '<br>';
       const wikiLinkText = (
-        'Please refer to this guide for details'.link(
+        'this guide'.link(
           'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
           '#submitting-a-pr-with-a-new-job'));
       const jobRegistryLink = 'job registry'.link(
@@ -258,7 +258,7 @@ describe('Pull Request Job Spec', () => {
         'files to the '+ jobRegistryLink +' and please make sure to fill in the ' +
         formText + ' for the new jobs to be tested on the backup server. ' +
         'This PR can be merged only after the test run is successful. ' +
-        wikiLinkText + '.' + newLineFeed + 'Thanks!',
+        'Please refer to ' + wikiLinkText + ' for details.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
       });
@@ -318,7 +318,7 @@ describe('Pull Request Job Spec', () => {
           'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
         const newLineFeed = '<br>';
         const wikiLinkText = (
-          'Please refer to this guide for details'.link(
+          'this guide'.link(
             'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
             '#submitting-a-pr-with-a-new-job'));
 
@@ -329,7 +329,7 @@ describe('Pull Request Job Spec', () => {
           newLineFeed + 'Also @' + author + ', please make sure to fill in the ' +
           formText + ' for the new job to be tested on the backup server. ' +
           'This PR can be merged only after the test run is successful. ' +
-          wikiLinkText + '.' + newLineFeed + 'Thanks!',
+          'Please refer to ' + wikiLinkText + ' for details.' + newLineFeed + 'Thanks!',
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
         });
@@ -386,7 +386,7 @@ describe('Pull Request Job Spec', () => {
         'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
       const newLineFeed = '<br>';
       const wikiLinkText = (
-        'Please refer to this guide for details'.link(
+        'this guide'.link(
           'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
           '#submitting-a-pr-with-a-new-job'));
       const jobRegistryLink = 'job registry'.link(
@@ -400,7 +400,7 @@ describe('Pull Request Job Spec', () => {
         'file to the ' + jobRegistryLink + ' and please make sure to fill in the ' +
         formText + ' for the new job to be tested on the backup server. ' +
         'This PR can be merged only after the test run is successful. ' +
-        wikiLinkText + '.' + newLineFeed + 'Thanks!',
+        'Please refer to ' + wikiLinkText + ' for details.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
       });
