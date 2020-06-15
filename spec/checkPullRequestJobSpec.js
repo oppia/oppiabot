@@ -43,7 +43,7 @@ describe('Pull Request Job Spec', () => {
       'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d7e9833c/core/domain/exp_jobs_one_off.py',
     contents_url:
       'https://api.github.com/repos/oppia/oppia/contents/core/domain/exp_jobs_one_off.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
-    patch: '@@ -0,0 +1 @@\n+class FirstTestOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n+    """One-off job for creating and populating UserContributionsModels for\n+    all registered users that have contributed.\n+    """\n+    @classmethod\n+    def entity_classes_to_map_over(cls):\n+        """Return a list of datastore class references to map over."""\n+        return [exp_models.ExplorationSnapshotMetadataModel]\n+\n+    @staticmethod\n+    def map(item):\n+        """Implements the map function for this job."""\n+        yield (\n+            item.committer_id, {\n+                \'exploration_id\': item.get_unversioned_instance_id(),\n+                \'version_string\': item.get_version_string(),\n+            })\n+\n+\n+    @staticmethod\n+    def reduce(key, version_and_exp_ids):\n+        """Implements the reduce function for this job."""\n+        created_exploration_ids = set()\n+        edited_exploration_ids = set()\n+\n+        edits = [ast.literal_eval(v) for v in version_and_exp_ids]\n+\n+        for edit in edits:\n+            edited_exploration_ids.add(edit[\'exploration_id\'])\n+            if edit[\'version_string\'] == \'1\':\n+                created_exploration_ids.add(edit[\'exploration_id\'])\n+\n+        if user_services.get_user_contributions(key, strict=False) is not None:\n+            user_services.update_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n+        else:\n+            user_services.create_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n+\n+\n+\n class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n     """One-off job for calculating the distribution of username lengths."""\n ',
+    patch: '@@ -0,0 +1 @@\n+class FirstTestOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n+    """One-off job for creating and populating UserContributionsModels for\n+    all registered users that have contributed.\n+    """\n+    @classmethod\n+    def entity_classes_to_map_over(cls):\n+        """Return a list of datastore class references to map over."""\n+        return [exp_models.ExplorationSnapshotMetadataModel]\n+\n+    @staticmethod\n+    def map(item):\n+        """Implements the map function for this job."""\n+        yield (\n+            item.committer_id, {\n+                \'exploration_id\': item.get_unversioned_instance_id(),\n+                \'version_string\': item.get_version_string(),\n+            })\n+\n+\n+    @staticmethod\n+    def reduce(key, version_and_exp_ids):\n+        """Implements the reduce function for this job."""\n+        created_exploration_ids = set()\n+        edited_exploration_ids = set()\n+\n+        edits = [ast.literal_eval(v) for v in version_and_exp_ids]\n+\n+        for edit in edits:\n+            edited_exploration_ids.add(edit[\'exploration_id\'])\n+            if edit[\'version_string\'] == \'1\':\n+                created_exploration_ids.add(edit[\'exploration_id\'])\n+\n+        if user_services.get_user_contributions(key, strict=False) is not None:\n+            user_services.update_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n+        else:\n+            user_services.create_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n',
   };
 
   const secondNewJobFileObj = {
@@ -59,7 +59,7 @@ describe('Pull Request Job Spec', () => {
       'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
     contents_url:
       'https://api.github.com/repos/oppia/oppia/contents/core/domain/exp_jobs_oppiabot_off.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
-    patch: '@@ -0,0 +1 @@\n+class SecondTestOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n+    """One-off job for creating and populating UserContributionsModels for\n+    all registered users that have contributed.\n+    """\n+    @classmethod\n+    def entity_classes_to_map_over(cls):\n+        """Return a list of datastore class references to map over."""\n+        return [exp_models.ExplorationSnapshotMetadataModel]\n+\n+    @staticmethod\n+    def map(item):\n+        """Implements the map function for this job."""\n+        yield (\n+            item.committer_id, {\n+                \'exploration_id\': item.get_unversioned_instance_id(),\n+                \'version_string\': item.get_version_string(),\n+            })\n+\n+\n+    @staticmethod\n+    def reduce(key, version_and_exp_ids):\n+        """Implements the reduce function for this job."""\n+        created_exploration_ids = set()\n+        edited_exploration_ids = set()\n+\n+        edits = [ast.literal_eval(v) for v in version_and_exp_ids]\n+\n+        for edit in edits:\n+            edited_exploration_ids.add(edit[\'exploration_id\'])\n+            if edit[\'version_string\'] == \'1\':\n+                created_exploration_ids.add(edit[\'exploration_id\'])\n+\n+        if user_services.get_user_contributions(key, strict=False) is not None:\n+            user_services.update_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n+        else:\n+            user_services.create_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n+\n+\n+\n class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n     """One-off job for calculating the distribution of username lengths."""\n ',
+    patch: '@@ -0,0 +1 @@\n+class SecondTestOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n+    """One-off job for creating and populating UserContributionsModels for\n+    all registered users that have contributed.\n+    """\n+    @classmethod\n+    def entity_classes_to_map_over(cls):\n+        """Return a list of datastore class references to map over."""\n+        return [exp_models.ExplorationSnapshotMetadataModel]\n+\n+    @staticmethod\n+    def map(item):\n+        """Implements the map function for this job."""\n+        yield (\n+            item.committer_id, {\n+                \'exploration_id\': item.get_unversioned_instance_id(),\n+                \'version_string\': item.get_version_string(),\n+            })\n+\n+\n+    @staticmethod\n+    def reduce(key, version_and_exp_ids):\n+        """Implements the reduce function for this job."""\n+        created_exploration_ids = set()\n+        edited_exploration_ids = set()\n+\n+        edits = [ast.literal_eval(v) for v in version_and_exp_ids]\n+\n+        for edit in edits:\n+            edited_exploration_ids.add(edit[\'exploration_id\'])\n+            if edit[\'version_string\'] == \'1\':\n+                created_exploration_ids.add(edit[\'exploration_id\'])\n+\n+        if user_services.get_user_contributions(key, strict=False) is not None:\n+            user_services.update_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n+        else:\n+            user_services.create_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n',
   };
 
   const modifiedExistingJobFileObj = {
@@ -76,7 +76,7 @@ describe('Pull Request Job Spec', () => {
     contents_url:
       'https://api.github.com/repos/oppia/oppia/contents/core/domain/user_jobs_one_off.py?ref=5b0e633fa1b9a00771a3b88302fa3ff048d7240c',
     patch:
-      '@@ -80,6 +80,49 @@ def reduce(key, version_and_exp_ids):\n                     edited_exploration_ids))\n \n \n+class OppiabotContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n+    """One-off job for creating and populating UserContributionsModels for\n+    all registered users that have contributed.\n+    """\n+    @classmethod\n+    def entity_classes_to_map_over(cls):\n+        """Return a list of datastore class references to map over."""\n+        return [exp_models.ExplorationSnapshotMetadataModel]\n+\n+    @staticmethod\n+    def map(item):\n+        """Implements the map function for this job."""\n+        yield (\n+            item.committer_id, {\n+                \'exploration_id\': item.get_unversioned_instance_id(),\n+                \'version_string\': item.get_version_string(),\n+            })\n+\n+\n+    @staticmethod\n+    def reduce(key, version_and_exp_ids):\n+        """Implements the reduce function for this job."""\n+        created_exploration_ids = set()\n+        edited_exploration_ids = set()\n+\n+        edits = [ast.literal_eval(v) for v in version_and_exp_ids]\n+\n+        for edit in edits:\n+            edited_exploration_ids.add(edit[\'exploration_id\'])\n+            if edit[\'version_string\'] == \'1\':\n+                created_exploration_ids.add(edit[\'exploration_id\'])\n+\n+        if user_services.get_user_contributions(key, strict=False) is not None:\n+            user_services.update_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n+        else:\n+            user_services.create_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n+\n+\n+\n class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n     """One-off job for calculating the distribution of username lengths."""\n ',
+      '@@ -80,6 +80,49 @@ def reduce(key, version_and_exp_ids):\n                     edited_exploration_ids))\n \n \n+class OppiabotContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n+    """One-off job for creating and populating UserContributionsModels for\n+    all registered users that have contributed.\n+    """\n+    @classmethod\n+    def entity_classes_to_map_over(cls):\n+        """Return a list of datastore class references to map over."""\n+        return [exp_models.ExplorationSnapshotMetadataModel]\n+\n+    @staticmethod\n+    def map(item):\n+        """Implements the map function for this job."""\n+        yield (\n+            item.committer_id, {\n+                \'exploration_id\': item.get_unversioned_instance_id(),\n+                \'version_string\': item.get_version_string(),\n+            })\n+\n+\n+    @staticmethod\n+    def reduce(key, version_and_exp_ids):\n+        """Implements the reduce function for this job."""\n+        created_exploration_ids = set()\n+        edited_exploration_ids = set()\n+\n+        edits = [ast.literal_eval(v) for v in version_and_exp_ids]\n+\n+        for edit in edits:\n+            edited_exploration_ids.add(edit[\'exploration_id\'])\n+            if edit[\'version_string\'] == \'1\':\n+                created_exploration_ids.add(edit[\'exploration_id\'])\n+\n+        if user_services.get_user_contributions(key, strict=False) is not None:\n+            user_services.update_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n+        else:\n+            user_services.create_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n',
   };
 
   const fileWithMultipleJobs = {
@@ -92,7 +92,7 @@ describe('Pull Request Job Spec', () => {
       'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
     contents_url:
       'https://api.github.com/repos/oppia/oppia/contents/core/domain/exp_jobs_oppiabot_off.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
-    patch: '@@ -0,0 +1 @@\n+class TestOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n+    """One-off job for creating and populating UserContributionsModels for \n+class AnotherTestOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n+    """\n+    @classmethod\n+    def entity_classes_to_map_over(cls):\n+        """Return a list of datastore class references to map over."""\n+        return [exp_models.ExplorationSnapshotMetadataModel]\n+\n+    @staticmethod\n+    def map(item):\n+        """Implements the map function for this job."""\n+        yield (\n+            item.committer_id, {\n+                \'exploration_id\': item.get_unversioned_instance_id(),\n+                \'version_string\': item.get_version_string(),\n+            })\n+\n+\n+    @staticmethod\n+    def reduce(key, version_and_exp_ids):\n+        """Implements the reduce function for this job."""\n+        created_exploration_ids = set()\n+        edited_exploration_ids = set()\n+\n+        edits = [ast.literal_eval(v) for v in version_and_exp_ids]\n+\n+        for edit in edits:\n+            edited_exploration_ids.add(edit[\'exploration_id\'])\n+            if edit[\'version_string\'] == \'1\':\n+                created_exploration_ids.add(edit[\'exploration_id\'])\n+\n+        if user_services.get_user_contributions(key, strict=False) is not None:\n+            user_services.update_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n+        else:\n+            user_services.create_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n+\n+\n+\n class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n     """One-off job for calculating the distribution of username lengths."""\n ',
+    patch: '@@ -0,0 +1 @@\n+class TestOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n+    """One-off job for creating and populating UserContributionsModels for \n+class AnotherTestOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n+    """\n+    @classmethod\n+    def entity_classes_to_map_over(cls):\n+        """Return a list of datastore class references to map over."""\n+        return [exp_models.ExplorationSnapshotMetadataModel]\n+\n+    @staticmethod\n+    def map(item):\n+        """Implements the map function for this job."""\n+        yield (\n+            item.committer_id, {\n+                \'exploration_id\': item.get_unversioned_instance_id(),\n+                \'version_string\': item.get_version_string(),\n+            })\n+\n+\n+    @staticmethod\n+    def reduce(key, version_and_exp_ids):\n+        """Implements the reduce function for this job."""\n+        created_exploration_ids = set()\n+        edited_exploration_ids = set()\n+\n+        edits = [ast.literal_eval(v) for v in version_and_exp_ids]\n+\n+        for edit in edits:\n+            edited_exploration_ids.add(edit[\'exploration_id\'])\n+            if edit[\'version_string\'] == \'1\':\n+                created_exploration_ids.add(edit[\'exploration_id\'])\n+\n+        if user_services.get_user_contributions(key, strict=False) is not None:\n+            user_services.update_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n+        else:\n+            user_services.create_user_contributions(\n+                key, list(created_exploration_ids), list(\n+                    edited_exploration_ids))\n',
   }
 
   const registryFileObjWithNewjob = {
@@ -170,17 +170,20 @@ describe('Pull Request Job Spec', () => {
         'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
       const newLineFeed = '<br>';
       const wikiLinkText = (
-        'This PR can be merged only after the test is successful'.link(
+        'Please refer to this guide for details'.link(
           'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
           '#submitting-a-pr-with-a-new-job'));
+      const jobRegistryLink = 'job registry'.link(
+        'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py');
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR, ' +
         'it adds a new one off job. The name of the job is exp_jobs_one_off.' +
         newLineFeed + 'Also @' + author + ', please add the new job ' +
-        'file to the job registry and please make sure to fill in the ' +
+        'file to the ' + jobRegistryLink + ' and please make sure to fill in the ' +
         formText + ' for the new job to be tested on the backup server. ' +
+        'This PR can be merged only after the test run is successful. ' +
         wikiLinkText + '.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -241,17 +244,20 @@ describe('Pull Request Job Spec', () => {
         'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
       const newLineFeed = '<br>';
       const wikiLinkText = (
-        'This PR can be merged only after the test is successful'.link(
+        'Please refer to this guide for details'.link(
           'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
           '#submitting-a-pr-with-a-new-job'));
+      const jobRegistryLink = 'job registry'.link(
+        'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py');
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR, ' +
         'it adds new one off jobs. The jobs are exp_jobs_one_off, exp_jobs_oppiabot_off.' +
         newLineFeed + 'Also @' + author + ', please add the new job ' +
-        'files to the job registry and please make sure to fill in the ' +
-        formText + ' for the new jobs  to be tested on the backup server. ' +
+        'files to the '+ jobRegistryLink +' and please make sure to fill in the ' +
+        formText + ' for the new jobs to be tested on the backup server. ' +
+        'This PR can be merged only after the test run is successful. ' +
         wikiLinkText + '.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -312,7 +318,7 @@ describe('Pull Request Job Spec', () => {
           'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
         const newLineFeed = '<br>';
         const wikiLinkText = (
-          'This PR can be merged only after the test is successful'.link(
+          'Please refer to this guide for details'.link(
             'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
             '#submitting-a-pr-with-a-new-job'));
 
@@ -322,6 +328,7 @@ describe('Pull Request Job Spec', () => {
           'it adds a new one off job. The name of the job is exp_jobs_one_off.' +
           newLineFeed + 'Also @' + author + ', please make sure to fill in the ' +
           formText + ' for the new job to be tested on the backup server. ' +
+          'This PR can be merged only after the test run is successful. ' +
           wikiLinkText + '.' + newLineFeed + 'Thanks!',
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
@@ -379,17 +386,20 @@ describe('Pull Request Job Spec', () => {
         'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
       const newLineFeed = '<br>';
       const wikiLinkText = (
-        'This PR can be merged only after the test is successful'.link(
+        'Please refer to this guide for details'.link(
           'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
           '#submitting-a-pr-with-a-new-job'));
+      const jobRegistryLink = 'job registry'.link(
+        'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py');
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR, ' +
         'it adds a new one off job. The name of the job is user_jobs_one_off.' +
         newLineFeed + 'Also @' + author + ', please add the new job ' +
-        'file to the job registry and please make sure to fill in the ' +
+        'file to the ' + jobRegistryLink + ' and please make sure to fill in the ' +
         formText + ' for the new job to be tested on the backup server. ' +
+        'This PR can be merged only after the test run is successful. ' +
         wikiLinkText + '.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
