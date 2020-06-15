@@ -7,4 +7,5 @@ newrelic_agent.log
 coverage
 .vscode
 /actions
+/dist
 action.yml
