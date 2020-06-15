@@ -9,9 +9,13 @@
     "dev": "nodemon",
     "lint": "standard",
     "start": "probot run ./index.js",
-    "test": "node ./spec/setup.js"
+    "test": "node ./spec/setup.js",
+    "actions-build": "ncc build actions/main.js",
+    "update-actions-build": "node actions/build.js"
   },
   "dependencies": {
+    "@actions/core": "^1.2.4",
+    "@actions/github": "^2.2.0",
     "dotenv": "^6.0.0",
     "google-auth-library": "^6.0.0",
     "googleapis": "^51.0.0",
@@ -27,7 +31,10 @@
     ]
   },
   "devDependencies": {
+    "@zeit/ncc": "^0.22.2",
+    "husky": "^4.2.5",
     "jasmine": "^3.1.0",
+    "lint-staged": "^10.2.6",
     "nodemon": "^2.0.0",
     "nyc": "^15.0.1",
     "smee-client": "^1.0.1",
@@ -47,5 +54,15 @@
       ".env",
       "."
     ]
+  },
+  "lint-staged": {
+    "actions/**/*.+(js|json)": [
+      "npm run update-actions-build"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }
