@@ -6,3 +6,6 @@ newrelic_agent.log
 .nyc_output
 coverage
 .vscode
+/actions
+/dist
+action.yml
