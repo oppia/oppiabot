@@ -10,7 +10,7 @@
     "lint": "standard",
     "start": "probot run ./index.js",
     "test": "node ./spec/setup.js",
-    "actions-build": "ncc build actions/main.js",
+    "actions-build": "ncc build actions/main.js -o actions_build",
     "update-actions-build": "node actions/build.js"
   },
   "dependencies": {
