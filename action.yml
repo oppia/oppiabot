@@ -1,0 +1,15 @@
+name: Oppiabot Actions
+
+description: Handles user interactions with issues.
+branding:
+  color: purple
+  icon: activity
+
+inputs:
+  repo-token: # Repository token.
+    description: 'The repository token needed to create comments.'
+    required: true
+
+runs:
+  using: "node12"
+  main: "actions_build/index.js"
