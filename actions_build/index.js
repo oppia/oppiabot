@@ -316,7 +316,7 @@ module.exports = require("https");
 /***/ 35:
 /***/ (function(module) {
 
-module.exports = {"goodFirstIssue":["U8NWXD","kevintab95","seanlip","ankita240796","Showtim3","bansalnitish","vojtechjelinek","marianazangrossi","brianrodri","nithusha21","aks681"],"teamLeads":{"onboardingTeam":"Showtim3"}};
+module.exports = {"goodFirstIssue":["U8NWXD","kevintab95","seanlip","ankita240796","Showtim3","bansalnitish","vojtechjelinek","marianazangrossi","brianrodri","nithusha21","aks681"],"teamLeads":{"onboardingTeam":"Showtim3"},"SERVER_JOBS_ADMIN":"seanlip"};
 
 /***/ }),
 
