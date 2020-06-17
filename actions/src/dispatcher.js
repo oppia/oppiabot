@@ -17,15 +17,24 @@
  */
 
 const core = require('@actions/core');
+const { checkAssignees } = require('./checkIssueAssigned');
 
 const EVENTS = {
   ISSUES: 'issues',
 };
 const ACTIONS = {
-  LABELLED: 'labeled'
+  LABELLED: 'labeled',
+  ASSIGNED: 'assigned'
 };
 module.exports = {
   async dispatch(event, action) {
     core.info(`Received Event:${event} Action:${action}.`);
+    if(event === EVENTS.ISSUES) {
+      switch (action) {
+        case ACTIONS.ASSIGNED:
+          await checkAssignees();
+          break;
+      }
+    }
   }
 };
