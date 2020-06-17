@@ -29,8 +29,10 @@ module.exports = {
   async dispatch(event, action) {
     core.info(`Received Event:${event} Action:${action}.`);
     if (event === EVENTS.ISSUES) {
-      if (action === ACTIONS.LABELLED) {
-        await issueLabelsModule.checkLabels();
+      switch (action) {
+        case ACTIONS.LABELLED:
+          await issueLabelsModule.checkLabels();
+          break;
       }
     }
   }
