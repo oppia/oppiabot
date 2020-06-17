@@ -51,7 +51,8 @@
   "nodemonConfig": {
     "exec": "npm start",
     "watch": [
-      ".env"
+      ".env",
+      "."
     ]
   },
   "lint-staged": {
