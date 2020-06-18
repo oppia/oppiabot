@@ -8,7 +8,7 @@ const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
 const checkWipModule = require('../lib/checkWipDraftPR');
 const scheduler = require('../lib/scheduler');
-const pullRequestpayload = JSON.parse(
+const pullRequestPayload = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
 const {google} = require('googleapis');
@@ -35,14 +35,6 @@ describe('Api For Sheets Module', () => {
 
     github = {
       issues: {
-        addLabels: jasmine.createSpy('addLabels').and.returnValue({
-          params: {
-            number: 5139,
-            owner: 'oppia',
-            repo: 'oppia',
-            labels: ["PR: don't merge - NEEDS CLA"],
-          },
-        }),
         createComment: jasmine.createSpy('createComment').and.returnValue({
           params: {
             number: 5139,
@@ -57,45 +49,7 @@ describe('Api For Sheets Module', () => {
               'we can accept your PR. Thanks!',
           },
         }),
-        listLabelsOnIssue: jasmine
-          .createSpy('listLabelsOnIssue')
-          .and.returnValue({
-            data: [
-              {
-                id: 248679580,
-                node_id: 'MDU6TGFiZWwyNDg2Nzk1ODA=',
-                url:
-                  'https://api.github.com/repos/oppia/oppia/labels/PR:%20LGTM',
-                name: 'PR: LGTM',
-                color: '009800',
-              },
-              {
-                id: 971968901,
-                node_id: 'MDU6TGFiZWw5NzE5Njg5MDE=',
-                url:
-                  "https://api.github.com/repos/oppia/oppia/labels/PR:%20don't%20merge%20-%20HAS%20MERGE%20CONFLICTS",
-                name: "PR: don't merge - HAS MERGE CONFLICTS",
-                color: 'd93f0b',
-              },
-              {
-                id: 638838928,
-                node_id: 'MDU6TGFiZWw2Mzg4Mzg5Mjg=',
-                url:
-                  'https://api.github.com/repos/oppia/oppia/labels/PR:%20for%20current%20release',
-                name: 'PR: for current release',
-                color: 'FF69B4',
-              },
-              {
-                id: 638839900,
-                node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-                url:
-                  'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-                name: 'PR: released',
-                color: '00FF00',
-              },
-            ],
-          }),
-        removeLabel: jasmine.createSpy('removeLabel').and.returnValue({}),
+        update: jasmine.createSpy('update').and.resolveTo({}),
       },
     };
 
@@ -133,7 +87,7 @@ describe('Api For Sheets Module', () => {
           },
         },
       });
-      robot.receive(pullRequestpayload);
+      robot.receive(pullRequestPayload);
       done();
     });
 
@@ -206,7 +160,7 @@ describe('Api For Sheets Module', () => {
           },
         },
       });
-      robot.receive(pullRequestpayload);
+      robot.receive(pullRequestPayload);
       done();
     });
 
@@ -223,105 +177,55 @@ describe('Api For Sheets Module', () => {
 
   describe('output generation', () => {
     const claData = [['abp'], ['kevinlee']];
-    describe('output generation without cla label', () => {
-      beforeEach(function (done) {
-        pullRequestpayload.payload.pull_request.labels.push({
-          name: 'PR CHANGELOG: Server Errors -- @kevintab95',
-        });
-        spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
-        spyOn(apiForSheetsModule, 'authorize').and.callFake(() => ({}));
-        spyOn(apiForSheetsModule, 'checkClaSheet').and.callFake(() => {});
-        robot.receive(pullRequestpayload);
-        done();
+    beforeEach(function (done) {
+      pullRequestPayload.payload.pull_request.labels.push({
+        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
       });
-      it('should not remove any label for the given payload', async () => {
-        await apiForSheetsModule.generateOutput(
-          claData,
-          pullRequestpayload.payload.pull_request.number,
-          pullRequestpayload.payload.pull_request
-        );
-        expect(github.issues.removeLabel).not.toHaveBeenCalled();
-      });
-
-      it('should add a relevant label for the given payload', async () => {
-        await apiForSheetsModule.generateOutput(
-          claData,
-          pullRequestpayload.payload.pull_request.number,
-          pullRequestpayload.payload.pull_request
-        );
-
-        expect(github.issues.addLabels).toHaveBeenCalled();
-      });
-
-      it('should post a comment for the given payload', async () => {
-        await apiForSheetsModule.generateOutput(
-          claData,
-          pullRequestpayload.payload.pull_request.number,
-          pullRequestpayload.payload.pull_request
-        );
-        expect(github.issues.createComment).toHaveBeenCalled();
-      });
-
-      it('should not add label if user has signed cla', async () => {
-        // Add username to CLA sheet.
-        await apiForSheetsModule.generateOutput(
-          [...claData, ['testuser7777']],
-          pullRequestpayload.payload.pull_request.number,
-          pullRequestpayload.payload.pull_request
-        );
-        expect(github.issues.createComment).not.toHaveBeenCalled();
-        expect(github.issues.addLabels).not.toHaveBeenCalled();
-      });
-
-      it('should do nothing if no data is obtained from sheet', async () => {
-        await apiForSheetsModule.generateOutput(
-          [],
-          pullRequestpayload.payload.pull_request.number,
-          pullRequestpayload.payload.pull_request
-        );
-        expect(github.issues.createComment).not.toHaveBeenCalled();
-        expect(github.issues.createComment).not.toHaveBeenCalledWith({});
-        expect(github.issues.addLabels).not.toHaveBeenCalled();
+      spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
+      spyOn(apiForSheetsModule, 'authorize').and.callFake(() => ({}));
+      spyOn(apiForSheetsModule, 'checkClaSheet').and.callFake(() => {});
+      robot.receive(pullRequestPayload);
+      done();
+    });
+    it('should close the PR if cla is not signed', async () => {
+      await apiForSheetsModule.generateOutput(
+        claData,
+        pullRequestPayload.payload.pull_request.number,
+        pullRequestPayload.payload.pull_request
+      );
+      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.update).toHaveBeenCalledWith({
+        issue_number: pullRequestPayload.payload.pull_request.number,
+        owner: pullRequestPayload.payload.repository.owner.login,
+        repo: pullRequestPayload.payload.repository.name,
+        state: 'closed',
       });
     });
 
-    describe('output generation with cla label', () => {
-      beforeEach(function (done) {
-        pullRequestpayload.payload.pull_request.labels.push(
-          {
-            name: 'PR CHANGELOG: Server Errors -- @kevintab95',
-          }, {
-            name: "PR: don't merge - NEEDS CLA",
-          }
-        );
-        spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
-        spyOn(apiForSheetsModule, 'authorize').and.callFake(() => ({}));
-        spyOn(apiForSheetsModule, 'checkClaSheet').and.callFake(() => {});
-        robot.receive(pullRequestpayload);
-        done();
-      });
+    it('should not close the PR if user has signed cla', async () => {
+      // Add username to CLA sheet.
+      await apiForSheetsModule.generateOutput(
+        [...claData, ['testuser7777']],
+        pullRequestPayload.payload.pull_request.number,
+        pullRequestPayload.payload.pull_request
+      );
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.issues.update).not.toHaveBeenCalled();
+    });
 
-      it('should not add label', async () => {
-        await apiForSheetsModule.generateOutput(
-          claData,
-          pullRequestpayload.payload.pull_request.number,
-          pullRequestpayload.payload.pull_request
-        );
-        expect(github.issues.addLabels).not.toHaveBeenCalled();
-      });
-
-      it('should remove label is user has signed cla', async () => {
-        await apiForSheetsModule.generateOutput(
-          [...claData, ['testuser7777']],
-          pullRequestpayload.payload.pull_request.number,
-          pullRequestpayload.payload.pull_request
-        );
-        expect(github.issues.addLabels).not.toHaveBeenCalled();
-      });
+    it('should do nothing if no data is obtained from sheet', async () => {
+      await apiForSheetsModule.generateOutput(
+        [],
+        pullRequestPayload.payload.pull_request.number,
+        pullRequestPayload.payload.pull_request
+      );
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.issues.createComment).not.toHaveBeenCalledWith({});
+      expect(github.issues.update).not.toHaveBeenCalled();
     });
   });
 
-  describe('checks are run per the whitelist', () => {
+  describe('only whitelisted checks are run for a repo', () => {
     beforeEach(function (done) {
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callThrough({});
@@ -345,7 +249,7 @@ describe('Api For Sheets Module', () => {
           'opened': ['cla-check']
         }
       });
-      robot.receive(pullRequestpayload);
+      robot.receive(pullRequestPayload);
       done();
     });
 
@@ -399,6 +303,32 @@ describe('Api For Sheets Module', () => {
       expect(apiForSheetsModule.checkClaSheet.calls.argsFor(0).length).toEqual(
         1
       );
+    });
+  });
+
+  describe('no checks are run for a non whitelisted repo', () => {
+    beforeEach(function (done) {
+      spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
+      spyOn(apiForSheetsModule, 'authorize').and.callThrough({});
+      spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
+      spyOn(checkPullRequestLabelsModule, 'checkChangelogLabel').and.callThrough();
+      spyOn(checkPullRequestBranchModule, 'checkBranch').and.callThrough();
+      spyOn(checkWipModule, 'checkWIP').and.callThrough();
+      spyOn(constants, 'getChecksWhitelist').and.returnValue({
+        'oppia-test': {
+          'opened': ['cla-check']
+        }
+      });
+      robot.receive(pullRequestPayload);
+      done();
+    });
+
+    it('should not call any checks', () => {
+      expect(
+        checkPullRequestLabelsModule.checkChangelogLabel).not.toHaveBeenCalled();
+      expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
+      expect(checkWipModule.checkWIP).not.toHaveBeenCalled();
+      expect(apiForSheetsModule.checkClaStatus).not.toHaveBeenCalled();
     });
   });
 });
