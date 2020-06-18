@@ -14,6 +14,7 @@ const wipCheck = 'wip-check';
 const assigneeCheck = 'assignee-check';
 const mergeConflictCheck = 'merge-conflict-check';
 const allMergeConflictCheck = 'all-merge-conflict-check';
+const jobCheck = 'job-check';
 
 const checksWhitelist = {
   'oppia-android': {
@@ -24,20 +25,11 @@ const checksWhitelist = {
     [closeEvent]: [],
     [editEvent]: []
   },
-  'oppia': {
-    [openEvent]: [
-      claCheck,
-      changelogCheck,
-      branchCheck,
-      wipCheck
-    ],
-    [reopenEvent]: [
-      changelogCheck,
-      branchCheck,
-      wipCheck
-    ],
+  oppia: {
+    [openEvent]: [claCheck, changelogCheck, branchCheck, wipCheck, jobCheck],
+    [reopenEvent]: [changelogCheck, branchCheck, wipCheck, jobCheck],
     [labelEvent]: [assigneeCheck],
-    [synchronizeEvent]: [mergeConflictCheck],
+    [synchronizeEvent]: [mergeConflictCheck, jobCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: [wipCheck]
   }
@@ -57,8 +49,8 @@ module.exports.wipCheck = wipCheck;
 module.exports.assigneeCheck = assigneeCheck;
 module.exports.mergeConflictCheck = mergeConflictCheck;
 module.exports.allMergeConflictCheck = allMergeConflictCheck;
+module.exports.jobCheck = jobCheck;
 
 module.exports.getChecksWhitelist = function() {
   return checksWhitelist;
 };
-

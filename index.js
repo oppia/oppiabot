@@ -5,12 +5,15 @@ const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
 const checkWipModule = require('./lib/checkWipDraftPR');
+const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
+
 const constants = require('./constants');
 
-const whitelistedAccounts = (
-  (process.env.WHITELISTED_ACCOUNTS || '').toLowerCase().split(','));
+const whitelistedAccounts = (process.env.WHITELISTED_ACCOUNTS || '')
+  .toLowerCase()
+  .split(',');
 
-async function runChecks(context, checkEvent) {
+const runChecks = async (context, checkEvent) => {
   const repoName = context.repo().repo.toLowerCase();
   const checksWhitelist = constants.getChecksWhitelist();
   if (checksWhitelist.hasOwnProperty(repoName)) {
@@ -36,13 +39,17 @@ async function runChecks(context, checkEvent) {
             break;
           case constants.mergeConflictCheck:
             await checkMergeConflictsModule.checkMergeConflictsInPullRequest(
-              context, context.payload.pull_request);
+              context,
+              context.payload.pull_request
+            );
             break;
           case constants.allMergeConflictCheck:
-            await (
-              checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(
-                context));
+            await checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(
+              context
+            );
             break;
+          case constants.jobCheck:
+            await checkPullRequestJobModule.checkForNewJob(context);
         }
       }
     }
@@ -60,10 +67,10 @@ function checkWhitelistedAccounts(context) {
 module.exports = (oppiabot) => {
   scheduler.createScheduler(oppiabot, {
     delay: !process.env.DISABLE_DELAY,
-    interval: 60 * 60 * 1000 // 1 hour
+    interval: 60 * 60 * 1000, // 1 hour
   });
 
-  oppiabot.on('pull_request.opened', async context => {
+  oppiabot.on('pull_request.opened', async (context) => {
     // The oppiabot runs only for repositories belonging to certain
     // whitelisted accounts. The whitelisted accounts are stored as an
     // env variable. context.repo().owner returns the owner of the
@@ -75,19 +82,19 @@ module.exports = (oppiabot) => {
     }
   });
 
-  oppiabot.on('pull_request.reopened', async context => {
+  oppiabot.on('pull_request.reopened', async (context) => {
     if (checkWhitelistedAccounts(context)) {
       await runChecks(context, constants.reopenEvent);
     }
   });
 
-  oppiabot.on('pull_request.labeled', async context => {
-     if (checkWhitelistedAccounts(context)) {
+  oppiabot.on('pull_request.labeled', async (context) => {
+    if (checkWhitelistedAccounts(context)) {
       await runChecks(context, constants.labelEvent);
     }
   });
 
-  oppiabot.on('pull_request.synchronize', async context => {
+  oppiabot.on('pull_request.synchronize', async (context) => {
     if (checkWhitelistedAccounts(context)) {
       // eslint-disable-next-line no-console
       console.log(' PR SYNC EVENT TRIGGERED..');
@@ -95,20 +102,22 @@ module.exports = (oppiabot) => {
     }
   });
 
-  oppiabot.on('pull_request.closed', async context => {
-     if (
+  oppiabot.on('pull_request.closed', async (context) => {
+    if (
       checkWhitelistedAccounts(context) &&
-      context.payload.pull_request.merged === true) {
+      context.payload.pull_request.merged === true
+    ) {
       // eslint-disable-next-line no-console
       console.log(' A PR HAS BEEN MERGED..');
       await runChecks(context, constants.closeEvent);
     }
   });
 
-  oppiabot.on('pull_request.edited', async context => {
+  oppiabot.on('pull_request.edited', async (context) => {
     if (
       checkWhitelistedAccounts(context) &&
-      context.payload.pull_request.state === 'open') {
+      context.payload.pull_request.state === 'open'
+    ) {
       // eslint-disable-next-line no-console
       console.log('A PR HAS BEEN EDITED...');
       await runChecks(context, constants.editEvent);
