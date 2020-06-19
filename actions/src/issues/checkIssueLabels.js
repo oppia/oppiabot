@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Handles issues getting labeled.
+ * @fileoverview File to handle checks when a issue is labeled.
  */
 
 const core = require('@actions/core');
@@ -29,10 +29,11 @@ const checkLabels = async () => {
   const octokit = new GitHub(token);
   const user = context.payload.sender.login;
 
-  if (label.name === GOOD_FIRST_LABEL &&
+  if (
+      label.name === GOOD_FIRST_LABEL &&
       !whitelist.goodFirstIssue.includes(user)) {
     core.info('Good first issue label got added by non whitelisted user.');
-    await handleGoodFirstIssue(octokit, user);
+    await handleGoodFirstIssueLabel(octokit, user);
   } else if (prLabels.includes(label.name) || label.name.startsWith('PR')) {
     core.info('PR label got added on an issue');
     await handlePRLabel(octokit, label.name, user);
@@ -45,14 +46,14 @@ const checkLabels = async () => {
  * @param {import('@actions/github').GitHub} octokit
  * @param {String} user - Username of the user that added the label.
  */
-const handleGoodFirstIssue = async (octokit, user) => {
+const handleGoodFirstIssueLabel = async (octokit, user) => {
   const issueNumber = context.payload.issue.number;
   // Comment on the issue and ping the onboarding team lead.
   await octokit.issues.createComment(
     {
       body:'Hi @' + user + ', thanks for proposing this as a good first ' +
           'issue. Looping in @' + whitelist.teamLeads.onboardingTeam +
-          ' to confirm, removing the label until he does so.',
+          ' to confirm, removing the label until it is approved.',
       issue_number: issueNumber,
       owner: context.repo.owner,
       repo: context.repo.repo,
@@ -65,6 +66,15 @@ const handleGoodFirstIssue = async (octokit, user) => {
     name: GOOD_FIRST_LABEL,
     owner: context.repo.owner,
     repo: context.repo.repo
+  });
+
+  // Assign issue to Team Lead.
+  core.info(`Assigning to ${whitelist.teamLeads.onboardingTeam}.`);
+  await octokit.issues.addAssignees({
+    issue_number:issueNumber,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    assignees:[whitelist.teamLeads.onboardingTeam],
   });
 };
 

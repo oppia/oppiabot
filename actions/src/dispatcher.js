@@ -17,7 +17,9 @@
  */
 
 const core = require('@actions/core');
+const { context } = require('@actions/github');
 const issueLabelsModule = require('./issues/checkIssueLabels');
+const constants = require('../../constants');
 
 const EVENTS = {
   ISSUES: 'issues',
@@ -28,11 +30,20 @@ const ACTIONS = {
 module.exports = {
   async dispatch(event, action) {
     core.info(`Received Event:${event} Action:${action}.`);
-    if (event === EVENTS.ISSUES) {
-      switch (action) {
-        case ACTIONS.LABELLED:
-          await issueLabelsModule.checkLabels();
-          break;
+    const checkEvent = `${event}_${action}`;
+    const repoName = context.payload.repository.name.toLowerCase();
+    const checksWhitelist = constants.getChecksWhitelist();
+    if (checksWhitelist.hasOwnProperty(repoName)) {
+      const checks = checksWhitelist[repoName];
+      if (checks.hasOwnProperty(checkEvent)) {
+        const checkList = checks[checkEvent];
+        for (var i = 0; i < checkList.length; i++) {
+          switch (checkList[i]) {
+            case constants.issuesLabelCheck:
+              await issueLabelsModule.checkLabels();
+              break;
+          }
+        }
       }
     }
   }

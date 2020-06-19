@@ -42,6 +42,7 @@ describe('Check Issue Labels Module', () => {
       issues: {
         createComment: jasmine.createSpy('createComment').and.resolveTo({}),
         removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
+        addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
       },
     };
 
@@ -57,13 +58,11 @@ describe('Check Issue Labels Module', () => {
   describe('called for only issue event and labeled action', () => {
     it('should not be called for non issue event', async () => {
       await dispatcher.dispatch('pull_request', 'labeled');
-
       expect(checkIssueLabelModule.checkLabels).not.toHaveBeenCalled();
     });
 
     it('should not be called for non labeled action', async () => {
       await dispatcher.dispatch('issues', 'opened');
-
       expect(checkIssueLabelModule.checkLabels).not.toHaveBeenCalled();
     });
   });
@@ -83,7 +82,7 @@ describe('Check Issue Labels Module', () => {
       const body = (
         'Hi @' + user + ', thanks for proposing this as a good first issue. ' +
         'Looping in @' + whitelist.teamLeads.onboardingTeam +
-        ' to confirm, removing the label until he does so.');
+        ' to confirm, removing the label until it is approved.');
 
       expect(octokit.issues.createComment).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
@@ -98,6 +97,16 @@ describe('Check Issue Labels Module', () => {
       expect(octokit.issues.removeLabel).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
         name: 'good first issue',
+        owner: payload.repository.owner.login,
+        repo: payload.repository.name,
+      });
+    });
+
+    it('should assign team lead', () => {
+      expect(octokit.issues.addAssignees).toHaveBeenCalled();
+      expect(octokit.issues.addAssignees).toHaveBeenCalledWith({
+        issue_number: payload.issue.number,
+        assignees: [whitelist.teamLeads.onboardingTeam],
         owner: payload.repository.owner.login,
         repo: payload.repository.name,
       });
@@ -120,6 +129,10 @@ describe('Check Issue Labels Module', () => {
 
     it('should not remove the label', () => {
       expect(octokit.issues.removeLabel).not.toHaveBeenCalled();
+    });
+
+    it('should not assign team lead', () => {
+      expect(octokit.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
 
@@ -204,4 +217,24 @@ describe('Check Issue Labels Module', () => {
       });
     });
   });
+
+  describe('check for other issues labels', () => {
+    const testLabel = 'code-health';
+    beforeEach(async () => {
+      payload.label.name = testLabel;
+      await dispatcher.dispatch('issues', 'labeled');
+    });
+
+    it('should be called for the payload', () => {
+      expect(checkIssueLabelModule.checkLabels).toHaveBeenCalled();
+    });
+
+    it('should not comment', () => {
+      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('should not remove the label', () => {
+      expect(octokit.issues.removeLabel).not.toHaveBeenCalled();
+    });
+  })
 });

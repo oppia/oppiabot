@@ -2334,6 +2334,75 @@ function checkMode (stat, options) {
 
 /***/ }),
 
+/***/ 208:
+/***/ (function(module) {
+
+const openEvent = 'opened';
+const reopenEvent = 'reopened';
+const labelEvent = 'labeled';
+const synchronizeEvent = 'synchronize';
+const closeEvent = 'closed';
+const editEvent = 'edited';
+const issuesLabelEvent = 'issues_labeled'
+
+const claCheck = 'cla-check';
+const changelogCheck = 'changelog-check';
+// This check is required in re-open events as well to
+// prevent user from reopening the PR.
+const branchCheck = 'branch-check';
+const wipCheck = 'wip-check';
+const assigneeCheck = 'assignee-check';
+const mergeConflictCheck = 'merge-conflict-check';
+const allMergeConflictCheck = 'all-merge-conflict-check';
+const jobCheck = 'job-check';
+const issuesLabelCheck = 'issues-labeled-check'
+
+const checksWhitelist = {
+  'oppia-android': {
+    [openEvent]: [claCheck],
+    [reopenEvent]: [],
+    [labelEvent]: [],
+    [synchronizeEvent]: [],
+    [closeEvent]: [],
+    [editEvent]: [],
+    [issuesLabelEvent]: []
+  },
+  oppia: {
+    [openEvent]: [claCheck, changelogCheck, branchCheck, wipCheck, jobCheck],
+    [reopenEvent]: [changelogCheck, branchCheck, wipCheck, jobCheck],
+    [labelEvent]: [assigneeCheck],
+    [synchronizeEvent]: [mergeConflictCheck, jobCheck],
+    [closeEvent]: [allMergeConflictCheck],
+    [editEvent]: [wipCheck],
+    [issuesLabelEvent]: [issuesLabelCheck]
+  }
+};
+
+module.exports.openEvent = openEvent;
+module.exports.reopenEvent = reopenEvent;
+module.exports.labelEvent = labelEvent;
+module.exports.synchronizeEvent = synchronizeEvent;
+module.exports.closeEvent = closeEvent;
+module.exports.editEvent = editEvent;
+module.exports.issuesLabelEvent = issuesLabelEvent
+
+module.exports.claCheck = claCheck;
+module.exports.changelogCheck = changelogCheck;
+module.exports.branchCheck = branchCheck;
+module.exports.wipCheck = wipCheck;
+module.exports.assigneeCheck = assigneeCheck;
+module.exports.mergeConflictCheck = mergeConflictCheck;
+module.exports.allMergeConflictCheck = allMergeConflictCheck;
+module.exports.jobCheck = jobCheck;
+module.exports.issuesLabelCheck = issuesLabelCheck
+
+module.exports.getChecksWhitelist = function() {
+  return checksWhitelist;
+};
+
+
+/***/ }),
+
 /***/ 211:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -4196,7 +4265,7 @@ function coerce (version) {
 // limitations under the License.
 
 /**
- * @fileoverview Handles issues getting labeled.
+ * @fileoverview File to handle checks when a issue is labeled.
  */
 
 const core = __webpack_require__(470);
@@ -4212,10 +4281,11 @@ const checkLabels = async () => {
   const octokit = new GitHub(token);
   const user = context.payload.sender.login;
 
-  if (label.name === GOOD_FIRST_LABEL &&
+  if (
+      label.name === GOOD_FIRST_LABEL &&
       !whitelist.goodFirstIssue.includes(user)) {
     core.info('Good first issue label got added by non whitelisted user.');
-    await handleGoodFirstIssue(octokit, user);
+    await handleGoodFirstIssueLabel(octokit, user);
   } else if (prLabels.includes(label.name) || label.name.startsWith('PR')) {
     core.info('PR label got added on an issue');
     await handlePRLabel(octokit, label.name, user);
@@ -4228,14 +4298,14 @@ const checkLabels = async () => {
  * @param {import('@actions/github').GitHub} octokit
  * @param {String} user - Username of the user that added the label.
  */
-const handleGoodFirstIssue = async (octokit, user) => {
+const handleGoodFirstIssueLabel = async (octokit, user) => {
   const issueNumber = context.payload.issue.number;
   // Comment on the issue and ping the onboarding team lead.
   await octokit.issues.createComment(
     {
       body:'Hi @' + user + ', thanks for proposing this as a good first ' +
           'issue. Looping in @' + whitelist.teamLeads.onboardingTeam +
-          ' to confirm, removing the label until he does so.',
+          ' to confirm, removing the label until it is approved.',
       issue_number: issueNumber,
       owner: context.repo.owner,
       repo: context.repo.repo,
@@ -4248,6 +4318,15 @@ const handleGoodFirstIssue = async (octokit, user) => {
     name: GOOD_FIRST_LABEL,
     owner: context.repo.owner,
     repo: context.repo.repo
+  });
+
+  // Assign issue to Team Lead.
+  core.info(`Assigning to ${whitelist.teamLeads.onboardingTeam}.`);
+  await octokit.issues.addAssignees({
+    issue_number:issueNumber,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    assignees:[whitelist.teamLeads.onboardingTeam],
   });
 };
 
@@ -9060,7 +9139,9 @@ exports.request = request;
  */
 
 const core = __webpack_require__(470);
+const { context } = __webpack_require__(469);
 const issueLabelsModule = __webpack_require__(293);
+const constants = __webpack_require__(208);
 
 const EVENTS = {
   ISSUES: 'issues',
@@ -9071,11 +9152,20 @@ const ACTIONS = {
 module.exports = {
   async dispatch(event, action) {
     core.info(`Received Event:${event} Action:${action}.`);
-    if (event === EVENTS.ISSUES) {
-      switch (action) {
-        case ACTIONS.LABELLED:
-          await issueLabelsModule.checkLabels();
-          break;
+    const checkEvent = `${event}_${action}`;
+    const repoName = context.payload.repository.name.toLowerCase();
+    const checksWhitelist = constants.getChecksWhitelist();
+    if (checksWhitelist.hasOwnProperty(repoName)) {
+      const checks = checksWhitelist[repoName];
+      if (checks.hasOwnProperty(checkEvent)) {
+        const checkList = checks[checkEvent];
+        for (var i = 0; i < checkList.length; i++) {
+          switch (checkList[i]) {
+            case constants.issuesLabelCheck:
+              await issueLabelsModule.checkLabels();
+              break;
+          }
+        }
       }
     }
   }
