@@ -179,7 +179,7 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR, ' +
-        'it adds a new one off job. The name of the job is exp_jobs_one_off.' +
+        'it adds a new one off job. The name of the job is FirstTestOneOffJob.' +
         newLineFeed + 'Also @' + author + ', please add the new job ' +
         'file to the ' + jobRegistryLink + ' and please make sure to fill in the ' +
         formText + ' for the new job to be tested on the backup server. ' +
@@ -253,7 +253,7 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR, ' +
-        'it adds new one off jobs. The jobs are exp_jobs_one_off, exp_jobs_oppiabot_off.' +
+        'it adds new one off jobs. The jobs are FirstTestOneOffJob, SecondTestOneOffJob.' +
         newLineFeed + 'Also @' + author + ', please add the new job ' +
         'files to the '+ jobRegistryLink +' and please make sure to fill in the ' +
         formText + ' for the new jobs to be tested on the backup server. ' +
@@ -325,7 +325,7 @@ describe('Pull Request Job Spec', () => {
         expect(github.issues.createComment).toHaveBeenCalledWith({
           issue_number: payloadData.payload.pull_request.number,
           body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR, ' +
-          'it adds a new one off job. The name of the job is exp_jobs_one_off.' +
+          'it adds a new one off job. The name of the job is FirstTestOneOffJob.' +
           newLineFeed + 'Also @' + author + ', please make sure to fill in the ' +
           formText + ' for the new job to be tested on the backup server. ' +
           'This PR can be merged only after the test run is successful. ' +
@@ -395,7 +395,7 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body: 'Hi @' + SERVER_JOBS_ADMIN + ', PTAL at this PR, ' +
-        'it adds a new one off job. The name of the job is user_jobs_one_off.' +
+        'it adds a new one off job. The name of the job is OppiabotContributionsOneOffJob.' +
         newLineFeed + 'Also @' + author + ', please add the new job ' +
         'file to the ' + jobRegistryLink + ' and please make sure to fill in the ' +
         formText + ' for the new job to be tested on the backup server. ' +
