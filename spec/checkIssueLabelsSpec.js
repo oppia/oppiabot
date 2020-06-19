@@ -239,4 +239,28 @@ describe('Check Issue Labels Module', () => {
       expect(octokit.issues.removeLabel).not.toHaveBeenCalled();
     });
   })
+
+
+  describe('check non whitelisted repo', () => {
+    beforeEach(async () => {
+      payload.repository.name = 'non-whitelisted-repo'
+      await dispatcher.dispatch('issues', 'labeled');
+    });
+
+    it('should not be called for the payload', () => {
+      expect(checkIssueLabelModule.checkLabels).not.toHaveBeenCalled();
+    });
+
+    it('should not comment on issue', () => {
+      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('should not remove the label', () => {
+      expect(octokit.issues.removeLabel).not.toHaveBeenCalled();
+    });
+
+    it('should not assign team lead', () => {
+      expect(octokit.issues.addAssignees).not.toHaveBeenCalled();
+    });
+  })
 });
