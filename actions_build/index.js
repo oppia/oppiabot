@@ -4304,8 +4304,9 @@ const handleGoodFirstIssueLabel = async (octokit, user) => {
   await octokit.issues.createComment(
     {
       body:'Hi @' + user + ', thanks for proposing this as a good first ' +
-          'issue. Looping in @' + whitelist.teamLeads.onboardingTeam +
-          ' to confirm, removing the label until it is approved.',
+          'issue. I am removing the label for now and looping in ' +
+          '@' + whitelist.teamLeads.onboardingTeam + ' to approve the label. ' +
+          'It will be added back if approved. Thanks!',
       issue_number: issueNumber,
       owner: context.repo.owner,
       repo: context.repo.repo,
@@ -4349,12 +4350,13 @@ const handlePRLabel = async (octokit, label, user) => {
     // Handle case for a changelog label.
     commentBody = (
       'Hi @' + user + ', changelog labels should not be used on issues.' +
-      ' I’m removing the label. You can learn more about labels ' + link);
+      ' I’m removing the label. You can learn more about labels ' + link +
+      '. Thanks!');
   } else {
     commentBody = (
       'Hi @' + user + ', the ' + label + ' label should only be used in ' +
       'pull requests. I’m removing the label. You can learn more about ' +
-      'labels ' + link);
+      'labels ' + link + '. Thanks!');
   }
 
   await octokit.issues.createComment(

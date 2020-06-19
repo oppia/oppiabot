@@ -81,8 +81,9 @@ describe('Check Issue Labels Module', () => {
       const user = payload.sender.login;
       const body = (
         'Hi @' + user + ', thanks for proposing this as a good first issue. ' +
-        'Looping in @' + whitelist.teamLeads.onboardingTeam +
-        ' to confirm, removing the label until it is approved.');
+        'I am removing the label for now and looping in ' +
+        '@' + whitelist.teamLeads.onboardingTeam + ' to approve the label. ' +
+        'It will be added back if approved. Thanks!');
 
       expect(octokit.issues.createComment).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
@@ -155,7 +156,8 @@ describe('Check Issue Labels Module', () => {
         'labeling-issues-and-pull-requests');
       const body = (
         'Hi @' + user + ', changelog labels should not be used on issues.' +
-        ' I’m removing the label. You can learn more about labels ' + link);
+        ' I’m removing the label. You can learn more about labels ' + link +
+        '. Thanks!');
 
       expect(octokit.issues.createComment).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
@@ -176,7 +178,7 @@ describe('Check Issue Labels Module', () => {
     });
   });
 
-  describe('check for other PR labels', () => {
+  describe('check for PR labels', () => {
     const testLabel = 'dependencies';
     beforeEach(async () => {
       payload.label.name = testLabel;
@@ -197,7 +199,7 @@ describe('Check Issue Labels Module', () => {
       const body = (
         'Hi @' + user + ', the ' + testLabel + ' label should only be used ' +
         'in pull requests. I’m removing the label. You can learn more ' +
-        'about labels ' + link);
+        'about labels ' + link + '. Thanks!');
 
       expect(octokit.issues.createComment).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
@@ -218,7 +220,7 @@ describe('Check Issue Labels Module', () => {
     });
   });
 
-  describe('check for other issues labels', () => {
+  describe('check for issues labels', () => {
     const testLabel = 'code-health';
     beforeEach(async () => {
       payload.label.name = testLabel;
