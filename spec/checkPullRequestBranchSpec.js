@@ -88,10 +88,11 @@ describe('Pull Request Branch Check', () => {
           'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
           'instructions-for-making-a-code-change');
         const commentBody = (
-          'Hi @' + author + ', PRs made from develop, release or test ' +
-          'branches are not allowed. So this PR is being closed. Please make ' +
-          'your changes in another branch and send in the PR. To learn more ' +
-          'about contributing to Oppia, take a look at our ' + wiki + '. Thanks!');
+          'Hi @' + author + ', PRs made from develop branch or prefixed with ' +
+          'release- or test- are not allowed. So this PR is being closed. ' +
+          'Please make your changes in another branch and send in the PR. To ' +
+          'learn more about contributing to Oppia, take a look at our '
+          + wiki + '. Thanks!');
         expect(github.issues.createComment).toHaveBeenCalledWith({
           issue_number: pullRequestPayload.payload.pull_request.number,
           owner: pullRequestPayload.payload.repository.owner.login,
@@ -128,10 +129,11 @@ describe('Pull Request Branch Check', () => {
           'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
           'instructions-for-making-a-code-change');
         const commentBody = (
-          'Hi @' + author + ', PRs made from develop, release or test ' +
-          'branches are not allowed. So this PR is being closed. Please make ' +
-          'your changes in another branch and send in the PR. To learn more ' +
-          'about contributing to Oppia, take a look at our ' + wiki + '. Thanks!');
+          'Hi @' + author + ', PRs made from develop branch or prefixed with ' +
+          'release- or test- are not allowed. So this PR is being closed. ' +
+          'Please make your changes in another branch and send in the PR. To ' +
+          'learn more about contributing to Oppia, take a look at our '
+          + wiki + '. Thanks!');
         expect(github.issues.createComment).toHaveBeenCalledWith({
           issue_number: pullRequestPayload.payload.pull_request.number,
           owner: pullRequestPayload.payload.repository.owner.login,
@@ -168,10 +170,11 @@ describe('Pull Request Branch Check', () => {
           'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
           'instructions-for-making-a-code-change');
         const commentBody = (
-          'Hi @' + author + ', PRs made from develop, release or test ' +
-          'branches are not allowed. So this PR is being closed. Please make ' +
-          'your changes in another branch and send in the PR. To learn more ' +
-          'about contributing to Oppia, take a look at our ' + wiki + '. Thanks!');
+          'Hi @' + author + ', PRs made from develop branch or prefixed with ' +
+          'release- or test- are not allowed. So this PR is being closed. ' +
+          'Please make your changes in another branch and send in the PR. To ' +
+          'learn more about contributing to Oppia, take a look at our '
+          + wiki + '. Thanks!');
         expect(github.issues.createComment).toHaveBeenCalledWith({
           issue_number: pullRequestPayload.payload.pull_request.number,
           owner: pullRequestPayload.payload.repository.owner.login,
