@@ -29,7 +29,7 @@ const checkAssignees = async () => {
 
     await octokit.issues.removeAssignees({
       issue_number: issue.number,
-      repo: context.repo.owner,
+      repo: context.repo.repo,
       owner: context.repo.owner,
       assignees: [assignee.login],
     });
