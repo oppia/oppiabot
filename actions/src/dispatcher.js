@@ -19,16 +19,9 @@
 const core = require('@actions/core');
 const { context } = require('@actions/github');
 const issueLabelsModule = require('./issues/checkIssueLabels');
-const issuesAssignedModule = require('./checkIssueAssigned');
+const issuesAssignedModule = require('./issues/checkIssueAssigned');
 const constants = require('../../constants');
 
-const EVENTS = {
-  ISSUES: 'issues',
-};
-const ACTIONS = {
-  LABELLED: 'labeled',
-  ASSIGNED: 'assigned'
-};
 module.exports = {
   async dispatch(event, action) {
     core.info(`Received Event:${event} Action:${action}.`);
