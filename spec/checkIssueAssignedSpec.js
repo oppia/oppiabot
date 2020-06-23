@@ -21,10 +21,10 @@ const core = require('@actions/core');
 const payload = require('../fixtures/issues.assigned.json');
 const { google } = require('googleapis');
 const dispatcher = require('../actions/src/dispatcher');
-const checkIssueAssignedModule = require('../actions/src/issues/checkIssueAssigned');
+const checkIssueAssigneeModule = require('../actions/src/issues/checkIssueAssignee');
 const checkIssueLabelModule = require('../actions/src/issues/checkIssueLabels');
 
-describe('Check Issue Assignees Module', () => {
+describe('Check Issue Assignee Module', () => {
   /**
    * @type {import('@actions/github').GitHub} octokit
    */
@@ -52,22 +52,22 @@ describe('Check Issue Assignees Module', () => {
     Object.setPrototypeOf(github.GitHub, function () {
       return octokit;
     });
-    spyOn(checkIssueAssignedModule, 'checkAssignees').and.callThrough();
+    spyOn(checkIssueAssigneeModule, 'checkAssignees').and.callThrough();
     spyOn(checkIssueLabelModule, 'checkLabels').and.callFake(() => {});
   });
 
-  describe('called for only issue event and labeled action', () => {
+  describe('called for only issue event and assigned action', () => {
     it('should not be called for non issue event', async () => {
       await dispatcher.dispatch('pull_request', 'assigned');
-      expect(checkIssueAssignedModule.checkAssignees).not.toHaveBeenCalled();
+      expect(checkIssueAssigneeModule.checkAssignees).not.toHaveBeenCalled();
     });
 
-    it('should not be called for non labeled action', async () => {
+    it('should not be called for non assigned action', async () => {
       await dispatcher.dispatch('issues', 'opened');
-      expect(checkIssueAssignedModule.checkAssignees).not.toHaveBeenCalled();
+      expect(checkIssueAssigneeModule.checkAssignees).not.toHaveBeenCalled();
 
       await dispatcher.dispatch('issues', 'labeled');
-      expect(checkIssueAssignedModule.checkAssignees).not.toHaveBeenCalled();
+      expect(checkIssueAssigneeModule.checkAssignees).not.toHaveBeenCalled();
     });
   });
 
@@ -87,7 +87,7 @@ describe('Check Issue Assignees Module', () => {
     });
 
     it('should call checkAssignees', () => {
-      expect(checkIssueAssignedModule.checkAssignees).toHaveBeenCalled();
+      expect(checkIssueAssigneeModule.checkAssignees).toHaveBeenCalled();
     });
 
     it('should check the spreadsheet', () => {
@@ -135,7 +135,7 @@ describe('Check Issue Assignees Module', () => {
     });
 
     it('should call checkAssignees', () => {
-      expect(checkIssueAssignedModule.checkAssignees).toHaveBeenCalled();
+      expect(checkIssueAssigneeModule.checkAssignees).toHaveBeenCalled();
     });
 
     it('should check the spreadsheet', () => {
@@ -150,4 +150,23 @@ describe('Check Issue Assignees Module', () => {
       expect(octokit.issues.removeAssignees).not.toHaveBeenCalled();
     });
   });
+
+  describe('check non whitelisted repo', () => {
+    beforeEach(async () => {
+      payload.repository.name = 'non-whitelisted-repo'
+      await dispatcher.dispatch('issues', 'assigned');
+    });
+
+    it('should not be called for the payload', () => {
+      expect(checkIssueAssigneeModule.checkAssignees).not.toHaveBeenCalled();
+    });
+
+    it('should not comment on issue', () => {
+      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('should not unassign user', () => {
+      expect(octokit.issues.removeAssignees).not.toHaveBeenCalled();
+    });
+  })
 });

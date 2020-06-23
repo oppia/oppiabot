@@ -19,7 +19,7 @@
 const core = require('@actions/core');
 const { context } = require('@actions/github');
 const issueLabelsModule = require('./issues/checkIssueLabels');
-const issuesAssignedModule = require('./issues/checkIssueAssigned');
+const checkIssueAssigneeModule = require('./issues/checkIssueAssignee');
 const constants = require('../../constants');
 
 module.exports = {
@@ -38,7 +38,7 @@ module.exports = {
               await issueLabelsModule.checkLabels();
               break;
             case constants.issuesAssignedCheck:
-              await issuesAssignedModule.checkAssignees();
+              await checkIssueAssigneeModule.checkAssignees();
               break;
           }
         }
