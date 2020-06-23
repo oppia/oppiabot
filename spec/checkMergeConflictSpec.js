@@ -4,6 +4,7 @@ const { createProbot } = require('probot');
 const oppiaBot = require('../index');
 const checkMergeConflictModule = require('../lib/checkMergeConflicts');
 const scheduler = require('../lib/scheduler');
+const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
@@ -54,6 +55,7 @@ describe('Merge Conflict Check', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
+    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
     spyOn(
       checkMergeConflictModule,
       'checkMergeConflictsInAllPullRequests'

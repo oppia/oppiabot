@@ -1,15 +1,16 @@
-name: Oppiabot
+name: Oppiabot Actions
 
 description: Handles user interactions with issues.
+branding:
+  color: purple
+  icon: activity
+
 inputs:
   repo-token: # Repository token.
     description: 'The repository token needed to create comments.'
     required: true
-  google-client-credentials:
-    description: 'Credentials for accessing google apis.'
-    required: true
-  google-auth-credentials:
-    description: 'Authenticated credentials for accessing google apis.'
+  google-api-key:
+    description: 'API credential for accessing google apis.'
     required: true
   cla-sheet-id:
     description: 'ID for the CLA spreadsheet.'
@@ -17,4 +18,4 @@ inputs:
 
 runs:
   using: "node12"
-  main: "dist/index.js"
+  main: "actions_build/index.js"
