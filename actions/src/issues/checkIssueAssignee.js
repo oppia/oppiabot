@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Issue assigned handler.
+ * @fileoverview Handler to check issue assigned event.
  */
 
 const core = require('@actions/core');
@@ -29,28 +29,32 @@ const checkAssignees = async () => {
   const linkToCla = 'here'.link(
     'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up');
 
-  core.info('Checking if ' + assignee.login + ' has signed the CLA');
-  const assigneeHasSignedCla = await hasSignedCla(assignee.login);
-  if (!assigneeHasSignedCla) {
-    core.info(assignee.login + ' has not signed the CLA');
+  try {
+    core.info('Checking if ' + assignee.login + ' has signed the CLA');
+    const assigneeHasSignedCla = await hasSignedCla(assignee.login);
+    if (!assigneeHasSignedCla) {
+      core.info(assignee.login + ' has not signed the CLA');
 
-    const commentBody = 'Hi @' + assignee.login + ', you need to sign the ' +
-      'CLA before you can get assigned to issues. Follow the instructions ' +
-      linkToCla + ' to get started. Thanks!';
+      const commentBody = 'Hi @' + assignee.login + ', you need to sign the ' +
+        'CLA before you can get assigned to issues. Follow the instructions ' +
+        linkToCla + ' to get started. Thanks!';
 
-    await octokit.issues.createComment({
-      issue_number: issue.number,
-      repo: context.repo.repo,
-      owner: context.repo.owner,
-      body: commentBody,
-    });
+      await octokit.issues.createComment({
+        issue_number: issue.number,
+        repo: context.repo.repo,
+        owner: context.repo.owner,
+        body: commentBody,
+      });
 
-    await octokit.issues.removeAssignees({
-      issue_number: issue.number,
-      repo: context.repo.repo,
-      owner: context.repo.owner,
-      assignees: [assignee.login],
-    });
+      await octokit.issues.removeAssignees({
+        issue_number: issue.number,
+        repo: context.repo.repo,
+        owner: context.repo.owner,
+        assignees: [assignee.login],
+      });
+    }
+  } catch (error) {
+    core.setFailed(error);
   }
 
 };

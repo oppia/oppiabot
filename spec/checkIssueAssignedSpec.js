@@ -151,6 +151,42 @@ describe('Check Issue Assignee Module', () => {
     });
   });
 
+
+  describe('when sheets api throws error', () => {
+    beforeEach(async () => {
+      spyOn(google, 'sheets').and.returnValue({
+        spreadsheets: {
+          values: {
+            get: jasmine.createSpy('get').and.throwError('Unable to get sheet.'),
+          },
+        },
+      });
+      spyOn(core, 'setFailed').and.callThrough();
+
+      await dispatcher.dispatch('issues', 'assigned');
+    });
+
+    it('should call checkAssignees', () => {
+      expect(checkIssueAssigneeModule.checkAssignees).toHaveBeenCalled();
+    });
+
+    it('should check the spreadsheet', () => {
+      expect(google.sheets).toHaveBeenCalled();
+    });
+
+    it('should fail the check', () =>{
+      expect(core.setFailed).toHaveBeenCalled();
+    });
+
+    it('should not comment on issue', () => {
+      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('should not unassign user', () => {
+      expect(octokit.issues.removeAssignees).not.toHaveBeenCalled();
+    });
+  });
+
   describe('check non whitelisted repo', () => {
     beforeEach(async () => {
       payload.repository.name = 'non-whitelisted-repo'
