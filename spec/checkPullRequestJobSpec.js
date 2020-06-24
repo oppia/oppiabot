@@ -144,6 +144,22 @@ describe('Pull Request Job Spec', () => {
     patch: '@@ -0,0 +1 @@\n+# exp_jobs_oppiabot_off.SecondTestOneOffJob exp_jobs_one_off.FirstTestOneOffJob',
   }
 
+  const nonJobFile = {
+    sha: 'd144f32b9812373d5f1bc9f94d9af795f09023ff',
+    filename: 'core/domain/exp_fetchers.py',
+    status: 'added',
+    additions: 1,
+    deletions: 0,
+    changes: 1,
+    blob_url:
+      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e110d7e9833c/core/domain/exp_fetchers.py',
+    raw_url:
+      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d7e9833c/core/domain/exp_fetchers.py',
+    contents_url:
+      'https://api.github.com/repos/oppia/oppia/contents/core/domain/exp_fetchers.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
+    patch: '@@ -0,0 +1 @@\n+# def _migrate_states_schema(versioned_exploration_states, exploration_id):',
+  }
+
   beforeEach(() => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => {});
 
@@ -178,9 +194,7 @@ describe('Pull Request Job Spec', () => {
       github.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
-            {
-              filename: 'core/templates/App.ts',
-            }, firstNewJobFileObj
+            nonJobFile, firstNewJobFileObj
           ],
         }),
       };
@@ -250,9 +264,7 @@ describe('Pull Request Job Spec', () => {
       github.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
-            {
-              filename: 'core/templates/App.ts',
-            },
+            nonJobFile,
             firstNewJobFileObj,
             secondNewJobFileObj
           ],
@@ -327,9 +339,7 @@ describe('Pull Request Job Spec', () => {
         github.pulls = {
           listFiles: jasmine.createSpy('listFiles').and.resolveTo({
             data: [
-              {
-                filename: 'core/templates/App.ts',
-              },
+              nonJobFile,
               firstNewJobFileObj,
               registryFileObjWithNewjob
             ],
@@ -506,17 +516,12 @@ describe('Pull Request Job Spec', () => {
       github.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
-            {
-              filename: 'core/domain/exp_fetchers.py',
-            },
-            {
-              filename: 'core/templates/App.ts',
-            },
+            nonJobFile
           ],
         }),
       };
 
-      payloadData.payload.pull_request.changed_files = 2;
+      payloadData.payload.pull_request.changed_files = 1;
       await robot.receive(payloadData);
     });
 
@@ -560,15 +565,40 @@ describe('Pull Request Job Spec', () => {
     });
   });
 
+  describe('When job test file gets added', () => {
+    beforeEach(async () => {
+      github.pulls = {
+        listFiles: jasmine.createSpy('listFiles').and.resolveTo({
+          data: [
+            jobTestFile
+          ],
+        }),
+      };
+
+      payloadData.payload.pull_request.changed_files = 1;
+      await robot.receive(payloadData);
+    });
+
+    it('should check for jobs', () => {
+      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+    });
+
+    it('should get modified files', () => {
+      expect(github.pulls.listFiles).toHaveBeenCalled();
+    });
+
+    it('should not ping server job admin', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+  });
+
   describe('When pull request has critical label', () => {
     beforeEach(async () => {
       payloadData.payload.pull_request.labels = [{ name: 'critical' }];
       github.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
-            {
-              filename: 'core/templates/App.ts',
-            }, firstNewJobFileObj
+            nonJobFile, firstNewJobFileObj
           ],
         }),
       };
