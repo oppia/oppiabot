@@ -29,6 +29,7 @@ const checkAssignees = async () => {
   const linkToCla = 'here'.link(
     'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up');
 
+  // Catch and log any error that will occur while accessing google sheets api.
   try {
     core.info('Checking if ' + assignee.login + ' has signed the CLA');
     const assigneeHasSignedCla = await hasSignedCla(assignee.login);
