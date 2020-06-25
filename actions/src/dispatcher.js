@@ -19,14 +19,9 @@
 const core = require('@actions/core');
 const { context } = require('@actions/github');
 const issueLabelsModule = require('./issues/checkIssueLabels');
+const checkIssueAssigneeModule = require('./issues/checkIssueAssignee');
 const constants = require('../../constants');
 
-const EVENTS = {
-  ISSUES: 'issues',
-};
-const ACTIONS = {
-  LABELLED: 'labeled'
-};
 module.exports = {
   async dispatch(event, action) {
     core.info(`Received Event:${event} Action:${action}.`);
@@ -41,6 +36,9 @@ module.exports = {
           switch (checkList[i]) {
             case constants.issuesLabelCheck:
               await issueLabelsModule.checkLabels();
+              break;
+            case constants.issuesAssignedCheck:
+              await checkIssueAssigneeModule.checkAssignees();
               break;
           }
         }
