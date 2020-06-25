@@ -9,6 +9,12 @@ inputs:
   repo-token: # Repository token.
     description: 'The repository token needed to create comments.'
     required: true
+  google-api-key:
+    description: 'API credential for accessing google apis.'
+    required: true
+  cla-sheet-id:
+    description: 'ID for the CLA spreadsheet.'
+    required: true
 
 runs:
   using: "node12"

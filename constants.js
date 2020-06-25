@@ -5,6 +5,7 @@ const synchronizeEvent = 'synchronize';
 const closeEvent = 'closed';
 const editEvent = 'edited';
 const issuesLabelEvent = 'issues_labeled'
+const issuesAssignedEvent = 'issues_assigned'
 
 const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
@@ -17,6 +18,7 @@ const mergeConflictCheck = 'merge-conflict-check';
 const allMergeConflictCheck = 'all-merge-conflict-check';
 const jobCheck = 'job-check';
 const issuesLabelCheck = 'issues-labeled-check'
+const issuesAssignedCheck = 'issues-assigned-check'
 
 const checksWhitelist = {
   'oppia-android': {
@@ -35,7 +37,8 @@ const checksWhitelist = {
     [synchronizeEvent]: [mergeConflictCheck, jobCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: [wipCheck],
-    [issuesLabelEvent]: [issuesLabelCheck]
+    [issuesLabelEvent]: [issuesLabelCheck],
+    [issuesAssignedEvent]: [issuesAssignedCheck]
   },
   'oppiabot': {
     [openEvent]: [claCheck],
@@ -53,6 +56,7 @@ module.exports.synchronizeEvent = synchronizeEvent;
 module.exports.closeEvent = closeEvent;
 module.exports.editEvent = editEvent;
 module.exports.issuesLabelEvent = issuesLabelEvent
+module.exports.issuesAssignedEvent = issuesAssignedEvent
 
 module.exports.claCheck = claCheck;
 module.exports.changelogCheck = changelogCheck;
@@ -63,6 +67,7 @@ module.exports.mergeConflictCheck = mergeConflictCheck;
 module.exports.allMergeConflictCheck = allMergeConflictCheck;
 module.exports.jobCheck = jobCheck;
 module.exports.issuesLabelCheck = issuesLabelCheck
+module.exports.issuesAssignedCheck = issuesAssignedCheck
 
 module.exports.getChecksWhitelist = function() {
   return checksWhitelist;
