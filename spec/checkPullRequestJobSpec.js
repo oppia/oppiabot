@@ -94,6 +94,22 @@ describe('Pull Request Job Spec', () => {
     patch: '@@ -0,0 +1 @@class SecondTestOneOffJob(jobs.BaseMapReduceOneOffJobManager)  def reduce(key, version_and_exp_ids):\n                     edited_exploration_ids))\n ',
   };
 
+  const jobFileObjWithJobClassInPatchAndNewJob = {
+    sha: 'd144f32b9812373d5f1bc9f94d9af795f09023ff',
+    filename: 'core/domain/exp_jobs_oppiabot_off.py',
+    status: 'modified',
+    additions: 1,
+    deletions: 0,
+    changes: 1,
+    blob_url:
+      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
+    raw_url:
+      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
+    contents_url:
+      'https://api.github.com/repos/oppia/oppia/contents/core/domain/exp_jobs_oppiabot_off.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
+    patch: '@@ -0,0 +1 @@class SecondTestOneOffJob(jobs.BaseMapReduceOneOffJobManager)  def reduce(key, version_and_exp_ids):\n                     edited_exploration_ids))\n \n+class AnotherTestOneOffJob(jobs.BaseMapReduceOneOffJobManager):\n+    """\n+    @classmethod\n+    def entity_classes_to_map_over ',
+  };
+
   const jobFromTestDir = {
     sha: 'd144f32b9812373d5f1bc9f94d9af795f09023ff',
     filename: 'core/tests/linter_tests/exp_jobs_oppiabot_off.py',
@@ -664,6 +680,11 @@ describe('Pull Request Job Spec', () => {
       jobs = checkPullRequestJobModule.getNewJobsFromFile(
         modifiedExistingJobFileObjWithJobClassInPatch)
       expect(jobs.length).toBe(0);
+
+      jobs = checkPullRequestJobModule.getNewJobsFromFile(
+        jobFileObjWithJobClassInPatchAndNewJob)
+      expect(jobs.length).toBe(1);
+      expect(jobs[0]).toBe('AnotherTestOneOffJob');
     });
   });
 });
