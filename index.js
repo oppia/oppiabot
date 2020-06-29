@@ -8,6 +8,7 @@ const checkWipModule = require('./lib/checkWipDraftPR');
 const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
 
 const constants = require('./constants');
+const checkIssueAssigneeModule = require('./lib/checkIssueAssignee');
 
 const whitelistedAccounts = (process.env.WHITELISTED_ACCOUNTS || '')
   .toLowerCase()
@@ -50,6 +51,10 @@ const runChecks = async (context, checkEvent) => {
             break;
           case constants.jobCheck:
             await checkPullRequestJobModule.checkForNewJob(context);
+            break;
+          case constants.issuesAssignedCheck:
+            await checkIssueAssigneeModule.checkAssignees(context);
+            break;
         }
       }
     }
@@ -68,6 +73,12 @@ module.exports = (oppiabot) => {
   scheduler.createScheduler(oppiabot, {
     delay: !process.env.DISABLE_DELAY,
     interval: 60 * 60 * 1000, // 1 hour
+  });
+
+  oppiabot.on('issues.assigned', async (context) => {
+    if (checkWhitelistedAccounts(context)) {
+      await runChecks(context, constants.issuesAssignedEvent);
+    }
   });
 
   oppiabot.on('pull_request.opened', async (context) => {

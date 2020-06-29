@@ -16,59 +16,57 @@
  * @fileoverview Spec for issue assigned handler.
  */
 
-const github = require('@actions/github');
-const core = require('@actions/core');
-const payload = require('../fixtures/issues.assigned.json');
+require('dotenv').config();
+const { createProbot } = require('probot');
+const oppiaBot = require('../index');
+const payloadData = require('../fixtures/issues.assigned.json');
 const { google } = require('googleapis');
-const dispatcher = require('../actions/src/dispatcher');
-const checkIssueAssigneeModule = require('../actions/src/issues/checkIssueAssignee');
-const checkIssueLabelModule = require('../actions/src/issues/checkIssueLabels');
+const { OAuth2Client } = require('google-auth-library');
+const checkIssueAssigneeModule = require('../lib/checkIssueAssignee');
+const apiForSheetsModule = require('../lib/apiForSheets');
+const scheduler = require('../lib/scheduler');
 
 describe('Check Issue Assignee Module', () => {
   /**
-   * @type {import('@actions/github').GitHub} octokit
+   * @type {import('probot').Probot} robot
    */
-  let octokit;
+  let robot;
+
+  /**
+   * @type {import('probot').Octokit} github
+   */
+  let github;
+
+  /**
+   * @type {import('probot').Application} app
+   */
+  let app;
 
   beforeEach(async () => {
-    github.context.eventName = 'issues';
-    github.context.payload = payload;
-    github.context.issue = payload.issue;
-    github.context.repo = {
-      owner: payload.repository.owner.login,
-      repo: payload.repository.name,
-    };
+    spyOn(scheduler, 'createScheduler').and.callFake(() => {});
 
-    octokit = {
+    github = {
       issues: {
         createComment: jasmine.createSpy('createComment').and.resolveTo({}),
         removeAssignees: jasmine.createSpy('removeAssignees').and.resolveTo({}),
       },
     };
 
-    spyOn(core, 'getInput').and.returnValue('sample-token');
-
-    // Mock GitHub API.
-    Object.setPrototypeOf(github.GitHub, function () {
-      return octokit;
+    robot = createProbot({
+      id: 1,
+      cert: 'test',
+      githubToken: 'test',
     });
+
+    app = robot.load(oppiaBot);
+    spyOn(app, 'auth').and.resolveTo(github);
+
+    // Mock google auth
+    Object.setPrototypeOf(OAuth2Client, function () {
+      return {};
+    });
+    spyOn(apiForSheetsModule, 'authorize').and.callThrough();
     spyOn(checkIssueAssigneeModule, 'checkAssignees').and.callThrough();
-    spyOn(checkIssueLabelModule, 'checkLabels').and.callFake(() => {});
-  });
-
-  describe('called for only issue event and assigned action', () => {
-    it('should not be called for non issue event', async () => {
-      await dispatcher.dispatch('pull_request', 'assigned');
-      expect(checkIssueAssigneeModule.checkAssignees).not.toHaveBeenCalled();
-    });
-
-    it('should not be called for non assigned action', async () => {
-      await dispatcher.dispatch('issues', 'opened');
-      expect(checkIssueAssigneeModule.checkAssignees).not.toHaveBeenCalled();
-
-      await dispatcher.dispatch('issues', 'labeled');
-      expect(checkIssueAssigneeModule.checkAssignees).not.toHaveBeenCalled();
-    });
   });
 
   describe('check when user has not signed cla', () => {
@@ -83,11 +81,15 @@ describe('Check Issue Assignee Module', () => {
         },
       });
 
-      await dispatcher.dispatch('issues', 'assigned');
+      await app.receive(payloadData);
     });
 
     it('should call checkAssignees', () => {
       expect(checkIssueAssigneeModule.checkAssignees).toHaveBeenCalled();
+    });
+
+    it('should be authorized', () => {
+      expect(apiForSheetsModule.authorize).toHaveBeenCalled();
     });
 
     it('should check the spreadsheet', () => {
@@ -96,25 +98,30 @@ describe('Check Issue Assignee Module', () => {
 
     it('should comment on issue', () => {
       const linkToCla = 'here'.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up');
-      expect(octokit.issues.createComment).toHaveBeenCalled();
-      expect(octokit.issues.createComment).toHaveBeenCalledWith({
-        issue_number: payload.issue.number,
-        owner: payload.repository.owner.login,
-        repo: payload.repository.name,
-        body: 'Hi @' + payload.assignee.login + ', you need to sign the ' +
-        'CLA before you can get assigned to issues. Follow the instructions ' +
-        linkToCla + ' to get started. Thanks!',
+        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up'
+      );
+      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        issue_number: payloadData.payload.issue.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name,
+        body:
+          'Hi @' +
+          payloadData.payload.assignee.login +
+          ', you need to sign the ' +
+          'CLA before you can get assigned to issues. Follow the instructions ' +
+          linkToCla +
+          ' to get started. Thanks!',
       });
     });
 
     it('should unassign user', () => {
-      expect(octokit.issues.removeAssignees).toHaveBeenCalled();
-      expect(octokit.issues.removeAssignees).toHaveBeenCalledWith({
-        issue_number: payload.issue.number,
-        owner: payload.repository.owner.login,
-        repo: payload.repository.name,
-        assignees: [payload.assignee.login],
+      expect(github.issues.removeAssignees).toHaveBeenCalled();
+      expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+        issue_number: payloadData.payload.issue.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name,
+        assignees: [payloadData.payload.assignee.login],
       });
     });
   });
@@ -131,7 +138,7 @@ describe('Check Issue Assignee Module', () => {
         },
       });
 
-      await dispatcher.dispatch('issues', 'assigned');
+      await app.receive(payloadData);
     });
 
     it('should call checkAssignees', () => {
@@ -143,54 +150,54 @@ describe('Check Issue Assignee Module', () => {
     });
 
     it('should not comment on issue', () => {
-      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+      expect(github.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not unassign user', () => {
-      expect(octokit.issues.removeAssignees).not.toHaveBeenCalled();
+      expect(github.issues.removeAssignees).not.toHaveBeenCalled();
     });
   });
-
 
   describe('when sheets api throws error', () => {
     beforeEach(async () => {
       spyOn(google, 'sheets').and.returnValue({
         spreadsheets: {
           values: {
-            get: jasmine.createSpy('get').and.throwError('Unable to get sheet.'),
+            get: jasmine
+              .createSpy('get')
+              .and.throwError('Unable to get sheet.'),
           },
         },
       });
-      spyOn(core, 'setFailed').and.callThrough();
 
-      await dispatcher.dispatch('issues', 'assigned');
+      await app.receive(payloadData);
     });
 
     it('should call checkAssignees', () => {
       expect(checkIssueAssigneeModule.checkAssignees).toHaveBeenCalled();
     });
 
+    it('should be authorized', () => {
+      expect(apiForSheetsModule.authorize).toHaveBeenCalled();
+    });
+
     it('should check the spreadsheet', () => {
       expect(google.sheets).toHaveBeenCalled();
     });
 
-    it('should fail the check', () =>{
-      expect(core.setFailed).toHaveBeenCalled();
-    });
-
     it('should not comment on issue', () => {
-      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+      expect(github.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not unassign user', () => {
-      expect(octokit.issues.removeAssignees).not.toHaveBeenCalled();
+      expect(github.issues.removeAssignees).not.toHaveBeenCalled();
     });
   });
 
   describe('check non whitelisted repo', () => {
     beforeEach(async () => {
-      payload.repository.name = 'non-whitelisted-repo'
-      await dispatcher.dispatch('issues', 'assigned');
+      payloadData.payload.repository.name = 'non-whitelisted-repo';
+      await app.receive(payloadData);
     });
 
     it('should not be called for the payload', () => {
@@ -198,11 +205,11 @@ describe('Check Issue Assignee Module', () => {
     });
 
     it('should not comment on issue', () => {
-      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+      expect(github.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not unassign user', () => {
-      expect(octokit.issues.removeAssignees).not.toHaveBeenCalled();
+      expect(github.issues.removeAssignees).not.toHaveBeenCalled();
     });
-  })
+  });
 });
