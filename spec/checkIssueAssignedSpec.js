@@ -110,8 +110,8 @@ describe('Check Issue Assignee Module', () => {
           payloadData.payload.assignee.login +
           ', you need to sign the ' +
           'CLA before you can get assigned to issues. Follow the instructions ' +
-          linkToCla +
-          ' to get started. Thanks!',
+          linkToCla + ' to get started. I am unassigning you for now, feel ' +
+          'free to assign yourself once you have signed the CLA. Thanks!'
       });
     });
 
