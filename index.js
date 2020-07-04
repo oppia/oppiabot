@@ -55,6 +55,12 @@ const runChecks = async (context, checkEvent) => {
           case constants.issuesAssignedCheck:
             await checkIssueAssigneeModule.checkAssignees(context);
             break;
+          case constants.prLabelCheck:
+            await checkPullRequestLabelsModule.checkForIssueLabel(context);
+            break;
+          case constants.criticalLabelCheck:
+            await checkPullRequestLabelsModule.checkCriticalLabel(context);
+            break;
         }
       }
     }
@@ -102,6 +108,12 @@ module.exports = (oppiabot) => {
   oppiabot.on('pull_request.labeled', async (context) => {
     if (checkWhitelistedAccounts(context)) {
       await runChecks(context, constants.labelEvent);
+    }
+  });
+
+  oppiabot.on('pull_request.unlabeled', async (context) => {
+    if (checkWhitelistedAccounts(context)) {
+      await runChecks(context, constants.unlabelEvent);
     }
   });
 
