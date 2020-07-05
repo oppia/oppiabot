@@ -127,7 +127,7 @@ describe('Pull Request Label Check', () => {
         expect(github.issues.addAssignees).not.toHaveBeenCalled();
       });
 
-    it('should not assign project owner if they are already assigned',
+    it('should not add comment if project owner is already assigned',
       async () => {
         const label = {
           id: 638839900,
@@ -146,6 +146,7 @@ describe('Pull Request Label Check', () => {
 
         expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
         expect(github.issues.addAssignees).not.toHaveBeenCalled();
+        expect(github.issues.createComment).not.toHaveBeenCalled();
       });
 
     it('should not assign if a changelog label is not added', async () => {
@@ -230,7 +231,7 @@ describe('Pull Request Label Check', () => {
         body:
           'Hi, @' +
           payloadData.payload.pull_request.user.login +
-          ', This pull request does not have a "CHANGELOG: ..." label ' +
+          ', this pull request does not have a "CHANGELOG: ..." label ' +
           'as mentioned in the PR checkbox list. Please add this label. ' +
           'PRs without this label will not be merged. If you are unsure ' +
           'of which label to add, please ask the reviewers for ' +
@@ -269,7 +270,8 @@ describe('Pull Request Label Check', () => {
         body:
           'Hi, @' +
           payloadData.payload.pull_request.user.login +
-          ', Adding a default changelog label to the pull request. Thanks!',
+          ', I have added a default changelog label to the pull request. ' +
+          'Thanks!',
       };
       expect(github.issues.createComment).toHaveBeenCalledWith(commentParams);
     });
