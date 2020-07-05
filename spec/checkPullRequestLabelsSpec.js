@@ -35,6 +35,15 @@ describe('Pull Request Label Check', () => {
         removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
         addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
       },
+      repos: {
+        checkCollaborator: jasmine.createSpy('checkCollaborator').and.callFake(
+          (params) => {
+            if (params.username === 'newuser') {
+              return {status: 404};
+            }
+            return {status: 204};
+          })
+      }
     };
 
     robot = createProbot({
@@ -117,6 +126,28 @@ describe('Pull Request Label Check', () => {
 
         expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
         expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      });
+
+    it('should not add comment if project owner is already assigned',
+      async () => {
+        const label = {
+          id: 638839900,
+          node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+          url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+          name: 'PR CHANGELOG: Server Errors -- @testuser1',
+          color: '00FF00',
+        };
+
+        // Set the payload action and label which will simulate adding
+        // the changelog label.
+        payloadData.payload.action = 'labeled';
+        payloadData.payload.label = label;
+        spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
+        await robot.receive(payloadData);
+
+        expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
+        expect(github.issues.addAssignees).not.toHaveBeenCalled();
+        expect(github.issues.createComment).not.toHaveBeenCalled();
       });
 
     it('should not assign if a changelog label is not added', async () => {
@@ -385,13 +416,49 @@ describe('Pull Request Label Check', () => {
         body:
           'Hi, @' +
           payloadData.payload.pull_request.user.login +
-          '. This pull request does not have a "CHANGELOG: ..." label ' +
+          ', this pull request does not have a "CHANGELOG: ..." label ' +
           'as mentioned in the PR checkbox list. Please add this label. ' +
           'PRs without this label will not be merged. If you are unsure ' +
           'of which label to add, please ask the reviewers for ' +
           'guidance. Thanks!',
       };
       expect(github.issues.createComment).toHaveBeenCalledWith(params);
+    });
+
+    it('adds a default label when pr author is not a collaborator', async () => {
+      payloadData.payload.action = 'reopened';
+      payloadData.payload.pull_request.user.login = 'newuser';
+
+      spyOn(
+        checkPullRequestLabelModule,
+        'checkChangelogLabel'
+      ).and.callThrough();
+      await robot.receive(payloadData);
+
+      expect(
+        checkPullRequestLabelModule.checkChangelogLabel
+      ).toHaveBeenCalled();
+      expect(github.issues.addLabels).toHaveBeenCalled();
+      const labelParams = {
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        issue_number: payloadData.payload.number,
+        labels: ['PR CHANGELOG: Miscellaneous -- @ankita240796']
+      };
+      expect(github.issues.addLabels).toHaveBeenCalledWith(labelParams);
+
+      expect(github.issues.createComment).toHaveBeenCalled();
+      const commentParams = {
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        number: payloadData.payload.number,
+        body:
+          'Hi, @' +
+          payloadData.payload.pull_request.user.login +
+          ', I have added a default changelog label to the pull request. ' +
+          'Thanks!',
+      };
+      expect(github.issues.createComment).toHaveBeenCalledWith(commentParams);
     });
 
     it('should not ping pr author if there is a changelog label', async() => {
