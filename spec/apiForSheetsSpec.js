@@ -35,6 +35,10 @@ describe('Api For Sheets Module', () => {
   beforeEach(function (done) {
     spyOn(scheduler, 'createScheduler').and.callFake(() => {});
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
+    spyOn(checkPullRequestLabelsModule, 'checkChangelogLabel').and.callFake(
+      () => {});
+    spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
+    spyOn(checkWipModule, 'checkWIP').and.callFake(() => {});
 
     github = {
       issues: {
@@ -81,9 +85,6 @@ describe('Api For Sheets Module', () => {
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callThrough({});
       spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
-      spyOn(checkPullRequestLabelsModule, 'checkChangelogLabel').and.callThrough();
-      spyOn(checkPullRequestBranchModule, 'checkBranch').and.callThrough();
-      spyOn(checkWipModule, 'checkWIP').and.callThrough();
       spyOn(google, 'sheets').and.returnValue({
         spreadsheets: {
           values: {
@@ -104,6 +105,7 @@ describe('Api For Sheets Module', () => {
         checkPullRequestLabelsModule.checkChangelogLabel).toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).toHaveBeenCalled();
       expect(checkWipModule.checkWIP).toHaveBeenCalled();
+      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
     });
 
     it('should be called for the given payload', () => {
@@ -273,9 +275,6 @@ describe('Api For Sheets Module', () => {
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callThrough({});
       spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
-      spyOn(checkPullRequestLabelsModule, 'checkChangelogLabel').and.callThrough();
-      spyOn(checkPullRequestBranchModule, 'checkBranch').and.callThrough();
-      spyOn(checkWipModule, 'checkWIP').and.callThrough();
       spyOn(google, 'sheets').and.returnValue({
         spreadsheets: {
           values: {
@@ -354,9 +353,6 @@ describe('Api For Sheets Module', () => {
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callThrough({});
       spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
-      spyOn(checkPullRequestLabelsModule, 'checkChangelogLabel').and.callThrough();
-      spyOn(checkPullRequestBranchModule, 'checkBranch').and.callThrough();
-      spyOn(checkWipModule, 'checkWIP').and.callThrough();
       spyOn(constants, 'getChecksWhitelist').and.returnValue({
         'oppia-test': {
           'opened': ['cla-check']
@@ -372,6 +368,7 @@ describe('Api For Sheets Module', () => {
       expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
       expect(checkWipModule.checkWIP).not.toHaveBeenCalled();
       expect(apiForSheetsModule.checkClaStatus).not.toHaveBeenCalled();
+      expect(checkPullRequestJobModule.checkForNewJob).not.toHaveBeenCalled();
     });
   });
 });
