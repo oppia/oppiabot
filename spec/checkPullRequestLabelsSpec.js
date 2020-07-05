@@ -117,6 +117,27 @@ describe('Pull Request Label Check', () => {
         expect(github.issues.addAssignees).not.toHaveBeenCalled();
       });
 
+    it('should not assign project owner if they are already assigned',
+      async () => {
+        const label = {
+          id: 638839900,
+          node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+          url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+          name: 'PR CHANGELOG: Server Errors -- @testuser1',
+          color: '00FF00',
+        };
+
+        // Set the payload action and label which will simulate adding
+        // the changelog label.
+        payloadData.payload.action = 'labeled';
+        payloadData.payload.label = label;
+        spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
+        await robot.receive(payloadData);
+
+        expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
+        expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      });
+
     it('should not assign if a changelog label is not added', async () => {
       const label = {
         id: 638839900,
