@@ -59,6 +59,10 @@ describe('Api For Sheets Module', () => {
           data: commitsData
         }),
       },
+      repos: {
+        checkCollaborator: jasmine.createSpy(
+          'checkCollaborator').and.returnValue(true),
+      }
     };
 
     robot = createProbot({
