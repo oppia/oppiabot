@@ -38,9 +38,9 @@ describe('Pull Request Label Check', () => {
         checkCollaborator: jasmine.createSpy('checkCollaborator').and.callFake(
           (params) => {
             if (params.username === 'newuser') {
-              return false;
+              return {status: 404};
             }
-            return true;
+            return {status: 204};
           })
       }
     };
