@@ -6,6 +6,7 @@ const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
 const checkWipModule = require('./lib/checkWipDraftPR');
 const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
+const checkBranchPushModule = require('./lib/checkBranchPush');
 
 const constants = require('./constants');
 const checkIssueAssigneeModule = require('./lib/checkIssueAssignee');
@@ -54,6 +55,9 @@ const runChecks = async (context, checkEvent) => {
             break;
           case constants.issuesAssignedCheck:
             await checkIssueAssigneeModule.checkAssignees(context);
+            break;
+          case constants.forcePushCheck:
+            await checkBranchPushModule.handleForcePush(context);
             break;
         }
       }
@@ -132,6 +136,14 @@ module.exports = (oppiabot) => {
       // eslint-disable-next-line no-console
       console.log('A PR HAS BEEN EDITED...');
       await runChecks(context, constants.editEvent);
+    }
+  });
+
+  oppiabot.on('push', async (context) => {
+    if (checkWhitelistedAccounts(context)) {
+      // eslint-disable-next-line no-console
+      console.log('A BRANCH HAS BEEN PUSHED...');
+      await runChecks(context, constants.pushEvent);
     }
   });
 };
