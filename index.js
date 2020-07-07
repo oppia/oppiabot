@@ -105,7 +105,7 @@ module.exports = (oppiabot) => {
 
   oppiabot.on('pull_request.labeled', async (context) => {
     if (checkWhitelistedAccounts(context)) {
-      await runChecks(context, constants.labelEvent);
+      await runChecks(context, constants.PRLabelEvent);
     }
   });
 

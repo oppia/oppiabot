@@ -128,4 +128,87 @@ describe('Force Push Check', () => {
       expect(github.issues.update).not.toHaveBeenCalled();
     });
   });
+
+  describe('when a push is made from develop branch', () => {
+    beforeEach(async () => {
+      pushPayload.payload.ref = "refs/heads/develop"
+      pushPayload.payload.forced = true;
+      await robot.receive(pushPayload);
+    });
+
+    it('should check for force push', () => {
+      expect(checkBranchPushModule.handleForcePush).toHaveBeenCalled();
+    });
+
+    it('should not search for pull request', () => {
+      expect(github.search.issuesAndPullRequests).not.toHaveBeenCalled();
+    });
+
+    it('should not comment on pull request', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('should not close the pull request', () => {
+      expect(github.issues.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('when a push is made from release branch', () => {
+    beforeEach(async () => {
+      pushPayload.payload.ref = "refs/heads/release-1.234"
+      pushPayload.payload.forced = true;
+      await robot.receive(pushPayload);
+    });
+
+    it('should check for force push', () => {
+      expect(checkBranchPushModule.handleForcePush).toHaveBeenCalled();
+    });
+
+    it('should not search for pull request', () => {
+      expect(github.search.issuesAndPullRequests).not.toHaveBeenCalled();
+    });
+
+    it('should not comment on pull request', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('should not close the pull request', () => {
+      expect(github.issues.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('when a push is made from a branch without a pr', () => {
+    beforeEach(async () => {
+      pushPayload.payload.ref = "refs/heads/some-weird-branch"
+      pushPayload.payload.forced = true;
+      github.search = {
+        issuesAndPullRequests: jasmine
+          .createSpy('issuesAndPullRequests')
+          .and.resolveTo({
+            data: {
+              // Return an empty payload since PR can't be found.
+              items: [],
+            },
+          }),
+      };
+      await robot.receive(pushPayload);
+    }, 20000);
+
+    it('should check for force push', () => {
+      expect(checkBranchPushModule.handleForcePush).toHaveBeenCalled();
+    });
+
+    it('should search for pull request', () => {
+      expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
+    });
+
+    it('should not comment on pull request', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('should not close the pull request', () => {
+      expect(github.issues.update).not.toHaveBeenCalled();
+    });
+
+  })
 });

@@ -1,6 +1,6 @@
 const openEvent = 'opened';
 const reopenEvent = 'reopened';
-const labelEvent = 'labeled';
+const PRLabelEvent = 'labeled';
 const synchronizeEvent = 'synchronize';
 const closeEvent = 'closed';
 const editEvent = 'edited';
@@ -26,7 +26,7 @@ const checksWhitelist = {
   'oppia-android': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
-    [labelEvent]: [],
+    [PRLabelEvent]: [],
     [synchronizeEvent]: [],
     [closeEvent]: [],
     [editEvent]: [],
@@ -35,7 +35,7 @@ const checksWhitelist = {
   'oppia': {
     [openEvent]: [claCheck, changelogCheck, branchCheck, wipCheck, jobCheck],
     [reopenEvent]: [changelogCheck, branchCheck, wipCheck, jobCheck],
-    [labelEvent]: [assigneeCheck],
+    [PRLabelEvent]: [assigneeCheck],
     [synchronizeEvent]: [mergeConflictCheck, jobCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: [wipCheck],
@@ -49,12 +49,12 @@ const checksWhitelist = {
     [synchronizeEvent]: [mergeConflictCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: []
-  },
+  }
 };
 
 module.exports.openEvent = openEvent;
 module.exports.reopenEvent = reopenEvent;
-module.exports.labelEvent = labelEvent;
+module.exports.PRLabelEvent = PRLabelEvent;
 module.exports.synchronizeEvent = synchronizeEvent;
 module.exports.closeEvent = closeEvent;
 module.exports.editEvent = editEvent;
