@@ -314,8 +314,9 @@ describe('Pull Request Label Check', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledWith({
         body: 'Hi @' + payloadData.payload.sender.login +
-          ', only members of the release team are allowed to remove ' +
-          'critical labels. I will be adding it back. Thanks!',
+          ', only members of the release team /cc @oppia/release-coordinators ' +
+          'are allowed to remove critical labels. ' +
+          'I will be adding it back. Thanks!',
         number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name
