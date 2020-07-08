@@ -48,7 +48,10 @@ const checksWhitelist = {
     [reopenEvent]: [],
     [synchronizeEvent]: [mergeConflictCheck],
     [closeEvent]: [allMergeConflictCheck],
-    [editEvent]: []
+    [editEvent]: [],
+    [issuesLabelEvent]: [],
+    [issuesAssignedEvent]: [],
+    [pushEvent]: []
   }
 };
 
