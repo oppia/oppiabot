@@ -1,0 +1,256 @@
+{
+  "name": "push",
+  "payload": {
+    "ref": "refs/heads/test-force-push",
+    "before": "3a2497ac3606e76cef2605fa913788bf437226ec",
+    "after": "a17e09811a9f0cc1c81ab0f73ed0079e16e92d27",
+    "repository": {
+      "id": 247711605,
+      "node_id": "MDEwOlJlcG9zaXRvcnkyNDc3MTE2MDU=",
+      "name": "oppia",
+      "full_name": "oppia/oppia",
+      "private": false,
+      "owner": {
+        "name": "oppia",
+        "email": "jamesjay4199@gmail.com",
+        "login": "oppia",
+        "id": 31052489,
+        "node_id": "MDQ6VXNlcjMxMDUyNDg5",
+        "avatar_url": "https://avatars1.githubusercontent.com/u/31052489?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/oppia",
+        "html_url": "https://github.com/oppia",
+        "followers_url": "https://api.github.com/users/oppia/followers",
+        "following_url": "https://api.github.com/users/oppia/following{/other_user}",
+        "gists_url": "https://api.github.com/users/oppia/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/oppia/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/oppia/subscriptions",
+        "organizations_url": "https://api.github.com/users/oppia/orgs",
+        "repos_url": "https://api.github.com/users/oppia/repos",
+        "events_url": "https://api.github.com/users/oppia/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/oppia/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "html_url": "https://github.com/oppia/oppia",
+      "description": "Simple repo to learn about github actions",
+      "fork": false,
+      "url": "https://github.com/oppia/oppia",
+      "forks_url": "https://api.github.com/repos/oppia/oppia/forks",
+      "keys_url": "https://api.github.com/repos/oppia/oppia/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/oppia/oppia/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/oppia/oppia/teams",
+      "hooks_url": "https://api.github.com/repos/oppia/oppia/hooks",
+      "issue_events_url": "https://api.github.com/repos/oppia/oppia/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/oppia/oppia/events",
+      "assignees_url": "https://api.github.com/repos/oppia/oppia/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/oppia/oppia/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/oppia/oppia/tags",
+      "blobs_url": "https://api.github.com/repos/oppia/oppia/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/oppia/oppia/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/oppia/oppia/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/oppia/oppia/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/oppia/oppia/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/oppia/oppia/languages",
+      "stargazers_url": "https://api.github.com/repos/oppia/oppia/stargazers",
+      "contributors_url": "https://api.github.com/repos/oppia/oppia/contributors",
+      "subscribers_url": "https://api.github.com/repos/oppia/oppia/subscribers",
+      "subscription_url": "https://api.github.com/repos/oppia/oppia/subscription",
+      "commits_url": "https://api.github.com/repos/oppia/oppia/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/oppia/oppia/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/oppia/oppia/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/oppia/oppia/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/oppia/oppia/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/oppia/oppia/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/oppia/oppia/merges",
+      "archive_url": "https://api.github.com/repos/oppia/oppia/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/oppia/oppia/downloads",
+      "issues_url": "https://api.github.com/repos/oppia/oppia/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/oppia/oppia/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/oppia/oppia/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/oppia/oppia/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/oppia/oppia/labels{/name}",
+      "releases_url": "https://api.github.com/repos/oppia/oppia/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/oppia/oppia/deployments",
+      "created_at": 1584365890,
+      "updated_at": "2020-06-23T17:35:58Z",
+      "pushed_at": 1593989982,
+      "git_url": "git://github.com/oppia/oppia.git",
+      "ssh_url": "git@github.com:jameesjohn/oppia.git",
+      "clone_url": "https://github.com/oppia/oppia.git",
+      "svn_url": "https://github.com/oppia/oppia",
+      "homepage": null,
+      "size": 1079,
+      "stargazers_count": 0,
+      "watchers_count": 0,
+      "language": "JavaScript",
+      "has_issues": true,
+      "has_projects": true,
+      "has_downloads": true,
+      "has_wiki": true,
+      "has_pages": false,
+      "forks_count": 2,
+      "mirror_url": null,
+      "archived": false,
+      "disabled": false,
+      "open_issues_count": 12,
+      "license": null,
+      "forks": 2,
+      "open_issues": 12,
+      "watchers": 0,
+      "default_branch": "master",
+      "stargazers": 0,
+      "master_branch": "master"
+    },
+    "pusher": {
+      "name": "jameesjohn",
+      "email": "jamesjay4199@gmail.com"
+    },
+    "sender": {
+      "login": "jameesjohn",
+      "id": 31052489,
+      "node_id": "MDQ6VXNlcjMxMDUyNDg5",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/31052489?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jameesjohn",
+      "html_url": "https://github.com/jameesjohn",
+      "followers_url": "https://api.github.com/users/oppia/followers",
+      "following_url": "https://api.github.com/users/oppia/following{/other_user}",
+      "gists_url": "https://api.github.com/users/oppia/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/oppia/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/oppia/subscriptions",
+      "organizations_url": "https://api.github.com/users/oppia/orgs",
+      "repos_url": "https://api.github.com/users/oppia/repos",
+      "events_url": "https://api.github.com/users/oppia/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/oppia/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "installation": {
+      "id": 6909030,
+      "node_id": "MDIzOkludGVncmF0aW9uSW5zdGFsbGF0aW9uNjkwOTAzMA=="
+    },
+    "created": false,
+    "deleted": false,
+    "forced": true,
+    "base_ref": null,
+    "compare": "https://github.com/oppia/oppia/compare/3a2497ac3606...a17e09811a9f",
+    "commits": [
+      {
+        "id": "6f58bc832575c734973dec443051b256367a69dc",
+        "tree_id": "0280b794524ebdce0e88b689d3c7186431f9f754",
+        "distinct": true,
+        "message": "minor changes",
+        "timestamp": "2020-07-05T23:26:25+01:00",
+        "url": "https://github.com/oppia/oppia/commit/6f58bc832575c734973dec443051b256367a69dc",
+        "author": {
+          "name": "James James",
+          "email": "jamesjay4199@gmail.com",
+          "username": "jameesjohn"
+        },
+        "committer": {
+          "name": "James James",
+          "email": "jamesjay4199@gmail.com",
+          "username": "jameesjohn"
+        },
+        "added": [],
+        "removed": [],
+        "modified": [
+          ".github/workflows/workflow.yml"
+        ]
+      },
+      {
+        "id": "6fa136a9161f98e49dd81797be85f1ff8e2fc192",
+        "tree_id": "7064e4380b93e0c53dbb345d6defba7bd81b3d52",
+        "distinct": true,
+        "message": "minor changes",
+        "timestamp": "2020-07-05T23:30:20+01:00",
+        "url": "https://github.com/oppia/oppia/commit/6fa136a9161f98e49dd81797be85f1ff8e2fc192",
+        "author": {
+          "name": "James James",
+          "email": "jamesjay4199@gmail.com",
+          "username": "jameesjohn"
+        },
+        "committer": {
+          "name": "James James",
+          "email": "jamesjay4199@gmail.com",
+          "username": "jameesjohn"
+        },
+        "added": [],
+        "removed": [],
+        "modified": [
+          ".github/workflows/workflow.yml"
+        ]
+      },
+      {
+        "id": "eb8ec38b24ee858436d727d1677fc638aa942dc6",
+        "tree_id": "630b5aae3659a05f49119678846af320774d970f",
+        "distinct": true,
+        "message": "minor changes",
+        "timestamp": "2020-07-05T23:50:12+01:00",
+        "url": "https://github.com/oppia/oppia/commit/eb8ec38b24ee858436d727d1677fc638aa942dc6",
+        "author": {
+          "name": "James James",
+          "email": "jamesjay4199@gmail.com",
+          "username": "jameesjohn"
+        },
+        "committer": {
+          "name": "James James",
+          "email": "jamesjay4199@gmail.com",
+          "username": "jameesjohn"
+        },
+        "added": [],
+        "removed": [],
+        "modified": [
+          ".github/workflows/workflow.yml"
+        ]
+      },
+      {
+        "id": "a17e09811a9f0cc1c81ab0f73ed0079e16e92d27",
+        "tree_id": "685dc97025398be650e28d8bb690da80ab08c7de",
+        "distinct": true,
+        "message": "minor changes",
+        "timestamp": "2020-07-05T23:59:19+01:00",
+        "url": "https://github.com/oppia/oppia/commit/a17e09811a9f0cc1c81ab0f73ed0079e16e92d27",
+        "author": {
+          "name": "James James",
+          "email": "jamesjay4199@gmail.com",
+          "username": "jameesjohn"
+        },
+        "committer": {
+          "name": "James James",
+          "email": "jamesjay4199@gmail.com",
+          "username": "jameesjohn"
+        },
+        "added": [],
+        "removed": [],
+        "modified": [
+          ".github/workflows/workflow.yml"
+        ]
+      }
+    ],
+    "head_commit": {
+      "id": "a17e09811a9f0cc1c81ab0f73ed0079e16e92d27",
+      "tree_id": "685dc97025398be650e28d8bb690da80ab08c7de",
+      "distinct": true,
+      "message": "minor changes",
+      "timestamp": "2020-07-05T23:59:19+01:00",
+      "url": "https://github.com/oppia/oppia/commit/a17e09811a9f0cc1c81ab0f73ed0079e16e92d27",
+      "author": {
+        "name": "James James",
+        "email": "jamesjay4199@gmail.com",
+        "username": "jameesjohn"
+      },
+      "committer": {
+        "name": "James James",
+        "email": "jamesjay4199@gmail.com",
+        "username": "jameesjohn"
+      },
+      "added": [],
+      "removed": [],
+      "modified": [
+        ".github/workflows/workflow.yml"
+      ]
+    }
+  }
+}
