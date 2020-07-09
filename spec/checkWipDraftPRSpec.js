@@ -22,6 +22,7 @@ const pullRequestEditedPayload = require('../fixtures/pullRequest.edited.json');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
+const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 
 describe('Oppiabot\'s', () => {
   /**
@@ -48,6 +49,7 @@ describe('Oppiabot\'s', () => {
       checkPullRequestLabelsModule, 'checkChangelogLabel')
       .and.callFake(() => {});
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
+    spyOn(checkCriticalPullRequestModule, 'checkIfCritical').and.callFake(() => {});
 
     github = {
       issues: {

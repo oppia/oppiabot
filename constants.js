@@ -17,6 +17,7 @@ const assigneeCheck = 'assignee-check';
 const mergeConflictCheck = 'merge-conflict-check';
 const allMergeConflictCheck = 'all-merge-conflict-check';
 const jobCheck = 'job-check';
+const modelCheck = 'model-check';
 const issuesLabelCheck = 'issues-labeled-check'
 const issuesAssignedCheck = 'issues-assigned-check'
 
@@ -31,10 +32,23 @@ const checksWhitelist = {
     [issuesLabelEvent]: []
   },
   'oppia': {
-    [openEvent]: [claCheck, changelogCheck, branchCheck, wipCheck, jobCheck],
-    [reopenEvent]: [changelogCheck, branchCheck, wipCheck, jobCheck],
+    [openEvent]: [
+      claCheck,
+      changelogCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+    ],
+    [reopenEvent]: [
+      changelogCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+    ],
     [labelEvent]: [assigneeCheck],
-    [synchronizeEvent]: [mergeConflictCheck, jobCheck],
+    [synchronizeEvent]: [mergeConflictCheck, jobCheck, modelCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
@@ -66,6 +80,7 @@ module.exports.assigneeCheck = assigneeCheck;
 module.exports.mergeConflictCheck = mergeConflictCheck;
 module.exports.allMergeConflictCheck = allMergeConflictCheck;
 module.exports.jobCheck = jobCheck;
+module.exports.modelCheck = modelCheck;
 module.exports.issuesLabelCheck = issuesLabelCheck
 module.exports.issuesAssignedCheck = issuesAssignedCheck
 
