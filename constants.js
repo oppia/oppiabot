@@ -1,11 +1,12 @@
 const openEvent = 'opened';
 const reopenEvent = 'reopened';
-const labelEvent = 'labeled';
+const PRLabelEvent = 'labeled';
 const synchronizeEvent = 'synchronize';
 const closeEvent = 'closed';
 const editEvent = 'edited';
-const issuesLabelEvent = 'issues_labeled'
-const issuesAssignedEvent = 'issues_assigned'
+const issuesLabelEvent = 'issues_labeled';
+const issuesAssignedEvent = 'issues_assigned';
+const pushEvent = 'push';
 
 const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
@@ -18,14 +19,15 @@ const mergeConflictCheck = 'merge-conflict-check';
 const allMergeConflictCheck = 'all-merge-conflict-check';
 const jobCheck = 'job-check';
 const modelCheck = 'model-check';
-const issuesLabelCheck = 'issues-labeled-check'
-const issuesAssignedCheck = 'issues-assigned-check'
+const issuesLabelCheck = 'issues-labeled-check';
+const issuesAssignedCheck = 'issues-assigned-check';
+const forcePushCheck = 'force-push-check';
 
 const checksWhitelist = {
   'oppia-android': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
-    [labelEvent]: [],
+    [PRLabelEvent]: [],
     [synchronizeEvent]: [],
     [closeEvent]: [],
     [editEvent]: [],
@@ -47,30 +49,35 @@ const checksWhitelist = {
       jobCheck,
       modelCheck,
     ],
-    [labelEvent]: [assigneeCheck],
+    [PRLabelEvent]: [assigneeCheck],
     [synchronizeEvent]: [mergeConflictCheck, jobCheck, modelCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
-    [issuesAssignedEvent]: [issuesAssignedCheck]
+    [issuesAssignedEvent]: [issuesAssignedCheck],
+    [pushEvent]: [forcePushCheck]
   },
   'oppiabot': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
     [synchronizeEvent]: [mergeConflictCheck],
     [closeEvent]: [allMergeConflictCheck],
-    [editEvent]: []
+    [editEvent]: [],
+    [issuesLabelEvent]: [],
+    [issuesAssignedEvent]: [],
+    [pushEvent]: []
   }
 };
 
 module.exports.openEvent = openEvent;
 module.exports.reopenEvent = reopenEvent;
-module.exports.labelEvent = labelEvent;
+module.exports.PRLabelEvent = PRLabelEvent;
 module.exports.synchronizeEvent = synchronizeEvent;
 module.exports.closeEvent = closeEvent;
 module.exports.editEvent = editEvent;
-module.exports.issuesLabelEvent = issuesLabelEvent
-module.exports.issuesAssignedEvent = issuesAssignedEvent
+module.exports.issuesLabelEvent = issuesLabelEvent;
+module.exports.issuesAssignedEvent = issuesAssignedEvent;
+module.exports.pushEvent = pushEvent;
 
 module.exports.claCheck = claCheck;
 module.exports.changelogCheck = changelogCheck;
@@ -81,8 +88,9 @@ module.exports.mergeConflictCheck = mergeConflictCheck;
 module.exports.allMergeConflictCheck = allMergeConflictCheck;
 module.exports.jobCheck = jobCheck;
 module.exports.modelCheck = modelCheck;
-module.exports.issuesLabelCheck = issuesLabelCheck
-module.exports.issuesAssignedCheck = issuesAssignedCheck
+module.exports.issuesLabelCheck = issuesLabelCheck;
+module.exports.issuesAssignedCheck = issuesAssignedCheck;
+module.exports.forcePushCheck = forcePushCheck;
 
 module.exports.getChecksWhitelist = function() {
   return checksWhitelist;
