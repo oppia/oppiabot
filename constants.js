@@ -1,5 +1,6 @@
 const openEvent = 'opened';
 const reopenEvent = 'reopened';
+const unlabelEvent = 'unlabeled';
 const PRLabelEvent = 'labeled';
 const synchronizeEvent = 'synchronize';
 const closeEvent = 'closed';
@@ -10,6 +11,8 @@ const pushEvent = 'push';
 
 const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
+const criticalLabelCheck = 'critical-label-check';
+const prLabelCheck = 'pr-label-check';
 // This check is required in re-open events as well to
 // prevent user from reopening the PR.
 const branchCheck = 'branch-check';
@@ -49,12 +52,13 @@ const checksWhitelist = {
       jobCheck,
       modelCheck,
     ],
-    [PRLabelEvent]: [assigneeCheck],
+    [PRLabelEvent]: [assigneeCheck, prLabelCheck],
     [synchronizeEvent]: [mergeConflictCheck, jobCheck, modelCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
+    [unlabelEvent]: [criticalLabelCheck],
     [pushEvent]: [forcePushCheck]
   },
   'oppiabot': {
@@ -71,6 +75,7 @@ const checksWhitelist = {
 
 module.exports.openEvent = openEvent;
 module.exports.reopenEvent = reopenEvent;
+module.exports.unlabelEvent = unlabelEvent;
 module.exports.PRLabelEvent = PRLabelEvent;
 module.exports.synchronizeEvent = synchronizeEvent;
 module.exports.closeEvent = closeEvent;
@@ -90,6 +95,8 @@ module.exports.jobCheck = jobCheck;
 module.exports.modelCheck = modelCheck;
 module.exports.issuesLabelCheck = issuesLabelCheck;
 module.exports.issuesAssignedCheck = issuesAssignedCheck;
+module.exports.criticalLabelCheck = criticalLabelCheck;
+module.exports.prLabelCheck = prLabelCheck;
 module.exports.forcePushCheck = forcePushCheck;
 
 module.exports.getChecksWhitelist = function() {

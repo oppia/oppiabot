@@ -33,7 +33,8 @@ describe('Pull Request Label Check', () => {
       issues: {
         createComment: jasmine.createSpy('createComment').and.returnValue({}),
         addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
-        addLabels: jasmine.createSpy('addLabels').and.returnValue({}),
+        removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
+        addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
       },
       repos: {
         checkCollaborator: jasmine.createSpy('checkCollaborator').and.callFake(
@@ -210,6 +211,191 @@ describe('Pull Request Label Check', () => {
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
       expect(github.issues.createComment).not.toHaveBeenCalled();
     });
+
+  });
+  describe('when an issue label gets added', () =>{
+    const label = {
+      id: 638839900,
+      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+      name: 'good first issue',
+      color: '00FF00',
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'labeled';
+      payloadData.payload.label = label;
+      spyOn(checkPullRequestLabelModule, 'checkForIssueLabel').and.callThrough();
+      await robot.receive(payloadData);
+    });
+
+    it('checks the label', () =>{
+      expect(checkPullRequestLabelModule.checkForIssueLabel).toHaveBeenCalled();
+    });
+
+    it('comments on the PR', () => {
+      expect(github.issues.createComment).toHaveBeenCalled();
+
+      const link = 'here'.link(
+        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+          'labeling-issues-and-pull-requests'
+      );
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        body:'Hi @' + payloadData.payload.sender.login + ', the good ' +
+          'first issue label should only be used on issues, and I’m ' +
+          'removing the label. You can learn more about ' +
+          'labels ' + link + '. Thanks!',
+        number: payloadData.payload.pull_request.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name
+      });
+    });
+
+    it('removes the label', () => {
+      expect(github.issues.removeLabel).toHaveBeenCalled();
+      expect(github.issues.removeLabel).toHaveBeenCalledWith({
+        name: 'good first issue',
+        number: payloadData.payload.pull_request.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name
+      });
+    });
+
+  });
+
+  describe('when a pr label gets added', () =>{
+    const label = {
+      id: 638839900,
+      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+      name: 'dependencies',
+      color: '00FF00',
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'labeled';
+      payloadData.payload.label = label;
+      spyOn(checkPullRequestLabelModule, 'checkForIssueLabel').and.callThrough();
+      await robot.receive(payloadData);
+    });
+
+    it('checks the label', () =>{
+      expect(checkPullRequestLabelModule.checkForIssueLabel).toHaveBeenCalled();
+    });
+
+    it('does not comment on the PR', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('does not remove the label', () => {
+      expect(github.issues.removeLabel).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('when critical label gets removed by non whitelisted user', () => {
+    const label = {
+      id: 638839900,
+      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+      name: 'critical',
+      color: '00FF00',
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'unlabeled';
+      payloadData.payload.label = label;
+      spyOn(checkPullRequestLabelModule, 'checkCriticalLabel').and.callThrough();
+      await robot.receive(payloadData);
+    });
+
+    it('should check for critical label', () => {
+      expect(checkPullRequestLabelModule.checkCriticalLabel).toHaveBeenCalled();
+    });
+
+    it('should comment on PR', () => {
+      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        body: 'Hi @' + payloadData.payload.sender.login +
+          ', only members of the release team /cc @oppia/release-coordinators ' +
+          'are allowed to remove critical labels. ' +
+          'I will be adding it back. Thanks!',
+        number: payloadData.payload.pull_request.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name
+      })
+    })
+
+    it('should add the critical label', () => {
+      expect(github.issues.addLabels).toHaveBeenCalled();
+      expect(github.issues.addLabels).toHaveBeenCalledWith({
+        labels: ['critical'],
+        number: payloadData.payload.pull_request.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name
+      });
+    });
+
+  });
+
+  describe('when critical label gets removed by whitelisted user', () => {
+    const label = {
+      id: 638839900,
+      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+      name: 'critical',
+      color: '00FF00',
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'unlabeled';
+      payloadData.payload.label = label;
+      payloadData.payload.sender.login = 'seanlip';
+      spyOn(checkPullRequestLabelModule, 'checkCriticalLabel').and.callThrough();
+      await robot.receive(payloadData);
+    });
+
+    it('checks for critical label', () =>{
+      expect(checkPullRequestLabelModule.checkCriticalLabel).toHaveBeenCalled();
+    });
+
+    it('does not add back the label', () => {
+      expect(github.issues.addLabels).not.toHaveBeenCalled();
+    });
+
+    it('does not comment on the PR', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+
+  });
+
+  describe('when another label gets removed', () => {
+    const label = {
+      id: 638839900,
+      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+      name: 'dependencies',
+      color: '00FF00',
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'unlabeled';
+      payloadData.payload.label = label;
+      spyOn(checkPullRequestLabelModule, 'checkCriticalLabel').and.callThrough();
+      await robot.receive(payloadData);
+    });
+
+    it('checks for critical label', () =>{
+      expect(checkPullRequestLabelModule.checkCriticalLabel).toHaveBeenCalled();
+    });
+
+    it('does not add back the label', () => {
+      expect(github.issues.addLabels).not.toHaveBeenCalled();
+    });
+
+    it('does not comment on the PR', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+
   });
 
   describe('when pull request gets opened or reopened', () => {
