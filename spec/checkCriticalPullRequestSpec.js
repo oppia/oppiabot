@@ -27,7 +27,7 @@ const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
 const checkWIPModule = require('../lib/checkWipDraftPR');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 const scheduler = require('../lib/scheduler');
-const { teamLeads } = require('../userWhitelist.json');
+const { teamLeads, oppiaMaintainers } = require('../userWhitelist.json');
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
@@ -194,7 +194,7 @@ describe('Critical Pull Request Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @' +
-          teamLeads.releaseTeam +
+          oppiaMaintainers +
           ', PTAL at this PR, ' +
           'it adds a model. The name of the model is ' +
           firstModel +
@@ -256,7 +256,7 @@ describe('Critical Pull Request Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @' +
-          teamLeads.releaseTeam +
+          oppiaMaintainers +
           ', PTAL at this PR, it adds ' +
           'new models. The models are ' +
           firstModel +

@@ -24,5 +24,6 @@
     "onboardingTeam": "Showtim3",
     "releaseTeam": "ankita240796"
   },
+  "oppiaMaintainers": "oppia/core-maintainers",
   "SERVER_JOBS_ADMIN": "seanlip"
 }
