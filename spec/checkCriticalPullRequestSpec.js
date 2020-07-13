@@ -56,13 +56,21 @@ describe('Critical Pull Request Spec', () => {
     deletions: 0,
     changes: 1,
     blob_url:
-      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e110d7e9833c/core/storage/skill/gae_models.py',
+      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e11' +
+      '0d7e9833c/core/storage/skill/gae_models.py',
     raw_url:
-      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d7e9833c/core/storage/skill/gae_models.py',
+      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d' +
+      '7e9833c/core/storage/skill/gae_models.py',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/storage/skill/gae_models.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
+      'https://api.github.com/repos/oppia/oppia/contents/core/storage/skill/' +
+      'gae_models.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
     patch:
-      '@@ -353,6 +353,11 @@ def export_data(user_id):\r\n         }\r\n \r\n \r\n+class OppiabotTestActivitiesModel(base_models.BaseModel):\r\n+    "Does some things right"\r\n+    pass\r\n+\r\n+\r\n class IncompleteActivitiesModel(base_models.BaseModel):\r\n     """Keeps track of all the activities currently being completed by the\r\n     learner.\r\n',
+    '@@ -353,6 +353,11 @@ def export_data(user_id):\r\n         }\r\n ' +
+    '\r\n \r\n+class OppiabotTestActivitiesModel(base_models.BaseModel):' +
+    '\r\n+    "Does some things right"\r\n+    pass\r\n+\r\n+\r\n class ' +
+    'IncompleteActivitiesModel(base_models.BaseModel):\r\n     """Keeps ' +
+    'track of all the activities currently being completed by the\r\n   ' +
+    'learner.\r\n',
   };
 
   const modifiedModelFileObj = {
@@ -73,13 +81,23 @@ describe('Critical Pull Request Spec', () => {
     deletions: 0,
     changes: 1,
     blob_url:
-      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e110d7e9833c/core/storage/skill/gae_models.py',
+      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e110' +
+      'd7e9833c/core/storage/skill/gae_models.py',
     raw_url:
-      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d7e9833c/core/storage/skill/gae_models.py',
+      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d' +
+      '7e9833c/core/storage/skill/gae_models.py',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/storage/skill/gae_models.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
+      'https://api.github.com/repos/oppia/oppia/contents/core/storage/skill/' +
+      'gae_models.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
     patch:
-      '@@ -39,6 +39,20 @@ class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):\r\n     pass\r\n \r\n \r\n+class OppiabotSnapshotContentModel(base_models.BaseSnapshotContentModel):\r\n+    """Oppiabot testing."""\r\n+\r\n+    pass\r\n+\r\n+\r\n+class OppiabotSnapshotTestingModel(base_models.BaseSnapshotContentModel):\r\n+    """Another Oppiabot model."""\r\n+\r\n+    pass\r\n+\r\n+\r\n+\r\n+\r\n class SkillModel(base_models.VersionedModel):\r\n     """Model for storing Skills.\r\n',
+      '@@ -39,6 +39,20 @@ class SkillSnapshotContentModel(base_models.BaseSn' +
+      'apshotContentModel):\r\n     pass\r\n \r\n \r\n+class OppiabotSnapsho' +
+      'tContentModel(base_models.BaseSnapshotContentModel):\r\n+    """Oppia' +
+      'bot testing."""\r\n+\r\n+    pass\r\n+\r\n+\r\n+class OppiabotSnapsho' +
+      'tTestingModel(base_models.BaseSnapshotContentModel):\r\n+    """Anoth' +
+      'er Oppiabot model."""\r\n+\r\n+    pass\r\n+\r\n+\r\n+\r\n+\r\n class' +
+      ' SkillModel(base_models.VersionedModel):\r\n     """Model for storing' +
+      ' Skills.\r\n',
   };
 
   const modelTestFileObj = {
@@ -90,13 +108,20 @@ describe('Critical Pull Request Spec', () => {
     deletions: 0,
     changes: 1,
     blob_url:
-      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e110d7e9833c/core/storage/skill/gae_models_test.py',
+      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e11' +
+      '0d7e9833c/core/storage/skill/gae_models_test.py',
     raw_url:
-      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d7e9833c/core/storage/skill/gae_models_test.py',
+      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110' +
+      'd7e9833c/core/storage/skill/gae_models_test.py',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/storage/skill/gae_models_test.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
+      'https://api.github.com/repos/oppia/oppia/contents/core/storage/skill' +
+      '/gae_models_test.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
     patch:
-      '@@ -46,6 +46,18 @@ def test_has_reference_to_user_id(self):\r\n             skill_models.SkillModel.has_reference_to_user_id(\'x_id\'))\r\n \r\n \r\n+class OppiabotSnapshotContentModelTest(base_models.BaseSnapshotContentModel):\r\n+    """Another Oppiabot model."""\r\n+\r\n+    pass\r\n+\r\n+\r\n+class OppiabotSnapshotTestingModelTest(base_models.BaseSnapshotContentModel):\r\n+    """Another Oppiabot model."""\r\n+\r\n+    pass\r\n+\r\n+\r\n class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):\r\n     """Tests the SkillCommitLogEntryModel class."""',
+      '@@ -46,6 +46,18 @@ def test_has_reference_to_user_id(self):\r\nskill_' +
+      'models.SkillModel.has_reference_to_user_id(\'x_id\'))\r\n \r\n \r\n+c' +
+      'lass OppiabotSnapshotContentModelTest(base_models.BaseSnapshotContent' +
+      'Model):\r\n+    """Another Oppiabot model."""\r\n+\r\n+    pass\r\n+\r' +
+      '\n+\r\n+class OppiabotSnapshotTestingModelTest(base_models.BaseSnapshot',
   };
 
   const modifiedModelFileWithNoNewModel = {
@@ -107,13 +132,18 @@ describe('Critical Pull Request Spec', () => {
     deletions: 0,
     changes: 1,
     blob_url:
-      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e110d7e9833c/core/storage/skill/gae_models_test.py',
+      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e11' +
+      '0d7e9833c/core/storage/skill/gae_models_test.py',
     raw_url:
-      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d7e9833c/core/storage/skill/gae_models_test.py',
+      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d' +
+      '7e9833c/core/storage/skill/gae_models_test.py',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/storage/skill/gae_models_test.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
+      'https://api.github.com/repos/oppia/oppia/contents/core/storage/skill/' +
+      'gae_models_test.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
     patch:
-      "@@ -41,6 +41,7 @@ def setUp(self):\r\n         super(SuggestionModelUnitTests, self).setUp()\r\n         suggestion_models.GeneralSuggestionModel.create(\r\n             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,\r\n+            suggestion_models.CONTENT_MENT,\r\n             suggestion_models.TARGET_TYPE_EXPLORATION,\r\n             self.target_id, self.target_version_at_submission,\r\n             suggestion_models.STATUS_IN_REVIEW, 'author_1',",
+      '@@ -41,6 +41,7 @@ def setUp(self):\r\n         super(SuggestionModelU' +
+      'itTests, self).setUp()\r\n         suggestion_models.GeneralSuggestion' +
+      'odel.create(\r\n',
   };
 
   const nonModelFile = {
@@ -124,13 +154,17 @@ describe('Critical Pull Request Spec', () => {
     deletions: 0,
     changes: 1,
     blob_url:
-      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e110d7e9833c/core/domain/exp_fetchers.py',
+      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e110d7e' +
+      '9833c/core/domain/exp_fetchers.py',
     raw_url:
-      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d7e9833c/core/domain/exp_fetchers.py',
+      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d7e9' +
+      '833c/core/domain/exp_fetchers.py',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/domain/exp_fetchers.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
+      'https://api.github.com/repos/oppia/oppia/contents/core/domain/exp_fetche' +
+      'rs.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
     patch:
-      '@@ -0,0 +1 @@\n+# def _migrate_states_schema(versioned_exploration_states, exploration_id):',
+      '@@ -0,0 +1 @@\n+# def _migrate_states_schema(versioned_exploration_states' +
+      ', exploration_id):',
   };
 
   beforeEach(() => {
