@@ -27,7 +27,11 @@ const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
 const checkWIPModule = require('../lib/checkWipDraftPR');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 const scheduler = require('../lib/scheduler');
-const { teamLeads, oppiaMaintainers } = require('../userWhitelist.json');
+const {
+  teamLeads,
+  oppiaMaintainers,
+  SERVER_JOBS_ADMIN,
+} = require('../userWhitelist.json');
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
@@ -65,12 +69,12 @@ describe('Critical Pull Request Spec', () => {
       'https://api.github.com/repos/oppia/oppia/contents/core/storage/skill/' +
       'gae_models.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
     patch:
-    '@@ -353,6 +353,11 @@ def export_data(user_id):\r\n         }\r\n ' +
-    '\r\n \r\n+class OppiabotTestActivitiesModel(base_models.BaseModel):' +
-    '\r\n+    "Does some things right"\r\n+    pass\r\n+\r\n+\r\n class ' +
-    'IncompleteActivitiesModel(base_models.BaseModel):\r\n     """Keeps ' +
-    'track of all the activities currently being completed by the\r\n   ' +
-    'learner.\r\n',
+      '@@ -353,6 +353,11 @@ def export_data(user_id):\r\n         }\r\n ' +
+      '\r\n \r\n+class OppiabotTestActivitiesModel(base_models.BaseModel):' +
+      '\r\n+    "Does some things right"\r\n+    pass\r\n+\r\n+\r\n class ' +
+      'IncompleteActivitiesModel(base_models.BaseModel):\r\n     """Keeps ' +
+      'track of all the activities currently being completed by the\r\n   ' +
+      'learner.\r\n',
   };
 
   const modifiedModelFileObj = {
@@ -118,7 +122,7 @@ describe('Critical Pull Request Spec', () => {
       '/gae_models_test.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
     patch:
       '@@ -46,6 +46,18 @@ def test_has_reference_to_user_id(self):\r\nskill_' +
-      'models.SkillModel.has_reference_to_user_id(\'x_id\'))\r\n \r\n \r\n+c' +
+      "models.SkillModel.has_reference_to_user_id('x_id'))\r\n \r\n \r\n+c" +
       'lass OppiabotSnapshotContentModelTest(base_models.BaseSnapshotContent' +
       'Model):\r\n+    """Another Oppiabot model."""\r\n+\r\n+    pass\r\n+\r' +
       '\n+\r\n+class OppiabotSnapshotTestingModelTest(base_models.BaseSnapshot',
@@ -227,12 +231,9 @@ describe('Critical Pull Request Spec', () => {
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @' +
-          oppiaMaintainers +
-          ', PTAL at this PR, ' +
-          'it adds a model. The name of the model is ' +
-          firstModel +
-          '.<br>Thanks!',
+          'Hi @' + SERVER_JOBS_ADMIN + ' and @' + teamLeads.releaseTeam +
+          ', PTAL at this PR, it adds a model that needs to be validated. ' +
+          'The name of the model is ' + firstModel + '.<br>Thanks!',
       });
     });
 
@@ -242,7 +243,7 @@ describe('Critical Pull Request Spec', () => {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
-        assignees: [teamLeads.releaseTeam],
+        assignees: [teamLeads.releaseTeam, SERVER_JOBS_ADMIN],
       });
     });
 
@@ -289,14 +290,9 @@ describe('Critical Pull Request Spec', () => {
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @' +
-          oppiaMaintainers +
-          ', PTAL at this PR, it adds ' +
-          'new models. The models are ' +
-          firstModel +
-          ', ' +
-          secondModels +
-          '.<br>Thanks!',
+          'Hi @' + SERVER_JOBS_ADMIN + ' and @' + teamLeads.releaseTeam +
+          ', PTAL at this PR, it adds new models that need to be validated. ' +
+          'The models are ' + firstModel + ', ' + secondModels + '.<br>Thanks!'
       });
     });
 
@@ -306,7 +302,7 @@ describe('Critical Pull Request Spec', () => {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
-        assignees: [teamLeads.releaseTeam],
+        assignees: [teamLeads.releaseTeam, SERVER_JOBS_ADMIN],
       });
     });
 
