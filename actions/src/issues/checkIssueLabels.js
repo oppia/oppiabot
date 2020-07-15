@@ -20,7 +20,7 @@ const core = require('@actions/core');
 const { context, GitHub } = require('@actions/github');
 const whitelist = require('../../../userWhitelist.json');
 const GOOD_FIRST_LABEL = 'good first issue';
-const prLabels = ['dependencies', 'datastore', 'stale'];
+const prLabels = ['dependencies', 'stale'];
 
 const checkLabels = async () => {
   core.info('Checking newly added label...');

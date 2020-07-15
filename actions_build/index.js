@@ -4314,7 +4314,7 @@ const core = __webpack_require__(470);
 const { context, GitHub } = __webpack_require__(469);
 const whitelist = __webpack_require__(35);
 const GOOD_FIRST_LABEL = 'good first issue';
-const prLabels = ['dependencies', 'datastore', 'stale'];
+const prLabels = ['dependencies', 'stale'];
 
 const checkLabels = async () => {
   core.info('Checking newly added label...');
