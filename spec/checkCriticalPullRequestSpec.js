@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview File to test the critical check functionalities.
+ * @fileoverview File to test the datastore check functionalities.
  */
 
 require('dotenv').config();
@@ -247,13 +247,13 @@ describe('Critical Pull Request Spec', () => {
       });
     });
 
-    it('should add critical label', () => {
+    it('should add datastore label', () => {
       expect(github.issues.addLabels).toHaveBeenCalled();
       expect(github.issues.addLabels).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
-        labels: ['critical'],
+        labels: ['PR: Affects datastore layer'],
       });
     });
   });
@@ -306,13 +306,13 @@ describe('Critical Pull Request Spec', () => {
       });
     });
 
-    it('should add critical label', () => {
+    it('should add datastore label', () => {
       expect(github.issues.addLabels).toHaveBeenCalled();
       expect(github.issues.addLabels).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
-        labels: ['critical'],
+        labels: ['PR: Affects datastore layer'],
       });
     });
   });
@@ -404,7 +404,7 @@ describe('Critical Pull Request Spec', () => {
     });
   });
 
-  describe('When pull request already has critical label', () => {
+  describe('When pull request already has datastore label', () => {
     beforeEach(async () => {
       github.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
@@ -413,7 +413,7 @@ describe('Critical Pull Request Spec', () => {
       };
       payloadData.payload.pull_request.labels = [
         {
-          name: 'critical',
+          name: 'PR: Affects datastore layer',
         },
       ];
       payloadData.payload.pull_request.changed_files = 2;

@@ -132,13 +132,13 @@ describe('Utility module tests', () => {
     ].join('')
   );
 
-  it('should check for critical labels', () => {
-    let result = utilityModule.hasCriticalLabel(pullRequest);
+  it('should check for datastore labels', () => {
+    let result = utilityModule.hasDatastoreLabel(pullRequest);
     expect(result).toBe(false);
 
-    result = utilityModule.hasCriticalLabel({
+    result = utilityModule.hasDatastoreLabel({
       ...pullRequest,
-      labels: [{ name: 'critical' }],
+      labels: [{ name: 'PR: Affects datastore layer' }],
     });
     expect(result).toBe(true);
   });

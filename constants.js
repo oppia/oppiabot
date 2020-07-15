@@ -11,7 +11,7 @@ const pushEvent = 'push';
 
 const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
-const criticalLabelCheck = 'critical-label-check';
+const datastoreLabelCheck = 'datastore-label-check';
 const prLabelCheck = 'pr-label-check';
 // This check is required in re-open events as well to
 // prevent user from reopening the PR.
@@ -58,7 +58,7 @@ const checksWhitelist = {
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
-    [unlabelEvent]: [criticalLabelCheck],
+    [unlabelEvent]: [datastoreLabelCheck],
     [pushEvent]: [forcePushCheck]
   },
   'oppiabot': {
@@ -95,7 +95,7 @@ module.exports.jobCheck = jobCheck;
 module.exports.modelCheck = modelCheck;
 module.exports.issuesLabelCheck = issuesLabelCheck;
 module.exports.issuesAssignedCheck = issuesAssignedCheck;
-module.exports.criticalLabelCheck = criticalLabelCheck;
+module.exports.datastoreLabelCheck = datastoreLabelCheck;
 module.exports.prLabelCheck = prLabelCheck;
 module.exports.forcePushCheck = forcePushCheck;
 

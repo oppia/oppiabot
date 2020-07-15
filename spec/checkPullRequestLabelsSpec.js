@@ -292,12 +292,12 @@ describe('Pull Request Label Check', () => {
     });
   });
 
-  describe('when critical label gets removed by non whitelisted user', () => {
+  describe('when datastore label gets removed by non whitelisted user', () => {
     const label = {
       id: 638839900,
       node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
       url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-      name: 'critical',
+      name: 'PR: Affects datastore layer',
       color: '00FF00',
     };
 
@@ -308,7 +308,7 @@ describe('Pull Request Label Check', () => {
       await robot.receive(payloadData);
     });
 
-    it('should check for critical label', () => {
+    it('should check for datastore label', () => {
       expect(checkPullRequestLabelModule.checkCriticalLabel).toHaveBeenCalled();
     });
 
@@ -317,7 +317,7 @@ describe('Pull Request Label Check', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         body: 'Hi @' + payloadData.payload.sender.login +
           ', only members of the release team /cc @oppia/release-coordinators ' +
-          'are allowed to remove critical labels. ' +
+          'are allowed to remove PR: Affects datastore layer labels. ' +
           'I will be adding it back. Thanks!',
         number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
@@ -325,10 +325,10 @@ describe('Pull Request Label Check', () => {
       })
     })
 
-    it('should add the critical label', () => {
+    it('should add the datastore label', () => {
       expect(github.issues.addLabels).toHaveBeenCalled();
       expect(github.issues.addLabels).toHaveBeenCalledWith({
-        labels: ['critical'],
+        labels: ['PR: Affects datastore layer'],
         number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name
@@ -337,12 +337,12 @@ describe('Pull Request Label Check', () => {
 
   });
 
-  describe('when critical label gets removed by whitelisted user', () => {
+  describe('when datastore label gets removed by whitelisted user', () => {
     const label = {
       id: 638839900,
       node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
       url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-      name: 'critical',
+      name: 'PR: Affects datastore layer',
       color: '00FF00',
     };
 
@@ -354,7 +354,7 @@ describe('Pull Request Label Check', () => {
       await robot.receive(payloadData);
     });
 
-    it('checks for critical label', () =>{
+    it('checks for datastore label', () =>{
       expect(checkPullRequestLabelModule.checkCriticalLabel).toHaveBeenCalled();
     });
 
@@ -384,7 +384,7 @@ describe('Pull Request Label Check', () => {
       await robot.receive(payloadData);
     });
 
-    it('checks for critical label', () =>{
+    it('checks for datastore label', () =>{
       expect(checkPullRequestLabelModule.checkCriticalLabel).toHaveBeenCalled();
     });
 

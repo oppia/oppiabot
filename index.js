@@ -63,7 +63,7 @@ const runChecks = async (context, checkEvent) => {
           case constants.prLabelCheck:
             await checkPullRequestLabelsModule.checkForIssueLabel(context);
             break;
-          case constants.criticalLabelCheck:
+          case constants.datastoreLabelCheck:
             await checkPullRequestLabelsModule.checkCriticalLabel(context);
             break;
           case constants.forcePushCheck:

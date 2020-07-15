@@ -280,13 +280,13 @@ describe('Pull Request Job Spec', () => {
       });
     });
 
-    it('should add critical label', () => {
+    it('should add datastore label', () => {
       expect(github.issues.addLabels).toHaveBeenCalled();
       expect(github.issues.addLabels).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        labels: ['critical']
+        labels: ['PR: Affects datastore layer']
       });
     });
   });
@@ -354,13 +354,13 @@ describe('Pull Request Job Spec', () => {
       });
     });
 
-    it('should add critical label', () => {
+    it('should add datastore label', () => {
       expect(github.issues.addLabels).toHaveBeenCalled();
       expect(github.issues.addLabels).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        labels: ['critical']
+        labels: ['PR: Affects datastore layer']
       });
     });
   });
@@ -423,13 +423,13 @@ describe('Pull Request Job Spec', () => {
         });
       });
 
-      it('should add critical label', () => {
+      it('should add datastore label', () => {
         expect(github.issues.addLabels).toHaveBeenCalled();
         expect(github.issues.addLabels).toHaveBeenCalledWith({
           issue_number: payloadData.payload.pull_request.number,
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
-          labels: ['critical']
+          labels: ['PR: Affects datastore layer']
         });
       });
     }
@@ -494,13 +494,13 @@ describe('Pull Request Job Spec', () => {
       });
     });
 
-    it('should add critical label', () => {
+    it('should add datastore label', () => {
       expect(github.issues.addLabels).toHaveBeenCalled();
       expect(github.issues.addLabels).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        labels: ['critical']
+        labels: ['PR: Affects datastore layer']
       });
     });
   });
@@ -535,7 +535,7 @@ describe('Pull Request Job Spec', () => {
     it('should not ping server jobs admin', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
     });
-    it('should not add critical label', () => {
+    it('should not add datastore label', () => {
       expect(github.issues.addLabels).not.toHaveBeenCalled();
     });
     it('should not assign server jobs admin', () => {
@@ -624,9 +624,9 @@ describe('Pull Request Job Spec', () => {
     });
   });
 
-  describe('When pull request has critical label', () => {
+  describe('When pull request has datastore label', () => {
     beforeEach(async () => {
-      payloadData.payload.pull_request.labels = [{ name: 'critical' }];
+      payloadData.payload.pull_request.labels = [{ name: 'PR: Affects datastore layer' }];
       github.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
