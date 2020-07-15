@@ -9,6 +9,7 @@ const issuesLabelEvent = 'issues_labeled';
 const issuesAssignedEvent = 'issues_assigned';
 const pushEvent = 'push';
 
+const assignCodeowners = 'assignReviewers';
 const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
 const criticalLabelCheck = 'critical-label-check';
@@ -36,7 +37,7 @@ const checksWhitelist = {
     [issuesLabelEvent]: []
   },
   'oppia': {
-    [openEvent]: [claCheck, changelogCheck, branchCheck, wipCheck, jobCheck],
+    [openEvent]: [claCheck, assignCodeowners, changelogCheck, branchCheck, wipCheck, jobCheck],
     [reopenEvent]: [changelogCheck, branchCheck, wipCheck, jobCheck],
     [PRLabelEvent]: [assigneeCheck, prLabelCheck],
     [synchronizeEvent]: [mergeConflictCheck, jobCheck],
@@ -56,6 +57,9 @@ const checksWhitelist = {
     [issuesLabelEvent]: [],
     [issuesAssignedEvent]: [],
     [pushEvent]: []
+  },
+  'comment-on-pr': {
+    [openEvent]: [assignCodeowners],
   }
 };
 
@@ -70,6 +74,7 @@ module.exports.issuesLabelEvent = issuesLabelEvent;
 module.exports.issuesAssignedEvent = issuesAssignedEvent;
 module.exports.pushEvent = pushEvent;
 
+module.exports.assignCodeowners = assignCodeowners;
 module.exports.claCheck = claCheck;
 module.exports.changelogCheck = changelogCheck;
 module.exports.branchCheck = branchCheck;

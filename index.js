@@ -7,6 +7,7 @@ const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
 const checkWipModule = require('./lib/checkWipDraftPR');
 const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
 const checkBranchPushModule = require('./lib/checkBranchPush');
+const assignReviewersModule = require('./lib/assignPRReviewers');
 
 const constants = require('./constants');
 const checkIssueAssigneeModule = require('./lib/checkIssueAssignee');
@@ -24,6 +25,9 @@ const runChecks = async (context, checkEvent) => {
       const checkList = checks[checkEvent];
       for (var i = 0; i < checkList.length; i++) {
         switch (checkList[i]) {
+          case constants.assignCodeowners:
+            await assignReviewersModule.assignAllCodeowners(context)
+            break;
           case constants.claCheck:
             await apiForSheetsModule.checkClaStatus(context);
             break;
