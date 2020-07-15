@@ -52,7 +52,7 @@ describe('Pull Request Branch Check', () => {
     ).and.callFake(() => {});
     spyOn(checkWipDraftPRModule, 'checkWIP').and.callFake(() => {});
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
-    spyOn(checkCriticalPullRequestModule, 'checkIfCritical').and.callFake(() => {});
+    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
 
     github = {
       issues: {

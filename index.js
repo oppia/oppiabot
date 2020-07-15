@@ -55,7 +55,9 @@ const runChecks = async (context, checkEvent) => {
             await checkPullRequestJobModule.checkForNewJob(context);
             break;
           case constants.modelCheck:
-            await checkCriticalPullRequestModule.checkIfCritical(context);
+            await checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer(
+              context
+            );
             break;
           case constants.issuesAssignedCheck:
             await checkIssueAssigneeModule.checkAssignees(context);

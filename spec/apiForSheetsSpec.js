@@ -40,7 +40,7 @@ describe('Api For Sheets Module', () => {
       () => {});
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
     spyOn(checkWipModule, 'checkWIP').and.callFake(() => {});
-    spyOn(checkCriticalPullRequestModule, 'checkIfCritical').and.callFake(() => {});
+    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
 
     github = {
       issues: {

@@ -199,7 +199,7 @@ describe('Critical Pull Request Spec', () => {
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
     spyOn(checkWIPModule, 'checkWIP').and.callFake(() => {});
 
-    spyOn(checkCriticalPullRequestModule, 'checkIfCritical').and.callThrough();
+    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callThrough();
   });
 
   describe('When a new model is created in a pull request', () => {
@@ -214,7 +214,7 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfCritical).toHaveBeenCalled();
+      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -270,7 +270,7 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfCritical).toHaveBeenCalled();
+      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -330,7 +330,7 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfCritical).toHaveBeenCalled();
+      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -359,7 +359,7 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfCritical).toHaveBeenCalled();
+      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -388,7 +388,7 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfCritical).toHaveBeenCalled();
+      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -421,7 +421,7 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfCritical).toHaveBeenCalled();
+      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer).toHaveBeenCalled();
     });
 
     it('should not get modified files', () => {

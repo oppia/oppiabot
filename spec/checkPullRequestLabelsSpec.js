@@ -56,7 +56,7 @@ describe('Pull Request Label Check', () => {
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() =>{});
-    spyOn(checkCriticalPullRequestModule,'checkIfCritical').and.callFake(() => {});
+    spyOn(checkCriticalPullRequestModule,'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
   });
 
   describe('when pull request gets labeled', () => {

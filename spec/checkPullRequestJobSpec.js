@@ -216,7 +216,7 @@ describe('Pull Request Job Spec', () => {
       checkPullRequestLabelsModule,
       'checkChangelogLabel'
     ).and.callFake(() => {});
-    spyOn(checkCriticalPullRequestModule,'checkIfCritical').and.callFake(() => {});
+    spyOn(checkCriticalPullRequestModule,'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
     spyOn(checkWIPModule, 'checkWIP').and.callFake(() => {});
   });

@@ -49,7 +49,7 @@ describe('Oppiabot\'s', () => {
       checkPullRequestLabelsModule, 'checkChangelogLabel')
       .and.callFake(() => {});
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
-    spyOn(checkCriticalPullRequestModule, 'checkIfCritical').and.callFake(() => {});
+    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
 
     github = {
       issues: {
