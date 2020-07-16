@@ -22,6 +22,7 @@ const pullRequestEditedPayload = require('../fixtures/pullRequest.edited.json');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
+const assignPRReviewersModule = require('../lib/assignPRReviewers');
 
 describe('Oppiabot\'s', () => {
   /**
@@ -48,7 +49,7 @@ describe('Oppiabot\'s', () => {
       checkPullRequestLabelsModule, 'checkChangelogLabel')
       .and.callFake(() => {});
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
-
+    spyOn(assignPRReviewersModule, 'assignAllCodeowners').and.callFake(() => {});
     github = {
       issues: {
         createComment: jasmine.createSpy('createComment').and.resolveTo({}),

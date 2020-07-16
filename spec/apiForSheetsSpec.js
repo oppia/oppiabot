@@ -13,6 +13,7 @@ const pullRequestPayload = JSON.parse(
 const commitsData = JSON.parse(
   JSON.stringify(require('../fixtures/commits.json')));
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
+const assignPRReviewersModule = require('../lib/assignPRReviewers');
 const {google} = require('googleapis');
 const {OAuth2Client} = require('google-auth-library');
 
@@ -39,6 +40,7 @@ describe('Api For Sheets Module', () => {
       () => {});
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
     spyOn(checkWipModule, 'checkWIP').and.callFake(() => {});
+    spyOn(assignPRReviewersModule, 'assignAllCodeowners').and.callFake(() => {});
 
     github = {
       issues: {

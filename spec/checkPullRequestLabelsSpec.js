@@ -4,6 +4,8 @@ const { createProbot } = require('probot');
 const oppiaBot = require('../index');
 const checkPullRequestLabelModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
+const assignPRReviewersModule = require('../lib/assignPRReviewers');
+
 const scheduler = require('../lib/scheduler');
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
