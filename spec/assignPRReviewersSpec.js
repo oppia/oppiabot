@@ -78,15 +78,9 @@ describe('Assign PR Reviewers', () => {
 
   describe('when a pull request is created', () => {
     const codeowners = [
-      {
-        login: 'reviewer1',
-      },
-      {
-        login: 'reviewer2',
-      },
-      {
-        login: 'reviewer3',
-      },
+      { login: 'reviewer1' },
+      { login: 'reviewer2' },
+      { login: 'reviewer3' }
     ];
 
     beforeEach(async () => {

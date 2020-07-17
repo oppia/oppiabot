@@ -40,9 +40,6 @@ const runChecks = async (context, checkEvent) => {
           case constants.wipCheck:
             await checkWipModule.checkWIP(context);
             break;
-          case constants.assigneeCheck:
-            await checkPullRequestLabelsModule.checkAssignee(context);
-            break;
           case constants.mergeConflictCheck:
             await checkMergeConflictsModule.checkMergeConflictsInPullRequest(
               context,
