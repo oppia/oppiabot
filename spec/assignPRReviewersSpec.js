@@ -29,7 +29,6 @@ const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const assignPRReviewersModule = require('../lib/assignPRReviewers');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 const oppiabot = require('../index');
-const { defaultReviewer } = require('../userWhitelist.json');
 
 describe('Assign PR Reviewers', () => {
   /**
@@ -85,7 +84,7 @@ describe('Assign PR Reviewers', () => {
     const codeowners = [
       { login: 'reviewer1' },
       { login: 'reviewer2' },
-      { login: 'reviewer3' }
+      { login: 'reviewer3' },
     ];
 
     beforeEach(async () => {
@@ -130,25 +129,26 @@ describe('Assign PR Reviewers', () => {
       expect(assignPRReviewersModule.assignAllCodeowners).toHaveBeenCalled();
     });
 
-    it('should not attempt to assign', () => {
+    it('should assign PR author', () => {
       expect(github.issues.addAssignees).toHaveBeenCalled();
       expect(github.issues.addAssignees).toHaveBeenCalledWith({
         owner: pullRequestPayload.payload.repository.owner.login,
         repo: pullRequestPayload.payload.repository.name,
         issue_number: pullRequestPayload.payload.pull_request.number,
-        assignees: [defaultReviewer]
+        assignees: [pullRequestPayload.payload.pull_request.user.login],
       });
     });
 
-    it('should not ping', () => {
+    it('should ping PR author', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledWith({
         owner: pullRequestPayload.payload.repository.owner.login,
         repo: pullRequestPayload.payload.repository.name,
         issue_number: pullRequestPayload.payload.pull_request.number,
         body:
-          'Assigning @' + defaultReviewer + ' for the ' +
-          'first pass review of this PR. Thanks!',
+          'Hi @' +
+          pullRequestPayload.payload.pull_request.user.login +
+          ' please assign the required reviewer for this PR. Thanks!',
       });
     });
   });
