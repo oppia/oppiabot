@@ -21,8 +21,10 @@
     "aks681"
   ],
   "teamLeads": {
-    "onboardingTeam": "Showtim3"
+    "onboardingTeam": "Showtim3",
+    "releaseTeam": "ankita240796"
   },
   "defaultReviewer": "ankita240796",
+  "oppiaMaintainers": "oppia/core-maintainers",
   "SERVER_JOBS_ADMIN": "seanlip"
 }

@@ -12,7 +12,7 @@ const pushEvent = 'push';
 const assignCodeowners = 'assignReviewers';
 const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
-const criticalLabelCheck = 'critical-label-check';
+const datastoreLabelCheck = 'datastore-label-check';
 const prLabelCheck = 'pr-label-check';
 // This check is required in re-open events as well to
 // prevent user from reopening the PR.
@@ -21,6 +21,7 @@ const wipCheck = 'wip-check';
 const mergeConflictCheck = 'merge-conflict-check';
 const allMergeConflictCheck = 'all-merge-conflict-check';
 const jobCheck = 'job-check';
+const modelCheck = 'model-check';
 const issuesLabelCheck = 'issues-labeled-check';
 const issuesAssignedCheck = 'issues-assigned-check';
 const forcePushCheck = 'force-push-check';
@@ -43,15 +44,22 @@ const checksWhitelist = {
       branchCheck,
       wipCheck,
       jobCheck,
+      modelCheck,
     ],
-    [reopenEvent]: [changelogCheck, branchCheck, wipCheck, jobCheck],
+    [reopenEvent]: [
+      changelogCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+    ],
     [PRLabelEvent]: [prLabelCheck],
-    [synchronizeEvent]: [mergeConflictCheck, jobCheck],
+    [synchronizeEvent]: [mergeConflictCheck, jobCheck, modelCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
-    [unlabelEvent]: [criticalLabelCheck],
+    [unlabelEvent]: [datastoreLabelCheck],
     [pushEvent]: [forcePushCheck]
   },
   'oppiabot': {
@@ -85,9 +93,10 @@ module.exports.wipCheck = wipCheck;
 module.exports.mergeConflictCheck = mergeConflictCheck;
 module.exports.allMergeConflictCheck = allMergeConflictCheck;
 module.exports.jobCheck = jobCheck;
+module.exports.modelCheck = modelCheck;
 module.exports.issuesLabelCheck = issuesLabelCheck;
 module.exports.issuesAssignedCheck = issuesAssignedCheck;
-module.exports.criticalLabelCheck = criticalLabelCheck;
+module.exports.datastoreLabelCheck = datastoreLabelCheck;
 module.exports.prLabelCheck = prLabelCheck;
 module.exports.forcePushCheck = forcePushCheck;
 

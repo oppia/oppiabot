@@ -23,6 +23,7 @@ const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const assignPRReviewersModule = require('../lib/assignPRReviewers');
+const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 
 describe('Oppiabot\'s', () => {
   /**
@@ -50,6 +51,8 @@ describe('Oppiabot\'s', () => {
       .and.callFake(() => {});
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
     spyOn(assignPRReviewersModule, 'assignAllCodeowners').and.callFake(() => {});
+    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
+
     github = {
       issues: {
         createComment: jasmine.createSpy('createComment').and.resolveTo({}),

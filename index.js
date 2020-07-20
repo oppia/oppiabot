@@ -6,6 +6,7 @@ const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
 const checkWipModule = require('./lib/checkWipDraftPR');
 const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
+const checkCriticalPullRequestModule = require('./lib/checkCriticalPullRequest');
 const checkBranchPushModule = require('./lib/checkBranchPush');
 const assignReviewersModule = require('./lib/assignPRReviewers');
 
@@ -54,13 +55,18 @@ const runChecks = async (context, checkEvent) => {
           case constants.jobCheck:
             await checkPullRequestJobModule.checkForNewJob(context);
             break;
+          case constants.modelCheck:
+            await checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer(
+              context
+            );
+            break;
           case constants.issuesAssignedCheck:
             await checkIssueAssigneeModule.checkAssignees(context);
             break;
           case constants.prLabelCheck:
             await checkPullRequestLabelsModule.checkForIssueLabel(context);
             break;
-          case constants.criticalLabelCheck:
+          case constants.datastoreLabelCheck:
             await checkPullRequestLabelsModule.checkCriticalLabel(context);
             break;
           case constants.forcePushCheck:
