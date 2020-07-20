@@ -27,6 +27,7 @@ const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const assignPRReviewersModule = require('../lib/assignPRReviewers');
+const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 const oppiabot = require('../index');
 const { defaultReviewer } = require('../userWhitelist.json');
 
@@ -58,6 +59,10 @@ describe('Assign PR Reviewers', () => {
     spyOn(checkWipDraftPRModule, 'checkWIP').and.callFake(() => {});
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
+    spyOn(
+      checkCriticalPullRequestModule,
+      'checkIfPRAffectsDatastoreLayer'
+    ).and.callFake(() => {});
 
     github = {
       issues: {
