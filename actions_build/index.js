@@ -316,7 +316,7 @@ module.exports = require("https");
 /***/ 35:
 /***/ (function(module) {
 
-module.exports = {"goodFirstIssue":["U8NWXD","kevintab95","seanlip","ankita240796","Showtim3","bansalnitish","vojtechjelinek","marianazangrossi","brianrodri","nithusha21","aks681"],"teamLeads":{"onboardingTeam":"Showtim3"},"SERVER_JOBS_ADMIN":"seanlip"};
+module.exports = {"releaseCoordinators":["nithusha21","aks681","vojtechjelinek","ankita240796","DubeySandeep","BenHenning"],"goodFirstIssue":["U8NWXD","kevintab95","seanlip","ankita240796","Showtim3","bansalnitish","vojtechjelinek","marianazangrossi","brianrodri","nithusha21","aks681"],"teamLeads":{"onboardingTeam":"Showtim3","releaseTeam":"ankita240796"},"oppiaMaintainers":"oppia/core-maintainers","SERVER_JOBS_ADMIN":"seanlip"};
 
 /***/ }),
 
@@ -2339,15 +2339,19 @@ function checkMode (stat, options) {
 
 const openEvent = 'opened';
 const reopenEvent = 'reopened';
-const labelEvent = 'labeled';
+const unlabelEvent = 'unlabeled';
+const PRLabelEvent = 'labeled';
 const synchronizeEvent = 'synchronize';
 const closeEvent = 'closed';
 const editEvent = 'edited';
-const issuesLabelEvent = 'issues_labeled'
-const issuesAssignedEvent = 'issues_assigned'
+const issuesLabelEvent = 'issues_labeled';
+const issuesAssignedEvent = 'issues_assigned';
+const pushEvent = 'push';
 
 const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
+const datastoreLabelCheck = 'datastore-label-check';
+const prLabelCheck = 'pr-label-check';
 // This check is required in re-open events as well to
 // prevent user from reopening the PR.
 const branchCheck = 'branch-check';
@@ -2356,46 +2360,68 @@ const assigneeCheck = 'assignee-check';
 const mergeConflictCheck = 'merge-conflict-check';
 const allMergeConflictCheck = 'all-merge-conflict-check';
 const jobCheck = 'job-check';
-const issuesLabelCheck = 'issues-labeled-check'
-const issuesAssignedCheck = 'issues-assigned-check'
+const modelCheck = 'model-check';
+const issuesLabelCheck = 'issues-labeled-check';
+const issuesAssignedCheck = 'issues-assigned-check';
+const forcePushCheck = 'force-push-check';
 
 const checksWhitelist = {
   'oppia-android': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
-    [labelEvent]: [],
+    [PRLabelEvent]: [],
     [synchronizeEvent]: [],
     [closeEvent]: [],
     [editEvent]: [],
     [issuesLabelEvent]: []
   },
   'oppia': {
-    [openEvent]: [claCheck, changelogCheck, branchCheck, wipCheck, jobCheck],
-    [reopenEvent]: [changelogCheck, branchCheck, wipCheck, jobCheck],
-    [labelEvent]: [assigneeCheck],
-    [synchronizeEvent]: [mergeConflictCheck, jobCheck],
+    [openEvent]: [
+      claCheck,
+      changelogCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+    ],
+    [reopenEvent]: [
+      changelogCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+    ],
+    [PRLabelEvent]: [assigneeCheck, prLabelCheck],
+    [synchronizeEvent]: [mergeConflictCheck, jobCheck, modelCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
-    [issuesAssignedEvent]: [issuesAssignedCheck]
+    [issuesAssignedEvent]: [issuesAssignedCheck],
+    [unlabelEvent]: [datastoreLabelCheck],
+    [pushEvent]: [forcePushCheck]
   },
   'oppiabot': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
     [synchronizeEvent]: [mergeConflictCheck],
     [closeEvent]: [allMergeConflictCheck],
-    [editEvent]: []
+    [editEvent]: [],
+    [issuesLabelEvent]: [],
+    [issuesAssignedEvent]: [],
+    [pushEvent]: []
   }
 };
 
 module.exports.openEvent = openEvent;
 module.exports.reopenEvent = reopenEvent;
-module.exports.labelEvent = labelEvent;
+module.exports.unlabelEvent = unlabelEvent;
+module.exports.PRLabelEvent = PRLabelEvent;
 module.exports.synchronizeEvent = synchronizeEvent;
 module.exports.closeEvent = closeEvent;
 module.exports.editEvent = editEvent;
-module.exports.issuesLabelEvent = issuesLabelEvent
-module.exports.issuesAssignedEvent = issuesAssignedEvent
+module.exports.issuesLabelEvent = issuesLabelEvent;
+module.exports.issuesAssignedEvent = issuesAssignedEvent;
+module.exports.pushEvent = pushEvent;
 
 module.exports.claCheck = claCheck;
 module.exports.changelogCheck = changelogCheck;
@@ -2405,8 +2431,12 @@ module.exports.assigneeCheck = assigneeCheck;
 module.exports.mergeConflictCheck = mergeConflictCheck;
 module.exports.allMergeConflictCheck = allMergeConflictCheck;
 module.exports.jobCheck = jobCheck;
-module.exports.issuesLabelCheck = issuesLabelCheck
-module.exports.issuesAssignedCheck = issuesAssignedCheck
+module.exports.modelCheck = modelCheck;
+module.exports.issuesLabelCheck = issuesLabelCheck;
+module.exports.issuesAssignedCheck = issuesAssignedCheck;
+module.exports.datastoreLabelCheck = datastoreLabelCheck;
+module.exports.prLabelCheck = prLabelCheck;
+module.exports.forcePushCheck = forcePushCheck;
 
 module.exports.getChecksWhitelist = function() {
   return checksWhitelist;
@@ -4284,7 +4314,7 @@ const core = __webpack_require__(470);
 const { context, GitHub } = __webpack_require__(469);
 const whitelist = __webpack_require__(35);
 const GOOD_FIRST_LABEL = 'good first issue';
-const prLabels = ['dependencies', 'critical', 'stale'];
+const prLabels = ['dependencies', 'stale'];
 
 const checkLabels = async () => {
   core.info('Checking newly added label...');

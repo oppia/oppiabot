@@ -23,6 +23,7 @@ const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
+const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 
 describe('Pull Request Branch Check', () => {
   /**
@@ -51,6 +52,7 @@ describe('Pull Request Branch Check', () => {
     ).and.callFake(() => {});
     spyOn(checkWipDraftPRModule, 'checkWIP').and.callFake(() => {});
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
+    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
 
     github = {
       issues: {
