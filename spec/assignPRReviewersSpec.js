@@ -119,7 +119,7 @@ describe('Assign PR Reviewers', () => {
     });
   });
 
-  describe('when a pull request has no codeowners', () => {
+  describe('when a pull request has no codeowners other than the PR author', () => {
     beforeEach(async () => {
       pullRequestPayload.payload.pull_request.requested_reviewers = [];
       await robot.receive(pullRequestPayload);
@@ -148,7 +148,7 @@ describe('Assign PR Reviewers', () => {
         body:
           'Hi @' +
           pullRequestPayload.payload.pull_request.user.login +
-          ' please assign the required reviewer for this PR. Thanks!',
+          ' please assign the required reviewer(s) for this PR. Thanks!',
       });
     });
   });

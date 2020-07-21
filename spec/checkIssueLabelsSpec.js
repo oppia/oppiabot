@@ -139,7 +139,7 @@ describe('Check Issue Labels Module', () => {
 
   describe('check for changelog labels', () => {
     beforeEach(async () => {
-      payload.label.name = 'PR CHANGELOG: Server Errors -- @kevintab95';
+      payload.label.name = 'PR CHANGELOG: Server Errors';
       await dispatcher.dispatch('issues', 'labeled');
     });
 
@@ -171,7 +171,7 @@ describe('Check Issue Labels Module', () => {
       expect(octokit.issues.removeLabel).toHaveBeenCalled();
       expect(octokit.issues.removeLabel).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
-        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
+        name: 'PR CHANGELOG: Server Errors',
         owner: payload.repository.owner.login,
         repo: payload.repository.name,
       });

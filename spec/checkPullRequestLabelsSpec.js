@@ -292,7 +292,7 @@ describe('Pull Request Label Check', () => {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.number,
-        labels: ['PR CHANGELOG: Miscellaneous -- @ankita240796']
+        labels: ['PR CHANGELOG: Miscellaneous']
       };
       expect(github.issues.addLabels).toHaveBeenCalledWith(labelParams);
 
@@ -315,7 +315,7 @@ describe('Pull Request Label Check', () => {
         id: 638839900,
         node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
         url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
+        name: 'PR CHANGELOG: Server Errors',
         color: '00FF00',
       };
       payloadData.payload.action = 'reopened';
@@ -372,7 +372,7 @@ describe('Pull Request Label Check', () => {
         id: 638839900,
         node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
         url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
+        name: 'PR CHANGELOG: Server Errors',
         color: '00FF00',
       };
 

@@ -193,7 +193,7 @@ describe('Api For Sheets Module', () => {
     const claData = [['abp'], ['kevinlee']];
     beforeEach(function (done) {
       pullRequestPayload.payload.pull_request.labels.push({
-        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
+        name: 'PR CHANGELOG: Server Errors',
       });
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callFake(() => ({}));
