@@ -14,6 +14,7 @@ const commitsData = JSON.parse(
   JSON.stringify(require('../fixtures/commits.json')));
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
+const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
 const {google} = require('googleapis');
 const {OAuth2Client} = require('google-auth-library');
 
@@ -41,6 +42,7 @@ describe('Api For Sheets Module', () => {
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
     spyOn(checkWipModule, 'checkWIP').and.callFake(() => {});
     spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
+    spyOn(checkPullRequestTemplateModule,'checkTemplate').and.callFake(() => {});
 
     github = {
       issues: {

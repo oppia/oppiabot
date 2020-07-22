@@ -8,6 +8,7 @@ const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
 const checkWIPModule = require('../lib/checkWipDraftPR');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
+const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
 const scheduler = require('../lib/scheduler');
 
 let payloadData = JSON.parse(
@@ -219,6 +220,7 @@ describe('Pull Request Job Spec', () => {
     spyOn(checkCriticalPullRequestModule,'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
     spyOn(checkWIPModule, 'checkWIP').and.callFake(() => {});
+    spyOn(checkPullRequestTemplateModule,'checkTemplate').and.callFake(() => {});
   });
 
   describe('When a new job file is created in a pull request', () => {

@@ -24,6 +24,7 @@ const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
+const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
 
 describe('Pull Request Branch Check', () => {
   /**
@@ -53,6 +54,7 @@ describe('Pull Request Branch Check', () => {
     spyOn(checkWipDraftPRModule, 'checkWIP').and.callFake(() => {});
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
     spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
+    spyOn(checkPullRequestTemplateModule,'checkTemplate').and.callFake(() => {});
 
     github = {
       issues: {

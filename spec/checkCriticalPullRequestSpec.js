@@ -26,6 +26,7 @@ const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
 const checkWIPModule = require('../lib/checkWipDraftPR');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
+const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
 const scheduler = require('../lib/scheduler');
 const {
   teamLeads,
@@ -198,6 +199,7 @@ describe('Critical Pull Request Spec', () => {
     ).and.callFake(() => {});
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
     spyOn(checkWIPModule, 'checkWIP').and.callFake(() => {});
+    spyOn(checkPullRequestTemplateModule,'checkTemplate').and.callFake(() => {});
 
     spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callThrough();
   });
