@@ -336,7 +336,7 @@ describe('Pull Request Template', () => {
     });
   });
 
-  describe('when pull request contains description without filled checklist', () => {
+  describe('when linter/karma checks aren\'t checked.', () => {
     beforeEach(async () => {
       payloadData.payload.pull_request.body = bodyWithExplanation;
       payloadData.payload.pull_request.maintainer_can_modify = false;
