@@ -6,7 +6,6 @@ const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
-const assignPRReviewersModule = require('../lib/assignPRReviewers');
 const checkWIPModule = require('../lib/checkWipDraftPR');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 const scheduler = require('../lib/scheduler');
@@ -220,7 +219,6 @@ describe('Pull Request Job Spec', () => {
     spyOn(checkCriticalPullRequestModule,'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
     spyOn(checkWIPModule, 'checkWIP').and.callFake(() => {});
-    spyOn(assignPRReviewersModule, 'assignAllCodeowners').and.callFake(() => {});
   });
 
   describe('When a new job file is created in a pull request', () => {

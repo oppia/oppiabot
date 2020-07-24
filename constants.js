@@ -9,7 +9,6 @@ const issuesLabelEvent = 'issues_labeled';
 const issuesAssignedEvent = 'issues_assigned';
 const pushEvent = 'push';
 
-const assignCodeowners = 'assignReviewers';
 const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
 const datastoreLabelCheck = 'datastore-label-check';
@@ -18,6 +17,7 @@ const prLabelCheck = 'pr-label-check';
 // prevent user from reopening the PR.
 const branchCheck = 'branch-check';
 const wipCheck = 'wip-check';
+const assigneeCheck = 'assignee-check';
 const mergeConflictCheck = 'merge-conflict-check';
 const allMergeConflictCheck = 'all-merge-conflict-check';
 const jobCheck = 'job-check';
@@ -39,7 +39,6 @@ const checksWhitelist = {
   'oppia': {
     [openEvent]: [
       claCheck,
-      assignCodeowners,
       changelogCheck,
       branchCheck,
       wipCheck,
@@ -53,7 +52,7 @@ const checksWhitelist = {
       jobCheck,
       modelCheck,
     ],
-    [PRLabelEvent]: [prLabelCheck],
+    [PRLabelEvent]: [assigneeCheck, prLabelCheck],
     [synchronizeEvent]: [mergeConflictCheck, jobCheck, modelCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: [wipCheck],
@@ -85,11 +84,11 @@ module.exports.issuesLabelEvent = issuesLabelEvent;
 module.exports.issuesAssignedEvent = issuesAssignedEvent;
 module.exports.pushEvent = pushEvent;
 
-module.exports.assignCodeowners = assignCodeowners;
 module.exports.claCheck = claCheck;
 module.exports.changelogCheck = changelogCheck;
 module.exports.branchCheck = branchCheck;
 module.exports.wipCheck = wipCheck;
+module.exports.assigneeCheck = assigneeCheck;
 module.exports.mergeConflictCheck = mergeConflictCheck;
 module.exports.allMergeConflictCheck = allMergeConflictCheck;
 module.exports.jobCheck = jobCheck;

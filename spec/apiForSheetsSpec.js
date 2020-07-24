@@ -13,7 +13,6 @@ const pullRequestPayload = JSON.parse(
 const commitsData = JSON.parse(
   JSON.stringify(require('../fixtures/commits.json')));
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
-const assignPRReviewersModule = require('../lib/assignPRReviewers');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 const {google} = require('googleapis');
 const {OAuth2Client} = require('google-auth-library');
@@ -41,7 +40,6 @@ describe('Api For Sheets Module', () => {
       () => {});
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
     spyOn(checkWipModule, 'checkWIP').and.callFake(() => {});
-    spyOn(assignPRReviewersModule, 'assignAllCodeowners').and.callFake(() => {});
     spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
 
     github = {
@@ -193,7 +191,7 @@ describe('Api For Sheets Module', () => {
     const claData = [['abp'], ['kevinlee']];
     beforeEach(function (done) {
       pullRequestPayload.payload.pull_request.labels.push({
-        name: 'PR CHANGELOG: Server Errors',
+        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
       });
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callFake(() => ({}));
