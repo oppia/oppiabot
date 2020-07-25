@@ -375,7 +375,7 @@ describe('Pull Request Template', () => {
     });
   });
 
-  describe('when pull request contains description and filled karma check', () => {
+  describe('when pull request contains description and filled karma/lint check', () => {
     beforeEach(async () => {
       payloadData.payload.pull_request.body = bodyWithExplanationAndLint;
       payloadData.payload.pull_request.maintainer_can_modify = false;
@@ -449,7 +449,7 @@ describe('Pull Request Template', () => {
     });
   });
 
-  describe('when pull request contains completely valid body', () => {
+  describe('when pull request contains a valid body', () => {
     beforeEach(async () => {
       payloadData.payload.pull_request.body = validBody;
       payloadData.payload.pull_request.maintainer_can_modify = true;
