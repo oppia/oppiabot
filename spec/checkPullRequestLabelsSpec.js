@@ -6,6 +6,7 @@ const checkPullRequestLabelModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 const scheduler = require('../lib/scheduler');
+
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
@@ -68,12 +69,13 @@ describe('Pull Request Label Check', () => {
         name: 'PR CHANGELOG: Server Errors -- @kevintab95',
         color: '00FF00',
       };
-
+      const reviewers = [{ login: 'kevintab95' }];
       beforeEach(async () => {
         // Set the payload action and label which will simulate adding
         // the changelog label.
         payloadData.payload.action = 'labeled';
         payloadData.payload.label = label;
+        payloadData.payload.pull_request.requested_reviewers = reviewers;
         spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
         await robot.receive(payloadData);
       });
@@ -105,10 +107,14 @@ describe('Pull Request Label Check', () => {
         };
         expect(github.issues.createComment).toHaveBeenCalledWith(params);
       });
+
+      afterAll(() => {
+        payloadData.payload.pull_request.requested_reviewers = [];
+      });
     });
 
-    it('should not assign project owner if they are the pr author',
-      async () => {
+    describe('when pr author is the project owner', () => {
+      beforeEach(async () => {
         const label = {
           id: 638839900,
           node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
@@ -116,41 +122,167 @@ describe('Pull Request Label Check', () => {
           name: 'PR CHANGELOG: Server Errors -- @kevintab95',
           color: '00FF00',
         };
-
         // Set the payload action and label which will simulate adding
         // the changelog label.
         payloadData.payload.action = 'labeled';
         payloadData.payload.label = label;
+        payloadData.payload.pull_request.requested_reviewers = [
+          { login: 'reviewer1' },
+          { login: 'reviewer2' },
+        ];
         // Set project owner to be pr author.
         payloadData.payload.pull_request.user.login = 'kevintab95';
         spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
         await robot.receive(payloadData);
-
-        expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
-        expect(github.issues.addAssignees).not.toHaveBeenCalled();
       });
 
-    it('should not add comment if project owner is already assigned',
-      async () => {
+      it('should check changelog label', () => {
+        expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
+      });
+
+      it('should not assign project owner', () => {
+        const arg = github.issues.addAssignees.calls.argsFor(0)[0];
+        expect(arg.assignees.includes('kevintab95')).toBe(false);
+      });
+
+      it('should assign all reviewers', () => {
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          assignees: ['reviewer1', 'reviewer2'],
+        });
+      });
+
+      afterAll(() => {
+        payloadData.payload.pull_request.requested_reviewers = [];
+      });
+    });
+
+    describe('when pr author is project owner and the only codeowner', () => {
+      beforeEach(async () => {
         const label = {
           id: 638839900,
           node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
           url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-          name: 'PR CHANGELOG: Server Errors -- @testuser1',
+          name: 'PR CHANGELOG: Server Errors -- @kevintab95',
           color: '00FF00',
         };
-
         // Set the payload action and label which will simulate adding
         // the changelog label.
         payloadData.payload.action = 'labeled';
         payloadData.payload.label = label;
+        payloadData.payload.pull_request.requested_reviewers = [];
+        // Set project owner to be pr author.
+        payloadData.payload.pull_request.user.login = 'kevintab95';
         spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
         await robot.receive(payloadData);
-
-        expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
-        expect(github.issues.addAssignees).not.toHaveBeenCalled();
-        expect(github.issues.createComment).not.toHaveBeenCalled();
       });
+
+      it('should check changelog label', () => {
+        expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
+      });
+
+      it('should assign pr author', () => {
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          assignees: ['kevintab95'],
+        });
+      });
+
+      it('should ping pr author', () => {
+        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          owner: payloadData.payload.repository.owner.login,
+          repo: payloadData.payload.repository.name,
+          issue_number: payloadData.payload.pull_request.number,
+          body:
+            'Hi @' +
+            payloadData.payload.pull_request.user.login +
+            ' please assign the required reviewer(s) for this PR. Thanks!',
+        });
+      })
+    });
+
+    describe('when pr changelog is excluded from codeowner assignment', () => {
+      const label = {
+        id: 638839900,
+        node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+        url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+        name: 'PR CHANGELOG: Angular Migration -- @kevintab95',
+        color: '00FF00',
+      };
+
+      beforeEach(async () => {
+        // Set the payload action and label which will simulate adding
+        // the changelog label.
+        payloadData.payload.action = 'labeled';
+        payloadData.payload.label = label;
+        payloadData.payload.pull_request.requested_reviewers = ['testuser'];
+        spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
+        await robot.receive(payloadData);
+      });
+
+      it('should call pull request label module', () => {
+        expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
+      });
+
+      it('should assign the project owner', () => {
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        const params = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          number: payloadData.payload.number,
+          assignees: ['kevintab95'],
+        };
+        expect(github.issues.addAssignees).toHaveBeenCalledWith(params);
+      });
+
+      it('should ping the project owner', () => {
+        expect(github.issues.createComment).toHaveBeenCalled();
+        const params = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          number: payloadData.payload.number,
+          body:
+            'Assigning @kevintab95 for the first-pass review' +
+            ' of this pull request. Thanks!',
+        };
+        expect(github.issues.createComment).toHaveBeenCalledWith(params);
+      });
+
+      afterAll(() => {
+        payloadData.payload.pull_request.requested_reviewers = [];
+      });
+    });
+
+    it('should not ping project owner if already assigned', async () => {
+      const label = {
+        id: 638839900,
+        node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+        url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+        name: 'PR CHANGELOG: Server Errors -- @testuser1',
+        color: '00FF00',
+      };
+      // Set the payload action and label which will simulate adding
+      // the changelog label.
+      payloadData.payload.action = 'labeled';
+      payloadData.payload.label = label;
+      payloadData.payload.pull_request.requested_reviewers = [
+        { login: 'testuser1' },
+      ];
+      payloadData.payload.pull_request.assignees = [{ login: 'testuser1' }];
+      spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
+      await robot.receive(payloadData);
+
+      expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
+      expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
 
     it('should not assign if a changelog label is not added', async () => {
       const label = {
@@ -211,8 +343,8 @@ describe('Pull Request Label Check', () => {
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
       expect(github.issues.createComment).not.toHaveBeenCalled();
     });
-
   });
+
   describe('when an issue label gets added', () =>{
     const label = {
       id: 638839900,

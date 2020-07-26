@@ -316,7 +316,7 @@ module.exports = require("https");
 /***/ 35:
 /***/ (function(module) {
 
-module.exports = {"releaseCoordinators":["nithusha21","aks681","vojtechjelinek","ankita240796","DubeySandeep","BenHenning"],"goodFirstIssue":["U8NWXD","kevintab95","seanlip","ankita240796","Showtim3","bansalnitish","vojtechjelinek","marianazangrossi","brianrodri","nithusha21","aks681"],"teamLeads":{"onboardingTeam":"Showtim3","releaseTeam":"ankita240796"},"oppiaMaintainers":"oppia/core-maintainers","SERVER_JOBS_ADMIN":"seanlip"};
+module.exports = {"releaseCoordinators":["nithusha21","aks681","vojtechjelinek","ankita240796","DubeySandeep","BenHenning"],"goodFirstIssue":["U8NWXD","kevintab95","seanlip","ankita240796","Showtim3","bansalnitish","vojtechjelinek","marianazangrossi","brianrodri","nithusha21","aks681"],"teamLeads":{"onboardingTeam":"Showtim3","releaseTeam":"ankita240796"},"defaultReviewer":"ankita240796","oppiaMaintainers":"oppia/core-maintainers","SERVER_JOBS_ADMIN":"seanlip"};
 
 /***/ }),
 
@@ -2348,6 +2348,7 @@ const issuesLabelEvent = 'issues_labeled';
 const issuesAssignedEvent = 'issues_assigned';
 const pushEvent = 'push';
 
+const assignCodeowners = 'assignReviewers';
 const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
 const datastoreLabelCheck = 'datastore-label-check';
@@ -2356,7 +2357,6 @@ const prLabelCheck = 'pr-label-check';
 // prevent user from reopening the PR.
 const branchCheck = 'branch-check';
 const wipCheck = 'wip-check';
-const assigneeCheck = 'assignee-check';
 const mergeConflictCheck = 'merge-conflict-check';
 const allMergeConflictCheck = 'all-merge-conflict-check';
 const jobCheck = 'job-check';
@@ -2378,6 +2378,7 @@ const checksWhitelist = {
   'oppia': {
     [openEvent]: [
       claCheck,
+      assignCodeowners,
       changelogCheck,
       branchCheck,
       wipCheck,
@@ -2391,7 +2392,7 @@ const checksWhitelist = {
       jobCheck,
       modelCheck,
     ],
-    [PRLabelEvent]: [assigneeCheck, prLabelCheck],
+    [PRLabelEvent]: [prLabelCheck],
     [synchronizeEvent]: [mergeConflictCheck, jobCheck, modelCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: [wipCheck],
@@ -2423,11 +2424,11 @@ module.exports.issuesLabelEvent = issuesLabelEvent;
 module.exports.issuesAssignedEvent = issuesAssignedEvent;
 module.exports.pushEvent = pushEvent;
 
+module.exports.assignCodeowners = assignCodeowners;
 module.exports.claCheck = claCheck;
 module.exports.changelogCheck = changelogCheck;
 module.exports.branchCheck = branchCheck;
 module.exports.wipCheck = wipCheck;
-module.exports.assigneeCheck = assigneeCheck;
 module.exports.mergeConflictCheck = mergeConflictCheck;
 module.exports.allMergeConflictCheck = allMergeConflictCheck;
 module.exports.jobCheck = jobCheck;
