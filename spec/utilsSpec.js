@@ -259,11 +259,4 @@ describe('Utility module tests', () => {
     expect(result.length).toBe(2);
     expect(result).toEqual([firstModelFileObj, firstJobFileObj]);
   });
-
-  it('should appropriately swap item in a string', () => {
-    let result = utilityModule.swapCharInPlace('SAMPLE', 1, 'O');
-    expect(result).toBe('SOMPLE');
-    result = utilityModule.swapCharInPlace('The user', 0, 't');
-    expect(result).toBe('the user');
-  })
 });
