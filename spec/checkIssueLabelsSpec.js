@@ -33,10 +33,6 @@ describe('Check Issue Labels Module', () => {
     github.context.eventName = 'issues';
     github.context.payload = payload;
     github.context.issue = payload.issue;
-    github.context.repo = {
-      owner: payload.repository.owner.login,
-      repo: payload.repository.name,
-    };
 
     octokit = {
       issues: {
@@ -47,6 +43,10 @@ describe('Check Issue Labels Module', () => {
     };
 
     spyOn(core, 'getInput').and.returnValue('sample-token');
+    spyOnProperty(github.context, 'repo').and.returnValue({
+      owner: payload.repository.owner.login,
+      repo: payload.repository.name,
+    });
 
     // Mock GitHub API.
     Object.setPrototypeOf(github.GitHub, function () {
