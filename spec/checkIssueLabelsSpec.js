@@ -35,8 +35,10 @@ describe('Check Issue Labels Module', () => {
     github.context.issue = payload.issue;
     github.context.repo = {
       owner: payload.repository.owner.login,
-      repo: payload.repository.name,
+      repo: 'oppia',
     };
+    console.log('Debug commit 7')
+    console.log(github.context.repo);
 
     octokit = {
       issues: {
