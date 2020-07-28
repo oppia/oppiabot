@@ -76,7 +76,7 @@ describe('Check Issue Labels Module', () => {
       expect(checkIssueLabelModule.checkLabels).toHaveBeenCalled();
     });
 
-    fit('should create appropriate comment', () => {
+    it('should create appropriate comment', () => {
       expect(octokit.issues.createComment).toHaveBeenCalled();
       const user = payload.sender.login;
       const body = (
