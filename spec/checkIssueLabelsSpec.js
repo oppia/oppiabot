@@ -77,7 +77,7 @@ describe('Check Issue Labels Module', () => {
     });
 
     fit('should create appropriate comment', () => {
-      console.log(payload);
+      console.log(payload.repository);
       expect(octokit.issues.createComment).toHaveBeenCalled();
       const user = payload.sender.login;
       const body = (
