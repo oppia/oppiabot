@@ -48,6 +48,8 @@ const checkLabels = async () => {
  */
 const handleGoodFirstIssueLabel = async (octokit, user) => {
   const issueNumber = context.payload.issue.number;
+  console.log('Debug commit');
+  console.log(context);
   // Comment on the issue and ping the onboarding team lead.
   await octokit.issues.createComment(
     {
