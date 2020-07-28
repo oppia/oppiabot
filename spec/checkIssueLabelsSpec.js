@@ -30,6 +30,8 @@ describe('Check Issue Labels Module', () => {
   let octokit;
 
   beforeEach(async () => {
+    console.log('Debug commit');
+    console.log(payload.repository);
     github.context.eventName = 'issues';
     github.context.payload = payload;
     github.context.issue = payload.issue;
@@ -37,6 +39,7 @@ describe('Check Issue Labels Module', () => {
       owner: payload.repository.owner.login,
       repo: payload.repository.name,
     };
+    console.log(github.context);
 
     octokit = {
       issues: {
@@ -77,7 +80,6 @@ describe('Check Issue Labels Module', () => {
     });
 
     fit('should create appropriate comment', () => {
-      console.log(payload.repository);
       expect(octokit.issues.createComment).toHaveBeenCalled();
       const user = payload.sender.login;
       const body = (
