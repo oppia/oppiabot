@@ -111,7 +111,7 @@ describe('Merge Conflict Check', () => {
       const params = {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        number: payloadData.payload.pull_request.number,
+        issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @' +
           payloadData.payload.pull_request.user.login +
@@ -130,11 +130,21 @@ describe('Merge Conflict Check', () => {
       const params = {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        number: payloadData.payload.pull_request.number,
+        issue_number: payloadData.payload.pull_request.number,
         labels: [mergeConflictLabel.name],
       };
       expect(github.issues.addLabels).toHaveBeenCalledWith(params);
     });
+
+    it('assigns pr author', () => {
+      expect(github.issues.addAssignees).toHaveBeenCalled();
+      const params = {
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        issue_number: payloadData.payload.pull_request.number,
+        assignees: [payloadData.payload.pull_request.user.login],
+      };
+    })
   });
 
   describe('pull request merge does not result in merge conflict', () => {
@@ -221,7 +231,7 @@ describe('Merge Conflict Check', () => {
       const params = {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        number: payloadData.payload.pull_request.number,
+        issue_number: payloadData.payload.pull_request.number,
         name: mergeConflictLabel.name,
       };
       expect(github.issues.removeLabel).toHaveBeenCalledWith(params);
