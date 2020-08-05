@@ -9,6 +9,7 @@ const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
 const checkPullRequestTemplateModule = require('./lib/checkPullRequestTemplate');
 const checkCriticalPullRequestModule = require('./lib/checkCriticalPullRequest');
 const checkBranchPushModule = require('./lib/checkBranchPush');
+const ciCheckModule = require('./lib/ciChecks');
 
 const constants = require('./constants');
 const checkIssueAssigneeModule = require('./lib/checkIssueAssignee');
@@ -74,6 +75,9 @@ const runChecks = async (context, checkEvent) => {
             break;
           case constants.prTemplateCheck:
             await checkPullRequestTemplateModule.checkTemplate(context);
+            break;
+          case constants.ciFailureCheck:
+            await ciCheckModule.handleFailure(context);
             break;
         }
       }
@@ -166,6 +170,14 @@ module.exports = (oppiabot) => {
       // eslint-disable-next-line no-console
       console.log('A BRANCH HAS BEEN PUSHED...');
       await runChecks(context, constants.pushEvent);
+    }
+  });
+
+  oppiabot.on('check_suite.completed', async (context) => {
+    if(checkWhitelistedAccounts(context)) {
+      // eslint-disable-next-line no-console
+      console.log('A CHECK SUITE HAS BEEN COMPLETED...');
+      await runChecks(context, constants.checkCompletedEvent);
     }
   });
 };
