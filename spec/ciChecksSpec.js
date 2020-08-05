@@ -163,4 +163,28 @@ describe('CI Checks', () => {
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
+
+  describe('When a non PR check suite failes', () => {
+    beforeEach(async () => {
+      payloadData.payload.check_suite.conclusion = 'failure';
+      payloadData.payload.check_suite.pull_requests = [];
+      await robot.receive(payloadData);
+    });
+
+    it('should call handle failure module', () => {
+      expect(ciCheckModule.handleFailure).toHaveBeenCalled();
+    });
+
+    it('should not fetch pull request data', () => {
+      expect(github.pulls.get).not.toHaveBeenCalled();
+    });
+
+    it('should not comment on pull request', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('should not assign PR author', () => {
+      expect(github.issues.addAssignees).not.toHaveBeenCalled();
+    });
+  })
 });

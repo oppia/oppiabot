@@ -77,9 +77,6 @@ const checksWhitelist = {
     [issuesAssignedEvent]: [],
     [pushEvent]: []
   },
-  'comment-on-pr': {
-    [checkCompletedEvent]: [ciFailureCheck]
-  }
 };
 
 module.exports.openEvent = openEvent;
