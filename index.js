@@ -75,6 +75,9 @@ const runChecks = async (context, checkEvent) => {
           case constants.prTemplateCheck:
             await checkPullRequestTemplateModule.checkTemplate(context);
             break;
+          case constants.updateWithDevelopCheck:
+            await checkMergeConflictsModule.pingAllPullRequestsToMergeFromDevelop(context);
+            break;
         }
       }
     }
