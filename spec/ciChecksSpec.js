@@ -105,9 +105,11 @@ describe('CI Checks', () => {
         repo: payloadData.payload.repository.name,
         issue_number: pullRequest.number,
         body:
-          'Hi @' + prAuthor +
-          ', there are some failing CI checks in your latest push, PTAL' +
-          '. Thanks!',
+          'Hi @' +
+          prAuthor +
+          ', there are some failing CI checks in your latest push ' +
+          ' If you think this is due to a flake, please file an issue ' +
+          'before restarting the tests. Thanks!',
       });
     });
 
