@@ -347,7 +347,9 @@ describe('Merge Conflict Check', () => {
     it('should comment on all open pull requests', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledTimes(2);
-
+      const linkToChange = 'new change'.link(
+        payloadData.payload.pull_request.html_url
+      );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -355,9 +357,11 @@ describe('Merge Conflict Check', () => {
         body:
           'Hi @' +
           firstPullRequest.user.login +
-          ', there is a new change in develop which needs to ' +
+          ', there is a ' +
+          linkToChange +
+          ' in develop which needs to ' +
           'be in your PR. Please update your branch with the latest changes ' +
-          'in develop, Thanks!'
+          'in develop, Thanks!',
       });
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
@@ -367,9 +371,11 @@ describe('Merge Conflict Check', () => {
         body:
           'Hi @' +
           secondPullRequest.user.login +
-          ', there is a new change in develop which needs to ' +
+          ', there is a ' +
+          linkToChange +
+          ' in develop which needs to ' +
           'be in your PR. Please update your branch with the latest changes ' +
-          'in develop, Thanks!'
+          'in develop, Thanks!',
       });
     });
 
