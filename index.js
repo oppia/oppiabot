@@ -17,6 +17,13 @@ const whitelistedAccounts = (process.env.WHITELISTED_ACCOUNTS || '')
   .toLowerCase()
   .split(',');
 
+/**
+ * This function checks the event type and accordingly invokes the right
+ * checks.
+ *
+ * @param {import('probot').Context} context
+ * @param {String} checkEvent
+ */
 const runChecks = async (context, checkEvent) => {
   const repoName = context.repo().repo.toLowerCase();
   const checksWhitelist = constants.getChecksWhitelist();
@@ -81,8 +88,25 @@ const runChecks = async (context, checkEvent) => {
   }
 }
 
+/**
+ * This function checks if repo owner is whitelisted for Oppiabot checks.
+ *
+ * @param {import('probot').Context} context
+ */
 function checkWhitelistedAccounts(context) {
   return whitelistedAccounts.includes(context.repo().owner.toLowerCase());
+}
+
+/**
+ * This function checks if pull request author is blacklisted for
+ * Oppiabot checks.
+ *
+ * @param {import('probot').Context} context
+ */
+function checkAuthor(context) {
+  const pullRequest = context.payload.pull_request;
+  const author = pullRequest.user.login;
+  return !constants.getBlacklistedAuthors().includes(author);
 }
 
 /**
@@ -108,31 +132,31 @@ module.exports = (oppiabot) => {
     // repository on which the bot has been installed.
     // This condition checks whether the owner account is included in
     // the whitelisted accounts.
-    if (checkWhitelistedAccounts(context)) {
+    if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
       await runChecks(context, constants.openEvent);
     }
   });
 
   oppiabot.on('pull_request.reopened', async (context) => {
-    if (checkWhitelistedAccounts(context)) {
+    if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
       await runChecks(context, constants.reopenEvent);
     }
   });
 
   oppiabot.on('pull_request.labeled', async (context) => {
-    if (checkWhitelistedAccounts(context)) {
+    if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
       await runChecks(context, constants.PRLabelEvent);
     }
   });
 
   oppiabot.on('pull_request.unlabeled', async (context) => {
-    if (checkWhitelistedAccounts(context)) {
+    if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
       await runChecks(context, constants.unlabelEvent);
     }
   });
 
   oppiabot.on('pull_request.synchronize', async (context) => {
-    if (checkWhitelistedAccounts(context)) {
+    if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
       // eslint-disable-next-line no-console
       console.log(' PR SYNC EVENT TRIGGERED..');
       await runChecks(context, constants.synchronizeEvent);
@@ -142,7 +166,8 @@ module.exports = (oppiabot) => {
   oppiabot.on('pull_request.closed', async (context) => {
     if (
       checkWhitelistedAccounts(context) &&
-      context.payload.pull_request.merged === true
+      context.payload.pull_request.merged === true &&
+      checkAuthor(context)
     ) {
       // eslint-disable-next-line no-console
       console.log(' A PR HAS BEEN MERGED..');
@@ -153,7 +178,8 @@ module.exports = (oppiabot) => {
   oppiabot.on('pull_request.edited', async (context) => {
     if (
       checkWhitelistedAccounts(context) &&
-      context.payload.pull_request.state === 'open'
+      context.payload.pull_request.state === 'open' &&
+      checkAuthor(context)
     ) {
       // eslint-disable-next-line no-console
       console.log('A PR HAS BEEN EDITED...');
