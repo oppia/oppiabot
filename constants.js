@@ -76,6 +76,8 @@ const checksWhitelist = {
   }
 };
 
+const blacklistedAuthors = ['translatewiki'];
+
 module.exports.openEvent = openEvent;
 module.exports.reopenEvent = reopenEvent;
 module.exports.unlabelEvent = unlabelEvent;
@@ -102,6 +104,10 @@ module.exports.datastoreLabelCheck = datastoreLabelCheck;
 module.exports.prLabelCheck = prLabelCheck;
 module.exports.prTemplateCheck = prTemplateCheck;
 module.exports.forcePushCheck = forcePushCheck;
+
+module.exports.getBlacklistedAuthors = function() {
+  return blacklistedAuthors;
+};
 
 module.exports.getChecksWhitelist = function() {
   return checksWhitelist;
