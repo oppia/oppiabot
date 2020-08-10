@@ -5,7 +5,9 @@ const oppiaBot = require('../index');
 const checkMergeConflictModule = require('../lib/checkMergeConflicts');
 const scheduler = require('../lib/scheduler');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
-const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
+const checkCriticalPullRequestModule = require(
+  '../lib/checkCriticalPullRequest'
+);
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
@@ -57,7 +59,10 @@ describe('Merge Conflict Check', () => {
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
-    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
+    spyOn(
+      checkCriticalPullRequestModule,
+      'checkIfPRAffectsDatastoreLayer'
+    ).and.callFake(() => {});
 
     spyOn(
       checkMergeConflictModule,
@@ -196,7 +201,9 @@ describe('Merge Conflict Check', () => {
     });
   });
 
-  describe('pull request with resolved merge conflicts has merge conflict label', () => {
+  describe(
+    'pull request with resolved merge conflicts has merge conflict label',
+    () => {
     beforeEach(async () => {
       // Set event to pull_request.synchronize.
       payloadData.payload.action = 'synchronize';
@@ -247,7 +254,9 @@ describe('Merge Conflict Check', () => {
     });
   });
 
-  describe('pull request with unresolved merge conflicts has merge conflict label and unassigned author', () => {
+  describe(
+    'pull request with unresolved merge conflicts has merge conflict label ' +
+    'and unassigned author', () => {
     beforeEach(async () => {
       // Set event to pull_request.synchronize.
       payloadData.payload.action = 'synchronize';
@@ -301,7 +310,9 @@ describe('Merge Conflict Check', () => {
     });
   });
 
-  describe('pull request with unresolved merge conflicts has merge conflict label and assigned author', () => {
+  describe(
+    'pull request with unresolved merge conflicts has merge conflict label ' +
+    'and assigned author', () => {
     beforeEach(async () => {
       // Set event to pull_request.synchronize.
       payloadData.payload.action = 'synchronize';
@@ -411,6 +422,10 @@ describe('Merge Conflict Check', () => {
       const linkToChange = 'new change'.link(
         payloadData.payload.pull_request.html_url
       );
+      const linkToWiki = 'link'.link(
+        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+        'instructions-for-making-a-code-change'
+      )
       expect(github.issues.createComment).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -422,7 +437,9 @@ describe('Merge Conflict Check', () => {
           linkToChange +
           ' in develop which needs to ' +
           'be in your PR. Please update your branch with the latest changes ' +
-          'in develop, Thanks!',
+          'in develop. For instructions, refer to this ' +
+          linkToWiki +
+          '. Thanks!',
       });
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
@@ -436,7 +453,9 @@ describe('Merge Conflict Check', () => {
           linkToChange +
           ' in develop which needs to ' +
           'be in your PR. Please update your branch with the latest changes ' +
-          'in develop, Thanks!',
+          'in develop. For instructions, refer to this ' +
+          linkToWiki +
+          '. Thanks!',
       });
     });
 
