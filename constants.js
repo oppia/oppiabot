@@ -8,6 +8,7 @@ const editEvent = 'edited';
 const issuesLabelEvent = 'issues_labeled';
 const issuesAssignedEvent = 'issues_assigned';
 const pushEvent = 'push';
+const checkCompletedEvent = 'check_completed';
 
 const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
@@ -26,6 +27,7 @@ const modelCheck = 'model-check';
 const issuesLabelCheck = 'issues-labeled-check';
 const issuesAssignedCheck = 'issues-assigned-check';
 const forcePushCheck = 'force-push-check';
+const ciFailureCheck = 'ci-failure-check';
 const updateWithDevelopCheck = 'update-with-develop-check';
 
 const checksWhitelist = {
@@ -63,7 +65,8 @@ const checksWhitelist = {
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
     [unlabelEvent]: [datastoreLabelCheck],
-    [pushEvent]: [forcePushCheck]
+    [pushEvent]: [forcePushCheck],
+    [checkCompletedEvent]: [ciFailureCheck]
   },
   'oppiabot': {
     [openEvent]: [claCheck],
@@ -74,7 +77,7 @@ const checksWhitelist = {
     [issuesLabelEvent]: [],
     [issuesAssignedEvent]: [],
     [pushEvent]: []
-  }
+  },
 };
 
 const blacklistedAuthors = ['translatewiki'];
@@ -89,6 +92,7 @@ module.exports.editEvent = editEvent;
 module.exports.issuesLabelEvent = issuesLabelEvent;
 module.exports.issuesAssignedEvent = issuesAssignedEvent;
 module.exports.pushEvent = pushEvent;
+module.exports.checkCompletedEvent = checkCompletedEvent;
 
 module.exports.claCheck = claCheck;
 module.exports.changelogCheck = changelogCheck;
@@ -105,6 +109,7 @@ module.exports.datastoreLabelCheck = datastoreLabelCheck;
 module.exports.prLabelCheck = prLabelCheck;
 module.exports.prTemplateCheck = prTemplateCheck;
 module.exports.forcePushCheck = forcePushCheck;
+module.exports.ciFailureCheck = ciFailureCheck;
 module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
 
 module.exports.getBlacklistedAuthors = function() {
