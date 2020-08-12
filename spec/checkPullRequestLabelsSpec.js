@@ -6,6 +6,7 @@ const checkPullRequestLabelModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
+const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
 
 let payloadData = JSON.parse(
@@ -60,6 +61,7 @@ describe('Pull Request Label Check', () => {
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() =>{});
     spyOn(checkCriticalPullRequestModule,'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
     spyOn(checkPullRequestTemplateModule,'checkTemplate').and.callFake(() => {});
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
   });
 
   describe('when pull request gets labeled', () => {

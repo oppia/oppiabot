@@ -26,6 +26,7 @@ const modelCheck = 'model-check';
 const issuesLabelCheck = 'issues-labeled-check';
 const issuesAssignedCheck = 'issues-assigned-check';
 const forcePushCheck = 'force-push-check';
+const codeOwnerCheck = 'code-owner-check'
 
 const checksWhitelist = {
   'oppia-android': {
@@ -45,7 +46,8 @@ const checksWhitelist = {
       wipCheck,
       jobCheck,
       modelCheck,
-      prTemplateCheck
+      prTemplateCheck,
+      codeOwnerCheck
     ],
     [reopenEvent]: [
       changelogCheck,
@@ -53,10 +55,11 @@ const checksWhitelist = {
       wipCheck,
       jobCheck,
       modelCheck,
-      prTemplateCheck
+      prTemplateCheck,
+      codeOwnerCheck
     ],
     [PRLabelEvent]: [assigneeCheck, prLabelCheck],
-    [synchronizeEvent]: [mergeConflictCheck, jobCheck, modelCheck],
+    [synchronizeEvent]: [mergeConflictCheck, jobCheck, modelCheck, codeOwnerCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
@@ -102,6 +105,7 @@ module.exports.datastoreLabelCheck = datastoreLabelCheck;
 module.exports.prLabelCheck = prLabelCheck;
 module.exports.prTemplateCheck = prTemplateCheck;
 module.exports.forcePushCheck = forcePushCheck;
+module.exports.codeOwnerCheck = codeOwnerCheck;
 
 module.exports.getChecksWhitelist = function() {
   return checksWhitelist;
