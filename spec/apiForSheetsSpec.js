@@ -377,4 +377,25 @@ describe('Api For Sheets Module', () => {
       expect(checkPullRequestJobModule.checkForNewJob).not.toHaveBeenCalled();
     });
   });
+
+  describe('should not run checks for a blacklisted author', () => {
+    beforeEach(function (done) {
+      spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
+      spyOn(apiForSheetsModule, 'authorize').and.callThrough({});
+      spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
+      spyOn(constants, 'getBlacklistedAuthors').and.returnValue([
+        'testuser7777']);
+      robot.receive(pullRequestPayload);
+      done();
+    });
+
+    it('should not call any checks', () => {
+      expect(
+        checkPullRequestLabelsModule.checkChangelogLabel).not.toHaveBeenCalled();
+      expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
+      expect(checkWipModule.checkWIP).not.toHaveBeenCalled();
+      expect(apiForSheetsModule.checkClaStatus).not.toHaveBeenCalled();
+      expect(checkPullRequestJobModule.checkForNewJob).not.toHaveBeenCalled();
+    });
+  });
 });
