@@ -62,9 +62,12 @@ const checksWhitelist = {
       codeOwnerCheck
     ],
     [PRLabelEvent]: [assigneeCheck, prLabelCheck],
-    [synchronizeEvent]: [mergeConflictCheck, jobCheck, modelCheck, codeOwnerCheck],
-    [closeEvent]: [allMergeConflictCheck],
-    [synchronizeEvent]: [mergeConflictCheck, jobCheck, modelCheck],
+    [synchronizeEvent]: [
+      mergeConflictCheck,
+      jobCheck,
+      modelCheck,
+      codeOwnerCheck
+    ],
     [closeEvent]: [allMergeConflictCheck, updateWithDevelopCheck],
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],

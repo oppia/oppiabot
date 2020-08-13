@@ -79,13 +79,17 @@ describe('check for new code owner', () => {
     deletions: 0,
     changes: 1,
     blob_url:
-      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e110d7e9833c/core/domain/exp_fetchers.py',
+      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130' +
+      'e110d7e9833c/core/domain/exp_fetchers.py',
     raw_url:
-      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d7e9833c/core/domain/exp_fetchers.py',
+      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e' +
+      '110d7e9833c/core/domain/exp_fetchers.py',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/domain/exp_fetchers.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
+      'https://api.github.com/repos/oppia/oppia/contents/core/domain/exp' +
+      '_fetchers.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
     patch:
-      '@@ -0,0 +1 @@\n+# def _migrate_states_schema(versioned_exploration_states, exploration_id):',
+      '@@ -0,0 +1 @@\n+# def _migrate_states_schema(versioned_exploration' +
+      '_states, exploration_id):',
   };
 
   const codeOwnerFileWithNewUser = {
@@ -96,11 +100,14 @@ describe('check for new code owner', () => {
     deletions: 0,
     changes: 2,
     blob_url:
-      'https://github.com/oppia/oppia/blob/c876111ec9c743179483d7ca75e348b8680b13ec/.github/CODEOWNERS',
+      'https://github.com/oppia/oppia/blob/c876111ec9c743179483d7ca75e348' +
+      'b8680b13ec/.github/CODEOWNERS',
     raw_url:
-      'https://github.com/oppia/oppia/raw/c876111ec9c743179483d7ca75e348b8680b13ec/.github/CODEOWNERS',
+      'https://github.com/oppia/oppia/raw/c876111ec9c743179483d7ca75e348b8' +
+      '680b13ec/.github/CODEOWNERS',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/.github/CODEOWNERS?ref=c876111ec9c743179483d7ca75e348b8680b13ec',
+      'https://api.github.com/repos/oppia/oppia/contents/.github/CODEOWNERS' +
+      '?ref=c876111ec9c743179483d7ca75e348b8680b13ec',
     patch:
       '@@ -523,7 +523,9 @@\n' +
       ' /core/templates/pages/pending-account-deletion-page/ @jameesjohn @vojtechjelinek\n' +
@@ -122,11 +129,14 @@ describe('check for new code owner', () => {
     deletions: 0,
     changes: 2,
     blob_url:
-      'https://github.com/oppia/oppia/blob/c876111ec9c743179483d7ca75e348b8680b13ec/.github/CODEOWNERS',
+      'https://github.com/oppia/oppia/blob/c876111ec9c743179483d7ca75e348b' +
+      '8680b13ec/.github/CODEOWNERS',
     raw_url:
-      'https://github.com/oppia/oppia/raw/c876111ec9c743179483d7ca75e348b8680b13ec/.github/CODEOWNERS',
+      'https://github.com/oppia/oppia/raw/c876111ec9c743179483d7ca75e348b8' +
+      '680b13ec/.github/CODEOWNERS',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/.github/CODEOWNERS?ref=c876111ec9c743179483d7ca75e348b8680b13ec',
+      'https://api.github.com/repos/oppia/oppia/contents/.github/CODEOWNERS' +
+      '?ref=c876111ec9c743179483d7ca75e348b8680b13ec',
     patch:
       '@@ -523,7 +523,9 @@\n' +
       ' /core/templates/pages/pending-account-deletion-page/ @jameesjohn @vojtechjelinek\n' +
@@ -148,11 +158,14 @@ describe('check for new code owner', () => {
     deletions: 0,
     changes: 2,
     blob_url:
-      'https://github.com/oppia/oppia/blob/c876111ec9c743179483d7ca75e348b8680b13ec/.github/CODEOWNERS',
+      'https://github.com/oppia/oppia/blob/c876111ec9c743179483d7ca75e348b86' +
+      '80b13ec/.github/CODEOWNERS',
     raw_url:
-      'https://github.com/oppia/oppia/raw/c876111ec9c743179483d7ca75e348b8680b13ec/.github/CODEOWNERS',
+      'https://github.com/oppia/oppia/raw/c876111ec9c743179483d7ca75e348b868' +
+      '0b13ec/.github/CODEOWNERS',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/.github/CODEOWNERS?ref=c876111ec9c743179483d7ca75e348b8680b13ec',
+      'https://api.github.com/repos/oppia/oppia/contents/.github/CODEOWNERS' +
+      '?ref=c876111ec9c743179483d7ca75e348b8680b13ec',
     patch:
       '@@ -523,7 +523,9 @@\n' +
       ' /core/templates/pages/pending-account-deletion-page/ @jameesjohn @vojtechjelinek\n' +
@@ -247,7 +260,7 @@ describe('check for new code owner', () => {
           issue_number: payloadData.payload.pull_request.number,
           body:
             'Hi @kevintab95, this PR adds a new code owner, @testuser. ' +
-            'Please take a look /cc @oppia/core-maintainers. Thanks!',
+            'Please take a look. Thanks!',
         });
       });
 
@@ -285,7 +298,7 @@ describe('check for new code owner', () => {
           issue_number: payloadData.payload.pull_request.number,
           body:
             'Hi @reviewer, this PR adds a new code owner, @testuser. ' +
-            'Please take a look /cc @oppia/core-maintainers. Thanks!',
+            'Please take a look. Thanks!',
         });
       });
 
@@ -334,8 +347,7 @@ describe('check for new code owner', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @kevintab95, this PR adds the following new code owners ' +
-          '@testuser, @testuser2. Please take a look /cc ' +
-          '@oppia/core-maintainers. Thanks!',
+          '@testuser, @testuser2. Please take a look. Thanks!',
       });
     });
 
@@ -375,7 +387,7 @@ describe('check for new code owner', () => {
       expect(utils.getMainCodeOwnerfile).toHaveBeenCalled();
     })
 
-    it('should ping project owner', () => {
+    it('should not ping project owner', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
     });
 
@@ -411,11 +423,11 @@ describe('check for new code owner', () => {
       expect(github.pulls.listFiles).toHaveBeenCalled();
     });
 
-    it('should get codeowner file from develop', () => {
+    it('should not get codeowner file from develop', () => {
       expect(utils.getMainCodeOwnerfile).not.toHaveBeenCalled();
     })
 
-    it('should ping project owner', () => {
+    it('should not ping project owner', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
     });
 
