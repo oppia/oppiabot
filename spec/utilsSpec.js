@@ -272,4 +272,15 @@ describe('Utility module tests', () => {
     expect(Axios.get).toHaveBeenCalledWith(CODE_OWNERS_FILE_URL)
     expect(response).toBe('Contents of code owner file.');
   });
+
+  it('should check if a label is a changelog label', () => {
+    let response = utilityModule.isChangelogLabel(
+      'PR CHANGELOG: Angular Migration'
+    );
+    expect(response).toBe(true);
+    response = utilityModule.isChangelogLabel(
+      'An invalid label'
+    );
+    expect(response).toBe(false);
+  });
 });

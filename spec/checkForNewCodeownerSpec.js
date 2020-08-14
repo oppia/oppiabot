@@ -259,8 +259,9 @@ describe('check for new code owner', () => {
           owner: payloadData.payload.repository.owner.login,
           issue_number: payloadData.payload.pull_request.number,
           body:
-            'Hi @kevintab95, this PR adds a new code owner, @testuser. ' +
-            'Please take a look. Thanks!',
+            'Hi @kevintab95, this PR adds a new code owner, @testuser, ' +
+            'we are flagging this, please make sure the changes are ' +
+            'verified. Thanks!'
         });
       });
 
@@ -297,8 +298,9 @@ describe('check for new code owner', () => {
           owner: payloadData.payload.repository.owner.login,
           issue_number: payloadData.payload.pull_request.number,
           body:
-            'Hi @reviewer, this PR adds a new code owner, @testuser. ' +
-            'Please take a look. Thanks!',
+            'Hi @reviewer, this PR adds a new code owner, @testuser, ' +
+            'we are flagging this, please make sure the changes are ' +
+            'verified. Thanks!'
         });
       });
 
@@ -347,7 +349,9 @@ describe('check for new code owner', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @kevintab95, this PR adds the following new code owners ' +
-          '@testuser, @testuser2. Please take a look. Thanks!',
+          '@testuser, @testuser2, '+
+          'we are flagging this, please make sure the changes are ' +
+          'verified. Thanks!',
       });
     });
 
