@@ -261,7 +261,7 @@ describe('check for new code owner', () => {
           body:
             'Hi @kevintab95, this PR adds a new code owner, @testuser, ' +
             'we are flagging this, please make sure the changes are ' +
-            'verified. Thanks!'
+            'verified by the previous codeowner of the file. Thanks!'
         });
       });
 
@@ -300,7 +300,7 @@ describe('check for new code owner', () => {
           body:
             'Hi @reviewer, this PR adds a new code owner, @testuser, ' +
             'we are flagging this, please make sure the changes are ' +
-            'verified. Thanks!'
+            'verified by the previous codeowner of the file. Thanks!'
         });
       });
 
@@ -351,7 +351,7 @@ describe('check for new code owner', () => {
           'Hi @kevintab95, this PR adds the following new code owners ' +
           '@testuser, @testuser2, '+
           'we are flagging this, please make sure the changes are ' +
-          'verified. Thanks!',
+          'verified by the previous codeowner of the file. Thanks!',
       });
     });
 
