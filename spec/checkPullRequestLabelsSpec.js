@@ -560,6 +560,14 @@ describe('Pull Request Label Check', () => {
           'guidance. Thanks!',
       };
       expect(github.issues.createComment).toHaveBeenCalledWith(params);
+
+      expect(github.issues.addAssignees).toHaveBeenCalled();
+      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        number: payloadData.payload.number,
+        assignees: [payloadData.payload.pull_request.user.login]
+      });
     });
 
     it('adds a default label when pr author is not a collaborator', async () => {
