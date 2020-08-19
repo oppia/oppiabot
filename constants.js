@@ -8,6 +8,7 @@ const editEvent = 'edited';
 const issuesLabelEvent = 'issues_labeled';
 const issuesAssignedEvent = 'issues_assigned';
 const pushEvent = 'push';
+const pullRequestReviewEvent = 'pr-review';
 
 const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
@@ -26,6 +27,7 @@ const modelCheck = 'model-check';
 const issuesLabelCheck = 'issues-labeled-check';
 const issuesAssignedCheck = 'issues-assigned-check';
 const forcePushCheck = 'force-push-check';
+const pullRequestReviewCheck = 'pr-review-check';
 
 const checksWhitelist = {
   'oppia-android': {
@@ -62,7 +64,8 @@ const checksWhitelist = {
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
     [unlabelEvent]: [datastoreLabelCheck],
-    [pushEvent]: [forcePushCheck]
+    [pushEvent]: [forcePushCheck],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
   },
   'oppiabot': {
     [openEvent]: [claCheck],
@@ -73,6 +76,9 @@ const checksWhitelist = {
     [issuesLabelEvent]: [],
     [issuesAssignedEvent]: [],
     [pushEvent]: []
+  },
+  'comment-on-pr': {
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
   }
 };
 
@@ -86,6 +92,7 @@ module.exports.editEvent = editEvent;
 module.exports.issuesLabelEvent = issuesLabelEvent;
 module.exports.issuesAssignedEvent = issuesAssignedEvent;
 module.exports.pushEvent = pushEvent;
+module.exports.pullRequestReviewEvent = pullRequestReviewEvent;
 
 module.exports.claCheck = claCheck;
 module.exports.changelogCheck = changelogCheck;
@@ -102,6 +109,7 @@ module.exports.datastoreLabelCheck = datastoreLabelCheck;
 module.exports.prLabelCheck = prLabelCheck;
 module.exports.prTemplateCheck = prTemplateCheck;
 module.exports.forcePushCheck = forcePushCheck;
+module.exports.pullRequestReviewCheck = pullRequestReviewCheck;
 
 module.exports.getChecksWhitelist = function() {
   return checksWhitelist;
