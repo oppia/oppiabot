@@ -10,6 +10,7 @@ const checkPullRequestTemplateModule = require('./lib/checkPullRequestTemplate')
 const checkCriticalPullRequestModule = require('./lib/checkCriticalPullRequest');
 const checkBranchPushModule = require('./lib/checkBranchPush');
 const checkPullRequestReviewModule = require('./lib/checkPullRequestReview');
+const ciCheckModule = require('./lib/ciChecks');
 
 const constants = require('./constants');
 const checkIssueAssigneeModule = require('./lib/checkIssueAssignee');
@@ -18,6 +19,13 @@ const whitelistedAccounts = (process.env.WHITELISTED_ACCOUNTS || '')
   .toLowerCase()
   .split(',');
 
+/**
+ * This function checks the event type and accordingly invokes the right
+ * checks.
+ *
+ * @param {import('probot').Context} context
+ * @param {String} checkEvent
+ */
 const runChecks = async (context, checkEvent) => {
   const repoName = context.repo().repo.toLowerCase();
   const checksWhitelist = constants.getChecksWhitelist();
@@ -79,14 +87,37 @@ const runChecks = async (context, checkEvent) => {
           case constants.pullRequestReviewCheck:
             await checkPullRequestReviewModule.handlePullRequestReview(context);
             break;
+          case constants.ciFailureCheck:
+            await ciCheckModule.handleFailure(context);
+            break;
+          case constants.updateWithDevelopCheck:
+            await checkMergeConflictsModule.pingAllPullRequestsToMergeFromDevelop(context);
+            break;
         }
       }
     }
   }
 }
 
+/**
+ * This function checks if repo owner is whitelisted for Oppiabot checks.
+ *
+ * @param {import('probot').Context} context
+ */
 function checkWhitelistedAccounts(context) {
   return whitelistedAccounts.includes(context.repo().owner.toLowerCase());
+}
+
+/**
+ * This function checks if pull request author is blacklisted for
+ * Oppiabot checks.
+ *
+ * @param {import('probot').Context} context
+ */
+function checkAuthor(context) {
+  const pullRequest = context.payload.pull_request;
+  const author = pullRequest.user.login;
+  return !constants.getBlacklistedAuthors().includes(author);
 }
 
 /**
@@ -112,31 +143,31 @@ module.exports = (oppiabot) => {
     // repository on which the bot has been installed.
     // This condition checks whether the owner account is included in
     // the whitelisted accounts.
-    if (checkWhitelistedAccounts(context)) {
+    if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
       await runChecks(context, constants.openEvent);
     }
   });
 
   oppiabot.on('pull_request.reopened', async (context) => {
-    if (checkWhitelistedAccounts(context)) {
+    if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
       await runChecks(context, constants.reopenEvent);
     }
   });
 
   oppiabot.on('pull_request.labeled', async (context) => {
-    if (checkWhitelistedAccounts(context)) {
+    if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
       await runChecks(context, constants.PRLabelEvent);
     }
   });
 
   oppiabot.on('pull_request.unlabeled', async (context) => {
-    if (checkWhitelistedAccounts(context)) {
+    if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
       await runChecks(context, constants.unlabelEvent);
     }
   });
 
   oppiabot.on('pull_request.synchronize', async (context) => {
-    if (checkWhitelistedAccounts(context)) {
+    if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
       // eslint-disable-next-line no-console
       console.log(' PR SYNC EVENT TRIGGERED..');
       await runChecks(context, constants.synchronizeEvent);
@@ -146,7 +177,8 @@ module.exports = (oppiabot) => {
   oppiabot.on('pull_request.closed', async (context) => {
     if (
       checkWhitelistedAccounts(context) &&
-      context.payload.pull_request.merged === true
+      context.payload.pull_request.merged === true &&
+      checkAuthor(context)
     ) {
       // eslint-disable-next-line no-console
       console.log(' A PR HAS BEEN MERGED..');
@@ -157,7 +189,8 @@ module.exports = (oppiabot) => {
   oppiabot.on('pull_request.edited', async (context) => {
     if (
       checkWhitelistedAccounts(context) &&
-      context.payload.pull_request.state === 'open'
+      context.payload.pull_request.state === 'open' &&
+      checkAuthor(context)
     ) {
       // eslint-disable-next-line no-console
       console.log('A PR HAS BEEN EDITED...');
@@ -178,5 +211,13 @@ module.exports = (oppiabot) => {
       console.log('A Pull Request got reviewed');
       await runChecks(context, constants.pullRequestReviewEvent);
     }
-  })
+  });
+
+  oppiabot.on('check_suite.completed', async (context) => {
+    if(checkWhitelistedAccounts(context)) {
+      // eslint-disable-next-line no-console
+      console.log('A CHECK SUITE HAS BEEN COMPLETED...');
+      await runChecks(context, constants.checkCompletedEvent);
+    }
+  });
 };

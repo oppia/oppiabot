@@ -9,6 +9,7 @@ const issuesLabelEvent = 'issues_labeled';
 const issuesAssignedEvent = 'issues_assigned';
 const pushEvent = 'push';
 const pullRequestReviewEvent = 'pr-review';
+const checkCompletedEvent = 'check_completed';
 
 const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
@@ -28,6 +29,8 @@ const issuesLabelCheck = 'issues-labeled-check';
 const issuesAssignedCheck = 'issues-assigned-check';
 const forcePushCheck = 'force-push-check';
 const pullRequestReviewCheck = 'pr-review-check';
+const ciFailureCheck = 'ci-failure-check';
+const updateWithDevelopCheck = 'update-with-develop-check';
 
 const checksWhitelist = {
   'oppia-android': {
@@ -59,13 +62,14 @@ const checksWhitelist = {
     ],
     [PRLabelEvent]: [assigneeCheck, prLabelCheck],
     [synchronizeEvent]: [mergeConflictCheck, jobCheck, modelCheck],
-    [closeEvent]: [allMergeConflictCheck],
+    [closeEvent]: [allMergeConflictCheck, updateWithDevelopCheck],
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
     [unlabelEvent]: [datastoreLabelCheck],
     [pushEvent]: [forcePushCheck],
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
+    [checkCompletedEvent]: [ciFailureCheck]
   },
   'oppiabot': {
     [openEvent]: [claCheck],
@@ -77,10 +81,9 @@ const checksWhitelist = {
     [issuesAssignedEvent]: [],
     [pushEvent]: []
   },
-  'comment-on-pr': {
-    [pullRequestReviewEvent]: [pullRequestReviewCheck],
-  }
 };
+
+const blacklistedAuthors = ['translatewiki'];
 
 module.exports.openEvent = openEvent;
 module.exports.reopenEvent = reopenEvent;
@@ -93,6 +96,7 @@ module.exports.issuesLabelEvent = issuesLabelEvent;
 module.exports.issuesAssignedEvent = issuesAssignedEvent;
 module.exports.pushEvent = pushEvent;
 module.exports.pullRequestReviewEvent = pullRequestReviewEvent;
+module.exports.checkCompletedEvent = checkCompletedEvent;
 
 module.exports.claCheck = claCheck;
 module.exports.changelogCheck = changelogCheck;
@@ -110,6 +114,12 @@ module.exports.prLabelCheck = prLabelCheck;
 module.exports.prTemplateCheck = prTemplateCheck;
 module.exports.forcePushCheck = forcePushCheck;
 module.exports.pullRequestReviewCheck = pullRequestReviewCheck;
+module.exports.ciFailureCheck = ciFailureCheck;
+module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
+
+module.exports.getBlacklistedAuthors = function() {
+  return blacklistedAuthors;
+};
 
 module.exports.getChecksWhitelist = function() {
   return checksWhitelist;
