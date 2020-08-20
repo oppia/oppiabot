@@ -554,7 +554,9 @@ describe('Pull Request Label Check', () => {
           'Hi, @' +
           payloadData.payload.pull_request.user.login +
           ', this pull request does not have a "CHANGELOG: ..." label ' +
-          'as mentioned in the PR checkbox list. Please add this label. ' +
+          'as mentioned in the PR checkbox list. Assigning @' +
+          payloadData.payload.pull_request.user.login +
+          'to add the required label. ' +
           'PRs without this label will not be merged. If you are unsure ' +
           'of which label to add, please ask the reviewers for ' +
           'guidance. Thanks!',
