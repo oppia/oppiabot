@@ -554,12 +554,22 @@ describe('Pull Request Label Check', () => {
           'Hi, @' +
           payloadData.payload.pull_request.user.login +
           ', this pull request does not have a "CHANGELOG: ..." label ' +
-          'as mentioned in the PR checkbox list. Please add this label. ' +
+          'as mentioned in the PR checkbox list. Assigning @' +
+          payloadData.payload.pull_request.user.login +
+          'to add the required label. ' +
           'PRs without this label will not be merged. If you are unsure ' +
           'of which label to add, please ask the reviewers for ' +
           'guidance. Thanks!',
       };
       expect(github.issues.createComment).toHaveBeenCalledWith(params);
+
+      expect(github.issues.addAssignees).toHaveBeenCalled();
+      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        number: payloadData.payload.number,
+        assignees: [payloadData.payload.pull_request.user.login]
+      });
     });
 
     it('adds a default label when pr author is not a collaborator', async () => {
