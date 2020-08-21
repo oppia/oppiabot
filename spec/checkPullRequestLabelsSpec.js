@@ -112,6 +112,10 @@ describe('Pull Request Label Check', () => {
         expect(github.issues.createComment).toHaveBeenCalledWith(params);
       });
 
+      it('should run check for new codeowners', () => {
+        expect(newCodeOwnerModule.checkForNewCodeowner).toHaveBeenCalled();
+      });
+
       afterAll(() => {
         payloadData.payload.pull_request.requested_reviewers = [];
       });
@@ -306,6 +310,8 @@ describe('Pull Request Label Check', () => {
       expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
       expect(github.issues.createComment).not.toHaveBeenCalled();
+      // Should not check for new code owner.
+      expect(newCodeOwnerModule.checkForNewCodeowner).not.toHaveBeenCalled();
     });
 
     it('should not assign when invalid changelog is applied', async () => {
@@ -325,6 +331,9 @@ describe('Pull Request Label Check', () => {
       expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
       expect(github.issues.createComment).not.toHaveBeenCalled();
+
+      // Should not check for new code owner.
+      expect(newCodeOwnerModule.checkForNewCodeowner).not.toHaveBeenCalled();
     });
 
     it('should not assign when there are review comments', async () => {

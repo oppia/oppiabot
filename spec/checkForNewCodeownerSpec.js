@@ -21,13 +21,9 @@ const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
-const apiForSheetsModule = require('../lib/apiForSheets');
-const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
-const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
-const checkWIPModule = require('../lib/checkWipDraftPR');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
-const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
+const mergeConflictModule = require('../lib/checkMergeConflicts');
 const utils = require('../lib/utils');
 const scheduler = require('../lib/scheduler');
 let payloadData = JSON.parse(
@@ -112,10 +108,8 @@ describe('check for new code owner', () => {
       '@@ -523,7 +523,9 @@\n' +
       ' /core/templates/pages/pending-account-deletion-page/ @jameesjohn @vojtechjelinek\n' +
       ' /core/templates/pages/preferences-page/ @jameesjohn @vojtechjelinek\n' +
-      ' /core/templates/pages/signup-page/ @jameesjohn @vojtechjelinek\n' +
       '+/core/templates/pages/signup-page/ @testuser @vojtechjelinek\n' +
       ' /core/templates/pages/splash-page/ @jameesjohn @vojtechjelinek\n' +
-      '+/core/templates/pages/signup-page/ @testuser @jameesjohn\n' +
       ' /core/templates/pages/teach-page/ @jameesjohn @vojtechjelinek\n' +
       ' /core/templates/pages/thanks-page/ @jameesjohn @vojtechjelinek\n' +
       ' ',
@@ -144,7 +138,7 @@ describe('check for new code owner', () => {
       ' /core/templates/pages/signup-page/ @jameesjohn @vojtechjelinek\n' +
       '+/core/templates/pages/signup-page/ @testuser @vojtechjelinek\n' +
       ' /core/templates/pages/splash-page/ @jameesjohn @vojtechjelinek\n' +
-      '+/core/templates/pages/signup-page/ @testuser2 @jameesjohn\n' +
+      '+/core/templates/pages/signdown-page/ @testuser2 @jameesjohn\n' +
       ' /core/templates/pages/teach-page/ @jameesjohn @vojtechjelinek\n' +
       ' /core/templates/pages/thanks-page/ @jameesjohn @vojtechjelinek\n' +
       ' ',
@@ -178,6 +172,9 @@ describe('check for new code owner', () => {
       ' /core/templates/pages/thanks-page/ @jameesjohn @vojtechjelinek\n' +
       ' ',
   };
+  beforeAll(() => {
+    payloadData.payload.action = 'synchronize';
+  });
 
   beforeEach(() => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => {});
@@ -197,21 +194,11 @@ describe('check for new code owner', () => {
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
-    spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => {});
-    spyOn(
-      checkPullRequestLabelsModule,
-      'checkChangelogLabel'
-    ).and.callFake(() => {});
     spyOn(
       checkCriticalPullRequestModule,
       'checkIfPRAffectsDatastoreLayer'
     ).and.callFake(() => {});
-    spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
-    spyOn(checkWIPModule, 'checkWIP').and.callFake(() => {});
-    spyOn(
-      checkPullRequestTemplateModule,
-      'checkTemplate'
-    ).and.callFake(() => {});
+    spyOn(mergeConflictModule, 'checkMergeConflictsInPullRequest').and.callFake(() => {});
 
     spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callThrough();
     spyOn(utils, 'getMainCodeOwnerfile').and.resolveTo(mainCodeOwnerFile);
@@ -259,9 +246,9 @@ describe('check for new code owner', () => {
           owner: payloadData.payload.repository.owner.login,
           issue_number: payloadData.payload.pull_request.number,
           body:
-            'Hi @kevintab95, this PR adds a new code owner, @testuser, ' +
-            'we are flagging this, please make sure the changes are ' +
-            'verified by the previous codeowner of the file. Thanks!'
+            'Hi @kevintab95, this PR adds a new code owner, @testuser to ' +
+            '/core/templates/pages/signup-page/. Please make sure the changes' +
+            ' are verified by the previous codeowner of the file. Thanks!'
         });
       });
 
@@ -298,9 +285,9 @@ describe('check for new code owner', () => {
           owner: payloadData.payload.repository.owner.login,
           issue_number: payloadData.payload.pull_request.number,
           body:
-            'Hi @reviewer, this PR adds a new code owner, @testuser, ' +
-            'we are flagging this, please make sure the changes are ' +
-            'verified by the previous codeowner of the file. Thanks!'
+          'Hi @reviewer, this PR adds a new code owner, @testuser to ' +
+          '/core/templates/pages/signup-page/. Please make sure the changes' +
+          ' are verified by the previous codeowner of the file. Thanks!'
         });
       });
 
@@ -349,9 +336,11 @@ describe('check for new code owner', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @kevintab95, this PR adds the following new code owners ' +
-          '@testuser, @testuser2, '+
-          'we are flagging this, please make sure the changes are ' +
-          'verified by the previous codeowner of the file. Thanks!',
+          '@testuser, @testuser2 to the following files ' +
+          '/core/templates/pages/signup-page/, ' +
+          '/core/templates/pages/signdown-page/'+
+          '. Please make sure the changes are ' +
+          'verified by the previous codeowner of the file. Thanks!'
       });
     });
 

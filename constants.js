@@ -49,8 +49,7 @@ const checksWhitelist = {
       wipCheck,
       jobCheck,
       modelCheck,
-      prTemplateCheck,
-      codeOwnerCheck
+      prTemplateCheck
     ],
     [reopenEvent]: [
       changelogCheck,
@@ -58,8 +57,7 @@ const checksWhitelist = {
       wipCheck,
       jobCheck,
       modelCheck,
-      prTemplateCheck,
-      codeOwnerCheck
+      prTemplateCheck
     ],
     [PRLabelEvent]: [assigneeCheck, prLabelCheck],
     [synchronizeEvent]: [
