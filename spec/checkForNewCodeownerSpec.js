@@ -248,7 +248,7 @@ describe('check for new code owner', () => {
           body:
             'Hi @kevintab95, this PR adds a new code owner, @testuser to ' +
             '/core/templates/pages/signup-page/. Please make sure the changes' +
-            ' are verified by the previous codeowner of the file. Thanks!'
+            ' are verified by the previous codeowner(s) of the file. Thanks!'
         });
       });
 
@@ -287,7 +287,7 @@ describe('check for new code owner', () => {
           body:
           'Hi @reviewer, this PR adds a new code owner, @testuser to ' +
           '/core/templates/pages/signup-page/. Please make sure the changes' +
-          ' are verified by the previous codeowner of the file. Thanks!'
+          ' are verified by the previous codeowner(s) of the file. Thanks!'
         });
       });
 
@@ -340,7 +340,7 @@ describe('check for new code owner', () => {
           '/core/templates/pages/signup-page/, ' +
           '/core/templates/pages/signdown-page/'+
           '. Please make sure the changes are ' +
-          'verified by the previous codeowner of the file. Thanks!'
+          'verified by the previous codeowner(s) of the file. Thanks!'
       });
     });
 

@@ -310,7 +310,7 @@ describe('Pull Request Label Check', () => {
       expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
       expect(github.issues.createComment).not.toHaveBeenCalled();
-      // Should not check for new code owner.
+      // Should not check for new code owner since there is no changelog label.
       expect(newCodeOwnerModule.checkForNewCodeowner).not.toHaveBeenCalled();
     });
 
@@ -332,7 +332,7 @@ describe('Pull Request Label Check', () => {
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
       expect(github.issues.createComment).not.toHaveBeenCalled();
 
-      // Should not check for new code owner.
+      // Should not check for new code owner since there is no changelog label.
       expect(newCodeOwnerModule.checkForNewCodeowner).not.toHaveBeenCalled();
     });
 
