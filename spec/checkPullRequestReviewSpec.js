@@ -96,6 +96,17 @@ describe('Pull Request Review Module', () => {
           issue_number: payloadData.payload.pull_request.number,
           assignees: [payloadData.payload.review.user.login],
         });
+
+        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          owner: payloadData.payload.repository.owner.login,
+          repo: payloadData.payload.repository.name,
+          issue_number: payloadData.payload.pull_request.number,
+          body:
+            'Unassigning @' +
+            payloadData.payload.review.user.login +
+            ' since the review is done.',
+        });
       });
 
       it('should assign pr author', () => {
@@ -156,6 +167,17 @@ describe('Pull Request Review Module', () => {
           issue_number: payloadData.payload.pull_request.number,
           assignees: [payloadData.payload.review.user.login],
         });
+
+        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          owner: payloadData.payload.repository.owner.login,
+          repo: payloadData.payload.repository.name,
+          issue_number: payloadData.payload.pull_request.number,
+          body:
+            'Unassigning @' +
+            payloadData.payload.review.user.login +
+            ' since the review is done.',
+        });
       });
 
       it('should not assign pr author', () => {
@@ -163,7 +185,17 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should not ping pr author', () => {
-        expect(github.issues.createComment).not.toHaveBeenCalled();
+        expect(github.issues.createComment).not.toHaveBeenCalledWith({
+          owner: payloadData.payload.repository.owner.login,
+          repo: payloadData.payload.repository.name,
+          issue_number: payloadData.payload.pull_request.number,
+          body:
+            'Assigning @' +
+            payloadData.payload.pull_request.user.login +
+            ' to respond to reviews from @' +
+            payloadData.payload.review.user.login +
+            '. Thanks!',
+        });
       });
 
       afterAll(() => {
@@ -398,6 +430,17 @@ describe('Pull Request Review Module', () => {
           issue_number: payloadData.payload.pull_request.number,
           assignees: [payloadData.payload.review.user.login],
         });
+
+        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          owner: payloadData.payload.repository.owner.login,
+          repo: payloadData.payload.repository.name,
+          issue_number: payloadData.payload.pull_request.number,
+          body:
+            'Unassigning @' +
+            payloadData.payload.review.user.login +
+            ' since the PR is approved.',
+        });
       });
 
       it('should check if all reviewers have approved the PR', () => {
@@ -414,7 +457,7 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should not ping remaining reviewers', () => {
-        expect(github.issues.createComment).not.toHaveBeenCalled();
+        expect(github.issues.createComment).not.toHaveBeenCalledTimes(2);
       });
 
       afterAll(() => {
@@ -788,6 +831,19 @@ describe('Pull Request Review Module', () => {
           repo: payloadData.payload.repository.name,
           issue_number: payloadData.payload.pull_request.number,
           assignees: [payloadData.payload.pull_request.user.login],
+        });
+      });
+
+      it('should ping pr author', () => {
+        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          owner: payloadData.payload.repository.owner.login,
+          repo: payloadData.payload.repository.name,
+          issue_number: payloadData.payload.pull_request.number,
+          body:
+            'Hi @' +
+            payloadData.payload.pull_request.user.login +
+            ', this PR is ready to be merged, PTAL. Thanks!',
         });
       });
 
