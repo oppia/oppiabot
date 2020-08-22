@@ -40,6 +40,7 @@ describe('Pull Request Review Module', () => {
    */
   let app;
 
+  const THREE_MINUTES = 180000;
   beforeEach(() => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => {});
 
@@ -77,7 +78,7 @@ describe('Pull Request Review Module', () => {
         await robot.receive(payloadData);
       });
 
-      it('should check review', () => {
+      it('should check type of review', () => {
         expect(
           pullRequestReviewModule.handlePullRequestReview
         ).toHaveBeenCalled();
@@ -85,7 +86,7 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(180000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
       });
 
       it('should unassign reviewer', async () => {
@@ -117,9 +118,7 @@ describe('Pull Request Review Module', () => {
           issue_number: payloadData.payload.pull_request.number,
           assignees: [payloadData.payload.pull_request.user.login],
         });
-      });
 
-      it('should ping pr author', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
         expect(github.issues.createComment).toHaveBeenCalledWith({
           owner: payloadData.payload.repository.owner.login,
@@ -148,7 +147,7 @@ describe('Pull Request Review Module', () => {
         await robot.receive(payloadData);
       });
 
-      it('should check review', () => {
+      it('should check type of review', () => {
         expect(
           pullRequestReviewModule.handlePullRequestReview
         ).toHaveBeenCalled();
@@ -156,7 +155,7 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(180000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
       });
 
       it('should unassign reviewer', async () => {
@@ -212,7 +211,7 @@ describe('Pull Request Review Module', () => {
         await robot.receive(payloadData);
       });
 
-      it('should check review', () => {
+      it('should check type of review', () => {
         expect(
           pullRequestReviewModule.handlePullRequestReview
         ).toHaveBeenCalled();
@@ -220,7 +219,7 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(180000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
       });
 
       it('should not unassign reviewer', async () => {
@@ -235,9 +234,7 @@ describe('Pull Request Review Module', () => {
           issue_number: payloadData.payload.pull_request.number,
           assignees: [payloadData.payload.pull_request.user.login],
         });
-      });
 
-      it('should ping pr author', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
         expect(github.issues.createComment).toHaveBeenCalledWith({
           owner: payloadData.payload.repository.owner.login,
@@ -257,6 +254,44 @@ describe('Pull Request Review Module', () => {
       });
     });
 
+    describe('when reviewer is not assigned but author is assigned', () => {
+      const assignees = [...payloadData.payload.pull_request.assignees];
+      beforeAll(() => {
+        payloadData.payload.pull_request.assignees = [
+          {
+            login: 'testuser',
+          },
+        ];
+      });
+      beforeEach(async () => {
+        await robot.receive(payloadData);
+      });
+
+      it('should check type of review', () => {
+        expect(
+          pullRequestReviewModule.handlePullRequestReview
+        ).toHaveBeenCalled();
+      });
+
+      it('should wait for 3 minutes before performing any action', () => {
+        expect(utilityModule.sleep).toHaveBeenCalled();
+        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+      });
+
+      it('should not unassign reviewer', async () => {
+        expect(github.issues.removeAssignees).not.toHaveBeenCalled();
+      });
+
+      it('should not assign pr author', () => {
+        expect(github.issues.addAssignees).not.toHaveBeenCalled();
+        expect(github.issues.createComment).not.toHaveBeenCalled();
+      });
+
+      afterAll(() => {
+        payloadData.payload.pull_request.assignees = assignees;
+      });
+    });
+
     describe('when the pull request gets closed before 3 minutes delay is over', () => {
       const initalState = payloadData.payload.pull_request.state;
       beforeAll(() => {
@@ -266,7 +301,7 @@ describe('Pull Request Review Module', () => {
         await robot.receive(payloadData);
       });
 
-      it('should check review', () => {
+      it('should check type of review', () => {
         expect(
           pullRequestReviewModule.handlePullRequestReview
         ).toHaveBeenCalled();
@@ -274,7 +309,7 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(180000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
       });
 
       it('should not unassign reviewer', async () => {
@@ -299,7 +334,8 @@ describe('Pull Request Review Module', () => {
     beforeAll(() => {
       payloadData.payload.review.state = 'approved';
     });
-    describe('when other reviewers are yet to review and are not assigned', () => {
+    describe(
+      'when other reviewers are yet to review and are not assigned', () => {
       const initialReviewers = [
         ...payloadData.payload.pull_request.requested_reviewers,
       ];
@@ -323,7 +359,7 @@ describe('Pull Request Review Module', () => {
         await robot.receive(payloadData);
       });
 
-      it('should check review', () => {
+      it('should check type of review', () => {
         expect(
           pullRequestReviewModule.handlePullRequestReview
         ).toHaveBeenCalled();
@@ -331,7 +367,7 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(180000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
       });
 
       it('should unassign reviewer', async () => {
@@ -375,6 +411,15 @@ describe('Pull Request Review Module', () => {
         });
       });
 
+      it('should not assign pr author', () => {
+        expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+          owner: payloadData.payload.repository.owner.login,
+          repo: payloadData.payload.repository.name,
+          issue_number: payloadData.payload.pull_request.number,
+          assignees: [payloadData.payload.pull_request.user.login],
+        });
+      });
+
       afterAll(() => {
         payloadData.payload.pull_request.requested_reviewers = initialReviewers;
       });
@@ -411,7 +456,7 @@ describe('Pull Request Review Module', () => {
         await robot.receive(payloadData);
       });
 
-      it('should check review', () => {
+      it('should check type of review', () => {
         expect(
           pullRequestReviewModule.handlePullRequestReview
         ).toHaveBeenCalled();
@@ -419,7 +464,7 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(180000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
       });
 
       it('should unassign reviewer', async () => {
@@ -454,9 +499,6 @@ describe('Pull Request Review Module', () => {
 
       it('should not assign remaining reviewers', () => {
         expect(github.issues.addAssignees).not.toHaveBeenCalled();
-      });
-
-      it('should not ping remaining reviewers', () => {
         expect(github.issues.createComment).not.toHaveBeenCalledTimes(2);
       });
 
@@ -466,7 +508,8 @@ describe('Pull Request Review Module', () => {
       });
     });
 
-    describe('when other reviewers are yet to review and some are assigned', () => {
+    describe(
+      'when other reviewers are yet to review and some are assigned', () => {
       const initialAssignees = [...payloadData.payload.pull_request.assignees];
       const initialReviewers = [
         ...payloadData.payload.pull_request.requested_reviewers,
@@ -496,7 +539,7 @@ describe('Pull Request Review Module', () => {
         await robot.receive(payloadData);
       });
 
-      it('should check review', () => {
+      it('should check type of review', () => {
         expect(
           pullRequestReviewModule.handlePullRequestReview
         ).toHaveBeenCalled();
@@ -504,7 +547,7 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(180000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
       });
 
       it('should unassign reviewer', async () => {
@@ -546,13 +589,22 @@ describe('Pull Request Review Module', () => {
         });
       });
 
+      it('should not assign pr author', () => {
+        expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+          owner: payloadData.payload.repository.owner.login,
+          repo: payloadData.payload.repository.name,
+          issue_number: payloadData.payload.pull_request.number,
+          assignees: [payloadData.payload.pull_request.user.login],
+        });
+      });
+
       afterAll(() => {
         payloadData.payload.pull_request.requested_reviewers = initialReviewers;
         payloadData.payload.pull_request.assignees = initialAssignees;
       });
     });
 
-    describe('when reviewer already unassigns themselves', () => {
+    describe(' when reviewer is not assigned.', () => {
       // Note that when the reviewer is the last reviewer, the list of
       // requested reviewers will be empty.
       const initialReviewers = [
@@ -581,7 +633,7 @@ describe('Pull Request Review Module', () => {
         await robot.receive(payloadData);
       });
 
-      it('should check review', () => {
+      it('should check type of review', () => {
         expect(
           pullRequestReviewModule.handlePullRequestReview
         ).toHaveBeenCalled();
@@ -589,7 +641,7 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(180000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
       });
 
       it('should not unassign reviewer', async () => {
@@ -601,7 +653,8 @@ describe('Pull Request Review Module', () => {
         expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
           owner: payloadData.payload.repository.owner.login,
           repo: payloadData.payload.repository.name,
-          q: `repo:oppia/oppia review:approved ${payloadData.payload.pull_request.number}`,
+          q: 'repo:oppia/oppia review:approved ' +
+            payloadData.payload.pull_request.number,
         });
       });
 
@@ -639,7 +692,10 @@ describe('Pull Request Review Module', () => {
           owner: payloadData.payload.repository.owner.login,
           repo: payloadData.payload.repository.name,
           issue_number: payloadData.payload.pull_request.number,
-          body: 'Hi @reviewer, this PR is ready to be merged, PTAL. Thanks!',
+          body:
+            'Hi @reviewer, this PR is ready to be merged. Please make ' +
+            'sure there are no pending comments from the ' +
+            "author's end before merge. Thanks!",
         });
       });
 
@@ -649,7 +705,8 @@ describe('Pull Request Review Module', () => {
       });
     });
 
-    describe('when reviewer is the last reviewer and pr author can not merge', () => {
+    describe(
+      'when reviewer is the last reviewer and pr author can not merge', () => {
       // Note that when the reviewer is the last reviewer, the list of
       // requested reviewers will be empty.
       const initialReviewers = [
@@ -676,7 +733,7 @@ describe('Pull Request Review Module', () => {
         await robot.receive(payloadData);
       });
 
-      it('should check review', () => {
+      it('should check type of review', () => {
         expect(
           pullRequestReviewModule.handlePullRequestReview
         ).toHaveBeenCalled();
@@ -684,7 +741,7 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(180000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
       });
 
       it('should unassign reviewer', async () => {
@@ -702,7 +759,9 @@ describe('Pull Request Review Module', () => {
         expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
           owner: payloadData.payload.repository.owner.login,
           repo: payloadData.payload.repository.name,
-          q: `repo:oppia/oppia review:approved ${payloadData.payload.pull_request.number}`,
+          q:
+            'repo:oppia/oppia review:approved ' +
+            payloadData.payload.pull_request.number,
         });
       });
 
@@ -740,7 +799,10 @@ describe('Pull Request Review Module', () => {
           owner: payloadData.payload.repository.owner.login,
           repo: payloadData.payload.repository.name,
           issue_number: payloadData.payload.pull_request.number,
-          body: 'Hi @reviewer, this PR is ready to be merged, PTAL. Thanks!',
+          body:
+            'Hi @reviewer, this PR is ready to be merged. Please make ' +
+            'sure there are no pending comments from the ' +
+            "author's end before merge. Thanks!",
         });
       });
 
@@ -749,7 +811,8 @@ describe('Pull Request Review Module', () => {
       });
     });
 
-    describe('when reviewer is the last reviewer and pr author can merge', () => {
+    describe(
+      'when reviewer is the last reviewer and pr author can merge', () => {
       // Note that when the reviewer is the last reviewer, the list of
       // requested reviewers will be empty.
       const initialReviewers = [
@@ -776,7 +839,7 @@ describe('Pull Request Review Module', () => {
         await robot.receive(payloadData);
       });
 
-      it('should check review', () => {
+      it('should check type of review', () => {
         expect(
           pullRequestReviewModule.handlePullRequestReview
         ).toHaveBeenCalled();
@@ -784,7 +847,7 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(180000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
       });
 
       it('should unassign reviewer', async () => {
@@ -802,7 +865,9 @@ describe('Pull Request Review Module', () => {
         expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
           owner: payloadData.payload.repository.owner.login,
           repo: payloadData.payload.repository.name,
-          q: `repo:oppia/oppia review:approved ${payloadData.payload.pull_request.number}`,
+          q:
+            'repo:oppia/oppia review:approved ' +
+            payloadData.payload.pull_request.number,
         });
       });
 
@@ -843,7 +908,8 @@ describe('Pull Request Review Module', () => {
           body:
             'Hi @' +
             payloadData.payload.pull_request.user.login +
-            ', this PR is ready to be merged, PTAL. Thanks!',
+            ', this PR is ready to be merged. Please make sure there are ' +
+            'no pending comments before merge. Thanks!',
         });
       });
 
@@ -852,7 +918,8 @@ describe('Pull Request Review Module', () => {
       });
     });
 
-    describe('when reviewer is last reviewer and already adds the lgtm label', () => {
+    describe(
+      'when reviewer is last reviewer and already adds the lgtm label', () => {
       // Note that when the reviewer is the last reviewer, the list of
       // requested reviewers will be empty.
       const initialReviewers = [
@@ -886,7 +953,7 @@ describe('Pull Request Review Module', () => {
         await robot.receive(payloadData);
       });
 
-      it('should check review', () => {
+      it('should check type of review', () => {
         expect(
           pullRequestReviewModule.handlePullRequestReview
         ).toHaveBeenCalled();
@@ -894,7 +961,7 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(180000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
       });
 
       it('should unassign reviewer', async () => {
@@ -912,7 +979,9 @@ describe('Pull Request Review Module', () => {
         expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
           owner: payloadData.payload.repository.owner.login,
           repo: payloadData.payload.repository.name,
-          q: `repo:oppia/oppia review:approved ${payloadData.payload.pull_request.number}`,
+          q:
+            'repo:oppia/oppia review:approved ' +
+            payloadData.payload.pull_request.number,
         });
       });
 
@@ -934,7 +1003,9 @@ describe('Pull Request Review Module', () => {
       });
     });
 
-    describe('when the pull request gets closed / merged before 3 minutes delay is over', () => {
+    describe(
+      'when the pull request gets closed / merged before 3 minutes delay '+
+      'is over', () => {
       const initalState = payloadData.payload.pull_request.state;
       beforeAll(() => {
         payloadData.payload.pull_request.state = 'closed';
@@ -943,7 +1014,7 @@ describe('Pull Request Review Module', () => {
         await robot.receive(payloadData);
       });
 
-      it('should check review', () => {
+      it('should check type of review', () => {
         expect(
           pullRequestReviewModule.handlePullRequestReview
         ).toHaveBeenCalled();
@@ -951,7 +1022,7 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(180000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
       });
 
       it('should not unassign reviewer', async () => {
@@ -982,7 +1053,7 @@ describe('Pull Request Review Module', () => {
       await robot.receive(payloadData);
     });
 
-    it('should check review', () => {
+    it('should check type of review', () => {
       expect(
         pullRequestReviewModule.handlePullRequestReview
       ).toHaveBeenCalled();
