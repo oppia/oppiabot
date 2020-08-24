@@ -5,6 +5,7 @@ const oppiaBot = require('../index');
 const checkMergeConflictModule = require('../lib/checkMergeConflicts');
 const scheduler = require('../lib/scheduler');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
+const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const checkCriticalPullRequestModule = require(
   '../lib/checkCriticalPullRequest'
 );
@@ -59,6 +60,7 @@ describe('Merge Conflict Check', () => {
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
     spyOn(
       checkCriticalPullRequestModule,
       'checkIfPRAffectsDatastoreLayer'
