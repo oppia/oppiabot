@@ -10,6 +10,7 @@ const checkPullRequestTemplateModule = require('./lib/checkPullRequestTemplate')
 const checkCriticalPullRequestModule = require('./lib/checkCriticalPullRequest');
 const checkBranchPushModule = require('./lib/checkBranchPush');
 const ciCheckModule = require('./lib/ciChecks');
+const periodicCheckModule = require('./lib/periodicChecks');
 
 const constants = require('./constants');
 const checkIssueAssigneeModule = require('./lib/checkIssueAssignee');
@@ -87,13 +88,18 @@ const runChecks = async (context, checkEvent) => {
             await ciCheckModule.handleFailure(context);
             break;
           case constants.updateWithDevelopCheck:
-            await checkMergeConflictsModule.pingAllPullRequestsToMergeFromDevelop(context);
+            await checkMergeConflictsModule.pingAllPullRequestsToMergeFromDevelop(
+              context
+            );
+            break;
+          case constants.periodicCheck:
+            await periodicCheckModule.ensurePullRequestIsAssigned(context);
             break;
         }
       }
     }
   }
-}
+};
 
 /**
  * This function checks if repo owner is whitelisted for Oppiabot checks.
@@ -122,8 +128,14 @@ function checkAuthor(context) {
  */
 module.exports = (oppiabot) => {
   scheduler.createScheduler(oppiabot, {
-    delay: !process.env.DISABLE_DELAY,
-    interval: 60 * 60 * 1000, // 1 hour
+    delay: !!process.env.DISABLE_DELAY, // delay is enabled on first run
+    interval: 24 * 60 * 60 * 1000, // 1 day
+  });
+
+  oppiabot.on('schedule.repository', async (context) => {
+    if (checkWhitelistedAccounts(context)) {
+      await runChecks(context, constants.periodicCheckEvent);
+    }
   });
 
   oppiabot.on('issues.assigned', async (context) => {
@@ -203,7 +215,7 @@ module.exports = (oppiabot) => {
   });
 
   oppiabot.on('check_suite.completed', async (context) => {
-    if(checkWhitelistedAccounts(context)) {
+    if (checkWhitelistedAccounts(context)) {
       // eslint-disable-next-line no-console
       console.log('A CHECK SUITE HAS BEEN COMPLETED...');
       await runChecks(context, constants.checkCompletedEvent);

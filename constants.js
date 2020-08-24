@@ -9,7 +9,9 @@ const issuesLabelEvent = 'issues_labeled';
 const issuesAssignedEvent = 'issues_assigned';
 const pushEvent = 'push';
 const checkCompletedEvent = 'check_completed';
+const periodicCheckEvent = 'periodic-check-event';
 
+const periodicCheck = 'periodic-check';
 const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
 const datastoreLabelCheck = 'datastore-label-check';
@@ -66,7 +68,8 @@ const checksWhitelist = {
     [issuesAssignedEvent]: [issuesAssignedCheck],
     [unlabelEvent]: [datastoreLabelCheck],
     [pushEvent]: [forcePushCheck],
-    [checkCompletedEvent]: [ciFailureCheck]
+    [checkCompletedEvent]: [ciFailureCheck],
+    [periodicCheckEvent]: [periodicCheck]
   },
   'oppiabot': {
     [openEvent]: [claCheck],
@@ -93,7 +96,9 @@ module.exports.issuesLabelEvent = issuesLabelEvent;
 module.exports.issuesAssignedEvent = issuesAssignedEvent;
 module.exports.pushEvent = pushEvent;
 module.exports.checkCompletedEvent = checkCompletedEvent;
+module.exports.periodicCheckEvent = periodicCheckEvent;
 
+module.exports.periodicCheck = periodicCheck;
 module.exports.claCheck = claCheck;
 module.exports.changelogCheck = changelogCheck;
 module.exports.branchCheck = branchCheck;
