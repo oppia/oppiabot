@@ -133,6 +133,7 @@ module.exports = (oppiabot) => {
   });
 
   oppiabot.on('schedule.repository', async (context) => {
+    console.log('PERIODIC CHECKS RUNNING...');
     if (checkWhitelistedAccounts(context)) {
       await runChecks(context, constants.periodicCheckEvent);
     }
