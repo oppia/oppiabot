@@ -15,10 +15,13 @@
 /**
  * @fileoverview Tests for the helper module.
  */
-
+const { default: Axios } = require('axios');
 const utilityModule = require('../lib/utils');
 const pullRequest = require('../fixtures/pullRequestPayload.json').payload
   .pull_request;
+const CODE_OWNERS_FILE_URL =
+  'https://raw.githubusercontent.com/oppia/oppia/develop/.github/CODEOWNERS';
+
 describe('Utility module tests', () => {
   const firstModelFileObj = {
     sha: 'd144f32b9812373d5f1bc9f94d9af795f09023ff',
@@ -258,5 +261,26 @@ describe('Utility module tests', () => {
     const result = await utilityModule.getAllChangedFiles(context);
     expect(result.length).toBe(2);
     expect(result).toEqual([firstModelFileObj, firstJobFileObj]);
+  });
+
+  it('should get main code owner file from develop', async () => {
+    spyOn(Axios, 'get').and.resolveTo({
+      data: 'Contents of code owner file.'
+    });
+    const response = await utilityModule.getMainCodeOwnerfile();
+    expect(Axios.get).toHaveBeenCalled();
+    expect(Axios.get).toHaveBeenCalledWith(CODE_OWNERS_FILE_URL)
+    expect(response).toBe('Contents of code owner file.');
+  });
+
+  it('should check if a label is a changelog label', () => {
+    let response = utilityModule.isChangelogLabel(
+      'PR CHANGELOG: Angular Migration'
+    );
+    expect(response).toBe(true);
+    response = utilityModule.isChangelogLabel(
+      'An invalid label'
+    );
+    expect(response).toBe(false);
   });
 });

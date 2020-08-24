@@ -6,6 +6,7 @@ const checkPullRequestLabelModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
+const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
 
 let payloadData = JSON.parse(
@@ -60,6 +61,7 @@ describe('Pull Request Label Check', () => {
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() =>{});
     spyOn(checkCriticalPullRequestModule,'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
     spyOn(checkPullRequestTemplateModule,'checkTemplate').and.callFake(() => {});
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
   });
 
   describe('when pull request gets labeled', () => {
@@ -108,6 +110,10 @@ describe('Pull Request Label Check', () => {
             ' of this pull request. Thanks!',
         };
         expect(github.issues.createComment).toHaveBeenCalledWith(params);
+      });
+
+      it('should run check for new codeowners', () => {
+        expect(newCodeOwnerModule.checkForNewCodeowner).toHaveBeenCalled();
       });
 
       afterAll(() => {
@@ -304,6 +310,8 @@ describe('Pull Request Label Check', () => {
       expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
       expect(github.issues.createComment).not.toHaveBeenCalled();
+      // Should not check for new code owner since there is no changelog label.
+      expect(newCodeOwnerModule.checkForNewCodeowner).not.toHaveBeenCalled();
     });
 
     it('should not assign when invalid changelog is applied', async () => {
@@ -323,6 +331,9 @@ describe('Pull Request Label Check', () => {
       expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
       expect(github.issues.createComment).not.toHaveBeenCalled();
+
+      // Should not check for new code owner since there is no changelog label.
+      expect(newCodeOwnerModule.checkForNewCodeowner).not.toHaveBeenCalled();
     });
 
     it('should not assign when there are review comments', async () => {
