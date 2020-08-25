@@ -502,6 +502,16 @@ describe('Pull Request Review Module', () => {
         expect(github.issues.createComment).not.toHaveBeenCalledTimes(2);
       });
 
+      it('should not assign pr author', () => {
+        expect(github.issues.addAssignees).not.toHaveBeenCalled();
+        expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+          owner: payloadData.payload.repository.owner.login,
+          repo: payloadData.payload.repository.name,
+          issue_number: payloadData.payload.pull_request.number,
+          assignees: [payloadData.payload.pull_request.user.login]
+        });
+      });
+
       afterAll(() => {
         payloadData.payload.pull_request.assignees = initialAssignees;
         payloadData.payload.pull_request.requested_reviewers = initialReviewers;
@@ -604,8 +614,10 @@ describe('Pull Request Review Module', () => {
       });
     });
 
-    describe('when all reviewers have approved and none are assigned.', () => {
-      // Note that when the reviewer is the last reviewer, the list of
+    describe(
+      'when all reviewers have approved and none are assigned and pr author ' +
+      'cannot merge.', () => {
+      // Note that when the last reviewer approves, the list of
       // requested reviewers will be empty.
       const initialReviewers = [
         ...payloadData.payload.pull_request.requested_reviewers,
