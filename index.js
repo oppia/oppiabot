@@ -9,6 +9,7 @@ const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
 const checkPullRequestTemplateModule = require('./lib/checkPullRequestTemplate');
 const checkCriticalPullRequestModule = require('./lib/checkCriticalPullRequest');
 const checkBranchPushModule = require('./lib/checkBranchPush');
+const newCodeOwnerModule = require('./lib/checkForNewCodeowner');
 const ciCheckModule = require('./lib/ciChecks');
 const periodicCheckModule = require('./lib/periodicChecks');
 
@@ -83,6 +84,9 @@ const runChecks = async (context, checkEvent) => {
             break;
           case constants.prTemplateCheck:
             await checkPullRequestTemplateModule.checkTemplate(context);
+            break;
+          case constants.codeOwnerCheck:
+            await newCodeOwnerModule.checkForNewCodeowner(context);
             break;
           case constants.ciFailureCheck:
             await ciCheckModule.handleFailure(context);

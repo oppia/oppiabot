@@ -6,6 +6,7 @@ const checkPullRequestLabelModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
+const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
 
 let payloadData = JSON.parse(
@@ -60,6 +61,7 @@ describe('Pull Request Label Check', () => {
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() =>{});
     spyOn(checkCriticalPullRequestModule,'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
     spyOn(checkPullRequestTemplateModule,'checkTemplate').and.callFake(() => {});
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
   });
 
   describe('when pull request gets labeled', () => {
@@ -108,6 +110,10 @@ describe('Pull Request Label Check', () => {
             ' of this pull request. Thanks!',
         };
         expect(github.issues.createComment).toHaveBeenCalledWith(params);
+      });
+
+      it('should run check for new codeowners', () => {
+        expect(newCodeOwnerModule.checkForNewCodeowner).toHaveBeenCalled();
       });
 
       afterAll(() => {
@@ -304,6 +310,8 @@ describe('Pull Request Label Check', () => {
       expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
       expect(github.issues.createComment).not.toHaveBeenCalled();
+      // Should not check for new code owner since there is no changelog label.
+      expect(newCodeOwnerModule.checkForNewCodeowner).not.toHaveBeenCalled();
     });
 
     it('should not assign when invalid changelog is applied', async () => {
@@ -323,6 +331,9 @@ describe('Pull Request Label Check', () => {
       expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
       expect(github.issues.createComment).not.toHaveBeenCalled();
+
+      // Should not check for new code owner since there is no changelog label.
+      expect(newCodeOwnerModule.checkForNewCodeowner).not.toHaveBeenCalled();
     });
 
     it('should not assign when there are review comments', async () => {
@@ -554,12 +565,22 @@ describe('Pull Request Label Check', () => {
           'Hi, @' +
           payloadData.payload.pull_request.user.login +
           ', this pull request does not have a "CHANGELOG: ..." label ' +
-          'as mentioned in the PR checkbox list. Please add this label. ' +
+          'as mentioned in the PR checkbox list. Assigning @' +
+          payloadData.payload.pull_request.user.login +
+          'to add the required label. ' +
           'PRs without this label will not be merged. If you are unsure ' +
           'of which label to add, please ask the reviewers for ' +
           'guidance. Thanks!',
       };
       expect(github.issues.createComment).toHaveBeenCalledWith(params);
+
+      expect(github.issues.addAssignees).toHaveBeenCalled();
+      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        number: payloadData.payload.number,
+        assignees: [payloadData.payload.pull_request.user.login]
+      });
     });
 
     it('adds a default label when pr author is not a collaborator', async () => {
