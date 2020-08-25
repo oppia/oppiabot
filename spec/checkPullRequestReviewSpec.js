@@ -1098,6 +1098,7 @@ describe('Pull Request Review Module', () => {
       afterAll(() => {
         payloadData.payload.pull_request.requested_reviewers = initialReviewers;
         payloadData.payload.pull_request.labels = initialLabels;
+        payloadData.payload.pull_request.assignees = initialAssignees;
       });
     });
 
