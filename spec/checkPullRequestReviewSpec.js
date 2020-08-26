@@ -1099,6 +1099,20 @@ describe('Pull Request Review Module', () => {
         });
       });
 
+      it('should ping assignee', () => {
+        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          owner: payloadData.payload.repository.owner.login,
+          repo: payloadData.payload.repository.name,
+          issue_number: payloadData.payload.pull_request.number,
+          body:
+            'Hi @user_to_merge, this PR is ready to be merged. We are pinging ' +
+            'you since you are the remaining assingee on this PR. Please make ' +
+            "sure there are no pending comments from the author's end before " +
+            'merge. Thanks!',
+        });
+      });
+
       it('should not check if author can merge', () => {
         expect(github.orgs.checkMembership).not.toHaveBeenCalled();
       });
