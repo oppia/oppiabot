@@ -97,6 +97,9 @@ const runChecks = async (context, checkEvent) => {
           case constants.updateWithDevelopCheck:
             await checkMergeConflictsModule.pingAllPullRequestsToMergeFromDevelop(context);
             break;
+          case constants.respondToReviewCheck:
+            await checkPullRequestReviewModule.handleResponseToReview(context);
+            break;
         }
       }
     }
@@ -139,6 +142,14 @@ module.exports = (oppiabot) => {
       await runChecks(context, constants.issuesAssignedEvent);
     }
   });
+
+  oppiabot.on('issue_comment.created', async (context) => {
+    if (checkWhitelistedAccounts(context)) {
+      // eslint-disable-next-line no-console
+      console.log('COMMENT CREATED ON ISSUE OR PULL REQUEST...');
+      await runChecks(context, constants.issueCommentCreatedEvent);
+    }
+  })
 
   oppiabot.on('pull_request.opened', async (context) => {
     // The oppiabot runs only for repositories belonging to certain
