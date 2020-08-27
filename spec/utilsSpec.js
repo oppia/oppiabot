@@ -241,8 +241,8 @@ describe('Utility module tests', () => {
         return {
           ...obj,
           repo: 'oppia',
-          owner: 'oppia'
-        }
+          owner: 'oppia',
+        };
       },
       payload: {
         pull_request: { ...pullRequest, changed_files: 2 },
@@ -265,11 +265,11 @@ describe('Utility module tests', () => {
 
   it('should get main code owner file from develop', async () => {
     spyOn(Axios, 'get').and.resolveTo({
-      data: 'Contents of code owner file.'
+      data: 'Contents of code owner file.',
     });
     const response = await utilityModule.getMainCodeOwnerfile();
     expect(Axios.get).toHaveBeenCalled();
-    expect(Axios.get).toHaveBeenCalledWith(CODE_OWNERS_FILE_URL)
+    expect(Axios.get).toHaveBeenCalledWith(CODE_OWNERS_FILE_URL);
     expect(response).toBe('Contents of code owner file.');
   });
 
@@ -278,9 +278,220 @@ describe('Utility module tests', () => {
       'PR CHANGELOG: Angular Migration'
     );
     expect(response).toBe(true);
-    response = utilityModule.isChangelogLabel(
-      'An invalid label'
+    response = utilityModule.isChangelogLabel('An invalid label');
+    expect(response).toBe(false);
+  });
+
+  it('should get all open pull requests', async () => {
+    const context = {
+      github: {
+        pulls: {
+          list: jasmine.createSpy('list').and.resolveTo({
+            data: [
+              {
+                number: 101,
+                body: 'sample pull request body',
+              },
+            ],
+          }),
+        },
+      },
+      repo: jasmine.createSpy('repo').and.callFake((params) => {
+        return {
+          repo: 'oppia',
+          owner: 'oppia',
+          ...params,
+        };
+      }),
+    };
+
+    let openPRs = await utilityModule.getAllOpenPullRequests(context);
+    expect(openPRs.length).toBe(1);
+    expect(openPRs[0].number).toBe(101);
+    expect(context.github.pulls.list).toHaveBeenCalled();
+    expect(context.github.pulls.list).toHaveBeenCalledWith({
+      repo: 'oppia',
+      owner: 'oppia',
+      per_page: 60,
+      state: 'open',
+    });
+
+    context.github.pulls.list = jasmine.createSpy('list').and.resolveTo({
+      data: [
+        {
+          number: 101,
+          body: 'sample pull request body',
+        },
+        {
+          number: 102,
+          body: 'another sample pull request body',
+        },
+      ],
+    });
+
+    openPRs = await utilityModule.getAllOpenPullRequests(context);
+    expect(openPRs.length).toBe(2);
+    expect(openPRs[0].number).toBe(101);
+    expect(openPRs[1].number).toBe(102);
+  });
+
+  it('should check that a pull request has been approved', async () => {
+    const context = {
+      payload: {
+        repository: {
+          full_name: 'oppia/oppia',
+        },
+      },
+      github: {
+        search: {
+          issuesAndPullRequests: jasmine
+            .createSpy('issuesAndPullRequests')
+            .and.resolveTo({
+              status: 204,
+            }),
+        },
+      },
+      repo: jasmine.createSpy('repo').and.callFake((params) => {
+        return {
+          repo: 'oppia',
+          owner: 'oppia',
+          ...params,
+        };
+      }),
+    };
+
+    let response = await utilityModule.hasPullRequestBeenApproved(context, 101);
+    expect(response).toBe(true);
+    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalled();
+    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+      repo: 'oppia',
+      owner: 'oppia',
+      q: 'repo:oppia/oppia review:approved 101',
+    });
+
+    context.github.search.issuesAndPullRequests = jasmine
+      .createSpy('issuesAndPullRequests')
+      .and.resolveTo({
+        status: 404,
+      });
+
+    response = await utilityModule.hasPullRequestBeenApproved(context, 102);
+    expect(response).toBe(false);
+    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalled();
+    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+      repo: 'oppia',
+      owner: 'oppia',
+      q: 'repo:oppia/oppia review:approved 102',
+    });
+  });
+
+  it('should check that a pull request has changes requested', async () => {
+    const context = {
+      payload: {
+        repository: {
+          full_name: 'oppia/oppia',
+        },
+      },
+      github: {
+        search: {
+          issuesAndPullRequests: jasmine
+            .createSpy('issuesAndPullRequests')
+            .and.resolveTo({
+              status: 204,
+            }),
+        },
+      },
+      repo: jasmine.createSpy('repo').and.callFake((params) => {
+        return {
+          repo: 'oppia',
+          owner: 'oppia',
+          ...params,
+        };
+      }),
+    };
+
+    let response = await utilityModule.doesPullRequestHaveChangesRequested(
+      context,
+      101
+    );
+    expect(response).toBe(true);
+    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalled();
+    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+      repo: 'oppia',
+      owner: 'oppia',
+      q: 'repo:oppia/oppia review:changes_requested 101',
+    });
+
+    context.github.search.issuesAndPullRequests = jasmine
+      .createSpy('issuesAndPullRequests')
+      .and.resolveTo({
+        status: 404,
+      });
+    response = await utilityModule.doesPullRequestHaveChangesRequested(
+      context,
+      102
     );
     expect(response).toBe(false);
+    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalled();
+    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+      repo: 'oppia',
+      owner: 'oppia',
+      q: 'repo:oppia/oppia review:changes_requested 102',
+    });
+  });
+
+  it('should check if a user is a member of the organisation', async () => {
+    const context = {
+      github: {
+        orgs: {
+          checkMembership: jasmine.createSpy('checkMembership').and.resolveTo({
+            status: 204,
+          }),
+        },
+      },
+    };
+
+    let response = await utilityModule.isUserAMemberOfTheOrganisation(
+      context,
+      'testuser'
+    );
+    expect(response).toBe(true);
+    expect(context.github.orgs.checkMembership).toHaveBeenCalled();
+    expect(context.github.orgs.checkMembership).toHaveBeenCalledWith({
+      org: 'oppia',
+      username: 'testuser',
+    });
+
+    context.github.orgs.checkMembership = jasmine
+      .createSpy('checkMembership')
+      .and.resolveTo({
+        status: 404,
+      });
+    response = await utilityModule.isUserAMemberOfTheOrganisation(
+      context,
+      'testuser'
+    );
+    expect(response).toBe(false);
+  });
+
+  it('should get changelog label from a pull request', () => {
+    const label = {
+      name: 'PR CHANGELOG: Angular Migration',
+    };
+    pullRequest.labels.push(label);
+
+    let response = utilityModule.getChangelogLabelFromPullRequest(pullRequest);
+    expect(response).toBe('PR CHANGELOG: Angular Migration');
+
+    pullRequest.labels = [];
+    response = utilityModule.getChangelogLabelFromPullRequest(pullRequest);
+    expect(response).toBe(undefined);
+  });
+
+  it('should get progect owner from a changelog label', () => {
+    let response = utilityModule.getProjectOwnerFromLabel(
+      'PR CHANGELOG: Miscellaneous -- @ankita240796'
+    );
+    expect(response).toBe('ankita240796');
   });
 });

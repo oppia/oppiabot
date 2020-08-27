@@ -1,3 +1,4 @@
+
 require('newrelic');
 const scheduler = require('./lib/scheduler');
 const apiForSheetsModule = require('./lib/apiForSheets');
@@ -103,7 +104,7 @@ const runChecks = async (context, checkEvent) => {
       }
     }
   }
-};
+}
 
 /**
  * This function checks if repo owner is whitelisted for Oppiabot checks.
