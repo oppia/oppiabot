@@ -622,10 +622,17 @@ describe('Pull Request Review Module', () => {
       const initialReviewers = [
         ...payloadData.payload.pull_request.requested_reviewers,
       ];
+      const initialLabels = [
+        ...payloadData.payload.pull_request.labels
+      ];
+      const changelogLabel = {
+        name: 'PR CHANGELOG: Server Errors -- @kevintab95'
+      };
       const initialAssignees = [...payloadData.payload.pull_request.assignees];
       beforeAll(() => {
         payloadData.payload.pull_request.requested_reviewers = [];
         payloadData.payload.pull_request.assignees = [];
+        payloadData.payload.pull_request.labels = [changelogLabel];
       });
       beforeEach(async () => {
         github.search = {
@@ -688,13 +695,13 @@ describe('Pull Request Review Module', () => {
         });
       });
 
-      it('should assign one of the reviewers', () => {
+      it('should assign project owner', () => {
         expect(github.issues.addAssignees).toHaveBeenCalled();
         expect(github.issues.addAssignees).toHaveBeenCalledWith({
           owner: payloadData.payload.repository.owner.login,
           repo: payloadData.payload.repository.name,
           issue_number: payloadData.payload.pull_request.number,
-          assignees: ['reviewer'],
+          assignees: ['kevintab95'],
         });
       });
 
@@ -705,7 +712,7 @@ describe('Pull Request Review Module', () => {
           repo: payloadData.payload.repository.name,
           issue_number: payloadData.payload.pull_request.number,
           body:
-            'Hi @reviewer, this PR is ready to be merged. We are assigning you ' +
+            'Hi @kevintab95, this PR is ready to be merged. We are assigning you ' +
             'since the author does not have merging rights. Please make ' +
             'sure there are no pending comments from the ' +
             "author's end before merge. Thanks!",
@@ -796,24 +803,24 @@ describe('Pull Request Review Module', () => {
         });
       });
 
-      it('should assign one of the reviewers', () => {
+      it('should assign project owner', () => {
         expect(github.issues.addAssignees).toHaveBeenCalled();
         expect(github.issues.addAssignees).toHaveBeenCalledWith({
           owner: payloadData.payload.repository.owner.login,
           repo: payloadData.payload.repository.name,
           issue_number: payloadData.payload.pull_request.number,
-          assignees: ['reviewer'],
+          assignees: ['kevintab95'],
         });
       });
 
-      it('should ping one of the reviewers to merge', () => {
+      it('should ping project owner to merge', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
         expect(github.issues.createComment).toHaveBeenCalledWith({
           owner: payloadData.payload.repository.owner.login,
           repo: payloadData.payload.repository.name,
           issue_number: payloadData.payload.pull_request.number,
           body:
-            'Hi @reviewer, this PR is ready to be merged. We are assigning you ' +
+            'Hi @kevintab95, this PR is ready to be merged. We are assigning you ' +
             'since the author does not have merging rights. Please make ' +
             'sure there are no pending comments from the ' +
             "author's end before merge. Thanks!",
@@ -1003,128 +1010,27 @@ describe('Pull Request Review Module', () => {
         expect(github.issues.addLabels).not.toHaveBeenCalled();
       });
 
-      it('should not check if author can merge', () => {
-        expect(github.orgs.checkMembership).not.toHaveBeenCalled();
+      it('should check if author can merge', () => {
+        expect(github.orgs.checkMembership).toHaveBeenCalled();
+        expect(github.orgs.checkMembership).toHaveBeenCalledWith({
+          org: payloadData.payload.organization.login,
+          username: payloadData.payload.pull_request.user.login,
+        });
       });
 
-      it('should not assign pr author', () => {
-        expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      it('should assign pr author', () => {
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          owner: payloadData.payload.repository.owner.login,
+          repo: payloadData.payload.repository.name,
+          issue_number: payloadData.payload.pull_request.number,
+          assignees: [payloadData.payload.pull_request.user.login],
+        });
       });
 
       afterAll(() => {
         payloadData.payload.pull_request.requested_reviewers = initialReviewers;
         payloadData.payload.pull_request.labels = initialLabels;
-      });
-    });
-
-    describe(
-      'when reviewer is last reviewer, and assigns someone else to merge ' +
-      'but does not add the lgtm label', () => {
-      // Note that when the reviewer is the last reviewer, the list of
-      // requested reviewers will be empty.
-      const initialReviewers = [
-        ...payloadData.payload.pull_request.requested_reviewers,
-      ];
-      const initialLabels = [...payloadData.payload.pull_request.labels];
-      const initialAssignees = [
-        ...payloadData.payload.pull_request.assignees,
-      ]
-      beforeAll(() => {
-        payloadData.payload.pull_request.requested_reviewers = [];
-        payloadData.payload.pull_request.assignees = [
-          ...payloadData.payload.pull_request.assignees,
-          {
-            login: 'user_to_merge'
-          }
-        ];
-      });
-
-      beforeEach(async () => {
-        github.search = {
-          issuesAndPullRequests: jasmine
-            .createSpy('issuesAndPullRequests')
-            .and.resolveTo({
-              data: {
-                items: [payloadData.payload.pull_request],
-              },
-            }),
-        };
-        github.orgs = {
-          checkMembership: jasmine.createSpy('checkMembership').and.resolveTo({
-            status: 204,
-          }),
-        };
-        await robot.receive(payloadData);
-      });
-
-      it('should check type of review', () => {
-        expect(
-          pullRequestReviewModule.handlePullRequestReview
-        ).toHaveBeenCalled();
-      });
-
-      it('should wait for 3 minutes before performing any action', () => {
-        expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
-      });
-
-      it('should unassign reviewer', async () => {
-        expect(github.issues.removeAssignees).toHaveBeenCalled();
-        expect(github.issues.removeAssignees).toHaveBeenCalledWith({
-          owner: payloadData.payload.repository.owner.login,
-          repo: payloadData.payload.repository.name,
-          issue_number: payloadData.payload.pull_request.number,
-          assignees: [payloadData.payload.review.user.login],
-        });
-      });
-
-      it('should check if all reviewers have approved the PR', () => {
-        expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
-        expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
-          owner: payloadData.payload.repository.owner.login,
-          repo: payloadData.payload.repository.name,
-          q:
-            'repo:oppia/oppia review:approved ' +
-            payloadData.payload.pull_request.number,
-        });
-      });
-
-      it('should add LGTM label', () => {
-        expect(github.issues.addLabels).toHaveBeenCalled();
-        expect(github.issues.addLabels).toHaveBeenCalledWith({
-          owner: payloadData.payload.repository.owner.login,
-          repo: payloadData.payload.repository.name,
-          issue_number: payloadData.payload.pull_request.number,
-          labels: ['PR: LGTM']
-        });
-      });
-
-      it('should ping assignee', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
-          owner: payloadData.payload.repository.owner.login,
-          repo: payloadData.payload.repository.name,
-          issue_number: payloadData.payload.pull_request.number,
-          body:
-            'Hi @user_to_merge, this PR is ready to be merged. We are pinging ' +
-            'you since you are the remaining assingee on this PR. Please make ' +
-            "sure there are no pending comments from the author's end before " +
-            'merge. Thanks!',
-        });
-      });
-
-      it('should not check if author can merge', () => {
-        expect(github.orgs.checkMembership).not.toHaveBeenCalled();
-      });
-
-      it('should not assign pr author', () => {
-        expect(github.issues.addAssignees).not.toHaveBeenCalled();
-      });
-
-      afterAll(() => {
-        payloadData.payload.pull_request.requested_reviewers = initialReviewers;
-        payloadData.payload.pull_request.labels = initialLabels;
-        payloadData.payload.pull_request.assignees = initialAssignees;
       });
     });
 
