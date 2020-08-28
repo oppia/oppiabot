@@ -9,6 +9,7 @@ const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
 const checkPullRequestTemplateModule = require('./lib/checkPullRequestTemplate');
 const checkCriticalPullRequestModule = require('./lib/checkCriticalPullRequest');
 const checkBranchPushModule = require('./lib/checkBranchPush');
+const checkPullRequestReviewModule = require('./lib/checkPullRequestReview');
 const newCodeOwnerModule = require('./lib/checkForNewCodeowner');
 const ciCheckModule = require('./lib/ciChecks');
 
@@ -83,6 +84,9 @@ const runChecks = async (context, checkEvent) => {
             break;
           case constants.prTemplateCheck:
             await checkPullRequestTemplateModule.checkTemplate(context);
+            break;
+          case constants.pullRequestReviewCheck:
+            await checkPullRequestReviewModule.handlePullRequestReview(context);
             break;
           case constants.codeOwnerCheck:
             await newCodeOwnerModule.checkForNewCodeowner(context);
@@ -203,6 +207,13 @@ module.exports = (oppiabot) => {
       // eslint-disable-next-line no-console
       console.log('A BRANCH HAS BEEN PUSHED...');
       await runChecks(context, constants.pushEvent);
+    }
+  });
+
+  oppiabot.on('pull_request_review.submitted', async (context) => {
+    if(checkWhitelistedAccounts(context)) {
+      console.log('A Pull Request got reviewed');
+      await runChecks(context, constants.pullRequestReviewEvent);
     }
   });
 
