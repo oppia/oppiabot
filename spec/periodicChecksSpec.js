@@ -481,61 +481,6 @@ describe('Periodic Checks Module', () => {
     });
   });
 
-  describe('when pull request has been approved, has no changelog label and author does not have merging rights', () => {
-    beforeEach(async () => {
-      const approvedPR = pullRequests[5];
-      github.pulls = {
-        get: jasmine.createSpy('get').and.callFake((params) => {
-          return {
-            data: pullRequests[params.pull_number - 1],
-          };
-        }),
-        list: jasmine.createSpy('list').and.resolveTo({
-          data: [approvedPR, assignedPullRequest],
-        }),
-      };
-
-      await robot.receive(payloadData);
-    });
-
-    it('should call periodic check module', () => {
-      expect(
-        periodicCheckModule.ensurePullRequestIsAssigned
-      ).toHaveBeenCalled();
-    });
-
-    it('should check if pr author has merging rights', () => {
-      expect(github.orgs.checkMembership).toHaveBeenCalled();
-      expect(github.orgs.checkMembership).toHaveBeenCalledWith({
-        org: 'oppia',
-        username: 'author6',
-      });
-    });
-
-    it('should assign pr author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
-        issue_number: 6,
-        owner: 'oppia',
-        repo: 'oppia',
-        assignees: ['author6'],
-      });
-    });
-
-    it('should ping pr author', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
-        issue_number: 6,
-        owner: 'oppia',
-        repo: 'oppia',
-        body:
-          'Hi @author6, this PR is ready to be merged. Please ask one of the ' +
-          'reviewers to help with the merge, also, make sure there are no ' +
-          'pending comments before merge. Thanks!',
-      });
-    });
-  });
-
   describe('when pull request does not match any above case', () => {
     beforeEach(async () => {
       const approvedPR = pullRequests[6];
