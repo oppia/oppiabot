@@ -8,6 +8,7 @@ const editEvent = 'edited';
 const issuesLabelEvent = 'issues_labeled';
 const issuesAssignedEvent = 'issues_assigned';
 const pushEvent = 'push';
+const pullRequestReviewEvent = 'pr-review';
 const checkCompletedEvent = 'check_completed';
 const periodicCheckEvent = 'periodic-check-event';
 
@@ -29,6 +30,7 @@ const modelCheck = 'model-check';
 const issuesLabelCheck = 'issues-labeled-check';
 const issuesAssignedCheck = 'issues-assigned-check';
 const forcePushCheck = 'force-push-check';
+const pullRequestReviewCheck = 'pr-review-check';
 const codeOwnerCheck = 'code-owner-check'
 const ciFailureCheck = 'ci-failure-check';
 const updateWithDevelopCheck = 'update-with-develop-check';
@@ -74,8 +76,9 @@ const checksWhitelist = {
     [issuesAssignedEvent]: [issuesAssignedCheck],
     [unlabelEvent]: [datastoreLabelCheck],
     [pushEvent]: [forcePushCheck],
-    [checkCompletedEvent]: [ciFailureCheck],
-    [periodicCheckEvent]: [periodicCheck]
+    [periodicCheckEvent]: [periodicCheck],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
+    [checkCompletedEvent]: [ciFailureCheck]
   },
   'oppiabot': {
     [openEvent]: [claCheck],
@@ -101,6 +104,7 @@ module.exports.editEvent = editEvent;
 module.exports.issuesLabelEvent = issuesLabelEvent;
 module.exports.issuesAssignedEvent = issuesAssignedEvent;
 module.exports.pushEvent = pushEvent;
+module.exports.pullRequestReviewEvent = pullRequestReviewEvent;
 module.exports.checkCompletedEvent = checkCompletedEvent;
 module.exports.periodicCheckEvent = periodicCheckEvent;
 
@@ -120,6 +124,7 @@ module.exports.datastoreLabelCheck = datastoreLabelCheck;
 module.exports.prLabelCheck = prLabelCheck;
 module.exports.prTemplateCheck = prTemplateCheck;
 module.exports.forcePushCheck = forcePushCheck;
+module.exports.pullRequestReviewCheck = pullRequestReviewCheck;
 module.exports.codeOwnerCheck = codeOwnerCheck;
 module.exports.ciFailureCheck = ciFailureCheck;
 module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
