@@ -1083,6 +1083,56 @@ describe('Pull Request Review Module', () => {
     );
 
     describe(
+      'when author asks reviewer to ptal and assigns some of them already', () => {
+        const initialAssignees = commentPayloadData.payload.issue.assignees;
+        beforeAll(() => {
+          commentPayloadData.payload.issue.assignees = [
+            {
+              login: 'reviewer1',
+            },
+          ];
+        });
+        beforeEach(async () => {
+          await robot.receive(commentPayloadData);
+        });
+
+        it('should check call response to review method', () => {
+          expect(
+            pullRequestReviewModule.handleResponseToReview
+          ).toHaveBeenCalled();
+        });
+
+        it('should wait for 3 minutes before performing any action', () => {
+          expect(utilityModule.sleep).toHaveBeenCalled();
+          expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+        });
+
+        it('should get the updated version of the pull request', () => {
+          expect(github.pulls.get).toHaveBeenCalled();
+          expect(github.pulls.get).toHaveBeenCalledWith({
+            repo: commentPayloadData.payload.repository.name,
+            owner: commentPayloadData.payload.repository.owner.login,
+            pull_number: commentPayloadData.payload.issue.number,
+          });
+        });
+
+        it('should assign remaining reviewer', () => {
+          expect(github.issues.addAssignees).toHaveBeenCalled();
+          expect(github.issues.addAssignees).toHaveBeenCalledWith({
+            repo: commentPayloadData.payload.repository.name,
+            owner: commentPayloadData.payload.repository.owner.login,
+            issue_number: commentPayloadData.payload.issue.number,
+            assignees: ['reviewer2'],
+          });
+        });
+
+        afterAll(() => {
+          commentPayloadData.payload.issue.assignees = initialAssignees;
+        });
+      }
+    );
+
+    describe(
       'when author asks reviewer to ptal and assigns them already', () => {
         const initialAssignees = commentPayloadData.payload.issue.assignees;
         beforeAll(() => {

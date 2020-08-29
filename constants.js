@@ -8,7 +8,7 @@ const editEvent = 'edited';
 const issuesLabelEvent = 'issues_labeled';
 const issuesAssignedEvent = 'issues_assigned';
 const pushEvent = 'push';
-const pullRequestReviewEvent = 'pr-review';
+const pullRequestReviewEvent = 'pr_review';
 const checkCompletedEvent = 'check_completed';
 const issueCommentCreatedEvent = 'comment_created';
 
