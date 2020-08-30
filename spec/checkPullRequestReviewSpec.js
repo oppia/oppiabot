@@ -593,7 +593,7 @@ describe('Pull Request Review Module', () => {
         });
       });
 
-      it('should assign remaining reviewer', () => {
+      it('should assign remaining reviewers', () => {
         expect(github.issues.addAssignees).toHaveBeenCalled();
         expect(github.issues.addAssignees).toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
@@ -1037,10 +1037,14 @@ describe('Pull Request Review Module', () => {
     });
 
     describe(
-      'when author asks reviewer to ptal and does not assign them', () => {
+      'when author asks reviewer to ptal and does not assign them and author is assigned', () => {
         const initialAssignees = commentPayloadData.payload.issue.assignees;
         beforeAll(() => {
-          commentPayloadData.payload.issue.assignees = [];
+          commentPayloadData.payload.issue.assignees = [
+            {
+              login: commentPayloadData.payload.issue.user.login
+            }
+          ];
         });
         beforeEach(async () => {
           await robot.receive(commentPayloadData);
@@ -1075,6 +1079,16 @@ describe('Pull Request Review Module', () => {
             assignees: ['reviewer1', 'reviewer2'],
           });
         });
+
+        it('should unassign author', () => {
+          expect(github.issues.removeAssignees).toHaveBeenCalled();
+          expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+            repo: commentPayloadData.payload.repository.name,
+            owner: commentPayloadData.payload.repository.owner.login,
+            issue_number: commentPayloadData.payload.issue.number,
+            assignees: [commentPayloadData.payload.issue.user.login],
+          });
+        })
 
         afterAll(() => {
           commentPayloadData.payload.issue.assignees = initialAssignees;
@@ -1116,7 +1130,7 @@ describe('Pull Request Review Module', () => {
           });
         });
 
-        it('should assign remaining reviewer', () => {
+        it('should assign remaining reviewers', () => {
           expect(github.issues.addAssignees).toHaveBeenCalled();
           expect(github.issues.addAssignees).toHaveBeenCalledWith({
             repo: commentPayloadData.payload.repository.name,
@@ -1293,7 +1307,7 @@ describe('Pull Request Review Module', () => {
     });
 
     describe(
-      'when the comment is from an issue and not a pull request', () => {
+      'when the comment is on an issue and not a pull request', () => {
         const pullRequestInfo = commentPayloadData.payload.issue.pull_request;
         beforeAll(() => {
           delete commentPayloadData.payload.issue.pull_request;
