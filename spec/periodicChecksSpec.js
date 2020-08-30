@@ -544,7 +544,8 @@ describe('Periodic Checks Module', () => {
         owner: 'oppia',
         repo: 'oppia',
         body:
-          'Hi @Showtim3, @oppia/core-maintainers this pull request needs some assistance, PTAL. Thanks!',
+          'Hi @Showtim3, @oppia/core-maintainers -- flagging this PR since ' +
+          'it needs some assistance. PTAL, thanks!',
       });
     });
 
