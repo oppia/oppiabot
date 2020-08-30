@@ -339,6 +339,37 @@ describe('Periodic Checks Module', () => {
         list: jasmine.createSpy('list').and.resolveTo({
           data: [changesRequestedPR, assignedPullRequest],
         }),
+        listReviews: jasmine.createSpy('listReviews').and.resolveTo({
+          data: [
+            {
+              id: 469398917,
+              user: {
+                login: 'reviewer1',
+              },
+              body: '',
+              commit_id: 'd8c0f3e805d23389dffb18fde642445ab6740412',
+              state: 'changes_requested',
+            },
+            {
+              id: 469398919,
+              user: {
+                login: 'reviewer2',
+              },
+              body: '',
+              commit_id: 'd8c0f3e805d23389dffb18fde642445ab6740412',
+              state: 'approved',
+            },
+            {
+              id: 469398919,
+              user: {
+                login: 'reviewer3',
+              },
+              body: '',
+              commit_id: 'd8c0f3e805d23389dffb18fde642445ab6740412',
+              state: 'changes_requested',
+            }
+          ],
+        }),
       };
 
       await robot.receive(payloadData);
@@ -367,7 +398,8 @@ describe('Periodic Checks Module', () => {
         owner: 'oppia',
         repo: 'oppia',
         body:
-          'Hi @author3, changes was requested on this pull request, PTAL. Thanks!',
+          'Hi @author3, it looks like some changes were requested on this ' +
+          'pull request by @reviewer1. PTAL. Thanks!',
       });
     });
   });
@@ -410,8 +442,9 @@ describe('Periodic Checks Module', () => {
         owner: 'oppia',
         repo: 'oppia',
         body:
-          'Hi @author4, this PR is ready to be merged. Please make sure ' +
-          'there are no pending comments before merge. Thanks!',
+          'Hi @author4, this PR is ready to be merged. Please address any ' +
+          'remaining comments prior to merging, and feel free to merge ' +
+          "this PR once you're happy with it. Thanks!",
       });
     });
 
@@ -464,10 +497,9 @@ describe('Periodic Checks Module', () => {
         owner: 'oppia',
         repo: 'oppia',
         body:
-          'Hi @ankita240796, this PR is ready to be merged. We are assigning ' +
-          'you since the author does not have merging rights. Please make ' +
-          "sure there are no pending comments from the author's end before " +
-          'merge. Thanks!',
+          'Hi @ankita240796, this PR is ready to be merged. Before you ' +
+          'merge it, please make sure that there are no pending comments ' +
+          "that require action from the author's end. Thanks!",
       });
     });
 
@@ -512,7 +544,7 @@ describe('Periodic Checks Module', () => {
         owner: 'oppia',
         repo: 'oppia',
         body:
-          'Hi @Showtim3, this pull request needs some assistance, PTAL. Thanks!',
+          'Hi @Showtim3, @oppia/core-maintainers this pull request needs some assistance, PTAL. Thanks!',
       });
     });
 
