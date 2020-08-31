@@ -494,4 +494,48 @@ describe('Utility module tests', () => {
     );
     expect(response).toBe('ankita240796');
   });
+
+  it('should get github usernames from text', () => {
+    let text = '@U8NWXD PTAL!';
+    let usernames = utilityModule.getUsernamesFromText(text);
+    expect(usernames.length).toBe(1);
+    expect(usernames[0]).toBe('U8NWXD');
+
+    text = '@aks681 @seanlip PTAL!';
+    usernames = utilityModule.getUsernamesFromText(text);
+    expect(usernames.length).toBe(2);
+    expect(usernames[0]).toBe('aks681');
+    expect(usernames[1]).toBe('seanlip');
+
+    text = `@DubeySandeep, done I've created the issue(#10419 ) and addressed your comments.
+      @seanlip @aks681 PTAL`;
+    usernames = utilityModule.getUsernamesFromText(text);
+    expect(usernames.length).toBe(3);
+    expect(usernames[0]).toBe('DubeySandeep');
+    expect(usernames[1]).toBe('seanlip');
+    expect(usernames[2]).toBe('aks681');
+
+    text = 'Hi @U8NWXD, please take a look, thanks!';
+    usernames = utilityModule.getUsernamesFromText(text);
+    expect(usernames.length).toBe(1);
+    expect(usernames[0]).toBe('U8NWXD');
+
+    text = "@aks681 @seanlip I've addressed all comments, please take a look.!";
+    usernames = utilityModule.getUsernamesFromText(text);
+    expect(usernames.length).toBe(2);
+    expect(usernames[0]).toBe('aks681');
+    expect(usernames[1]).toBe('seanlip');
+
+    text = `@DubeySandeep, done I've created the issue(#10419 ) and addressed your comments.
+      @seanlip @aks681 please take a look`;
+    usernames = utilityModule.getUsernamesFromText(text);
+    expect(usernames.length).toBe(3);
+    expect(usernames[0]).toBe('DubeySandeep');
+    expect(usernames[1]).toBe('seanlip');
+    expect(usernames[2]).toBe('aks681');
+
+    text = 'A random text containing no users';
+    usernames = utilityModule.getUsernamesFromText(text);
+    expect(usernames.length).toBe(0);
+  });
 });

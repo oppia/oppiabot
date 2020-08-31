@@ -8,9 +8,10 @@ const editEvent = 'edited';
 const issuesLabelEvent = 'issues_labeled';
 const issuesAssignedEvent = 'issues_assigned';
 const pushEvent = 'push';
-const pullRequestReviewEvent = 'pr-review';
+const pullRequestReviewEvent = 'pr_review';
 const checkCompletedEvent = 'check_completed';
 const periodicCheckEvent = 'periodic-check-event';
+const issueCommentCreatedEvent = 'comment_created';
 
 const periodicCheck = 'periodic-check';
 const claCheck = 'cla-check';
@@ -34,6 +35,7 @@ const pullRequestReviewCheck = 'pr-review-check';
 const codeOwnerCheck = 'code-owner-check'
 const ciFailureCheck = 'ci-failure-check';
 const updateWithDevelopCheck = 'update-with-develop-check';
+const respondToReviewCheck = 'respond-to-review-check';
 
 const checksWhitelist = {
   'oppia-android': {
@@ -78,7 +80,8 @@ const checksWhitelist = {
     [pushEvent]: [forcePushCheck],
     [periodicCheckEvent]: [periodicCheck],
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
-    [checkCompletedEvent]: [ciFailureCheck]
+    [checkCompletedEvent]: [ciFailureCheck],
+    [issueCommentCreatedEvent]: [respondToReviewCheck]
   },
   'oppiabot': {
     [openEvent]: [claCheck],
@@ -107,6 +110,7 @@ module.exports.pushEvent = pushEvent;
 module.exports.pullRequestReviewEvent = pullRequestReviewEvent;
 module.exports.checkCompletedEvent = checkCompletedEvent;
 module.exports.periodicCheckEvent = periodicCheckEvent;
+module.exports.issueCommentCreatedEvent = issueCommentCreatedEvent;
 
 module.exports.periodicCheck = periodicCheck;
 module.exports.claCheck = claCheck;
@@ -128,6 +132,7 @@ module.exports.pullRequestReviewCheck = pullRequestReviewCheck;
 module.exports.codeOwnerCheck = codeOwnerCheck;
 module.exports.ciFailureCheck = ciFailureCheck;
 module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
+module.exports.respondToReviewCheck = respondToReviewCheck
 
 module.exports.getBlacklistedAuthors = function() {
   return blacklistedAuthors;
