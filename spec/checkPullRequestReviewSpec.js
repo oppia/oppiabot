@@ -407,7 +407,7 @@ describe('Pull Request Review Module', () => {
           issue_number: payloadData.payload.pull_request.number,
           body:
             'Assigning @reviewer2, @reviewer3 for code owner reviews' +
-            ', Thanks!',
+            '. Thanks!',
         });
       });
 
@@ -595,7 +595,7 @@ describe('Pull Request Review Module', () => {
           owner: payloadData.payload.repository.owner.login,
           repo: payloadData.payload.repository.name,
           issue_number: payloadData.payload.pull_request.number,
-          body: 'Assigning @reviewer3 for code owner reviews' + ', Thanks!',
+          body: 'Assigning @reviewer3 for code owner reviews' + '. Thanks!',
         });
       });
 

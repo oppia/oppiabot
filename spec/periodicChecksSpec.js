@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Spec for CI Checks handler.
+ * @fileoverview Spec for periodic checks handler.
  */
 
 require('dotenv').config();
@@ -40,12 +40,8 @@ describe('Periodic Checks Module', () => {
    */
   let app;
 
-  /**
-   * @type {import('probot').Octokit.PullsGetResponse[]} pullRequests
-   */
-  let pullRequests = [
-    // Merge Conflict PR.
-    {
+  let pullRequests = {
+    mergeConflictPR: {
       number: 1,
       assignees: [],
       user: {
@@ -55,8 +51,8 @@ describe('Periodic Checks Module', () => {
       mergeable: false,
       labels: [],
     },
-    // Has Pending reviewers
-    {
+
+    pendingReviewPR: {
       number: 2,
       assignees: [],
       user: {
@@ -73,8 +69,8 @@ describe('Periodic Checks Module', () => {
       ],
       labels: [],
     },
-    // Has Changes Requested.
-    {
+
+    hasChangesRequestedPR: {
       number: 3,
       assignees: [],
       user: {
@@ -84,8 +80,8 @@ describe('Periodic Checks Module', () => {
       requested_reviewers: [],
       labels: [],
     },
-    // Has been approved.
-    {
+
+    approvedPR: {
       number: 4,
       assignees: [],
       user: {
@@ -95,7 +91,8 @@ describe('Periodic Checks Module', () => {
       requested_reviewers: [],
       labels: [],
     },
-    {
+
+    approvedPRWithLabel: {
       number: 5,
       assignees: [],
       user: {
@@ -109,7 +106,8 @@ describe('Periodic Checks Module', () => {
         },
       ],
     },
-    {
+
+    unResolvablePR: {
       number: 6,
       assignees: [],
       user: {
@@ -119,17 +117,8 @@ describe('Periodic Checks Module', () => {
       requested_reviewers: [],
       labels: [],
     },
-    {
-      number: 7,
-      assignees: [],
-      user: {
-        login: 'author7',
-      },
-      mergeable: true,
-      requested_reviewers: [],
-      labels: [],
-    },
-    {
+
+    assignedPullRequest: {
       number: 8,
       assignees: [
         {
@@ -137,12 +126,8 @@ describe('Periodic Checks Module', () => {
         },
       ],
     },
-  ];
+  };
 
-  /**
-   * @type {import('probot').Octokit.PullsGetResponse} assignedPullRequest
-   */
-  let assignedPullRequest = pullRequests[7];
   beforeEach(async () => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => {});
 
@@ -154,11 +139,22 @@ describe('Periodic Checks Module', () => {
         addAssignees: jasmine.createSpy('addAssignees').and.callFake(() => {}),
         addLabels: jasmine.createSpy('addLabels').and.callFake(() => {}),
       },
+      pulls: {
+        get: jasmine.createSpy('get').and.callFake((params) => {
+          const prData = Object.values(pullRequests).find(
+            (pr) => pr.number === params.pull_number
+          );
+          return {
+            data: prData,
+          };
+        }),
+      },
       orgs: {
         checkMembership: jasmine
           .createSpy('checkMembership')
           .and.callFake((params) => {
-            if (params.username.includes('4')) {
+            // pullRequests.approvedPR is the only user that has merging rights.
+            if (params.username === pullRequests.approvedPR.user.login) {
               return {
                 status: 204,
               };
@@ -172,8 +168,16 @@ describe('Periodic Checks Module', () => {
         issuesAndPullRequests: jasmine
           .createSpy('issuesAndPullRequests')
           .and.callFake((params) => {
-            const approvedPRNumbers = [4, 5, 6];
-            const requestedChangesPRNumber = 3;
+            // This function checks if a PR has been approved by all reviewers
+            // or has changes requested, so we need to return 204 for the
+            // appropriate cases when called with the specific pull request
+            // numbers.
+            const approvedPRNumbers = [
+              pullRequests.approvedPR.number,
+              pullRequests.approvedPRWithLabel.number,
+            ];
+            const requestedChangesPRNumber =
+              pullRequests.hasChangesRequestedPR.number;
             const isApproved = approvedPRNumbers.some((num) =>
               params.q.includes(num)
             );
@@ -217,17 +221,10 @@ describe('Periodic Checks Module', () => {
 
   describe('when pull request has merge conflict', () => {
     beforeEach(async () => {
-      const mergeConflictPR = pullRequests[0];
-      github.pulls = {
-        get: jasmine.createSpy('get').and.callFake((params) => {
-          return {
-            data: pullRequests[params.pull_number - 1],
-          };
-        }),
-        list: jasmine.createSpy('list').and.resolveTo({
-          data: [mergeConflictPR, assignedPullRequest],
-        }),
-      };
+      const mergeConflictPR = pullRequests.mergeConflictPR;
+      github.pulls.list = jasmine.createSpy('list').and.resolveTo({
+        data: [mergeConflictPR, pullRequests.assignedPullRequest],
+      });
       await robot.receive(payloadData);
     });
     it('should call periodic check module', () => {
@@ -285,18 +282,10 @@ describe('Periodic Checks Module', () => {
 
   describe('when pull request has pending reviews', () => {
     beforeEach(async () => {
-      const pendingReviewPR = pullRequests[1];
-      github.pulls = {
-        get: jasmine.createSpy('get').and.callFake((params) => {
-          return {
-            data: pullRequests[params.pull_number - 1],
-          };
-        }),
-        list: jasmine.createSpy('list').and.resolveTo({
-          data: [pendingReviewPR, assignedPullRequest],
-        }),
-      };
-
+      const pendingReviewPR = pullRequests.pendingReviewPR;
+      github.pulls.list = jasmine.createSpy('list').and.resolveTo({
+        data: [pendingReviewPR, pullRequests.assignedPullRequest],
+      });
       await robot.receive(payloadData);
     });
 
@@ -322,24 +311,30 @@ describe('Periodic Checks Module', () => {
         issue_number: 2,
         owner: 'oppia',
         repo: 'oppia',
-        body: 'Assigning @reviewer1, @reviewer2 for codeowner reviews. Thanks!',
+        body:
+          'Assigning @reviewer1, @reviewer2 for code owner reviews. Thanks!',
+      });
+    });
+
+    it('should not assign pr author', () => {
+      expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+        issue_number: 2,
+        assignees: ['author2'],
+        owner: 'oppia',
+        repo: 'oppia',
       });
     });
   });
 
   describe('when pull request has changes requested', () => {
     beforeEach(async () => {
-      const changesRequestedPR = pullRequests[2];
-      github.pulls = {
-        get: jasmine.createSpy('get').and.callFake((params) => {
-          return {
-            data: pullRequests[params.pull_number - 1],
-          };
-        }),
-        list: jasmine.createSpy('list').and.resolveTo({
-          data: [changesRequestedPR, assignedPullRequest],
-        }),
-        listReviews: jasmine.createSpy('listReviews').and.resolveTo({
+      const changesRequestedPR = pullRequests.hasChangesRequestedPR;
+      github.pulls.list = jasmine.createSpy('list').and.resolveTo({
+        data: [changesRequestedPR, pullRequests.assignedPullRequest],
+      });
+      github.pulls.listReviews = jasmine
+        .createSpy('listReviews')
+        .and.resolveTo({
           data: [
             {
               id: 469398917,
@@ -367,10 +362,9 @@ describe('Periodic Checks Module', () => {
               body: '',
               commit_id: 'd8c0f3e805d23389dffb18fde642445ab6740412',
               state: 'changes_requested',
-            }
+            },
           ],
-        }),
-      };
+        });
 
       await robot.receive(payloadData);
     });
@@ -404,19 +398,13 @@ describe('Periodic Checks Module', () => {
     });
   });
 
-  describe('when pull request has been approved and author has merging rights', () => {
+  describe(
+    'when pull request has been approved and author has merging rights', () => {
     beforeEach(async () => {
-      const approvedPR = pullRequests[3];
-      github.pulls = {
-        get: jasmine.createSpy('get').and.callFake((params) => {
-          return {
-            data: pullRequests[params.pull_number - 1],
-          };
-        }),
-        list: jasmine.createSpy('list').and.resolveTo({
-          data: [approvedPR, assignedPullRequest],
-        }),
-      };
+      const approvedPR = pullRequests.approvedPR;
+      github.pulls.list = jasmine.createSpy('list').and.resolveTo({
+        data: [approvedPR, pullRequests.assignedPullRequest],
+      });
 
       await robot.receive(payloadData);
     });
@@ -459,74 +447,64 @@ describe('Periodic Checks Module', () => {
     });
   });
 
-  describe('when pull request has been approved and has a changelog label but author does not have merging rights', () => {
+  describe(
+    'when pull request has been approved and has a changelog label but ' +
+      'author does not have merging rights',
+    () => {
+      beforeEach(async () => {
+        const approvedPR = pullRequests.approvedPRWithLabel;
+        github.pulls.list = jasmine.createSpy('list').and.resolveTo({
+          data: [approvedPR, pullRequests.assignedPullRequest],
+        });
+
+        await robot.receive(payloadData);
+      });
+
+      it('should call periodic check module', () => {
+        expect(
+          periodicCheckModule.ensurePullRequestIsAssigned
+        ).toHaveBeenCalled();
+      });
+
+      it('should check if pr author has merging rights', () => {
+        expect(github.orgs.checkMembership).toHaveBeenCalled();
+        expect(github.orgs.checkMembership).toHaveBeenCalledWith({
+          org: 'oppia',
+          username: 'author5',
+        });
+      });
+
+      it('should ping project owner', () => {
+        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          issue_number: 5,
+          owner: 'oppia',
+          repo: 'oppia',
+          body:
+            'Hi @ankita240796, this PR is ready to be merged. Before you ' +
+            'merge it, please make sure that there are no pending comments ' +
+            "that require action from the author's end. Thanks!",
+        });
+      });
+
+      it('should assign project owner', () => {
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          issue_number: 5,
+          owner: 'oppia',
+          repo: 'oppia',
+          assignees: ['ankita240796'],
+        });
+      });
+    }
+  );
+
+  describe('when pull request does not match any of the above cases', () => {
     beforeEach(async () => {
-      const approvedPR = pullRequests[4];
-      github.pulls = {
-        get: jasmine.createSpy('get').and.callFake((params) => {
-          return {
-            data: pullRequests[params.pull_number - 1],
-          };
-        }),
-        list: jasmine.createSpy('list').and.resolveTo({
-          data: [approvedPR, assignedPullRequest],
-        }),
-      };
-
-      await robot.receive(payloadData);
-    });
-
-    it('should call periodic check module', () => {
-      expect(
-        periodicCheckModule.ensurePullRequestIsAssigned
-      ).toHaveBeenCalled();
-    });
-
-    it('should check if pr author has merging rights', () => {
-      expect(github.orgs.checkMembership).toHaveBeenCalled();
-      expect(github.orgs.checkMembership).toHaveBeenCalledWith({
-        org: 'oppia',
-        username: 'author5',
+      const approvedPR = pullRequests.unResolvablePR;
+      github.pulls.list = jasmine.createSpy('list').and.resolveTo({
+        data: [approvedPR, pullRequests.assignedPullRequest],
       });
-    });
-
-    it('should ping project owner', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
-        issue_number: 5,
-        owner: 'oppia',
-        repo: 'oppia',
-        body:
-          'Hi @ankita240796, this PR is ready to be merged. Before you ' +
-          'merge it, please make sure that there are no pending comments ' +
-          "that require action from the author's end. Thanks!",
-      });
-    });
-
-    it('should assign project owner', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
-        issue_number: 5,
-        owner: 'oppia',
-        repo: 'oppia',
-        assignees: ['ankita240796'],
-      });
-    });
-  });
-
-  describe('when pull request does not match any above case', () => {
-    beforeEach(async () => {
-      const approvedPR = pullRequests[6];
-      github.pulls = {
-        get: jasmine.createSpy('get').and.callFake((params) => {
-          return {
-            data: pullRequests[params.pull_number - 1],
-          };
-        }),
-        list: jasmine.createSpy('list').and.resolveTo({
-          data: [approvedPR, assignedPullRequest],
-        }),
-      };
 
       await robot.receive(payloadData);
     });
@@ -540,7 +518,7 @@ describe('Periodic Checks Module', () => {
     it('should ping welfare team lead', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledWith({
-        issue_number: 7,
+        issue_number: 6,
         owner: 'oppia',
         repo: 'oppia',
         body:
@@ -552,7 +530,7 @@ describe('Periodic Checks Module', () => {
     it('should assign welfare team lead', () => {
       expect(github.issues.addAssignees).toHaveBeenCalled();
       expect(github.issues.addAssignees).toHaveBeenCalledWith({
-        issue_number: 7,
+        issue_number: 6,
         owner: 'oppia',
         repo: 'oppia',
         assignees: ['Showtim3'],
