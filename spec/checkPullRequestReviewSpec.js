@@ -297,41 +297,43 @@ describe('Pull Request Review Module', () => {
       });
     });
 
-    describe('when the pull request gets closed before 3 minutes delay is over', () => {
-      const initalState = reviewPayloadData.payload.pull_request.state;
-      beforeAll(() => {
-        reviewPayloadData.payload.pull_request.state = 'closed';
-      });
-      beforeEach(async () => {
-        await robot.receive(reviewPayloadData);
-      });
+    describe(
+      'when the pull request gets closed before 3 minutes delay is ' +
+      'over', () => {
+        const initalState = reviewPayloadData.payload.pull_request.state;
+        beforeAll(() => {
+          reviewPayloadData.payload.pull_request.state = 'closed';
+        });
+        beforeEach(async () => {
+          await robot.receive(reviewPayloadData);
+        });
 
-      it('should check type of review', () => {
-        expect(
-          pullRequestReviewModule.handlePullRequestReview
-        ).toHaveBeenCalled();
-      });
+        it('should check type of review', () => {
+          expect(
+            pullRequestReviewModule.handlePullRequestReview
+          ).toHaveBeenCalled();
+        });
 
-      it('should wait for 3 minutes before performing any action', () => {
-        expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
-      });
+        it('should wait for 3 minutes before performing any action', () => {
+          expect(utilityModule.sleep).toHaveBeenCalled();
+          expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+        });
 
-      it('should not unassign reviewer', async () => {
-        expect(github.issues.removeAssignees).not.toHaveBeenCalled();
-      });
+        it('should not unassign reviewer', async () => {
+          expect(github.issues.removeAssignees).not.toHaveBeenCalled();
+        });
 
-      it('should not assign pr author', () => {
-        expect(github.issues.addAssignees).not.toHaveBeenCalled();
-      });
+        it('should not assign pr author', () => {
+          expect(github.issues.addAssignees).not.toHaveBeenCalled();
+        });
 
-      it('should not ping pr author', () => {
-        expect(github.issues.createComment).not.toHaveBeenCalled();
-      });
+        it('should not ping pr author', () => {
+          expect(github.issues.createComment).not.toHaveBeenCalled();
+        });
 
-      afterAll(() => {
-        reviewPayloadData.payload.pull_request.state = initalState;
-      });
+        afterAll(() => {
+          reviewPayloadData.payload.pull_request.state = initalState;
+        });
     });
   });
 
@@ -346,94 +348,99 @@ describe('Pull Request Review Module', () => {
         }),
       };
     });
-    describe('when other reviewers are yet to review and are not assigned', () => {
-      const initialReviewers = [
-        ...reviewPayloadData.payload.pull_request.requested_reviewers,
-      ];
-      beforeAll(() => {
-        reviewPayloadData.payload.pull_request.requested_reviewers = [
+    describe(
+      'when other reviewers are yet to review and are not assigned', () => {
+        const initialReviewers = [
           ...reviewPayloadData.payload.pull_request.requested_reviewers,
-          { login: 'reviewer2' },
-          { login: 'reviewer3' },
         ];
-      });
-      beforeEach(async () => {
-        github.search = {
-          issuesAndPullRequests: jasmine
-            .createSpy('issuesAndPullRequests')
-            .and.resolveTo({
-              data: {
-                items: [],
-              },
-            }),
-        };
-        await robot.receive(reviewPayloadData);
-      });
-
-      it('should check type of review', () => {
-        expect(
-          pullRequestReviewModule.handlePullRequestReview
-        ).toHaveBeenCalled();
-      });
-
-      it('should wait for 3 minutes before performing any action', () => {
-        expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
-      });
-
-      it('should unassign reviewer', async () => {
-        expect(github.issues.removeAssignees).toHaveBeenCalled();
-        expect(github.issues.removeAssignees).toHaveBeenCalledWith({
-          owner: reviewPayloadData.payload.repository.owner.login,
-          repo: reviewPayloadData.payload.repository.name,
-          issue_number: reviewPayloadData.payload.pull_request.number,
-          assignees: [reviewPayloadData.payload.review.user.login],
+        beforeAll(() => {
+          reviewPayloadData.payload.pull_request.requested_reviewers = [
+            ...reviewPayloadData.payload.pull_request.requested_reviewers,
+            { login: 'reviewer2' },
+            { login: 'reviewer3' },
+          ];
         });
-      });
-
-      it('should check if all reviewers have approved the PR', () => {
-        expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
-        expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
-          owner: reviewPayloadData.payload.repository.owner.login,
-          repo: reviewPayloadData.payload.repository.name,
-          q: `repo:oppia/oppia review:approved ${reviewPayloadData.payload.pull_request.number}`,
+        beforeEach(async () => {
+          github.search = {
+            issuesAndPullRequests: jasmine
+              .createSpy('issuesAndPullRequests')
+              .and.resolveTo({
+                data: {
+                  items: [],
+                },
+              }),
+          };
+          await robot.receive(reviewPayloadData);
         });
-      });
 
-      it('should assign remaining reviewers', () => {
-        expect(github.issues.addAssignees).toHaveBeenCalled();
-        expect(github.issues.addAssignees).toHaveBeenCalledWith({
-          owner: reviewPayloadData.payload.repository.owner.login,
-          repo: reviewPayloadData.payload.repository.name,
-          issue_number: reviewPayloadData.payload.pull_request.number,
-          assignees: ['reviewer2', 'reviewer3'],
+        it('should check type of review', () => {
+          expect(
+            pullRequestReviewModule.handlePullRequestReview
+          ).toHaveBeenCalled();
         });
-      });
 
-      it('should ping remaining reviewers', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
-          owner: reviewPayloadData.payload.repository.owner.login,
-          repo: reviewPayloadData.payload.repository.name,
-          issue_number: reviewPayloadData.payload.pull_request.number,
-          body:
-            'Assigning @reviewer2, @reviewer3 for code owner reviews' +
-            ', Thanks!',
+        it('should wait for 3 minutes before performing any action', () => {
+          expect(utilityModule.sleep).toHaveBeenCalled();
+          expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
         });
-      });
 
-      it('should not assign pr author', () => {
-        expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
-          owner: reviewPayloadData.payload.repository.owner.login,
-          repo: reviewPayloadData.payload.repository.name,
-          issue_number: reviewPayloadData.payload.pull_request.number,
-          assignees: [reviewPayloadData.payload.pull_request.user.login],
+        it('should unassign reviewer', async () => {
+          expect(github.issues.removeAssignees).toHaveBeenCalled();
+          expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
+            issue_number: reviewPayloadData.payload.pull_request.number,
+            assignees: [reviewPayloadData.payload.review.user.login],
+          });
         });
-      });
 
-      afterAll(() => {
-        reviewPayloadData.payload.pull_request.requested_reviewers = initialReviewers;
-      });
+        it('should check if all reviewers have approved the PR', () => {
+          expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
+          expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
+            q:
+              'repo:oppia/oppia review:approved ' +
+              reviewPayloadData.payload.pull_request.number,
+          });
+        });
+
+        it('should assign remaining reviewers', () => {
+          expect(github.issues.addAssignees).toHaveBeenCalled();
+          expect(github.issues.addAssignees).toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
+            issue_number: reviewPayloadData.payload.pull_request.number,
+            assignees: ['reviewer2', 'reviewer3'],
+          });
+        });
+
+        it('should ping remaining reviewers', () => {
+          expect(github.issues.createComment).toHaveBeenCalled();
+          expect(github.issues.createComment).toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
+            issue_number: reviewPayloadData.payload.pull_request.number,
+            body:
+              'Assigning @reviewer2, @reviewer3 for code owner reviews' +
+              ', Thanks!',
+          });
+        });
+
+        it('should not assign pr author', () => {
+          expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
+            issue_number: reviewPayloadData.payload.pull_request.number,
+            assignees: [reviewPayloadData.payload.pull_request.user.login],
+          });
+        });
+
+        afterAll(() => {
+          reviewPayloadData.payload.pull_request.requested_reviewers = (
+            initialReviewers
+          );
+        });
     });
 
     describe('when other reviewers are yet to review and are assigned', () => {
@@ -506,7 +513,9 @@ describe('Pull Request Review Module', () => {
         expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
           repo: reviewPayloadData.payload.repository.name,
-          q: `repo:oppia/oppia review:approved ${reviewPayloadData.payload.pull_request.number}`,
+          q:
+            'repo:oppia/oppia review:approved ' +
+            reviewPayloadData.payload.pull_request.number,
         });
       });
 
@@ -527,105 +536,112 @@ describe('Pull Request Review Module', () => {
 
       afterAll(() => {
         reviewPayloadData.payload.pull_request.assignees = initialAssignees;
-        reviewPayloadData.payload.pull_request.requested_reviewers = initialReviewers;
+        reviewPayloadData.payload.pull_request.requested_reviewers = (
+          initialReviewers
+        );
       });
     });
 
-    describe('when other reviewers are yet to review and some are assigned', () => {
-      const initialAssignees = [
-        ...reviewPayloadData.payload.pull_request.assignees,
-      ];
-      const initialReviewers = [
-        ...reviewPayloadData.payload.pull_request.requested_reviewers,
-      ];
-      beforeAll(() => {
-        reviewPayloadData.payload.pull_request.requested_reviewers = [
-          ...reviewPayloadData.payload.pull_request.requested_reviewers,
-          { login: 'reviewer2' },
-          { login: 'reviewer3' },
-        ];
-
-        reviewPayloadData.payload.pull_request.assignees = [
+    describe(
+      'when other reviewers are yet to review and some are assigned', () => {
+        const initialAssignees = [
           ...reviewPayloadData.payload.pull_request.assignees,
-          { login: 'reviewer2' },
         ];
-      });
-      beforeEach(async () => {
-        github.search = {
-          issuesAndPullRequests: jasmine
-            .createSpy('issuesAndPullRequests')
-            .and.resolveTo({
-              data: {
-                items: [],
-              },
-            }),
-        };
-        await robot.receive(reviewPayloadData);
-      });
+        const initialReviewers = [
+          ...reviewPayloadData.payload.pull_request.requested_reviewers,
+        ];
+        beforeAll(() => {
+          reviewPayloadData.payload.pull_request.requested_reviewers = [
+            ...reviewPayloadData.payload.pull_request.requested_reviewers,
+            { login: 'reviewer2' },
+            { login: 'reviewer3' },
+          ];
 
-      it('should check type of review', () => {
-        expect(
-          pullRequestReviewModule.handlePullRequestReview
-        ).toHaveBeenCalled();
-      });
-
-      it('should wait for 3 minutes before performing any action', () => {
-        expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
-      });
-
-      it('should unassign reviewer', async () => {
-        expect(github.issues.removeAssignees).toHaveBeenCalled();
-        expect(github.issues.removeAssignees).toHaveBeenCalledWith({
-          owner: reviewPayloadData.payload.repository.owner.login,
-          repo: reviewPayloadData.payload.repository.name,
-          issue_number: reviewPayloadData.payload.pull_request.number,
-          assignees: [reviewPayloadData.payload.review.user.login],
+          reviewPayloadData.payload.pull_request.assignees = [
+            ...reviewPayloadData.payload.pull_request.assignees,
+            { login: 'reviewer2' },
+          ];
         });
-      });
-
-      it('should check if all reviewers have approved the PR', () => {
-        expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
-        expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
-          owner: reviewPayloadData.payload.repository.owner.login,
-          repo: reviewPayloadData.payload.repository.name,
-          q: `repo:oppia/oppia review:approved ${reviewPayloadData.payload.pull_request.number}`,
+        beforeEach(async () => {
+          github.search = {
+            issuesAndPullRequests: jasmine
+              .createSpy('issuesAndPullRequests')
+              .and.resolveTo({
+                data: {
+                  items: [],
+                },
+              }),
+          };
+          await robot.receive(reviewPayloadData);
         });
-      });
 
-      it('should assign remaining reviewers', () => {
-        expect(github.issues.addAssignees).toHaveBeenCalled();
-        expect(github.issues.addAssignees).toHaveBeenCalledWith({
-          owner: reviewPayloadData.payload.repository.owner.login,
-          repo: reviewPayloadData.payload.repository.name,
-          issue_number: reviewPayloadData.payload.pull_request.number,
-          assignees: ['reviewer3'],
+        it('should check type of review', () => {
+          expect(
+            pullRequestReviewModule.handlePullRequestReview
+          ).toHaveBeenCalled();
         });
-      });
 
-      it('should ping remaining reviewers', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
-          owner: reviewPayloadData.payload.repository.owner.login,
-          repo: reviewPayloadData.payload.repository.name,
-          issue_number: reviewPayloadData.payload.pull_request.number,
-          body: 'Assigning @reviewer3 for code owner reviews' + ', Thanks!',
+        it('should wait for 3 minutes before performing any action', () => {
+          expect(utilityModule.sleep).toHaveBeenCalled();
+          expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
         });
-      });
 
-      it('should not assign pr author', () => {
-        expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
-          owner: reviewPayloadData.payload.repository.owner.login,
-          repo: reviewPayloadData.payload.repository.name,
-          issue_number: reviewPayloadData.payload.pull_request.number,
-          assignees: [reviewPayloadData.payload.pull_request.user.login],
+        it('should unassign reviewer', async () => {
+          expect(github.issues.removeAssignees).toHaveBeenCalled();
+          expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
+            issue_number: reviewPayloadData.payload.pull_request.number,
+            assignees: [reviewPayloadData.payload.review.user.login],
+          });
         });
-      });
 
-      afterAll(() => {
-        reviewPayloadData.payload.pull_request.requested_reviewers = initialReviewers;
-        reviewPayloadData.payload.pull_request.assignees = initialAssignees;
-      });
+        it('should check if all reviewers have approved the PR', () => {
+          expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
+          expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
+            q:
+              'repo:oppia/oppia review:approved ' +
+              reviewPayloadData.payload.pull_request.number,
+          });
+        });
+
+        it('should assign remaining reviewers', () => {
+          expect(github.issues.addAssignees).toHaveBeenCalled();
+          expect(github.issues.addAssignees).toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
+            issue_number: reviewPayloadData.payload.pull_request.number,
+            assignees: ['reviewer3'],
+          });
+        });
+
+        it('should ping remaining reviewers', () => {
+          expect(github.issues.createComment).toHaveBeenCalled();
+          expect(github.issues.createComment).toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
+            issue_number: reviewPayloadData.payload.pull_request.number,
+            body: 'Assigning @reviewer3 for code owner reviews' + ', Thanks!',
+          });
+        });
+
+        it('should not assign pr author', () => {
+          expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
+            issue_number: reviewPayloadData.payload.pull_request.number,
+            assignees: [reviewPayloadData.payload.pull_request.user.login],
+          });
+        });
+
+        afterAll(() => {
+          reviewPayloadData.payload.pull_request.requested_reviewers = (
+            initialReviewers
+          );
+          reviewPayloadData.payload.pull_request.assignees = initialAssignees;
+        });
     });
 
     describe(
@@ -642,7 +658,9 @@ describe('Pull Request Review Module', () => {
       const changelogLabel = {
         name: 'PR CHANGELOG: Server Errors -- @kevintab95'
       };
-      const initialAssignees = [...reviewPayloadData.payload.pull_request.assignees];
+      const initialAssignees = [
+        ...reviewPayloadData.payload.pull_request.assignees
+      ];
       beforeAll(() => {
         reviewPayloadData.payload.pull_request.requested_reviewers = [];
         reviewPayloadData.payload.pull_request.assignees = [];
@@ -727,15 +745,17 @@ describe('Pull Request Review Module', () => {
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
           body:
-            'Hi @kevintab95, this PR is ready to be merged. We are assigning you ' +
-            'since the author does not have merging rights. Please make ' +
-            'sure there are no pending comments from the ' +
+            'Hi @kevintab95, this PR is ready to be merged. We are ' +
+            'assigning you since the author does not have merging rights. ' +
+            'Please make sure there are no pending comments from the ' +
             "author's end before merge. Thanks!",
         });
       });
 
       afterAll(() => {
-        reviewPayloadData.payload.pull_request.requested_reviewers = initialReviewers;
+        reviewPayloadData.payload.pull_request.requested_reviewers = (
+          initialReviewers
+        );
         reviewPayloadData.payload.pull_request.assignees = initialAssignees;
         reviewPayloadData.payload.pull_request.labels = initialLabels;
       });
@@ -844,7 +864,9 @@ describe('Pull Request Review Module', () => {
       });
 
       afterAll(() => {
-        reviewPayloadData.payload.pull_request.requested_reviewers = initialReviewers;
+        reviewPayloadData.payload.pull_request.requested_reviewers = (
+          initialReviewers
+        );
       });
     });
     describe(
@@ -937,7 +959,9 @@ describe('Pull Request Review Module', () => {
       });
 
       afterAll(() => {
-        reviewPayloadData.payload.pull_request.requested_reviewers = initialReviewers;
+        reviewPayloadData.payload.pull_request.requested_reviewers = (
+          initialReviewers
+        );
         reviewPayloadData.payload.pull_request.labels = initialLabels;
       });
     });
@@ -1037,7 +1061,8 @@ describe('Pull Request Review Module', () => {
     });
 
     describe(
-      'when author asks reviewer to ptal and does not assign them and author is assigned', () => {
+      'when author asks reviewer to ptal and does not assign them and author ' +
+      'is assigned', () => {
         const initialAssignees = commentPayloadData.payload.issue.assignees;
         beforeAll(() => {
           commentPayloadData.payload.issue.assignees = [
@@ -1046,6 +1071,7 @@ describe('Pull Request Review Module', () => {
             }
           ];
         });
+
         beforeEach(async () => {
           await robot.receive(commentPayloadData);
         });
@@ -1088,6 +1114,16 @@ describe('Pull Request Review Module', () => {
             issue_number: commentPayloadData.payload.issue.number,
             assignees: [commentPayloadData.payload.issue.user.login],
           });
+
+          expect(github.issues.createComment).toHaveBeenCalled();
+          expect(github.issues.createComment).toHaveBeenCalledWith({
+            repo: commentPayloadData.payload.repository.name,
+            owner: commentPayloadData.payload.repository.owner.login,
+            issue_number: commentPayloadData.payload.issue.number,
+            body:
+              'Unassigning @author since a re-review was requested ' +
+              '- please make sure all comments are addressed. Thanks!',
+          });
         })
 
         afterAll(() => {
@@ -1097,7 +1133,8 @@ describe('Pull Request Review Module', () => {
     );
 
     describe(
-      'when author asks reviewer to ptal and assigns some of them already', () => {
+      'when author asks reviewer to ptal and assigns some of them ' +
+      'already', () => {
         const initialAssignees = commentPayloadData.payload.issue.assignees;
         beforeAll(() => {
           commentPayloadData.payload.issue.assignees = [
