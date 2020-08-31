@@ -1121,8 +1121,9 @@ describe('Pull Request Review Module', () => {
             owner: commentPayloadData.payload.repository.owner.login,
             issue_number: commentPayloadData.payload.issue.number,
             body:
-              'Unassigning @author since a re-review was requested ' +
-              '- please make sure all comments are addressed. Thanks!',
+              'Unassigning @testuser since a re-review was requested. ' +
+              '@testuser, please make sure you have addressed all review ' +
+              'comments. Thanks!',
           });
         })
 
