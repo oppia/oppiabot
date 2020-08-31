@@ -41,7 +41,6 @@ describe('Pull Request Review Module', () => {
    */
   let app;
 
-  const THREE_MINUTES = 180000;
   beforeEach(() => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => {});
 
@@ -91,7 +90,8 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(
+          utilityModule.THREE_MINUTES);
       });
 
       it('should unassign reviewer', async () => {
@@ -160,7 +160,8 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(
+          utilityModule.THREE_MINUTES);
       });
 
       it('should unassign reviewer', async () => {
@@ -224,7 +225,8 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(
+          utilityModule.THREE_MINUTES);
       });
 
       it('should not unassign reviewer', async () => {
@@ -280,7 +282,8 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(
+          utilityModule.THREE_MINUTES);
       });
 
       it('should not unassign reviewer', async () => {
@@ -316,7 +319,8 @@ describe('Pull Request Review Module', () => {
 
         it('should wait for 3 minutes before performing any action', () => {
           expect(utilityModule.sleep).toHaveBeenCalled();
-          expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+          expect(utilityModule.sleep).toHaveBeenCalledWith(
+            utilityModule.THREE_MINUTES);
         });
 
         it('should not unassign reviewer', async () => {
@@ -381,7 +385,8 @@ describe('Pull Request Review Module', () => {
 
         it('should wait for 3 minutes before performing any action', () => {
           expect(utilityModule.sleep).toHaveBeenCalled();
-          expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+          expect(utilityModule.sleep).toHaveBeenCalledWith(
+            utilityModule.THREE_MINUTES);
         });
 
         it('should unassign reviewer', async () => {
@@ -484,7 +489,8 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(
+          utilityModule.THREE_MINUTES);
       });
 
       it('should unassign reviewer', async () => {
@@ -583,7 +589,8 @@ describe('Pull Request Review Module', () => {
 
         it('should wait for 3 minutes before performing any action', () => {
           expect(utilityModule.sleep).toHaveBeenCalled();
-          expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+          expect(utilityModule.sleep).toHaveBeenCalledWith(
+            utilityModule.THREE_MINUTES);
         });
 
         it('should unassign reviewer', async () => {
@@ -692,7 +699,8 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(
+          utilityModule.THREE_MINUTES);
       });
 
       it('should not unassign reviewer', async () => {
@@ -797,7 +805,8 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(
+          utilityModule.THREE_MINUTES);
       });
 
       it('should unassign reviewer', async () => {
@@ -912,7 +921,8 @@ describe('Pull Request Review Module', () => {
 
       it('should wait for 3 minutes before performing any action', () => {
         expect(utilityModule.sleep).toHaveBeenCalled();
-        expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(
+          utilityModule.THREE_MINUTES);
       });
 
       it('should unassign reviewer', async () => {
@@ -986,7 +996,8 @@ describe('Pull Request Review Module', () => {
 
         it('should wait for 3 minutes before performing any action', () => {
           expect(utilityModule.sleep).toHaveBeenCalled();
-          expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+          expect(utilityModule.sleep).toHaveBeenCalledWith(
+            utilityModule.THREE_MINUTES);
         });
 
         it('should not unassign reviewer', async () => {
@@ -1084,7 +1095,8 @@ describe('Pull Request Review Module', () => {
 
         it('should wait for 3 minutes before performing any action', () => {
           expect(utilityModule.sleep).toHaveBeenCalled();
-          expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+          expect(utilityModule.sleep).toHaveBeenCalledWith(
+            utilityModule.THREE_MINUTES);
         });
 
         it('should get the updated version of the pull request', () => {
@@ -1156,7 +1168,8 @@ describe('Pull Request Review Module', () => {
 
         it('should wait for 3 minutes before performing any action', () => {
           expect(utilityModule.sleep).toHaveBeenCalled();
-          expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+          expect(utilityModule.sleep).toHaveBeenCalledWith(
+            utilityModule.THREE_MINUTES);
         });
 
         it('should get the updated version of the pull request', () => {
@@ -1209,7 +1222,8 @@ describe('Pull Request Review Module', () => {
 
         it('should wait for 3 minutes before performing any action', () => {
           expect(utilityModule.sleep).toHaveBeenCalled();
-          expect(utilityModule.sleep).toHaveBeenCalledWith(THREE_MINUTES);
+          expect(utilityModule.sleep).toHaveBeenCalledWith(
+            utilityModule.THREE_MINUTES);
         });
 
         it('should get the updated version of the pull request', () => {
@@ -1258,7 +1272,8 @@ describe('Pull Request Review Module', () => {
 
       it('should not wait for 3 minutes', () => {
         expect(utilityModule.sleep).not.toHaveBeenCalled();
-        expect(utilityModule.sleep).not.toHaveBeenCalledWith(THREE_MINUTES);
+        expect(utilityModule.sleep).not.toHaveBeenCalledWith(
+          utilityModule.THREE_MINUTES);
       });
 
       it('should not get the updated version of the pull request', () => {
@@ -1314,7 +1329,8 @@ describe('Pull Request Review Module', () => {
 
       it('should not wait for 3 minutes', () => {
         expect(utilityModule.sleep).not.toHaveBeenCalled();
-        expect(utilityModule.sleep).not.toHaveBeenCalledWith(THREE_MINUTES);
+        expect(utilityModule.sleep).not.toHaveBeenCalledWith(
+          utilityModule.THREE_MINUTES);
       });
 
       it('should not get the updated version of the pull request', () => {
@@ -1362,7 +1378,8 @@ describe('Pull Request Review Module', () => {
 
         it('should not wait for 3 minutes', () => {
           expect(utilityModule.sleep).not.toHaveBeenCalled();
-          expect(utilityModule.sleep).not.toHaveBeenCalledWith(THREE_MINUTES);
+          expect(utilityModule.sleep).not.toHaveBeenCalledWith(
+            utilityModule.THREE_MINUTES);
         });
 
         it('should not get the updated version of the pull request', () => {
