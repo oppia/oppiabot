@@ -216,11 +216,16 @@ describe('Periodic Checks Module', () => {
       mergeConflictModule,
       'checkMergeConflictsInPullRequest'
     ).and.callThrough();
-    spyOn(periodicCheckModule, 'ensurePullRequestIsAssigned').and.callThrough();
   });
 
   describe('when pull request has merge conflict', () => {
     beforeEach(async () => {
+      spyOn(
+        periodicCheckModule, 'ensurePullRequestIsAssigned'
+      ).and.callThrough();
+      spyOn(
+        periodicCheckModule, 'ensureIssueHasProjects'
+      ).and.callFake(() => {});
       const mergeConflictPR = pullRequests.mergeConflictPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [mergeConflictPR, pullRequests.assignedPullRequest],
@@ -282,6 +287,12 @@ describe('Periodic Checks Module', () => {
 
   describe('when pull request has pending reviews', () => {
     beforeEach(async () => {
+      spyOn(
+        periodicCheckModule, 'ensurePullRequestIsAssigned'
+      ).and.callThrough();
+      spyOn(
+        periodicCheckModule, 'ensureIssueHasProjects'
+      ).and.callFake(() => {});
       const pendingReviewPR = pullRequests.pendingReviewPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [pendingReviewPR, pullRequests.assignedPullRequest],
@@ -328,6 +339,12 @@ describe('Periodic Checks Module', () => {
 
   describe('when pull request has changes requested', () => {
     beforeEach(async () => {
+      spyOn(
+        periodicCheckModule, 'ensurePullRequestIsAssigned'
+      ).and.callThrough();
+      spyOn(
+        periodicCheckModule, 'ensureIssueHasProjects'
+      ).and.callFake(() => {});
       const changesRequestedPR = pullRequests.hasChangesRequestedPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [changesRequestedPR, pullRequests.assignedPullRequest],
@@ -401,6 +418,12 @@ describe('Periodic Checks Module', () => {
   describe(
     'when pull request has been approved and author has merging rights', () => {
     beforeEach(async () => {
+      spyOn(
+        periodicCheckModule, 'ensurePullRequestIsAssigned'
+      ).and.callThrough();
+      spyOn(
+        periodicCheckModule, 'ensureIssueHasProjects'
+      ).and.callFake(() => {});
       const approvedPR = pullRequests.approvedPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [approvedPR, pullRequests.assignedPullRequest],
@@ -452,11 +475,16 @@ describe('Periodic Checks Module', () => {
       'author does not have merging rights',
     () => {
       beforeEach(async () => {
+        spyOn(
+          periodicCheckModule, 'ensurePullRequestIsAssigned'
+        ).and.callThrough();
+        spyOn(
+          periodicCheckModule, 'ensureIssueHasProjects'
+        ).and.callFake(() => {});
         const approvedPR = pullRequests.approvedPRWithLabel;
         github.pulls.list = jasmine.createSpy('list').and.resolveTo({
           data: [approvedPR, pullRequests.assignedPullRequest],
         });
-
         await robot.receive(payloadData);
       });
 
@@ -501,6 +529,12 @@ describe('Periodic Checks Module', () => {
 
   describe('when pull request does not match any of the above cases', () => {
     beforeEach(async () => {
+      spyOn(
+        periodicCheckModule, 'ensurePullRequestIsAssigned'
+      ).and.callThrough();
+      spyOn(
+        periodicCheckModule, 'ensureIssueHasProjects'
+      ).and.callFake(() => {});
       const approvedPR = pullRequests.unResolvablePR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [approvedPR, pullRequests.assignedPullRequest],
@@ -536,5 +570,335 @@ describe('Periodic Checks Module', () => {
         assignees: ['Showtim3'],
       });
     });
+  });
+
+  describe('Should ensure all issues have been assigned to a project', () => {
+    const issues = {
+      withoutProject: {
+        number: 1,
+        labels: []
+      },
+      anotherWithoutProject: {
+        number: 2,
+        labels: []
+      },
+      withProject: {
+        number: 3,
+        labels: []
+      },
+      anotherWithProject: {
+        number: 4,
+        labels: []
+      },
+      withoutProjectButHasTriageLabel: {
+        number: 5,
+        labels: [
+          {
+            name: 'TODO: triage',
+          },
+        ],
+      },
+    };
+
+    const projects = [
+      {
+        id: 101,
+        columns: [
+          {
+            id: 111,
+            cards: [
+              {
+                content_url:
+                  'https://api.github.com/repos/api-playground/projects-test/issues/3',
+              },
+              {
+                content_url:
+                  'https://api.github.com/repos/api-playground/projects-test/issues/4',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 102,
+        columns: [
+          {
+            id: 112,
+            cards: [
+              {
+                content_url:
+                  'https://api.github.com/repos/api-playground/projects-test/issues/30',
+              },
+            ],
+          },
+          {
+            id: 113,
+            cards: [],
+          },
+        ],
+      },
+    ];
+    beforeEach(() => {
+      spyOn(
+        periodicCheckModule,
+        'ensurePullRequestIsAssigned'
+      ).and.callFake(() => {});
+      spyOn(periodicCheckModule, 'ensureIssueHasProjects').and.callThrough();
+
+      github.projects = {
+        listForRepo: jasmine.createSpy('listForRepo').and.resolveTo({
+          data: projects,
+        }),
+
+        listColumns: jasmine.createSpy('listColumns').and.callFake((params) => {
+          const currentProject = projects.find(
+            (project) => project.id === params.project_id
+          );
+          return {
+            data: currentProject.columns
+          }
+        }),
+
+        listCards: jasmine.createSpy('listCards').and.callFake((params) => {
+          const currentProject = projects.find(project => {
+            const columnIds = project.columns.map(column => column.id);
+            return columnIds.includes(params.column_id)
+          })
+          const currentColumn = currentProject.columns.find(column => column.id === params.column_id)
+          return {data: currentColumn.cards};
+        })
+      };
+    });
+
+    describe('When all issues have been added to a project', () => {
+      beforeEach(async () => {
+        github.issues.listForRepo = jasmine
+          .createSpy('listForRepo')
+          .and.resolveTo({
+            data: [issues.withProject, issues.anotherWithProject],
+          });
+        await robot.receive(payloadData);
+      });
+
+      it('should call ensureIssueHasProjects function', () => {
+        expect(periodicCheckModule.ensureIssueHasProjects).toHaveBeenCalled()
+      })
+
+      it('should get all open issues', () => {
+        expect(github.issues.listForRepo).toHaveBeenCalled()
+        expect(github.issues.listForRepo).toHaveBeenCalledWith({
+          owner: 'oppia',
+          repo: 'oppia',
+          per_page: 100,
+          state: 'open',
+          page: 1
+        });
+      });
+
+      it('should get all project cards', () => {
+        expect(github.projects.listForRepo).toHaveBeenCalled();
+        expect(github.projects.listForRepo).toHaveBeenCalledWith({
+          repo: 'oppia',
+          owner: 'oppia'
+        });
+
+        expect(github.projects.listColumns).toHaveBeenCalled();
+        expect(github.projects.listColumns).toHaveBeenCalledTimes(2);
+        expect(github.projects.listColumns).toHaveBeenCalledWith({
+          project_id: 101,
+        });
+        expect(github.projects.listColumns).toHaveBeenCalledWith({
+          project_id: 102,
+        });
+
+        expect(github.projects.listCards).toHaveBeenCalled();
+        expect(github.projects.listCards).toHaveBeenCalledTimes(3);
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 111
+        });
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 112
+        });
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 113
+        });
+      });
+
+      it('should not add triage label', () => {
+        expect(github.issues.addLabels).not.toHaveBeenCalled()
+      })
+
+      it('should not ping core maintainers', () => {
+        expect(github.issues.createComment).not.toHaveBeenCalled()
+      })
+    });
+
+    describe('When some issues have not been added to a project', () => {
+      beforeEach(async () => {
+        github.issues.listForRepo = jasmine
+          .createSpy('listForRepo')
+          .and.resolveTo({
+            data: [issues.withProject, issues.anotherWithProject, issues.withoutProject],
+          });
+        await robot.receive(payloadData);
+      });
+
+      it('should call ensureIssueHasProjects function', () => {
+        expect(periodicCheckModule.ensureIssueHasProjects).toHaveBeenCalled()
+      })
+
+      it('should get all open issues', () => {
+        expect(github.issues.listForRepo).toHaveBeenCalled()
+        expect(github.issues.listForRepo).toHaveBeenCalledWith({
+          owner: 'oppia',
+          repo: 'oppia',
+          per_page: 100,
+          state: 'open',
+          page: 1
+        });
+      });
+
+      it('should get all project cards', () => {
+        expect(github.projects.listForRepo).toHaveBeenCalled();
+        expect(github.projects.listForRepo).toHaveBeenCalledWith({
+          repo: 'oppia',
+          owner: 'oppia'
+        });
+
+        expect(github.projects.listColumns).toHaveBeenCalled();
+        expect(github.projects.listColumns).toHaveBeenCalledTimes(2);
+        expect(github.projects.listColumns).toHaveBeenCalledWith({
+          project_id: 101,
+        });
+        expect(github.projects.listColumns).toHaveBeenCalledWith({
+          project_id: 102,
+        });
+
+        expect(github.projects.listCards).toHaveBeenCalled();
+        expect(github.projects.listCards).toHaveBeenCalledTimes(3);
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 111
+        });
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 112
+        });
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 113
+        });
+      });
+
+      it('should add triage label', () => {
+        expect(github.issues.addLabels).toHaveBeenCalled();
+        expect(github.issues.addLabels).toHaveBeenCalledWith({
+          owner: 'oppia',
+          repo: 'oppia',
+          issue_number: 1,
+          labels: ['TODO: triage'],
+        });
+      })
+
+      it('should ping core maintainers', () => {
+        expect(github.issues.createComment).toHaveBeenCalled()
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          owner: 'oppia',
+          repo: 'oppia',
+          issue_number: 1,
+          body:
+            'Hi @oppia/core-maintainers, this issue is not assigned ' +
+            'to any project. Can you please update the same? Thanks!',
+        })
+      })
+    });
+
+    describe(
+      'When an issue has not been added to a project and already has triage ' +
+      'label', () => {
+        beforeEach(async () => {
+          github.issues.listForRepo = jasmine
+            .createSpy('listForRepo')
+            .and.resolveTo({
+              data: [issues.withoutProject, issues.withoutProjectButHasTriageLabel, issues.withProject],
+            });
+          await robot.receive(payloadData);
+        });
+
+        it('should call ensureIssueHasProjects function', () => {
+          expect(periodicCheckModule.ensureIssueHasProjects).toHaveBeenCalled()
+        })
+
+        it('should get all open issues', () => {
+          expect(github.issues.listForRepo).toHaveBeenCalled()
+          expect(github.issues.listForRepo).toHaveBeenCalledWith({
+            owner: 'oppia',
+            repo: 'oppia',
+            per_page: 100,
+            state: 'open',
+            page: 1
+          });
+        });
+
+        it('should get all project cards', () => {
+          expect(github.projects.listForRepo).toHaveBeenCalled();
+          expect(github.projects.listForRepo).toHaveBeenCalledWith({
+            repo: 'oppia',
+            owner: 'oppia'
+          });
+
+          expect(github.projects.listColumns).toHaveBeenCalled();
+          expect(github.projects.listColumns).toHaveBeenCalledTimes(2);
+          expect(github.projects.listColumns).toHaveBeenCalledWith({
+            project_id: 101,
+          });
+          expect(github.projects.listColumns).toHaveBeenCalledWith({
+            project_id: 102,
+          });
+
+          expect(github.projects.listCards).toHaveBeenCalled();
+          expect(github.projects.listCards).toHaveBeenCalledTimes(3);
+          expect(github.projects.listCards).toHaveBeenCalledWith({
+            archived_state: 'not_archived',
+            column_id: 111
+          });
+          expect(github.projects.listCards).toHaveBeenCalledWith({
+            archived_state: 'not_archived',
+            column_id: 112
+          });
+          expect(github.projects.listCards).toHaveBeenCalledWith({
+            archived_state: 'not_archived',
+            column_id: 113
+          });
+        });
+
+        it('should add triage label once', () => {
+          expect(github.issues.addLabels).toHaveBeenCalled();
+          expect(github.issues.addLabels).toHaveBeenCalledTimes(1);
+          expect(github.issues.addLabels).toHaveBeenCalledWith({
+            owner: 'oppia',
+            repo: 'oppia',
+            issue_number: 1,
+            labels: ['TODO: triage'],
+          });
+        })
+
+        it('should ping core maintainers', () => {
+          expect(github.issues.createComment).toHaveBeenCalled()
+          expect(github.issues.createComment).toHaveBeenCalledTimes(2)
+          expect(github.issues.createComment).toHaveBeenCalledWith({
+            owner: 'oppia',
+            repo: 'oppia',
+            issue_number: 1,
+            body:
+              'Hi @oppia/core-maintainers, this issue is not assigned ' +
+              'to any project. Can you please update the same? Thanks!',
+          })
+        })
+      }
+    )
   });
 });
