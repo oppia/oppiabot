@@ -131,9 +131,9 @@ describe('Pull Request Review Module', () => {
           issue_number: reviewPayloadData.payload.pull_request.number,
           body:
             'Hi @' +
-            payloadData.payload.pull_request.user.login +
+            reviewPayloadData.payload.pull_request.user.login +
             ', it looks like some changes were requested on this pull request by @' +
-            payloadData.payload.review.user.login +
+            reviewPayloadData.payload.review.user.login +
             '. PTAL. Thanks!',
         });
       });
@@ -195,9 +195,9 @@ describe('Pull Request Review Module', () => {
           issue_number: reviewPayloadData.payload.pull_request.number,
           body:
             'Hi @' +
-            payloadData.payload.pull_request.user.login +
+            reviewPayloadData.payload.pull_request.user.login +
             ', it looks like some changes were requested on this pull request by @' +
-            payloadData.payload.review.user.login +
+            reviewPayloadData.payload.review.user.login +
             '. PTAL. Thanks!',
         });
       });
@@ -247,9 +247,9 @@ describe('Pull Request Review Module', () => {
           issue_number: reviewPayloadData.payload.pull_request.number,
           body:
             'Hi @' +
-            payloadData.payload.pull_request.user.login +
+            reviewPayloadData.payload.pull_request.user.login +
             ', it looks like some changes were requested on this pull request by @' +
-            payloadData.payload.review.user.login +
+            reviewPayloadData.payload.review.user.login +
             '. PTAL. Thanks!',
         });
       });
@@ -418,9 +418,9 @@ describe('Pull Request Review Module', () => {
         it('should ping remaining reviewers', () => {
           expect(github.issues.createComment).toHaveBeenCalled();
           expect(github.issues.createComment).toHaveBeenCalledWith({
-            owner: payloadData.payload.repository.owner.login,
-            repo: payloadData.payload.repository.name,
-            issue_number: payloadData.payload.pull_request.number,
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
+            issue_number: reviewPayloadData.payload.pull_request.number,
             body:
               'Assigning @reviewer2, @reviewer3 for code owner reviews' +
               '. Thanks!',
@@ -620,9 +620,9 @@ describe('Pull Request Review Module', () => {
         it('should ping remaining reviewers', () => {
           expect(github.issues.createComment).toHaveBeenCalled();
           expect(github.issues.createComment).toHaveBeenCalledWith({
-            owner: payloadData.payload.repository.owner.login,
-            repo: payloadData.payload.repository.name,
-            issue_number: payloadData.payload.pull_request.number,
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
+            issue_number: reviewPayloadData.payload.pull_request.number,
             body: 'Assigning @reviewer3 for code owner reviews' + '. Thanks!',
           });
         });
@@ -856,7 +856,7 @@ describe('Pull Request Review Module', () => {
           issue_number: reviewPayloadData.payload.pull_request.number,
           body:
             'Hi @' +
-            payloadData.payload.pull_request.user.login +
+            reviewPayloadData.payload.pull_request.user.login +
             ', this PR is ready to be merged. Please address any remaining ' +
             'comments prior to merging, and feel free to merge this PR once ' +
             "you're happy with it. Thanks!",
