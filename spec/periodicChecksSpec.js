@@ -221,10 +221,10 @@ describe('Periodic Checks Module', () => {
   describe('when pull request has merge conflict', () => {
     beforeEach(async () => {
       spyOn(
-        periodicCheckModule, 'ensurePullRequestIsAssigned'
+        periodicCheckModule, 'ensureAllPullRequestsAreAssigned'
       ).and.callThrough();
       spyOn(
-        periodicCheckModule, 'ensureIssueHasProjects'
+        periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => {});
       const mergeConflictPR = pullRequests.mergeConflictPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
@@ -234,7 +234,7 @@ describe('Periodic Checks Module', () => {
     });
     it('should call periodic check module', () => {
       expect(
-        periodicCheckModule.ensurePullRequestIsAssigned
+        periodicCheckModule.ensureAllPullRequestsAreAssigned
       ).toHaveBeenCalled();
     });
 
@@ -288,10 +288,10 @@ describe('Periodic Checks Module', () => {
   describe('when pull request has pending reviews', () => {
     beforeEach(async () => {
       spyOn(
-        periodicCheckModule, 'ensurePullRequestIsAssigned'
+        periodicCheckModule, 'ensureAllPullRequestsAreAssigned'
       ).and.callThrough();
       spyOn(
-        periodicCheckModule, 'ensureIssueHasProjects'
+        periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => {});
       const pendingReviewPR = pullRequests.pendingReviewPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
@@ -302,7 +302,7 @@ describe('Periodic Checks Module', () => {
 
     it('should call periodic check module', () => {
       expect(
-        periodicCheckModule.ensurePullRequestIsAssigned
+        periodicCheckModule.ensureAllPullRequestsAreAssigned
       ).toHaveBeenCalled();
     });
 
@@ -340,10 +340,10 @@ describe('Periodic Checks Module', () => {
   describe('when pull request has changes requested', () => {
     beforeEach(async () => {
       spyOn(
-        periodicCheckModule, 'ensurePullRequestIsAssigned'
+        periodicCheckModule, 'ensureAllPullRequestsAreAssigned'
       ).and.callThrough();
       spyOn(
-        periodicCheckModule, 'ensureIssueHasProjects'
+        periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => {});
       const changesRequestedPR = pullRequests.hasChangesRequestedPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
@@ -388,7 +388,7 @@ describe('Periodic Checks Module', () => {
 
     it('should call periodic check module', () => {
       expect(
-        periodicCheckModule.ensurePullRequestIsAssigned
+        periodicCheckModule.ensureAllPullRequestsAreAssigned
       ).toHaveBeenCalled();
     });
 
@@ -419,10 +419,10 @@ describe('Periodic Checks Module', () => {
     'when pull request has been approved and author has merging rights', () => {
     beforeEach(async () => {
       spyOn(
-        periodicCheckModule, 'ensurePullRequestIsAssigned'
+        periodicCheckModule, 'ensureAllPullRequestsAreAssigned'
       ).and.callThrough();
       spyOn(
-        periodicCheckModule, 'ensureIssueHasProjects'
+        periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => {});
       const approvedPR = pullRequests.approvedPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
@@ -434,7 +434,7 @@ describe('Periodic Checks Module', () => {
 
     it('should call periodic check module', () => {
       expect(
-        periodicCheckModule.ensurePullRequestIsAssigned
+        periodicCheckModule.ensureAllPullRequestsAreAssigned
       ).toHaveBeenCalled();
     });
 
@@ -476,10 +476,10 @@ describe('Periodic Checks Module', () => {
     () => {
       beforeEach(async () => {
         spyOn(
-          periodicCheckModule, 'ensurePullRequestIsAssigned'
+          periodicCheckModule, 'ensureAllPullRequestsAreAssigned'
         ).and.callThrough();
         spyOn(
-          periodicCheckModule, 'ensureIssueHasProjects'
+          periodicCheckModule, 'ensureAllIssuesHaveProjects'
         ).and.callFake(() => {});
         const approvedPR = pullRequests.approvedPRWithLabel;
         github.pulls.list = jasmine.createSpy('list').and.resolveTo({
@@ -490,7 +490,7 @@ describe('Periodic Checks Module', () => {
 
       it('should call periodic check module', () => {
         expect(
-          periodicCheckModule.ensurePullRequestIsAssigned
+          periodicCheckModule.ensureAllPullRequestsAreAssigned
         ).toHaveBeenCalled();
       });
 
@@ -530,10 +530,10 @@ describe('Periodic Checks Module', () => {
   describe('when pull request does not match any of the above cases', () => {
     beforeEach(async () => {
       spyOn(
-        periodicCheckModule, 'ensurePullRequestIsAssigned'
+        periodicCheckModule, 'ensureAllPullRequestsAreAssigned'
       ).and.callThrough();
       spyOn(
-        periodicCheckModule, 'ensureIssueHasProjects'
+        periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => {});
       const approvedPR = pullRequests.unResolvablePR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
@@ -545,11 +545,11 @@ describe('Periodic Checks Module', () => {
 
     it('should call periodic check module', () => {
       expect(
-        periodicCheckModule.ensurePullRequestIsAssigned
+        periodicCheckModule.ensureAllPullRequestsAreAssigned
       ).toHaveBeenCalled();
     });
 
-    it('should ping welfare team lead', () => {
+    it('should ping onboarding team lead', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: 6,
@@ -561,7 +561,7 @@ describe('Periodic Checks Module', () => {
       });
     });
 
-    it('should assign welfare team lead', () => {
+    it('should assign onboarding team lead', () => {
       expect(github.issues.addAssignees).toHaveBeenCalled();
       expect(github.issues.addAssignees).toHaveBeenCalledWith({
         issue_number: 6,
@@ -641,9 +641,9 @@ describe('Periodic Checks Module', () => {
     beforeEach(() => {
       spyOn(
         periodicCheckModule,
-        'ensurePullRequestIsAssigned'
+        'ensureAllPullRequestsAreAssigned'
       ).and.callFake(() => {});
-      spyOn(periodicCheckModule, 'ensureIssueHasProjects').and.callThrough();
+      spyOn(periodicCheckModule, 'ensureAllIssuesHaveProjects').and.callThrough();
 
       github.projects = {
         listForRepo: jasmine.createSpy('listForRepo').and.resolveTo({
@@ -680,8 +680,8 @@ describe('Periodic Checks Module', () => {
         await robot.receive(payloadData);
       });
 
-      it('should call ensureIssueHasProjects function', () => {
-        expect(periodicCheckModule.ensureIssueHasProjects).toHaveBeenCalled()
+      it('should call ensureAllIssuesHaveProjects function', () => {
+        expect(periodicCheckModule.ensureAllIssuesHaveProjects).toHaveBeenCalled()
       })
 
       it('should get all open issues', () => {
@@ -746,8 +746,8 @@ describe('Periodic Checks Module', () => {
         await robot.receive(payloadData);
       });
 
-      it('should call ensureIssueHasProjects function', () => {
-        expect(periodicCheckModule.ensureIssueHasProjects).toHaveBeenCalled()
+      it('should call ensureAllIssuesHaveProjects function', () => {
+        expect(periodicCheckModule.ensureAllIssuesHaveProjects).toHaveBeenCalled()
       })
 
       it('should get all open issues', () => {
@@ -828,8 +828,8 @@ describe('Periodic Checks Module', () => {
           await robot.receive(payloadData);
         });
 
-        it('should call ensureIssueHasProjects function', () => {
-          expect(periodicCheckModule.ensureIssueHasProjects).toHaveBeenCalled()
+        it('should call ensureAllIssuesHaveProjects function', () => {
+          expect(periodicCheckModule.ensureAllIssuesHaveProjects).toHaveBeenCalled()
         })
 
         it('should get all open issues', () => {
@@ -888,7 +888,7 @@ describe('Periodic Checks Module', () => {
 
         it('should ping core maintainers', () => {
           expect(github.issues.createComment).toHaveBeenCalled()
-          expect(github.issues.createComment).toHaveBeenCalledTimes(2)
+          expect(github.issues.createComment).toHaveBeenCalledTimes(1)
           expect(github.issues.createComment).toHaveBeenCalledWith({
             owner: 'oppia',
             repo: 'oppia',
@@ -897,7 +897,19 @@ describe('Periodic Checks Module', () => {
               'Hi @oppia/core-maintainers, this issue is not assigned ' +
               'to any project. Can you please update the same? Thanks!',
           })
-        })
+        });
+
+        it('should not ping core maintainers for issue that has triage label',
+          () => {
+            expect(github.issues.createComment).not.toHaveBeenCalledWith({
+              owner: 'oppia',
+              repo: 'oppia',
+              issue_number: issues.withoutProjectButHasTriageLabel.number,
+              body:
+                'Hi @oppia/core-maintainers, this issue is not assigned ' +
+                'to any project. Can you please update the same? Thanks!',
+            })
+        });
       }
     )
   });
