@@ -111,7 +111,7 @@ describe('Oppiabot\'s', () => {
       const params = {
         repo: pullRequestEditedPayload.payload.repository.name,
         owner: pullRequestEditedPayload.payload.repository.owner.login,
-        number: pullRequestEditedPayload.payload.pull_request.number,
+        issue_number: pullRequestEditedPayload.payload.pull_request.number,
         assignees: ['testuser7777'],
       };
       expect(github.issues.addAssignees).toHaveBeenCalledWith(params);
@@ -273,7 +273,7 @@ describe('Oppiabot\'s', () => {
       const params = {
         repo: pullRequestEditedPayload.payload.repository.name,
         owner: pullRequestEditedPayload.payload.repository.owner.login,
-        number: pullRequestEditedPayload.payload.pull_request.number,
+        issue_number: pullRequestEditedPayload.payload.pull_request.number,
         assignees: ['testuser7777'],
       };
       expect(github.issues.addAssignees).toHaveBeenCalledWith(params);

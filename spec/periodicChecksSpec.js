@@ -576,27 +576,19 @@ describe('Periodic Checks Module', () => {
     const issues = {
       withoutProject: {
         number: 1,
-        labels: []
+        labels: [],
       },
       anotherWithoutProject: {
         number: 2,
-        labels: []
+        labels: [],
       },
       withProject: {
         number: 3,
-        labels: []
+        labels: [],
       },
       anotherWithProject: {
         number: 4,
-        labels: []
-      },
-      withoutProjectButHasTriageLabel: {
-        number: 5,
-        labels: [
-          {
-            name: 'TODO: triage',
-          },
-        ],
+        labels: [],
       },
     };
 
@@ -643,7 +635,10 @@ describe('Periodic Checks Module', () => {
         periodicCheckModule,
         'ensureAllPullRequestsAreAssigned'
       ).and.callFake(() => {});
-      spyOn(periodicCheckModule, 'ensureAllIssuesHaveProjects').and.callThrough();
+      spyOn(
+        periodicCheckModule,
+        'ensureAllIssuesHaveProjects'
+      ).and.callThrough();
 
       github.projects = {
         listForRepo: jasmine.createSpy('listForRepo').and.resolveTo({
@@ -655,18 +650,20 @@ describe('Periodic Checks Module', () => {
             (project) => project.id === params.project_id
           );
           return {
-            data: currentProject.columns
-          }
+            data: currentProject.columns,
+          };
         }),
 
         listCards: jasmine.createSpy('listCards').and.callFake((params) => {
-          const currentProject = projects.find(project => {
-            const columnIds = project.columns.map(column => column.id);
-            return columnIds.includes(params.column_id)
-          })
-          const currentColumn = currentProject.columns.find(column => column.id === params.column_id)
-          return {data: currentColumn.cards};
-        })
+          const currentProject = projects.find((project) => {
+            const columnIds = project.columns.map((column) => column.id);
+            return columnIds.includes(params.column_id);
+          });
+          const currentColumn = currentProject.columns.find(
+            (column) => column.id === params.column_id
+          );
+          return { data: currentColumn.cards };
+        }),
       };
     });
 
@@ -681,17 +678,19 @@ describe('Periodic Checks Module', () => {
       });
 
       it('should call ensureAllIssuesHaveProjects function', () => {
-        expect(periodicCheckModule.ensureAllIssuesHaveProjects).toHaveBeenCalled()
-      })
+        expect(
+          periodicCheckModule.ensureAllIssuesHaveProjects
+        ).toHaveBeenCalled();
+      });
 
       it('should get all open issues', () => {
-        expect(github.issues.listForRepo).toHaveBeenCalled()
+        expect(github.issues.listForRepo).toHaveBeenCalled();
         expect(github.issues.listForRepo).toHaveBeenCalledWith({
           owner: 'oppia',
           repo: 'oppia',
           per_page: 100,
           state: 'open',
-          page: 1
+          page: 1,
         });
       });
 
@@ -699,7 +698,7 @@ describe('Periodic Checks Module', () => {
         expect(github.projects.listForRepo).toHaveBeenCalled();
         expect(github.projects.listForRepo).toHaveBeenCalledWith({
           repo: 'oppia',
-          owner: 'oppia'
+          owner: 'oppia',
         });
 
         expect(github.projects.listColumns).toHaveBeenCalled();
@@ -715,25 +714,21 @@ describe('Periodic Checks Module', () => {
         expect(github.projects.listCards).toHaveBeenCalledTimes(3);
         expect(github.projects.listCards).toHaveBeenCalledWith({
           archived_state: 'not_archived',
-          column_id: 111
+          column_id: 111,
         });
         expect(github.projects.listCards).toHaveBeenCalledWith({
           archived_state: 'not_archived',
-          column_id: 112
+          column_id: 112,
         });
         expect(github.projects.listCards).toHaveBeenCalledWith({
           archived_state: 'not_archived',
-          column_id: 113
+          column_id: 113,
         });
       });
 
-      it('should not add triage label', () => {
-        expect(github.issues.addLabels).not.toHaveBeenCalled()
-      })
-
       it('should not ping core maintainers', () => {
-        expect(github.issues.createComment).not.toHaveBeenCalled()
-      })
+        expect(github.issues.createComment).not.toHaveBeenCalled();
+      });
     });
 
     describe('When some issues have not been added to a project', () => {
@@ -741,23 +736,29 @@ describe('Periodic Checks Module', () => {
         github.issues.listForRepo = jasmine
           .createSpy('listForRepo')
           .and.resolveTo({
-            data: [issues.withProject, issues.anotherWithProject, issues.withoutProject],
+            data: [
+              issues.withProject,
+              issues.anotherWithProject,
+              issues.withoutProject,
+            ],
           });
         await robot.receive(payloadData);
       });
 
       it('should call ensureAllIssuesHaveProjects function', () => {
-        expect(periodicCheckModule.ensureAllIssuesHaveProjects).toHaveBeenCalled()
-      })
+        expect(
+          periodicCheckModule.ensureAllIssuesHaveProjects
+        ).toHaveBeenCalled();
+      });
 
       it('should get all open issues', () => {
-        expect(github.issues.listForRepo).toHaveBeenCalled()
+        expect(github.issues.listForRepo).toHaveBeenCalled();
         expect(github.issues.listForRepo).toHaveBeenCalledWith({
           owner: 'oppia',
           repo: 'oppia',
           per_page: 100,
           state: 'open',
-          page: 1
+          page: 1,
         });
       });
 
@@ -765,7 +766,7 @@ describe('Periodic Checks Module', () => {
         expect(github.projects.listForRepo).toHaveBeenCalled();
         expect(github.projects.listForRepo).toHaveBeenCalledWith({
           repo: 'oppia',
-          owner: 'oppia'
+          owner: 'oppia',
         });
 
         expect(github.projects.listColumns).toHaveBeenCalled();
@@ -781,30 +782,20 @@ describe('Periodic Checks Module', () => {
         expect(github.projects.listCards).toHaveBeenCalledTimes(3);
         expect(github.projects.listCards).toHaveBeenCalledWith({
           archived_state: 'not_archived',
-          column_id: 111
+          column_id: 111,
         });
         expect(github.projects.listCards).toHaveBeenCalledWith({
           archived_state: 'not_archived',
-          column_id: 112
+          column_id: 112,
         });
         expect(github.projects.listCards).toHaveBeenCalledWith({
           archived_state: 'not_archived',
-          column_id: 113
+          column_id: 113,
         });
       });
 
-      it('should add triage label', () => {
-        expect(github.issues.addLabels).toHaveBeenCalled();
-        expect(github.issues.addLabels).toHaveBeenCalledWith({
-          owner: 'oppia',
-          repo: 'oppia',
-          issue_number: 1,
-          labels: ['TODO: triage'],
-        });
-      })
-
       it('should ping core maintainers', () => {
-        expect(github.issues.createComment).toHaveBeenCalled()
+        expect(github.issues.createComment).toHaveBeenCalled();
         expect(github.issues.createComment).toHaveBeenCalledWith({
           owner: 'oppia',
           repo: 'oppia',
@@ -812,105 +803,8 @@ describe('Periodic Checks Module', () => {
           body:
             'Hi @oppia/core-maintainers, this issue is not assigned ' +
             'to any project. Can you please update the same? Thanks!',
-        })
-      })
+        });
+      });
     });
-
-    describe(
-      'When an issue has not been added to a project and already has triage ' +
-      'label', () => {
-        beforeEach(async () => {
-          github.issues.listForRepo = jasmine
-            .createSpy('listForRepo')
-            .and.resolveTo({
-              data: [issues.withoutProject, issues.withoutProjectButHasTriageLabel, issues.withProject],
-            });
-          await robot.receive(payloadData);
-        });
-
-        it('should call ensureAllIssuesHaveProjects function', () => {
-          expect(periodicCheckModule.ensureAllIssuesHaveProjects).toHaveBeenCalled()
-        })
-
-        it('should get all open issues', () => {
-          expect(github.issues.listForRepo).toHaveBeenCalled()
-          expect(github.issues.listForRepo).toHaveBeenCalledWith({
-            owner: 'oppia',
-            repo: 'oppia',
-            per_page: 100,
-            state: 'open',
-            page: 1
-          });
-        });
-
-        it('should get all project cards', () => {
-          expect(github.projects.listForRepo).toHaveBeenCalled();
-          expect(github.projects.listForRepo).toHaveBeenCalledWith({
-            repo: 'oppia',
-            owner: 'oppia'
-          });
-
-          expect(github.projects.listColumns).toHaveBeenCalled();
-          expect(github.projects.listColumns).toHaveBeenCalledTimes(2);
-          expect(github.projects.listColumns).toHaveBeenCalledWith({
-            project_id: 101,
-          });
-          expect(github.projects.listColumns).toHaveBeenCalledWith({
-            project_id: 102,
-          });
-
-          expect(github.projects.listCards).toHaveBeenCalled();
-          expect(github.projects.listCards).toHaveBeenCalledTimes(3);
-          expect(github.projects.listCards).toHaveBeenCalledWith({
-            archived_state: 'not_archived',
-            column_id: 111
-          });
-          expect(github.projects.listCards).toHaveBeenCalledWith({
-            archived_state: 'not_archived',
-            column_id: 112
-          });
-          expect(github.projects.listCards).toHaveBeenCalledWith({
-            archived_state: 'not_archived',
-            column_id: 113
-          });
-        });
-
-        it('should add triage label once', () => {
-          expect(github.issues.addLabels).toHaveBeenCalled();
-          expect(github.issues.addLabels).toHaveBeenCalledTimes(1);
-          expect(github.issues.addLabels).toHaveBeenCalledWith({
-            owner: 'oppia',
-            repo: 'oppia',
-            issue_number: 1,
-            labels: ['TODO: triage'],
-          });
-        })
-
-        it('should ping core maintainers', () => {
-          expect(github.issues.createComment).toHaveBeenCalled()
-          expect(github.issues.createComment).toHaveBeenCalledTimes(1)
-          expect(github.issues.createComment).toHaveBeenCalledWith({
-            owner: 'oppia',
-            repo: 'oppia',
-            issue_number: 1,
-            body:
-              'Hi @oppia/core-maintainers, this issue is not assigned ' +
-              'to any project. Can you please update the same? Thanks!',
-          })
-        });
-
-        it('should not ping core maintainers for issue that has triage label',
-          () => {
-            expect(github.issues.createComment).not.toHaveBeenCalledWith({
-              owner: 'oppia',
-              repo: 'oppia',
-              issue_number: issues.withoutProjectButHasTriageLabel.number,
-              body:
-                'Hi @oppia/core-maintainers, this issue is not assigned ' +
-                'to any project. Can you please update the same? Thanks!',
-            })
-        });
-      }
-    )
   });
 });

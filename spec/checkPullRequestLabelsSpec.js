@@ -95,7 +95,7 @@ describe('Pull Request Label Check', () => {
         const params = {
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
-          number: payloadData.payload.number,
+          issue_number: payloadData.payload.number,
           assignees: ['kevintab95'],
         };
         expect(github.issues.addAssignees).toHaveBeenCalledWith(params);
@@ -106,7 +106,7 @@ describe('Pull Request Label Check', () => {
         const params = {
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
-          number: payloadData.payload.number,
+          issue_number: payloadData.payload.number,
           body:
             'Assigning @kevintab95 for the first-pass review' +
             ' of this pull request. Thanks!',
@@ -245,7 +245,7 @@ describe('Pull Request Label Check', () => {
         const params = {
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
-          number: payloadData.payload.number,
+          issue_number: payloadData.payload.number,
           assignees: ['kevintab95'],
         };
         expect(github.issues.addAssignees).toHaveBeenCalledWith(params);
@@ -256,7 +256,7 @@ describe('Pull Request Label Check', () => {
         const params = {
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
-          number: payloadData.payload.number,
+          issue_number: payloadData.payload.number,
           body:
             'Assigning @kevintab95 for the first-pass review' +
             ' of this pull request. Thanks!',
@@ -559,7 +559,7 @@ describe('Pull Request Label Check', () => {
       const params = {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        number: payloadData.payload.number,
+        issue_number: payloadData.payload.number,
         body:
           'Hi, @' +
           payloadData.payload.pull_request.user.login +
@@ -577,7 +577,7 @@ describe('Pull Request Label Check', () => {
       expect(github.issues.addAssignees).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        number: payloadData.payload.number,
+        issue_number: payloadData.payload.number,
         assignees: [payloadData.payload.pull_request.user.login]
       });
     });
