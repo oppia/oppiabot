@@ -51,6 +51,7 @@ const checksWhitelist = {
     [openEvent]: [
       claCheck,
       changelogCheck,
+      codeOwnerCheck,
       branchCheck,
       wipCheck,
       jobCheck,

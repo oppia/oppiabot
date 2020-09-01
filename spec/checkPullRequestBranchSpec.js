@@ -25,6 +25,7 @@ const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
+const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 
 describe('Pull Request Branch Check', () => {
   /**
@@ -55,6 +56,7 @@ describe('Pull Request Branch Check', () => {
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
     spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
     spyOn(checkPullRequestTemplateModule,'checkTemplate').and.callFake(() => {});
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
 
     github = {
       issues: {
