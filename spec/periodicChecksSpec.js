@@ -524,6 +524,15 @@ describe('Periodic Checks Module', () => {
           assignees: ['ankita240796'],
         });
       });
+
+      it('should not assign author', () => {
+        expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+          issue_number: 5,
+          owner: 'oppia',
+          repo: 'oppia',
+          assignees: ['author5'],
+        });
+      });
     }
   );
 
