@@ -25,6 +25,7 @@ const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
 const checkWIPModule = require('../lib/checkWipDraftPR');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
+const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
 const payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
@@ -214,6 +215,7 @@ describe('Pull Request Template', () => {
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
     spyOn(checkWIPModule, 'checkWIP').and.callFake(() => {});
     spyOn(checkPullRequestTemplateModule, 'checkTemplate').and.callThrough();
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
   });
 
   describe('when pull request with invalid template is created', () => {

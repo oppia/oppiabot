@@ -6,7 +6,6 @@ const checkPullRequestLabelModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
-const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
 
 let payloadData = JSON.parse(
@@ -59,9 +58,11 @@ describe('Pull Request Label Check', () => {
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() =>{});
-    spyOn(checkCriticalPullRequestModule,'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
-    spyOn(checkPullRequestTemplateModule,'checkTemplate').and.callFake(() => {});
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
+    spyOn(
+      checkCriticalPullRequestModule,
+      'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
+    spyOn(
+      checkPullRequestTemplateModule, 'checkTemplate').and.callFake(() => {});
   });
 
   describe('when pull request gets labeled', () => {
@@ -80,6 +81,7 @@ describe('Pull Request Label Check', () => {
         payloadData.payload.action = 'labeled';
         payloadData.payload.label = label;
         payloadData.payload.pull_request.requested_reviewers = reviewers;
+        payloadData.payload.pull_request.assignees = [];
         spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
         await robot.receive(payloadData);
       });
@@ -112,10 +114,6 @@ describe('Pull Request Label Check', () => {
         expect(github.issues.createComment).toHaveBeenCalledWith(params);
       });
 
-      it('should run check for new codeowners', () => {
-        expect(newCodeOwnerModule.checkForNewCodeowner).toHaveBeenCalled();
-      });
-
       afterAll(() => {
         payloadData.payload.pull_request.requested_reviewers = [];
       });
@@ -138,6 +136,7 @@ describe('Pull Request Label Check', () => {
           { login: 'reviewer1' },
           { login: 'reviewer2' },
         ];
+        payloadData.payload.pull_request.assignees = [];
         // Set project owner to be pr author.
         payloadData.payload.pull_request.user.login = 'kevintab95';
         spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
@@ -182,6 +181,7 @@ describe('Pull Request Label Check', () => {
         payloadData.payload.action = 'labeled';
         payloadData.payload.label = label;
         payloadData.payload.pull_request.requested_reviewers = [];
+        payloadData.payload.pull_request.assignees = [];
         // Set project owner to be pr author.
         payloadData.payload.pull_request.user.login = 'kevintab95';
         spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
@@ -231,6 +231,7 @@ describe('Pull Request Label Check', () => {
         payloadData.payload.action = 'labeled';
         payloadData.payload.label = label;
         payloadData.payload.pull_request.requested_reviewers = ['testuser'];
+        payloadData.payload.pull_request.assignees = [];
         spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
         await robot.receive(payloadData);
       });
@@ -268,7 +269,7 @@ describe('Pull Request Label Check', () => {
       });
     });
 
-    it('should not ping project owner if already assigned', async () => {
+    it('should not assign anyone if a user is already assigned', async () => {
       const label = {
         id: 638839900,
         node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
@@ -304,14 +305,13 @@ describe('Pull Request Label Check', () => {
       // the changelog label.
       payloadData.payload.action = 'labeled';
       payloadData.payload.label = label;
+      payloadData.payload.pull_request.assignees = [];
       spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
       await robot.receive(payloadData);
 
       expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
       expect(github.issues.createComment).not.toHaveBeenCalled();
-      // Should not check for new code owner since there is no changelog label.
-      expect(newCodeOwnerModule.checkForNewCodeowner).not.toHaveBeenCalled();
     });
 
     it('should not assign when invalid changelog is applied', async () => {
@@ -325,15 +325,13 @@ describe('Pull Request Label Check', () => {
 
       payloadData.payload.action = 'labeled';
       payloadData.payload.label = label;
+      payloadData.payload.pull_request.assignees = [];
       spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
       await robot.receive(payloadData);
 
       expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
       expect(github.issues.createComment).not.toHaveBeenCalled();
-
-      // Should not check for new code owner since there is no changelog label.
-      expect(newCodeOwnerModule.checkForNewCodeowner).not.toHaveBeenCalled();
     });
 
     it('should not assign when there are review comments', async () => {
@@ -347,6 +345,7 @@ describe('Pull Request Label Check', () => {
 
       payloadData.payload.action = 'labeled';
       payloadData.payload.label = label;
+      payloadData.payload.pull_request.assignees = [];
       // Simulate when the payload alread has review comments.
       payloadData.payload.pull_request.review_comments = 2;
       spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
