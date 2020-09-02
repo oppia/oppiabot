@@ -432,7 +432,7 @@ describe('check for new code owner', () => {
   it('Should get new codeowner from files', () => {
     spyOn(newCodeOwnerModule, 'getNewCodeOwners').and.callThrough();
 
-    // Payload from https://github.com/oppia/oppia/pull/10534
+    // Payload from https://github.com/oppia/oppia/pull/10534.
     const fileWithComments = {
       sha: '6911619e95dfcb11eb2204fba88987e5abf02352',
       filename: '.github/CODEOWNERS',
