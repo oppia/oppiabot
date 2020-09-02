@@ -582,41 +582,98 @@ describe('Pull Request Label Check', () => {
       });
     });
 
-    it('adds a default label when pr author is not a collaborator', async () => {
-      payloadData.payload.action = 'reopened';
-      payloadData.payload.pull_request.user.login = 'newuser';
+    it(
+      'adds a default label when pr author is not a collaborator and PR ' +
+        'has one reviewer',
+      async () => {
+        payloadData.payload.action = 'reopened';
+        payloadData.payload.pull_request.user.login = 'newuser';
+        payloadData.payload.pull_request.requested_reviewers = [
+          {
+            login: 'reviewer',
+          },
+        ];
 
-      spyOn(
-        checkPullRequestLabelModule,
-        'checkChangelogLabel'
-      ).and.callThrough();
-      await robot.receive(payloadData);
+        spyOn(
+          checkPullRequestLabelModule,
+          'checkChangelogLabel'
+        ).and.callThrough();
+        await robot.receive(payloadData);
 
-      expect(
-        checkPullRequestLabelModule.checkChangelogLabel
-      ).toHaveBeenCalled();
-      expect(github.issues.addLabels).toHaveBeenCalled();
-      const labelParams = {
-        repo: payloadData.payload.repository.name,
-        owner: payloadData.payload.repository.owner.login,
-        issue_number: payloadData.payload.number,
-        labels: ['PR CHANGELOG: Miscellaneous -- @ankita240796']
-      };
-      expect(github.issues.addLabels).toHaveBeenCalledWith(labelParams);
+        expect(
+          checkPullRequestLabelModule.checkChangelogLabel
+        ).toHaveBeenCalled();
+        expect(github.issues.addLabels).toHaveBeenCalled();
+        const labelParams = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          labels: ['REVIEWERS: Please add changelog label'],
+        };
+        expect(github.issues.addLabels).toHaveBeenCalledWith(labelParams);
 
-      expect(github.issues.createComment).toHaveBeenCalled();
-      const commentParams = {
-        repo: payloadData.payload.repository.name,
-        owner: payloadData.payload.repository.owner.login,
-        number: payloadData.payload.number,
-        body:
-          'Hi, @' +
-          payloadData.payload.pull_request.user.login +
-          ', I have added a default changelog label to the pull request. ' +
-          'Thanks!',
-      };
-      expect(github.issues.createComment).toHaveBeenCalledWith(commentParams);
-    });
+        expect(github.issues.createComment).toHaveBeenCalled();
+        const commentParams = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          number: payloadData.payload.number,
+          body:
+            'Hi @reviewer, could you please add the appropriate ' +
+            'changelog label to this pull request? Thanks!',
+        };
+        expect(github.issues.createComment).toHaveBeenCalledWith(commentParams);
+      }
+    );
+
+    it(
+      'adds a default label when pr author is not a collaborator and PR ' +
+        'reviewers are more than one',
+      async () => {
+        payloadData.payload.action = 'reopened';
+        payloadData.payload.pull_request.user.login = 'newuser';
+        payloadData.payload.pull_request.requested_reviewers = [
+          {
+            login: 'reviewer1',
+          },
+          {
+            login: 'reviewer2',
+          },
+          {
+            login: 'reviewer3',
+          },
+        ];
+
+        spyOn(
+          checkPullRequestLabelModule,
+          'checkChangelogLabel'
+        ).and.callThrough();
+        await robot.receive(payloadData);
+
+        expect(
+          checkPullRequestLabelModule.checkChangelogLabel
+        ).toHaveBeenCalled();
+        expect(github.issues.addLabels).toHaveBeenCalled();
+        const labelParams = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          labels: ['REVIEWERS: Please add changelog label'],
+        };
+        expect(github.issues.addLabels).toHaveBeenCalledWith(labelParams);
+
+        expect(github.issues.createComment).toHaveBeenCalled();
+        const commentParams = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          number: payloadData.payload.number,
+          body:
+            'Hi @reviewer1, @reviewer2 -- could one of you please add the ' +
+            'appropriate changelog label to this pull request? Thanks!',
+        };
+        expect(github.issues.createComment).toHaveBeenCalledWith(commentParams);
+      }
+    );
+
 
     it('should not ping pr author if there is a changelog label', async() => {
       const label = {
