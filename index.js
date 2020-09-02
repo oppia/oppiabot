@@ -1,3 +1,21 @@
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Entry point to the app.
+ */
+
 require('newrelic');
 const scheduler = require('./lib/scheduler');
 const apiForSheetsModule = require('./lib/apiForSheets');
@@ -12,6 +30,7 @@ const checkBranchPushModule = require('./lib/checkBranchPush');
 const checkPullRequestReviewModule = require('./lib/checkPullRequestReview');
 const newCodeOwnerModule = require('./lib/checkForNewCodeowner');
 const ciCheckModule = require('./lib/ciChecks');
+const periodicCheckModule = require('./lib/periodicChecks');
 
 const constants = require('./constants');
 const checkIssueAssigneeModule = require('./lib/checkIssueAssignee');
@@ -95,7 +114,13 @@ const runChecks = async (context, checkEvent) => {
             await ciCheckModule.handleFailure(context);
             break;
           case constants.updateWithDevelopCheck:
-            await checkMergeConflictsModule.pingAllPullRequestsToMergeFromDevelop(context);
+            await checkMergeConflictsModule.pingAllPullRequestsToMergeFromDevelop(
+              context
+            );
+            break;
+          case constants.periodicCheck:
+            await periodicCheckModule.ensureAllPullRequestsAreAssigned(context);
+            await periodicCheckModule.ensureAllIssuesHaveProjects(context);
             break;
           case constants.respondToReviewCheck:
             await checkPullRequestReviewModule.handleResponseToReview(context);
@@ -133,8 +158,15 @@ function checkAuthor(context) {
  */
 module.exports = (oppiabot) => {
   scheduler.createScheduler(oppiabot, {
-    delay: !process.env.DISABLE_DELAY,
-    interval: 60 * 60 * 1000, // 1 hour
+    delay: !process.env.DISABLE_DELAY, // delay is enabled on first run
+    interval: 24 * 60 * 60 * 1000, // 1 day
+  });
+
+  oppiabot.on('schedule.repository', async (context) => {
+    console.log('PERIODIC CHECKS RUNNING...');
+    if (checkWhitelistedAccounts(context)) {
+      await runChecks(context, constants.periodicCheckEvent);
+    }
   });
 
   oppiabot.on('issues.assigned', async (context) => {
@@ -229,7 +261,7 @@ module.exports = (oppiabot) => {
   });
 
   oppiabot.on('check_suite.completed', async (context) => {
-    if(checkWhitelistedAccounts(context)) {
+    if (checkWhitelistedAccounts(context)) {
       // eslint-disable-next-line no-console
       console.log('A CHECK SUITE HAS BEEN COMPLETED...');
       await runChecks(context, constants.checkCompletedEvent);

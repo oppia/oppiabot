@@ -130,11 +130,11 @@ describe('Pull Request Review Module', () => {
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
           body:
-            'Assigning @' +
+            'Hi @' +
             reviewPayloadData.payload.pull_request.user.login +
-            ' to respond to reviews from @' +
+            ', it looks like some changes were requested on this pull request by @' +
             reviewPayloadData.payload.review.user.login +
-            '. Thanks!',
+            '. PTAL. Thanks!',
         });
       });
     });
@@ -195,11 +195,11 @@ describe('Pull Request Review Module', () => {
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
           body:
-            'Assigning @' +
+            'Hi @' +
             reviewPayloadData.payload.pull_request.user.login +
-            ' to respond to reviews from @' +
+            ', it looks like some changes were requested on this pull request by @' +
             reviewPayloadData.payload.review.user.login +
-            '. Thanks!',
+            '. PTAL. Thanks!',
         });
       });
 
@@ -248,11 +248,11 @@ describe('Pull Request Review Module', () => {
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
           body:
-            'Assigning @' +
+            'Hi @' +
             reviewPayloadData.payload.pull_request.user.login +
-            ' to respond to reviews from @' +
+            ', it looks like some changes were requested on this pull request by @' +
             reviewPayloadData.payload.review.user.login +
-            '. Thanks!',
+            '. PTAL. Thanks!',
         });
       });
 
@@ -428,7 +428,7 @@ describe('Pull Request Review Module', () => {
             issue_number: reviewPayloadData.payload.pull_request.number,
             body:
               'Assigning @reviewer2, @reviewer3 for code owner reviews' +
-              ', Thanks!',
+              '. Thanks!',
           });
         });
 
@@ -630,7 +630,7 @@ describe('Pull Request Review Module', () => {
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
-            body: 'Assigning @reviewer3 for code owner reviews' + ', Thanks!',
+            body: 'Assigning @reviewer3 for code owner reviews' + '. Thanks!',
           });
         });
 
@@ -753,10 +753,9 @@ describe('Pull Request Review Module', () => {
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
           body:
-            'Hi @kevintab95, this PR is ready to be merged. We are ' +
-            'assigning you since the author does not have merging rights. ' +
-            'Please make sure there are no pending comments from the ' +
-            "author's end before merge. Thanks!",
+            'Hi @kevintab95, this PR is ready to be merged. Before you ' +
+            'merge it, please make sure that there are no pending comments ' +
+            "that require action from the author's end. Thanks!",
         });
       });
 
@@ -867,8 +866,9 @@ describe('Pull Request Review Module', () => {
           body:
             'Hi @' +
             reviewPayloadData.payload.pull_request.user.login +
-            ', this PR is ready to be merged. Please make sure there are ' +
-            'no pending comments before merge. Thanks!',
+            ', this PR is ready to be merged. Please address any remaining ' +
+            'comments prior to merging, and feel free to merge this PR once ' +
+            "you're happy with it. Thanks!",
         });
       });
 
