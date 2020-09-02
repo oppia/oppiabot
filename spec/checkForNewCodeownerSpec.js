@@ -428,4 +428,54 @@ describe('check for new code owner', () => {
       payloadData.payload.pull_request.labels.pop();
     });
   });
+
+  it('Should get new codeowner from files', () => {
+    spyOn(newCodeOwnerModule, 'getNewCodeOwners').and.callThrough();
+
+    // Payload from https://github.com/oppia/oppia/pull/10534.
+    const fileWithComments = {
+      sha: '6911619e95dfcb11eb2204fba88987e5abf02352',
+      filename: '.github/CODEOWNERS',
+      status: 'modified',
+      additions: 82,
+      deletions: 58,
+      changes: 140,
+      blob_url:
+        'https://github.com/oppia/oppia/blob/c876111ec9c743179483d7ca75e348b' +
+        '8680b13ec/.github/CODEOWNERS',
+      raw_url:
+        'https://github.com/oppia/oppia/raw/c876111ec9c743179483d7ca75e348b8' +
+        '680b13ec/.github/CODEOWNERS',
+      contents_url:
+        'https://api.github.com/repos/oppia/oppia/contents/.github/CODEOWNERS' +
+      '?ref=c876111ec9c743179483d7ca75e348b8680b13ec',
+      patch:
+        '-/extensions/ @vojtechjelinek\r\n+# TODO(#10538): Revert ownership ' +
+        'to @vojtechjelinek after 2020-09-06.\r\n+/extensions/ @seanlip\r\n/'+
+        'core/templates/services/UpgradedServices.ts @bansalnitish '+
+        '@srijanreddy98\r\n/typings/ @ankita240796\r\n/tsconfig.json '+
+        '@ankita240796\r\n-/tsconfig-strict.json @nishantwrp @vojtechjelinek' +
+        '\r\n+# TODO(#10538): Add @vojtechjelinek as an owner after 2020-09-' +
+        '06.\r\n+/tsconfig-strict.json @nishantwrp\r\n-/core/controllers/' +
+        'resources*.py @vojtechjelinek\r\n+# TODO(#10538): Revert ownership ' +
+        'to @vojtechjelinek after 2020-09-06.\r\n-/core/controllers/' +
+        'resources*.py @seanlip'
+    }
+
+    let codeowners = newCodeOwnerModule.getNewCodeOwners(fileWithComments);
+    expect(codeowners.length).toBe(2);
+    expect(codeowners).toEqual(['@seanlip', '@nishantwrp']);
+
+    codeowners = newCodeOwnerModule.getNewCodeOwners(nonCodeOwnerFile)
+    expect(codeowners.length).toBe(0)
+
+    codeowners = newCodeOwnerModule.getNewCodeOwners(codeOwnerFileWithNewUser)
+    expect(codeowners.length).toBe(2)
+    expect(codeowners).toEqual(['@testuser', '@vojtechjelinek']);
+
+    codeowners = newCodeOwnerModule.getNewCodeOwners(codeOwnerFileWithMultipleNewUsers)
+    expect(codeowners.length).toBe(4)
+    expect(codeowners).toEqual(['@testuser', '@vojtechjelinek', '@testuser2', '@jameesjohn']);
+  });
 });
+
