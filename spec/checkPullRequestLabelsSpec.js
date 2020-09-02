@@ -616,12 +616,20 @@ describe('Pull Request Label Check', () => {
         const commentParams = {
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
-          number: payloadData.payload.number,
+          issue_number: payloadData.payload.number,
           body:
             'Hi @reviewer, could you please add the appropriate ' +
             'changelog label to this pull request? Thanks!',
         };
         expect(github.issues.createComment).toHaveBeenCalledWith(commentParams);
+
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          assignees: ['reviewer']
+        });
       }
     );
 
@@ -665,12 +673,20 @@ describe('Pull Request Label Check', () => {
         const commentParams = {
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
-          number: payloadData.payload.number,
+          issue_number: payloadData.payload.number,
           body:
             'Hi @reviewer1, @reviewer2 -- could one of you please add the ' +
             'appropriate changelog label to this pull request? Thanks!',
         };
         expect(github.issues.createComment).toHaveBeenCalledWith(commentParams);
+
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          assignees: ['reviewer1', 'reviewer2']
+        });
       }
     );
 
