@@ -510,7 +510,7 @@ describe('Pull Request Review Module', () => {
           body:
             'Unassigning @' +
             reviewPayloadData.payload.review.user.login +
-            ' since the PR is approved.',
+            ' since they have already approved the PR.',
         });
       });
 
