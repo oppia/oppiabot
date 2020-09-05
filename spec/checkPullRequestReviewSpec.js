@@ -867,8 +867,8 @@ describe('Pull Request Review Module', () => {
             'Hi @' +
             reviewPayloadData.payload.pull_request.user.login +
             ', this PR is ready to be merged. Please address any remaining ' +
-            'comments prior to merging, and feel free to merge this PR once ' +
-            "you're happy with it. Thanks!",
+            'comments prior to merging, and feel free to merge this PR ' +
+            "once the CI checks pass and you're happy with it. Thanks!",
         });
       });
 
