@@ -347,7 +347,10 @@ describe('Utility module tests', () => {
           issuesAndPullRequests: jasmine
             .createSpy('issuesAndPullRequests')
             .and.resolveTo({
-              status: 204,
+              status: 200,
+              data: {
+                items: [pullRequest],
+              },
             }),
         },
       },
@@ -372,7 +375,10 @@ describe('Utility module tests', () => {
     context.github.search.issuesAndPullRequests = jasmine
       .createSpy('issuesAndPullRequests')
       .and.resolveTo({
-        status: 404,
+        status: 200,
+        data: {
+          items: [],
+        },
       });
 
     response = await utilityModule.hasPullRequestBeenApproved(context, 102);
@@ -397,7 +403,10 @@ describe('Utility module tests', () => {
           issuesAndPullRequests: jasmine
             .createSpy('issuesAndPullRequests')
             .and.resolveTo({
-              status: 204,
+              status: 200,
+              data: {
+                items: [pullRequest],
+              },
             }),
         },
       },
@@ -425,7 +434,10 @@ describe('Utility module tests', () => {
     context.github.search.issuesAndPullRequests = jasmine
       .createSpy('issuesAndPullRequests')
       .and.resolveTo({
-        status: 404,
+        status: 200,
+        data: {
+          items: [],
+        },
       });
     response = await utilityModule.doesPullRequestHaveChangesRequested(
       context,
