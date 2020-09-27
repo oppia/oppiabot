@@ -674,6 +674,9 @@ describe('Pull Request Review Module', () => {
         reviewPayloadData.payload.pull_request.labels = [changelogLabel];
       });
       beforeEach(async () => {
+        spyOn(
+          utilityModule, 'doesPullRequestHaveChangesRequested'
+        ).and.resolveTo(false);
         github.search = {
           issuesAndPullRequests: jasmine
             .createSpy('issuesAndPullRequests')
@@ -779,6 +782,10 @@ describe('Pull Request Review Module', () => {
         reviewPayloadData.payload.pull_request.requested_reviewers = [];
       });
       beforeEach(async () => {
+        spyOn(
+          utilityModule, 'doesPullRequestHaveChangesRequested'
+        ).and.resolveTo(false);
+
         github.search = {
           issuesAndPullRequests: jasmine
             .createSpy('issuesAndPullRequests')
@@ -878,6 +885,7 @@ describe('Pull Request Review Module', () => {
         );
       });
     });
+
     describe(
       'when reviewer is last reviewer and already adds the lgtm label', () => {
       // Note that when the reviewer is the last reviewer, the list of
@@ -896,6 +904,9 @@ describe('Pull Request Review Module', () => {
       });
 
       beforeEach(async () => {
+        spyOn(
+          utilityModule, 'doesPullRequestHaveChangesRequested'
+        ).and.resolveTo(false);
         github.search = {
           issuesAndPullRequests: jasmine
             .createSpy('issuesAndPullRequests')
@@ -975,6 +986,99 @@ describe('Pull Request Review Module', () => {
         reviewPayloadData.payload.pull_request.labels = initialLabels;
       });
     });
+
+    describe(
+      'when the last reviewer approves but the pull request already ' +
+        'has changes requested',
+      () => {
+        // Note that when the reviewer is the last reviewer, the list of
+        // requested reviewers will be empty.
+        const initialReviewers = [
+          ...reviewPayloadData.payload.pull_request.requested_reviewers,
+        ];
+        beforeAll(() => {
+          reviewPayloadData.payload.pull_request.requested_reviewers = [];
+        });
+        beforeEach(async () => {
+          spyOn(
+            utilityModule,
+            'doesPullRequestHaveChangesRequested'
+          ).and.callThrough();
+          github.search = {
+            // This function will be called by the utility module when checking
+            // if the pull request has changes requested.
+            issuesAndPullRequests: jasmine
+              .createSpy('issuesAndPullRequests')
+              .and.resolveTo({
+                data: {
+                  items: [reviewPayloadData.payload.pull_request],
+                },
+              }),
+          };
+          github.orgs = {
+            checkMembership: jasmine
+              .createSpy('checkMembership')
+              .and.resolveTo({
+                status: 204,
+              }),
+          };
+          await robot.receive(reviewPayloadData);
+        });
+
+        it('should check type of review', () => {
+          expect(
+            pullRequestReviewModule.handlePullRequestReview
+          ).toHaveBeenCalled();
+        });
+
+        it('should wait for 3 minutes before performing any action', () => {
+          expect(utilityModule.sleep).toHaveBeenCalled();
+          expect(utilityModule.sleep).toHaveBeenCalledWith(
+            utilityModule.THREE_MINUTES
+          );
+        });
+
+        it('should unassign reviewer', async () => {
+          expect(github.issues.removeAssignees).toHaveBeenCalled();
+          expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
+            issue_number: reviewPayloadData.payload.pull_request.number,
+            assignees: [reviewPayloadData.payload.review.user.login],
+          });
+        });
+
+        it('should check if pull request has changes requested', () => {
+          expect(
+            utilityModule.doesPullRequestHaveChangesRequested
+          ).toHaveBeenCalled();
+          expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
+          expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
+            q:
+              'repo:oppia/oppia review:approved ' +
+              reviewPayloadData.payload.pull_request.number,
+          });
+        });
+
+        it('should not add LGTM label', () => {
+          expect(github.issues.addLabels).not.toHaveBeenCalled();
+        });
+
+        it('should not check if author can merge', () => {
+          expect(github.orgs.checkMembership).not.toHaveBeenCalled();
+        });
+
+        it('should not assign pr author', () => {
+          expect(github.issues.addAssignees).not.toHaveBeenCalled();
+        });
+
+        afterAll(() => {
+          reviewPayloadData.payload.pull_request.requested_reviewers = initialReviewers;
+        });
+      }
+    );
 
     describe(
       'when the pull request gets closed / merged before 3 minutes delay ' +

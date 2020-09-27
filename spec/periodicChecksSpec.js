@@ -184,7 +184,10 @@ describe('Periodic Checks Module', () => {
 
             if (isApproved && params.q.includes('review:approved')) {
               return {
-                status: 204,
+                status: 200,
+                data: {
+                  items: [pullRequests.approvedPR]
+                }
               };
             }
 
@@ -193,12 +196,18 @@ describe('Periodic Checks Module', () => {
               params.q.includes('review:changes_requested')
             ) {
               return {
-                status: 204,
+                status: 200,
+                data: {
+                  items: [pullRequests.hasChangesRequestedPR]
+                }
               };
             }
 
             return {
-              status: 404,
+              status: 200,
+              data: {
+                items: []
+              }
             };
           }),
       },
