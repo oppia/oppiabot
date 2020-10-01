@@ -14,7 +14,7 @@
     "update-actions-build": "node actions/build.js"
   },
   "dependencies": {
-    "@actions/core": "^1.2.4",
+    "@actions/core": "^1.2.6",
     "@actions/github": "^2.2.0",
     "axios": "^0.19.2",
     "dotenv": "^6.0.0",
