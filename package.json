@@ -7,7 +7,7 @@
   "repository": "https://github.com/oppiabot/oppiabot.git",
   "scripts": {
     "dev": "nodemon",
-    "lint": "standard",
+    "lint": "eslint",
     "start": "probot run ./index.js",
     "test": "node ./spec/setup.js",
     "actions-build": "ncc build actions/main.js -o actions_build",
@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@zeit/ncc": "^0.22.2",
+    "eslint": "^7.11.0",
     "husky": "^4.2.5",
     "jasmine": "^3.1.0",
     "lint-staged": "^10.2.6",

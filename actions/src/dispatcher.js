@@ -22,23 +22,23 @@ const issueLabelsModule = require('./issues/checkIssueLabels');
 const constants = require('../../constants');
 
 module.exports = {
-  async dispatch(event, action) {
-    core.info(`Received Event:${event} Action:${action}.`);
-    const checkEvent = `${event}_${action}`;
-    const repoName = context.payload.repository.name.toLowerCase();
-    const checksWhitelist = constants.getChecksWhitelist();
-    if (checksWhitelist.hasOwnProperty(repoName)) {
-      const checks = checksWhitelist[repoName];
-      if (checks.hasOwnProperty(checkEvent)) {
-        const checkList = checks[checkEvent];
-        for (var i = 0; i < checkList.length; i++) {
-          switch (checkList[i]) {
-            case constants.issuesLabelCheck:
-              await issueLabelsModule.checkLabels();
-              break;
-          }
+    async dispatch(event, action) {
+        core.info(`Received Event:${event} Action:${action}.`);
+        const checkEvent = `${event}_${action}`;
+        const repoName = context.payload.repository.name.toLowerCase();
+        const checksWhitelist = constants.getChecksWhitelist();
+        if (Object.prototype.hasOwnProperty.call(checksWhitelist, repoName)) {
+            const checks = checksWhitelist[repoName];
+            if ((Object.prototype.hasOwnProperty.call(checks, checkEvent))) {
+                const checkList = checks[checkEvent];
+                for (var i = 0; i < checkList.length; i++) {
+                    switch (checkList[i]) {
+                    case constants.issuesLabelCheck:
+                        await issueLabelsModule.checkLabels();
+                        break;
+                    }
+                }
+            }
         }
-      }
     }
-  }
 };
