@@ -1,4 +1,4 @@
-name: Custom ESLint tests
+name: CI ESLint 
 on:
   push:
     branches:
@@ -15,7 +15,10 @@ jobs:
         os: [ubuntu-18.04]
     steps:
       - uses: actions/checkout@v2
-      - name: Install modules
-        run: yarn
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - name: Install dependencies
+        run: npm install
       - name: Run ESLint
-        run: eslint actions/**/*.js
+        run: npm run lint
