@@ -3,7 +3,7 @@
     "eslint:recommended",
   ],
   "parserOptions": {
-    "ecmaVersion": 8,
+    "ecmaVersion": 11,
   },
   "overrides": [{
     // We exclude test files from dependency injection format checks because

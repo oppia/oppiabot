@@ -23,21 +23,21 @@ const GOOD_FIRST_LABEL = 'good first issue';
 const prLabels = ['dependencies', 'stale'];
 
 const checkLabels = async () => {
-    core.info('Checking newly added label...');
-    const token = core.getInput('repo-token');
-    const label = context.payload.label;
-    const octokit = new GitHub(token);
-    const user = context.payload.sender.login;
+  core.info('Checking newly added label...');
+  const token = core.getInput('repo-token');
+  const label = context.payload.label;
+  const octokit = new GitHub(token);
+  const user = context.payload.sender.login;
 
-    if (
-        label.name === GOOD_FIRST_LABEL &&
+  if (
+    label.name === GOOD_FIRST_LABEL &&
       !whitelist.goodFirstIssue.includes(user)) {
-        core.info('Good first issue label got added by non whitelisted user.');
-        await handleGoodFirstIssueLabel(octokit, user);
-    } else if (prLabels.includes(label.name) || label.name.startsWith('PR')) {
-        core.info('PR label got added on an issue');
-        await handlePRLabel(octokit, label.name, user);
-    }
+    core.info('Good first issue label got added by non whitelisted user.');
+    await handleGoodFirstIssueLabel(octokit, user);
+  } else if (prLabels.includes(label.name) || label.name.startsWith('PR')) {
+    core.info('PR label got added on an issue');
+    await handlePRLabel(octokit, label.name, user);
+  }
 };
 
 /**
@@ -47,36 +47,36 @@ const checkLabels = async () => {
  * @param {String} user - Username of the user that added the label.
  */
 const handleGoodFirstIssueLabel = async (octokit, user) => {
-    const issueNumber = context.payload.issue.number;
-    // Comment on the issue and ping the onboarding team lead.
-    await octokit.issues.createComment(
-        {
-            body:'Hi @' + user + ', thanks for proposing this as a good first ' +
+  const issueNumber = context.payload.issue.number;
+  // Comment on the issue and ping the onboarding team lead.
+  await octokit.issues.createComment(
+    {
+      body:'Hi @' + user + ', thanks for proposing this as a good first ' +
           'issue. I am removing the label for now and looping in ' +
           '@' + whitelist.teamLeads.onboardingTeam + ' to approve the label. ' +
           'It will be added back if approved. Thanks!',
-            issue_number: issueNumber,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-        }
-    );
-    // Remove the label.
-    core.info('Removing the label.');
-    await octokit.issues.removeLabel({
-        issue_number:issueNumber,
-        name: GOOD_FIRST_LABEL,
-        owner: context.repo.owner,
-        repo: context.repo.repo
-    });
+      issue_number: issueNumber,
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+    }
+  );
+  // Remove the label.
+  core.info('Removing the label.');
+  await octokit.issues.removeLabel({
+    issue_number:issueNumber,
+    name: GOOD_FIRST_LABEL,
+    owner: context.repo.owner,
+    repo: context.repo.repo
+  });
 
-    // Assign issue to Team Lead.
-    core.info(`Assigning to ${whitelist.teamLeads.onboardingTeam}.`);
-    await octokit.issues.addAssignees({
-        issue_number:issueNumber,
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        assignees:[whitelist.teamLeads.onboardingTeam],
-    });
+  // Assign issue to Team Lead.
+  core.info(`Assigning to ${whitelist.teamLeads.onboardingTeam}.`);
+  await octokit.issues.addAssignees({
+    issue_number:issueNumber,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    assignees:[whitelist.teamLeads.onboardingTeam],
+  });
 };
 
 /**
@@ -87,45 +87,45 @@ const handleGoodFirstIssueLabel = async (octokit, user) => {
  * @param {String} user - Username of the user that added the label.
  */
 const handlePRLabel = async (octokit, label, user) => {
-    const issueNumber = context.payload.issue.number;
-    const linkText = 'here';
-    // Add link to wiki.
-    const link = linkText.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+  const issueNumber = context.payload.issue.number;
+  const linkText = 'here';
+  // Add link to wiki.
+  const link = linkText.link(
+    'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
     'labeling-issues-and-pull-requests');
-    let commentBody = '';
-    if (label.startsWith('PR CHANGELOG')) {
+  let commentBody = '';
+  if (label.startsWith('PR CHANGELOG')) {
     // Handle case for a changelog label.
-        commentBody = (
-            'Hi @' + user + ', changelog labels should not be used on issues.' +
+    commentBody = (
+      'Hi @' + user + ', changelog labels should not be used on issues.' +
       ' I’m removing the label. You can learn more about labels ' + link +
       '. Thanks!');
-    } else {
-        commentBody = (
-            'Hi @' + user + ', the ' + label + ' label should only be used in ' +
+  } else {
+    commentBody = (
+      'Hi @' + user + ', the ' + label + ' label should only be used in ' +
       'pull requests. I’m removing the label. You can learn more about ' +
       'labels ' + link + '. Thanks!');
+  }
+
+  await octokit.issues.createComment(
+    {
+      body:commentBody,
+      issue_number: issueNumber,
+      owner: context.repo.owner,
+      repo: context.repo.repo,
     }
+  );
 
-    await octokit.issues.createComment(
-        {
-            body:commentBody,
-            issue_number: issueNumber,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-        }
-    );
-
-    // Remove the label.
-    core.info('Removing the label.');
-    await octokit.issues.removeLabel({
-        issue_number:issueNumber,
-        name: label,
-        owner: context.repo.owner,
-        repo: context.repo.repo
-    });
+  // Remove the label.
+  core.info('Removing the label.');
+  await octokit.issues.removeLabel({
+    issue_number:issueNumber,
+    name: label,
+    owner: context.repo.owner,
+    repo: context.repo.repo
+  });
 };
 
 module.exports = {
-    checkLabels,
+  checkLabels,
 };
