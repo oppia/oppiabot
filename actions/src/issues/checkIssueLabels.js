@@ -31,7 +31,8 @@ const checkLabels = async () => {
 
   if (
     label.name === GOOD_FIRST_LABEL &&
-      !whitelist.goodFirstIssue.includes(user)) {
+    !whitelist.goodFirstIssue.includes(user)
+  ) {
     core.info('Good first issue label got added by non whitelisted user.');
     await handleGoodFirstIssueLabel(octokit, user);
   } else if (prLabels.includes(label.name) || label.name.startsWith('PR')) {
@@ -51,10 +52,10 @@ const handleGoodFirstIssueLabel = async (octokit, user) => {
   // Comment on the issue and ping the onboarding team lead.
   await octokit.issues.createComment(
     {
-      body:'Hi @' + user + ', thanks for proposing this as a good first ' +
-          'issue. I am removing the label for now and looping in ' +
-          '@' + whitelist.teamLeads.onboardingTeam + ' to approve the label. ' +
-          'It will be added back if approved. Thanks!',
+      body: 'Hi @' + user + ', thanks for proposing this as a good first ' +
+        'issue. I am removing the label for now and looping in ' +
+        '@' + whitelist.teamLeads.onboardingTeam + ' to approve the label. ' +
+        'It will be added back if approved. Thanks!',
       issue_number: issueNumber,
       owner: context.repo.owner,
       repo: context.repo.repo,
@@ -63,7 +64,7 @@ const handleGoodFirstIssueLabel = async (octokit, user) => {
   // Remove the label.
   core.info('Removing the label.');
   await octokit.issues.removeLabel({
-    issue_number:issueNumber,
+    issue_number: issueNumber,
     name: GOOD_FIRST_LABEL,
     owner: context.repo.owner,
     repo: context.repo.repo
@@ -72,10 +73,10 @@ const handleGoodFirstIssueLabel = async (octokit, user) => {
   // Assign issue to Team Lead.
   core.info(`Assigning to ${whitelist.teamLeads.onboardingTeam}.`);
   await octokit.issues.addAssignees({
-    issue_number:issueNumber,
+    issue_number: issueNumber,
     owner: context.repo.owner,
     repo: context.repo.repo,
-    assignees:[whitelist.teamLeads.onboardingTeam],
+    assignees: [whitelist.teamLeads.onboardingTeam],
   });
 };
 
@@ -109,7 +110,7 @@ const handlePRLabel = async (octokit, label, user) => {
 
   await octokit.issues.createComment(
     {
-      body:commentBody,
+      body: commentBody,
       issue_number: issueNumber,
       owner: context.repo.owner,
       repo: context.repo.repo,
@@ -119,7 +120,7 @@ const handlePRLabel = async (octokit, label, user) => {
   // Remove the label.
   core.info('Removing the label.');
   await octokit.issues.removeLabel({
-    issue_number:issueNumber,
+    issue_number: issueNumber,
     name: label,
     owner: context.repo.owner,
     repo: context.repo.repo

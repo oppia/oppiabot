@@ -5,11 +5,6 @@
   "parserOptions": {
     "ecmaVersion": 11,
   },
-  "overrides": [{
-    // We exclude test files from dependency injection format checks because
-    // they are never minified.
-    "files": ["*Spec.js", "*Spec.ts"]
-  }],
   "rules": {
     "brace-style":[
       "error",

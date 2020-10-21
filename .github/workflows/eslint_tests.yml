@@ -1,4 +1,4 @@
-name: CI ESLint 
+name: CI Lint
 on:
   push:
     branches:
@@ -21,4 +21,4 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run ESLint
-        run: npm run lint
+        run: eslint actions/**/*.js
