@@ -3,7 +3,7 @@
     "eslint:recommended",
   ],
   "parserOptions": {
-    "ecmaVersion": 8,
+    "ecmaVersion": 11,
   },
   "rules": {
     "brace-style":[
@@ -65,7 +65,8 @@
     "max-len": [
       "error",
       "code": 80,
-      "ignoreUrls": true
+      "ignoreUrls": true,
+      "ignorePattern": "^import \\{"
     ],
     "no-compare-neg": "off",
     "no-console": [

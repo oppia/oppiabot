@@ -1,17 +1,3 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 module.exports =
 /******/ (function(modules, runtime) { // webpackBootstrap
 /******/ 	"use strict";
@@ -330,7 +316,7 @@ module.exports = require("https");
 /***/ 35:
 /***/ (function(module) {
 
-module.exports = {"releaseCoordinators":["nithusha21","aks681","vojtechjelinek","ankita240796","DubeySandeep","BenHenning"],"goodFirstIssue":["U8NWXD","kevintab95","seanlip","ankita240796","Showtim3","bansalnitish","vojtechjelinek","marianazangrossi","brianrodri","nithusha21","aks681"],"teamLeads":{"onboardingTeam":"Showtim3","releaseTeam":"ankita240796"},"oppiaMaintainers":"oppia/core-maintainers","SERVER_JOBS_ADMIN":"seanlip"};
+module.exports = {"releaseCoordinators":["nithusha21","aks681","vojtechjelinek","ankita240796","DubeySandeep","BenHenning"],"goodFirstIssue":["U8NWXD","kevintab95","seanlip","ankita240796","Showtim3","bansalnitish","vojtechjelinek","marianazangrossi","brianrodri","nithusha21","aks681"],"teamLeads":{"onboardingTeam":"Showtim3","releaseTeam":"ankita240796","welfareTeam":"Showtim3"},"oppiaMaintainers":"oppia/core-maintainers","SERVER_JOBS_ADMIN":"seanlip"};
 
 /***/ }),
 
@@ -2351,6 +2337,20 @@ function checkMode (stat, options) {
 /***/ 208:
 /***/ (function(module) {
 
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 const openEvent = 'opened';
 const reopenEvent = 'reopened';
 const unlabelEvent = 'unlabeled';
@@ -2361,7 +2361,12 @@ const editEvent = 'edited';
 const issuesLabelEvent = 'issues_labeled';
 const issuesAssignedEvent = 'issues_assigned';
 const pushEvent = 'push';
+const pullRequestReviewEvent = 'pr_review';
+const checkCompletedEvent = 'check_completed';
+const periodicCheckEvent = 'periodic-check-event';
+const issueCommentCreatedEvent = 'comment_created';
 
+const periodicCheck = 'periodic-check';
 const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
 const datastoreLabelCheck = 'datastore-label-check';
@@ -2379,6 +2384,11 @@ const modelCheck = 'model-check';
 const issuesLabelCheck = 'issues-labeled-check';
 const issuesAssignedCheck = 'issues-assigned-check';
 const forcePushCheck = 'force-push-check';
+const pullRequestReviewCheck = 'pr-review-check';
+const codeOwnerCheck = 'code-owner-check'
+const ciFailureCheck = 'ci-failure-check';
+const updateWithDevelopCheck = 'update-with-develop-check';
+const respondToReviewCheck = 'respond-to-review-check';
 
 const checksWhitelist = {
   'oppia-android': {
@@ -2394,6 +2404,7 @@ const checksWhitelist = {
     [openEvent]: [
       claCheck,
       changelogCheck,
+      codeOwnerCheck,
       branchCheck,
       wipCheck,
       jobCheck,
@@ -2409,13 +2420,22 @@ const checksWhitelist = {
       prTemplateCheck
     ],
     [PRLabelEvent]: [assigneeCheck, prLabelCheck],
-    [synchronizeEvent]: [mergeConflictCheck, jobCheck, modelCheck],
-    [closeEvent]: [allMergeConflictCheck],
+    [synchronizeEvent]: [
+      mergeConflictCheck,
+      jobCheck,
+      modelCheck,
+      codeOwnerCheck
+    ],
+    [closeEvent]: [allMergeConflictCheck, updateWithDevelopCheck],
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
     [unlabelEvent]: [datastoreLabelCheck],
-    [pushEvent]: [forcePushCheck]
+    [pushEvent]: [forcePushCheck],
+    [periodicCheckEvent]: [periodicCheck],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
+    [checkCompletedEvent]: [ciFailureCheck],
+    [issueCommentCreatedEvent]: [respondToReviewCheck]
   },
   'oppiabot': {
     [openEvent]: [claCheck],
@@ -2426,8 +2446,10 @@ const checksWhitelist = {
     [issuesLabelEvent]: [],
     [issuesAssignedEvent]: [],
     [pushEvent]: []
-  }
+  },
 };
+
+const blacklistedAuthors = ['translatewiki'];
 
 module.exports.openEvent = openEvent;
 module.exports.reopenEvent = reopenEvent;
@@ -2439,7 +2461,12 @@ module.exports.editEvent = editEvent;
 module.exports.issuesLabelEvent = issuesLabelEvent;
 module.exports.issuesAssignedEvent = issuesAssignedEvent;
 module.exports.pushEvent = pushEvent;
+module.exports.pullRequestReviewEvent = pullRequestReviewEvent;
+module.exports.checkCompletedEvent = checkCompletedEvent;
+module.exports.periodicCheckEvent = periodicCheckEvent;
+module.exports.issueCommentCreatedEvent = issueCommentCreatedEvent;
 
+module.exports.periodicCheck = periodicCheck;
 module.exports.claCheck = claCheck;
 module.exports.changelogCheck = changelogCheck;
 module.exports.branchCheck = branchCheck;
@@ -2455,6 +2482,15 @@ module.exports.datastoreLabelCheck = datastoreLabelCheck;
 module.exports.prLabelCheck = prLabelCheck;
 module.exports.prTemplateCheck = prTemplateCheck;
 module.exports.forcePushCheck = forcePushCheck;
+module.exports.pullRequestReviewCheck = pullRequestReviewCheck;
+module.exports.codeOwnerCheck = codeOwnerCheck;
+module.exports.ciFailureCheck = ciFailureCheck;
+module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
+module.exports.respondToReviewCheck = respondToReviewCheck
+
+module.exports.getBlacklistedAuthors = function() {
+  return blacklistedAuthors;
+};
 
 module.exports.getChecksWhitelist = function() {
   return checksWhitelist;
@@ -4342,8 +4378,9 @@ const checkLabels = async () => {
   const user = context.payload.sender.login;
 
   if (
-      label.name === GOOD_FIRST_LABEL &&
-      !whitelist.goodFirstIssue.includes(user)) {
+    label.name === GOOD_FIRST_LABEL &&
+    !whitelist.goodFirstIssue.includes(user)
+  ) {
     core.info('Good first issue label got added by non whitelisted user.');
     await handleGoodFirstIssueLabel(octokit, user);
   } else if (prLabels.includes(label.name) || label.name.startsWith('PR')) {
@@ -4363,10 +4400,10 @@ const handleGoodFirstIssueLabel = async (octokit, user) => {
   // Comment on the issue and ping the onboarding team lead.
   await octokit.issues.createComment(
     {
-      body:'Hi @' + user + ', thanks for proposing this as a good first ' +
-          'issue. I am removing the label for now and looping in ' +
-          '@' + whitelist.teamLeads.onboardingTeam + ' to approve the label. ' +
-          'It will be added back if approved. Thanks!',
+      body: 'Hi @' + user + ', thanks for proposing this as a good first ' +
+        'issue. I am removing the label for now and looping in ' +
+        '@' + whitelist.teamLeads.onboardingTeam + ' to approve the label. ' +
+        'It will be added back if approved. Thanks!',
       issue_number: issueNumber,
       owner: context.repo.owner,
       repo: context.repo.repo,
@@ -4375,7 +4412,7 @@ const handleGoodFirstIssueLabel = async (octokit, user) => {
   // Remove the label.
   core.info('Removing the label.');
   await octokit.issues.removeLabel({
-    issue_number:issueNumber,
+    issue_number: issueNumber,
     name: GOOD_FIRST_LABEL,
     owner: context.repo.owner,
     repo: context.repo.repo
@@ -4384,10 +4421,10 @@ const handleGoodFirstIssueLabel = async (octokit, user) => {
   // Assign issue to Team Lead.
   core.info(`Assigning to ${whitelist.teamLeads.onboardingTeam}.`);
   await octokit.issues.addAssignees({
-    issue_number:issueNumber,
+    issue_number: issueNumber,
     owner: context.repo.owner,
     repo: context.repo.repo,
-    assignees:[whitelist.teamLeads.onboardingTeam],
+    assignees: [whitelist.teamLeads.onboardingTeam],
   });
 };
 
@@ -4421,7 +4458,7 @@ const handlePRLabel = async (octokit, label, user) => {
 
   await octokit.issues.createComment(
     {
-      body:commentBody,
+      body: commentBody,
       issue_number: issueNumber,
       owner: context.repo.owner,
       repo: context.repo.repo,
@@ -4431,7 +4468,7 @@ const handlePRLabel = async (octokit, label, user) => {
   // Remove the label.
   core.info('Removing the label.');
   await octokit.issues.removeLabel({
-    issue_number:issueNumber,
+    issue_number: issueNumber,
     name: label,
     owner: context.repo.owner,
     repo: context.repo.repo
@@ -9211,9 +9248,9 @@ module.exports = {
     const checkEvent = `${event}_${action}`;
     const repoName = context.payload.repository.name.toLowerCase();
     const checksWhitelist = constants.getChecksWhitelist();
-    if (checksWhitelist.hasOwnProperty(repoName)) {
+    if (Object.prototype.hasOwnProperty.call(checksWhitelist, repoName)) {
       const checks = checksWhitelist[repoName];
-      if (checks.hasOwnProperty(checkEvent)) {
+      if ((Object.prototype.hasOwnProperty.call(checks, checkEvent))) {
         const checkList = checks[checkEvent];
         for (var i = 0; i < checkList.length; i++) {
           switch (checkList[i]) {
@@ -25135,7 +25172,7 @@ exports.requestLog = requestLog;
 /***/ 919:
 /***/ (function(module) {
 
-module.exports = {"_args":[["@octokit/rest@16.43.1","/Users/saxenaankita/Desktop/opensrc/oppiabot"]],"_from":"@octokit/rest@16.43.1","_id":"@octokit/rest@16.43.1","_inBundle":false,"_integrity":"sha512-gfFKwRT/wFxq5qlNjnW2dh+qh74XgTQ2B179UX5K1HYCluioWj8Ndbgqw2PVqa1NnVJkGHp2ovMpVn/DImlmkw==","_location":"/@actions/github/@octokit/rest","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"@octokit/rest@16.43.1","name":"@octokit/rest","escapedName":"@octokit%2frest","scope":"@octokit","rawSpec":"16.43.1","saveSpec":null,"fetchSpec":"16.43.1"},"_requiredBy":["/@actions/github"],"_resolved":"https://registry.npmjs.org/@octokit/rest/-/rest-16.43.1.tgz","_spec":"16.43.1","_where":"/Users/saxenaankita/Desktop/opensrc/oppiabot","author":{"name":"Gregor Martynus","url":"https://github.com/gr2m"},"bugs":{"url":"https://github.com/octokit/rest.js/issues"},"bundlesize":[{"path":"./dist/octokit-rest.min.js.gz","maxSize":"33 kB"}],"contributors":[{"name":"Mike de Boer","email":"info@mikedeboer.nl"},{"name":"Fabian Jakobs","email":"fabian@c9.io"},{"name":"Joe Gallo","email":"joe@brassafrax.com"},{"name":"Gregor Martynus","url":"https://github.com/gr2m"}],"dependencies":{"@octokit/auth-token":"^2.4.0","@octokit/plugin-paginate-rest":"^1.1.1","@octokit/plugin-request-log":"^1.0.0","@octokit/plugin-rest-endpoint-methods":"2.4.0","@octokit/request":"^5.2.0","@octokit/request-error":"^1.0.2","atob-lite":"^2.0.0","before-after-hook":"^2.0.0","btoa-lite":"^1.0.0","deprecation":"^2.0.0","lodash.get":"^4.4.2","lodash.set":"^4.3.2","lodash.uniq":"^4.5.0","octokit-pagination-methods":"^1.1.0","once":"^1.4.0","universal-user-agent":"^4.0.0"},"description":"GitHub REST API client for Node.js","devDependencies":{"@gimenete/type-writer":"^0.1.3","@octokit/auth":"^1.1.1","@octokit/fixtures-server":"^5.0.6","@octokit/graphql":"^4.2.0","@types/node":"^13.1.0","bundlesize":"^0.18.0","chai":"^4.1.2","compression-webpack-plugin":"^3.1.0","cypress":"^3.0.0","glob":"^7.1.2","http-proxy-agent":"^4.0.0","lodash.camelcase":"^4.3.0","lodash.merge":"^4.6.1","lodash.upperfirst":"^4.3.1","lolex":"^5.1.2","mkdirp":"^1.0.0","mocha":"^7.0.1","mustache":"^4.0.0","nock":"^11.3.3","npm-run-all":"^4.1.2","nyc":"^15.0.0","prettier":"^1.14.2","proxy":"^1.0.0","semantic-release":"^17.0.0","sinon":"^8.0.0","sinon-chai":"^3.0.0","sort-keys":"^4.0.0","string-to-arraybuffer":"^1.0.0","string-to-jsdoc-comment":"^1.0.0","typescript":"^3.3.1","webpack":"^4.0.0","webpack-bundle-analyzer":"^3.0.0","webpack-cli":"^3.0.0"},"files":["index.js","index.d.ts","lib","plugins"],"homepage":"https://github.com/octokit/rest.js#readme","keywords":["octokit","github","rest","api-client"],"license":"MIT","name":"@octokit/rest","nyc":{"ignore":["test"]},"publishConfig":{"access":"public"},"release":{"publish":["@semantic-release/npm",{"path":"@semantic-release/github","assets":["dist/*","!dist/*.map.gz"]}]},"repository":{"type":"git","url":"git+https://github.com/octokit/rest.js.git"},"scripts":{"build":"npm-run-all build:*","build:browser":"npm-run-all build:browser:*","build:browser:development":"webpack --mode development --entry . --output-library=Octokit --output=./dist/octokit-rest.js --profile --json > dist/bundle-stats.json","build:browser:production":"webpack --mode production --entry . --plugin=compression-webpack-plugin --output-library=Octokit --output-path=./dist --output-filename=octokit-rest.min.js --devtool source-map","build:ts":"npm run -s update-endpoints:typescript","coverage":"nyc report --reporter=html && open coverage/index.html","generate-bundle-report":"webpack-bundle-analyzer dist/bundle-stats.json --mode=static --no-open --report dist/bundle-report.html","lint":"prettier --check '{lib,plugins,scripts,test}/**/*.{js,json,ts}' 'docs/*.{js,json}' 'docs/src/**/*' index.js README.md package.json","lint:fix":"prettier --write '{lib,plugins,scripts,test}/**/*.{js,json,ts}' 'docs/*.{js,json}' 'docs/src/**/*' index.js README.md package.json","postvalidate:ts":"tsc --noEmit --target es6 test/typescript-validate.ts","prebuild:browser":"mkdirp dist/","pretest":"npm run -s lint","prevalidate:ts":"npm run -s build:ts","start-fixtures-server":"octokit-fixtures-server","test":"nyc mocha test/mocha-node-setup.js \"test/*/**/*-test.js\"","test:browser":"cypress run --browser chrome","update-endpoints":"npm-run-all update-endpoints:*","update-endpoints:fetch-json":"node scripts/update-endpoints/fetch-json","update-endpoints:typescript":"node scripts/update-endpoints/typescript","validate:ts":"tsc --target es6 --noImplicitAny index.d.ts"},"types":"index.d.ts","version":"16.43.1"};
+module.exports = {"_args":[["@octokit/rest@16.43.1","/Users/akshaynandwana/Desktop/opensource/oppiabot"]],"_from":"@octokit/rest@16.43.1","_id":"@octokit/rest@16.43.1","_inBundle":false,"_integrity":"sha512-gfFKwRT/wFxq5qlNjnW2dh+qh74XgTQ2B179UX5K1HYCluioWj8Ndbgqw2PVqa1NnVJkGHp2ovMpVn/DImlmkw==","_location":"/@actions/github/@octokit/rest","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"@octokit/rest@16.43.1","name":"@octokit/rest","escapedName":"@octokit%2frest","scope":"@octokit","rawSpec":"16.43.1","saveSpec":null,"fetchSpec":"16.43.1"},"_requiredBy":["/@actions/github"],"_resolved":"https://registry.npmjs.org/@octokit/rest/-/rest-16.43.1.tgz","_spec":"16.43.1","_where":"/Users/akshaynandwana/Desktop/opensource/oppiabot","author":{"name":"Gregor Martynus","url":"https://github.com/gr2m"},"bugs":{"url":"https://github.com/octokit/rest.js/issues"},"bundlesize":[{"path":"./dist/octokit-rest.min.js.gz","maxSize":"33 kB"}],"contributors":[{"name":"Mike de Boer","email":"info@mikedeboer.nl"},{"name":"Fabian Jakobs","email":"fabian@c9.io"},{"name":"Joe Gallo","email":"joe@brassafrax.com"},{"name":"Gregor Martynus","url":"https://github.com/gr2m"}],"dependencies":{"@octokit/auth-token":"^2.4.0","@octokit/plugin-paginate-rest":"^1.1.1","@octokit/plugin-request-log":"^1.0.0","@octokit/plugin-rest-endpoint-methods":"2.4.0","@octokit/request":"^5.2.0","@octokit/request-error":"^1.0.2","atob-lite":"^2.0.0","before-after-hook":"^2.0.0","btoa-lite":"^1.0.0","deprecation":"^2.0.0","lodash.get":"^4.4.2","lodash.set":"^4.3.2","lodash.uniq":"^4.5.0","octokit-pagination-methods":"^1.1.0","once":"^1.4.0","universal-user-agent":"^4.0.0"},"description":"GitHub REST API client for Node.js","devDependencies":{"@gimenete/type-writer":"^0.1.3","@octokit/auth":"^1.1.1","@octokit/fixtures-server":"^5.0.6","@octokit/graphql":"^4.2.0","@types/node":"^13.1.0","bundlesize":"^0.18.0","chai":"^4.1.2","compression-webpack-plugin":"^3.1.0","cypress":"^3.0.0","glob":"^7.1.2","http-proxy-agent":"^4.0.0","lodash.camelcase":"^4.3.0","lodash.merge":"^4.6.1","lodash.upperfirst":"^4.3.1","lolex":"^5.1.2","mkdirp":"^1.0.0","mocha":"^7.0.1","mustache":"^4.0.0","nock":"^11.3.3","npm-run-all":"^4.1.2","nyc":"^15.0.0","prettier":"^1.14.2","proxy":"^1.0.0","semantic-release":"^17.0.0","sinon":"^8.0.0","sinon-chai":"^3.0.0","sort-keys":"^4.0.0","string-to-arraybuffer":"^1.0.0","string-to-jsdoc-comment":"^1.0.0","typescript":"^3.3.1","webpack":"^4.0.0","webpack-bundle-analyzer":"^3.0.0","webpack-cli":"^3.0.0"},"files":["index.js","index.d.ts","lib","plugins"],"homepage":"https://github.com/octokit/rest.js#readme","keywords":["octokit","github","rest","api-client"],"license":"MIT","name":"@octokit/rest","nyc":{"ignore":["test"]},"publishConfig":{"access":"public"},"release":{"publish":["@semantic-release/npm",{"path":"@semantic-release/github","assets":["dist/*","!dist/*.map.gz"]}]},"repository":{"type":"git","url":"git+https://github.com/octokit/rest.js.git"},"scripts":{"build":"npm-run-all build:*","build:browser":"npm-run-all build:browser:*","build:browser:development":"webpack --mode development --entry . --output-library=Octokit --output=./dist/octokit-rest.js --profile --json > dist/bundle-stats.json","build:browser:production":"webpack --mode production --entry . --plugin=compression-webpack-plugin --output-library=Octokit --output-path=./dist --output-filename=octokit-rest.min.js --devtool source-map","build:ts":"npm run -s update-endpoints:typescript","coverage":"nyc report --reporter=html && open coverage/index.html","generate-bundle-report":"webpack-bundle-analyzer dist/bundle-stats.json --mode=static --no-open --report dist/bundle-report.html","lint":"prettier --check '{lib,plugins,scripts,test}/**/*.{js,json,ts}' 'docs/*.{js,json}' 'docs/src/**/*' index.js README.md package.json","lint:fix":"prettier --write '{lib,plugins,scripts,test}/**/*.{js,json,ts}' 'docs/*.{js,json}' 'docs/src/**/*' index.js README.md package.json","postvalidate:ts":"tsc --noEmit --target es6 test/typescript-validate.ts","prebuild:browser":"mkdirp dist/","pretest":"npm run -s lint","prevalidate:ts":"npm run -s build:ts","start-fixtures-server":"octokit-fixtures-server","test":"nyc mocha test/mocha-node-setup.js \"test/*/**/*-test.js\"","test:browser":"cypress run --browser chrome","update-endpoints":"npm-run-all update-endpoints:*","update-endpoints:fetch-json":"node scripts/update-endpoints/fetch-json","update-endpoints:typescript":"node scripts/update-endpoints/typescript","validate:ts":"tsc --target es6 --noImplicitAny index.d.ts"},"types":"index.d.ts","version":"16.43.1"};
 
 /***/ }),
 
