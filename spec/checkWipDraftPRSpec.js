@@ -22,8 +22,10 @@ const pullRequestEditedPayload = require('../fixtures/pullRequest.edited.json');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
-const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
-const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
+const checkCriticalPullRequestModule =
+  require('../lib/checkCriticalPullRequest');
+const checkPullRequestTemplateModule =
+  require('../lib/checkPullRequestTemplate');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 
 describe('Oppiabot\'s', () => {
@@ -43,17 +45,19 @@ describe('Oppiabot\'s', () => {
   let app;
 
   beforeEach((done) => {
-    spyOn(scheduler, 'createScheduler').and.callFake(() => {});
+    spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     // Spy on other modules that will be triggered by the payload.
-    spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => {});
+    spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
       checkPullRequestLabelsModule, 'checkChangelogLabel')
-      .and.callFake(() => {});
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
-    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
-    spyOn(checkPullRequestTemplateModule,'checkTemplate').and.callFake(() => {});
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
+      .and.callFake(() => { });
+    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')
+      .and.callFake(() => { });
+    spyOn(checkPullRequestTemplateModule, 'checkTemplate')
+      .and.callFake(() => { });
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
 
     github = {
       issues: {
@@ -88,11 +92,11 @@ describe('Oppiabot\'s', () => {
       done();
     });
 
-    it('calls checkWIP function', () =>{
+    it('calls checkWIP function', () => {
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
     });
 
-    it('calls checkWIP once', () =>{
+    it('calls checkWIP once', () => {
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalledTimes(1);
     });
 
@@ -155,11 +159,11 @@ describe('Oppiabot\'s', () => {
       done();
     });
 
-    it('calls checkWIP function', () =>{
+    it('calls checkWIP function', () => {
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
     });
 
-    it('calls checkWIP once', () =>{
+    it('calls checkWIP once', () => {
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalledTimes(1);
     });
 
@@ -204,7 +208,7 @@ describe('Oppiabot\'s', () => {
       expect(github.issues.createComment).toHaveBeenCalledTimes(1);
     });
 
-    it('should check when PR is reopnend', async() => {
+    it('should check when PR is reopnend', async () => {
       spyOn(checkWipDraftPRModule, 'checkWIP').and.callThrough();
       github.git = {
         getCommit: jasmine.createSpy('getCommit').and.resolveTo({

@@ -238,12 +238,12 @@ describe('Check Issue Labels Module', () => {
     it('should not remove the label', () => {
       expect(octokit.issues.removeLabel).not.toHaveBeenCalled();
     });
-  })
+  });
 
 
   describe('check non whitelisted repo', () => {
     beforeEach(async () => {
-      payload.repository.name = 'non-whitelisted-repo'
+      payload.repository.name = 'non-whitelisted-repo';
       await dispatcher.dispatch('issues', 'labeled');
     });
 
@@ -262,5 +262,5 @@ describe('Check Issue Labels Module', () => {
     it('should not assign team lead', () => {
       expect(octokit.issues.addAssignees).not.toHaveBeenCalled();
     });
-  })
+  });
 });

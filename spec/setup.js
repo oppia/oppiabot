@@ -165,8 +165,8 @@ runTest().then(
   () => {
     revertEnv();
     console.log('Tests successful');
-  }).catch(() => {
-    revertEnv();
-    console.log('Tests failed.')
-    process.exit(1);
-  });
+  })['catch'](() => {
+  revertEnv();
+  console.log('Tests failed.');
+  process.exit(1);
+});
