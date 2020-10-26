@@ -271,7 +271,7 @@ describe('Api For Sheets Module', () => {
           body:
             'Hi! @testuser7778, Welcome to Oppia! Please could you ' +
             'follow the instructions ' + linkResult +
-            ' to get started? You \'ll need to do ' +
+            ' to get started? You\'ll need to do ' +
             'this before we can accept your PR. ' +
             'I am closing this PR for now. Feel free to re-open it ' +
             'once you are done with the above instructions. Thanks!',
