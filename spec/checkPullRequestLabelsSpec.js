@@ -75,10 +75,11 @@ describe('Pull Request Label Check', () => {
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
     spyOn(
-      checkCriticalPullRequestModule,
-      'checkIfPRAffectsDatastoreLayer').and.callFake(() => { });
+      checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'
+    ).and.callFake(() => { });
     spyOn(
-      checkPullRequestTemplateModule, 'checkTemplate').and.callFake(() => { });
+      checkPullRequestTemplateModule, 'checkTemplate'
+    ).and.callFake(() => { });
   });
 
   describe('when pull request gets labeled', () => {
@@ -385,8 +386,9 @@ describe('Pull Request Label Check', () => {
     beforeEach(async () => {
       payloadData.payload.action = 'labeled';
       payloadData.payload.label = label;
-      spyOn(checkPullRequestLabelModule, 'checkForIssueLabel')
-        .and.callThrough();
+      spyOn(
+        checkPullRequestLabelModule, 'checkForIssueLabel'
+      ).and.callThrough();
       await robot.receive(payloadData);
     });
 
@@ -435,8 +437,9 @@ describe('Pull Request Label Check', () => {
     beforeEach(async () => {
       payloadData.payload.action = 'labeled';
       payloadData.payload.label = label;
-      spyOn(checkPullRequestLabelModule, 'checkForIssueLabel')
-        .and.callThrough();
+      spyOn(
+        checkPullRequestLabelModule, 'checkForIssueLabel'
+      ).and.callThrough();
       await robot.receive(payloadData);
     });
 
@@ -465,8 +468,9 @@ describe('Pull Request Label Check', () => {
     beforeEach(async () => {
       payloadData.payload.action = 'unlabeled';
       payloadData.payload.label = label;
-      spyOn(checkPullRequestLabelModule, 'checkCriticalLabel')
-        .and.callThrough();
+      spyOn(
+        checkPullRequestLabelModule, 'checkCriticalLabel'
+      ).and.callThrough();
       await robot.receive(payloadData);
     });
 
@@ -513,8 +517,9 @@ describe('Pull Request Label Check', () => {
       payloadData.payload.action = 'unlabeled';
       payloadData.payload.label = label;
       payloadData.payload.sender.login = 'seanlip';
-      spyOn(checkPullRequestLabelModule, 'checkCriticalLabel')
-        .and.callThrough();
+      spyOn(
+        checkPullRequestLabelModule, 'checkCriticalLabel'
+      ).and.callThrough();
       await robot.receive(payloadData);
     });
 
@@ -543,8 +548,9 @@ describe('Pull Request Label Check', () => {
     beforeEach(async () => {
       payloadData.payload.action = 'unlabeled';
       payloadData.payload.label = label;
-      spyOn(checkPullRequestLabelModule, 'checkCriticalLabel')
-        .and.callThrough();
+      spyOn(
+        checkPullRequestLabelModule, 'checkCriticalLabel'
+      ).and.callThrough();
       await robot.receive(payloadData);
     });
 
@@ -566,8 +572,7 @@ describe('Pull Request Label Check', () => {
       payloadData.payload.action = 'reopened';
 
       spyOn(
-        checkPullRequestLabelModule,
-        'checkChangelogLabel'
+        checkPullRequestLabelModule, 'checkChangelogLabel'
       ).and.callThrough();
       await robot.receive(payloadData);
 
@@ -614,8 +619,7 @@ describe('Pull Request Label Check', () => {
         ];
 
         spyOn(
-          checkPullRequestLabelModule,
-          'checkChangelogLabel'
+          checkPullRequestLabelModule, 'checkChangelogLabel'
         ).and.callThrough();
         await robot.receive(payloadData);
 
@@ -671,8 +675,7 @@ describe('Pull Request Label Check', () => {
         ];
 
         spyOn(
-          checkPullRequestLabelModule,
-          'checkChangelogLabel'
+          checkPullRequestLabelModule, 'checkChangelogLabel'
         ).and.callThrough();
         await robot.receive(payloadData);
 
@@ -722,8 +725,7 @@ describe('Pull Request Label Check', () => {
       // Add changelog label.
       payloadData.payload.pull_request.labels.push(label);
       spyOn(
-        checkPullRequestLabelModule,
-        'checkChangelogLabel'
+        checkPullRequestLabelModule, 'checkChangelogLabel'
       ).and.callThrough();
       await robot.receive(payloadData);
 
@@ -746,8 +748,7 @@ describe('Pull Request Label Check', () => {
       payloadData.payload.action = 'reopened';
       payloadData.payload.pull_request.labels = [label];
       spyOn(
-        checkPullRequestLabelModule,
-        'checkChangelogLabel'
+        checkPullRequestLabelModule, 'checkChangelogLabel'
       ).and.callThrough();
       await robot.receive(payloadData);
 
@@ -781,8 +782,7 @@ describe('Pull Request Label Check', () => {
 
         payloadData.payload.pull_request.labels = [label];
         spyOn(
-          checkPullRequestLabelModule,
-          'checkChangelogLabel'
+          checkPullRequestLabelModule, 'checkChangelogLabel'
         ).and.callThrough();
         await robot.receive(payloadData);
 

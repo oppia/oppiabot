@@ -54,7 +54,7 @@ describe('Merge Conflict Check', () => {
     'default': false,
   };
   beforeEach(() => {
-    spyOn(scheduler, 'createScheduler').and.callFake(() => {});
+    spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
       issues: {
@@ -73,12 +73,12 @@ describe('Merge Conflict Check', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
+    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
     spyOn(
       checkCriticalPullRequestModule,
       'checkIfPRAffectsDatastoreLayer'
-    ).and.callFake(() => {});
+    ).and.callFake(() => { });
 
     spyOn(
       checkMergeConflictModule,
@@ -132,7 +132,7 @@ describe('Merge Conflict Check', () => {
 
       const link = 'link'.link(
         'https://help.github.com/articles/resolving-a-merge' +
-          '-conflict-using-the-command-line/'
+        '-conflict-using-the-command-line/'
       );
       const params = {
         repo: payloadData.payload.repository.name,
@@ -221,7 +221,7 @@ describe('Merge Conflict Check', () => {
     'pull request with resolved merge conflicts has merge conflict label',
     () => {
       beforeEach(async () => {
-      // Set event to pull_request.synchronize.
+        // Set event to pull_request.synchronize.
         payloadData.payload.action = 'synchronize';
 
         // Create new pull request from payload data.
@@ -274,7 +274,7 @@ describe('Merge Conflict Check', () => {
     'pull request with unresolved merge conflicts has merge conflict label ' +
     'and unassigned author', () => {
       beforeEach(async () => {
-      // Set event to pull_request.synchronize.
+        // Set event to pull_request.synchronize.
         payloadData.payload.action = 'synchronize';
 
         // Create new pull request from payload data.
@@ -330,7 +330,7 @@ describe('Merge Conflict Check', () => {
     'pull request with unresolved merge conflicts has merge conflict label ' +
     'and assigned author', () => {
       beforeEach(async () => {
-      // Set event to pull_request.synchronize.
+        // Set event to pull_request.synchronize.
         payloadData.payload.action = 'synchronize';
 
         // Create new pull request from payload data.
@@ -413,7 +413,7 @@ describe('Merge Conflict Check', () => {
 
       spyOn(
         checkMergeConflictModule, 'checkMergeConflictsInAllPullRequests'
-      ).and.callFake(() => {});
+      ).and.callFake(() => { });
 
       // Add label to pull request.
       payloadData.payload.pull_request.labels.push({
@@ -533,7 +533,7 @@ describe('Merge Conflict Check', () => {
 
       spyOn(
         checkMergeConflictModule, 'checkMergeConflictsInAllPullRequests'
-      ).and.callFake(() => {});
+      ).and.callFake(() => { });
 
       await robot.receive(payloadData);
     });

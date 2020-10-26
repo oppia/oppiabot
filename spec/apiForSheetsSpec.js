@@ -114,7 +114,9 @@ describe('Api For Sheets Module', () => {
           values: {
             get: jasmine.createSpy('get').and.callFake(async (obj, cb) => {
               await cb(null, {
-                data: { values: [['test']] },
+                data: {
+                  values: [['test']]
+                },
               });
             }),
           },
@@ -267,15 +269,12 @@ describe('Api For Sheets Module', () => {
           repo: pullRequestPayload.payload.repository.name,
           number: pullRequestPayload.payload.pull_request.number,
           body:
-            'Hi! @testuser7778,' +
-            ' Welcome to Oppia! Please could you ' +
-            'follow the instructions ' +
-            linkResult +
-            " to get started? You'll need to do " +
-            'this before we can accept your PR.' +
-            ' I am closing this PR for now. ' +
-            'Feel free to re-open it once you are done with the above ' +
-            'instructions. Thanks!',
+            'Hi! @testuser7778, Welcome to Oppia! Please could you ' +
+            'follow the instructions ' + linkResult +
+            ' to get started? You \'ll need to do ' +
+            'this before we can accept your PR. ' +
+            'I am closing this PR for now. Feel free to re-open it ' +
+            'once you are done with the above instructions. Thanks!',
         });
         expect(github.issues.update).toHaveBeenCalledWith({
           issue_number: pullRequestPayload.payload.pull_request.number,
@@ -307,7 +306,9 @@ describe('Api For Sheets Module', () => {
           values: {
             get: jasmine.createSpy('get').and.callFake(async (obj, cb) => {
               await cb(null, {
-                data: { values: [['test']] },
+                data: {
+                  values: [['test']]
+                },
               });
             }),
           },
@@ -347,8 +348,9 @@ describe('Api For Sheets Module', () => {
     it('should be called with the correct username for the given payload',
       () => {
         const context = apiForSheetsModule.checkClaStatus.calls.argsFor(0)[0];
-        expect(context.payload.pull_request.user.login)
-          .toEqual('testuser7777');
+        expect(
+          context.payload.pull_request.user.login
+        ).toEqual('testuser7777');
       });
 
     it('should call authorize', () => {

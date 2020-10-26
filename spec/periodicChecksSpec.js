@@ -464,7 +464,8 @@ describe('Periodic Checks Module', () => {
           body:
             'Hi @author4, this PR is ready to be merged. Please address any ' +
             'remaining comments prior to merging, and feel free to merge ' +
-            "this PR once the CI checks pass and you're happy with it. Thanks!",
+            'this PR once the CI checks pass and you\'re happy with it. ' +
+            'Thanks!',
         });
       });
 

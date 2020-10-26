@@ -24,7 +24,6 @@ const checkWIPModule = require('../lib/checkWipDraftPR');
 const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
-
   require('../lib/checkPullRequestTemplate');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
@@ -67,35 +66,35 @@ describe('Pull Request Job Spec', () => {
       'https://api.github.com/repos/oppia/oppia/contents/core/domain/' +
       'exp_jobs_one_off.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
     patch: '@@ -0,0 +1 @@\n+class FirstTestOneOffJob(jobs.' +
-    'BaseMapReduceOneOffJobManager):\n+    """One-off job for ' +
-    'creating and populating UserContributionsModels for\n+    ' +
-    'all registered users that have contributed.\n+    """\n+    ' +
-    '@classmethod\n+    def entity_classes_to_map_over(cls)' +
-    ':\n+        """Return a list of datastore class references ' +
-    'to map over."""\n+        return [exp_models.' +
-    'ExplorationSnapshotMetadataModel]\n+\n+    @staticmethod\n+    ' +
-    'def map(item):\n+        """Implements the map function for this ' +
-    'job."""\n+        yield (\n+            item.committer_id, ' +
-    '{\n+                \'exploration_id\': item.' +
-    'get_unversioned_instance_id(),\n+                ' +
-    '\'version_string\': item.get_version_string(),\n+            ' +
-    '})\n+\n+\n+    @staticmethod\n+    def reduce(key, ' +
-    'version_and_exp_ids):\n+        """Implements the reduce ' +
-    'function for this job."""\n+        created_exploration_ids = ' +
-    'set()\n+        edited_exploration_ids = set()\n+\n+        ' +
-    'edits = [ast.literal_eval(v) for v in version_and_exp_ids]' +
-    '\n+\n+        for edit in edits:\n+            ' +
-    'edited_exploration_ids.add(edit[\'exploration_id\'])' +
-    '\n+            if edit[\'version_string\'] == \'1\'' +
-    ':\n+                created_exploration_ids.add(edit' +
-    '[\'exploration_id\'])\n+\n+        if user_services.' +
-    'get_user_contributions(key, strict=False) is not None' +
-    ':\n+            user_services.update_user_contributions' +
-    '(\n+                key, list(created_exploration_ids), ' +
-    'list(\n+                    edited_exploration_ids))\n+        ' +
-    'else:\n+            user_services.create_user_contributions' +
-    '(\n+                key, list(created_exploration_ids), list' +
-    '(\n+                    edited_exploration_ids))\n',
+      'BaseMapReduceOneOffJobManager):\n+    """One-off job for ' +
+      'creating and populating UserContributionsModels for\n+    ' +
+      'all registered users that have contributed.\n+    """\n+    ' +
+      '@classmethod\n+    def entity_classes_to_map_over(cls)' +
+      ':\n+        """Return a list of datastore class references ' +
+      'to map over."""\n+        return [exp_models.' +
+      'ExplorationSnapshotMetadataModel]\n+\n+    @staticmethod\n+    ' +
+      'def map(item):\n+        """Implements the map function for this ' +
+      'job."""\n+        yield (\n+            item.committer_id, ' +
+      '{\n+                \'exploration_id\': item.' +
+      'get_unversioned_instance_id(),\n+                ' +
+      '\'version_string\': item.get_version_string(),\n+            ' +
+      '})\n+\n+\n+    @staticmethod\n+    def reduce(key, ' +
+      'version_and_exp_ids):\n+        """Implements the reduce ' +
+      'function for this job."""\n+        created_exploration_ids = ' +
+      'set()\n+        edited_exploration_ids = set()\n+\n+        ' +
+      'edits = [ast.literal_eval(v) for v in version_and_exp_ids]' +
+      '\n+\n+        for edit in edits:\n+            ' +
+      'edited_exploration_ids.add(edit[\'exploration_id\'])' +
+      '\n+            if edit[\'version_string\'] == \'1\'' +
+      ':\n+                created_exploration_ids.add(edit' +
+      '[\'exploration_id\'])\n+\n+        if user_services.' +
+      'get_user_contributions(key, strict=False) is not None' +
+      ':\n+            user_services.update_user_contributions' +
+      '(\n+                key, list(created_exploration_ids), ' +
+      'list(\n+                    edited_exploration_ids))\n+        ' +
+      'else:\n+            user_services.create_user_contributions' +
+      '(\n+                key, list(created_exploration_ids), list' +
+      '(\n+                    edited_exploration_ids))\n',
   };
 
   const secondNewJobFileObj = {
@@ -115,35 +114,35 @@ describe('Pull Request Job Spec', () => {
       'https://api.github.com/repos/oppia/oppia/contents/core/domain/' +
       'exp_jobs_oppiabot_off.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
     patch: '@@ -0,0 +1 @@\n+class SecondTestOneOffJob(jobs.' +
-    'BaseMapReduceOneOffJobManager):\n+    """One-off job ' +
-    'for creating and populating UserContributionsModels for' +
-    '\n+    all registered users that have contributed.\n+    ' +
-    '"""\n+    @classmethod\n+    def entity_classes_to_map_over' +
-    '(cls):\n+        """Return a list of datastore class references ' +
-    'to map over."""\n+        return [exp_models.' +
-    'ExplorationSnapshotMetadataModel]\n+\n+    @staticmethod\n+    ' +
-    'def map(item):\n+        """Implements the map function for this ' +
-    'job."""\n+        yield (\n+            item.committer_id, ' +
-    '{\n+                \'exploration_id\': item.' +
-    'get_unversioned_instance_id(),\n+                \'version_string\'' +
-    ': item.get_version_string(),\n+            })\n+\n+\n+    ' +
-    '@staticmethod\n+    def reduce(key, version_and_exp_ids)' +
-    ':\n+        """Implements the reduce function for this job.' +
-    '"""\n+        created_exploration_ids = set()\n+        ' +
-    'edited_exploration_ids = set()\n+\n+        edits = ' +
-    '[ast.literal_eval(v) for v in version_and_exp_ids]\n+\n+        ' +
-    'for edit in edits:\n+            edited_exploration_ids.add' +
-    '(edit[\'exploration_id\'])\n+            if edit' +
-    '[\'version_string\'] == \'1\':\n+                ' +
-    'created_exploration_ids.add(edit[\'exploration_id\'])' +
-    '\n+\n+        if user_services.get_user_contributions' +
-    '(key, strict=False) is not None:\n+            user_services.' +
-    'update_user_contributions(\n+                key, list' +
-    '(created_exploration_ids), list(\n+                    ' +
-    'edited_exploration_ids))\n+        else:\n+            ' +
-    'user_services.create_user_contributions(\n+                ' +
-    'key, list(created_exploration_ids), list(\n+                    ' +
-    'edited_exploration_ids))\n',
+      'BaseMapReduceOneOffJobManager):\n+    """One-off job ' +
+      'for creating and populating UserContributionsModels for' +
+      '\n+    all registered users that have contributed.\n+    ' +
+      '"""\n+    @classmethod\n+    def entity_classes_to_map_over' +
+      '(cls):\n+        """Return a list of datastore class references ' +
+      'to map over."""\n+        return [exp_models.' +
+      'ExplorationSnapshotMetadataModel]\n+\n+    @staticmethod\n+    ' +
+      'def map(item):\n+        """Implements the map function for this ' +
+      'job."""\n+        yield (\n+            item.committer_id, ' +
+      '{\n+                \'exploration_id\': item.' +
+      'get_unversioned_instance_id(),\n+                \'version_string\'' +
+      ': item.get_version_string(),\n+            })\n+\n+\n+    ' +
+      '@staticmethod\n+    def reduce(key, version_and_exp_ids)' +
+      ':\n+        """Implements the reduce function for this job.' +
+      '"""\n+        created_exploration_ids = set()\n+        ' +
+      'edited_exploration_ids = set()\n+\n+        edits = ' +
+      '[ast.literal_eval(v) for v in version_and_exp_ids]\n+\n+        ' +
+      'for edit in edits:\n+            edited_exploration_ids.add' +
+      '(edit[\'exploration_id\'])\n+            if edit' +
+      '[\'version_string\'] == \'1\':\n+                ' +
+      'created_exploration_ids.add(edit[\'exploration_id\'])' +
+      '\n+\n+        if user_services.get_user_contributions' +
+      '(key, strict=False) is not None:\n+            user_services.' +
+      'update_user_contributions(\n+                key, list' +
+      '(created_exploration_ids), list(\n+                    ' +
+      'edited_exploration_ids))\n+        else:\n+            ' +
+      'user_services.create_user_contributions(\n+                ' +
+      'key, list(created_exploration_ids), list(\n+                    ' +
+      'edited_exploration_ids))\n',
   };
 
   const modifiedExistingJobFileObj = {
@@ -455,15 +454,16 @@ describe('Pull Request Job Spec', () => {
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callThrough();
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
-      checkPullRequestLabelsModule,
-      'checkChangelogLabel'
+      checkPullRequestLabelsModule, 'checkChangelogLabel'
     ).and.callFake(() => { });
-    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')
-      .and.callFake(() => { });
+    spyOn(
+      checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'
+    ).and.callFake(() => { });
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
     spyOn(checkWIPModule, 'checkWIP').and.callFake(() => { });
-    spyOn(checkPullRequestTemplateModule, 'checkTemplate')
-      .and.callFake(() => { });
+    spyOn(
+      checkPullRequestTemplateModule, 'checkTemplate'
+    ).and.callFake(() => { });
     spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
   });
 
@@ -501,8 +501,8 @@ describe('Pull Request Job Spec', () => {
       const jobRegistryLink = 'job registry'.link(
         'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py'
       );
-      const jobNameLink = 'FirstTestOneOffJob'
-        .link(firstNewJobFileObj.blob_url);
+      const jobNameLink = (
+        'FirstTestOneOffJob'.link(firstNewJobFileObj.blob_url));
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
@@ -569,19 +569,20 @@ describe('Pull Request Job Spec', () => {
     it('should ping server jobs admin', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       const author = payloadData.payload.pull_request.user.login;
-      const formText = 'server jobs form'.link(
-        'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
+      const formText = (
+        'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2'));
       const newLineFeed = '<br>';
       const wikiLinkText = (
         'this guide'.link(
           'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
           '#submitting-a-pr-with-a-new-job'));
-      const jobRegistryLink = 'job registry'.link(
-        'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py');
+      const jobRegistryLink = (
+        'job registry'.link(
+          'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py'));
       const firstJobNameLink = 'FirstTestOneOffJob'
         .link(firstNewJobFileObj.blob_url);
-      const secondJobNameLink = 'SecondTestOneOffJob'
-        .link(secondNewJobFileObj.blob_url);
+      const secondJobNameLink = (
+        'SecondTestOneOffJob'.link(secondNewJobFileObj.blob_url));
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
@@ -648,8 +649,8 @@ describe('Pull Request Job Spec', () => {
     it('should ping server jobs admin', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       const author = payloadData.payload.pull_request.user.login;
-      const formText = 'server jobs form'.link(
-        'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
+      const formText = (
+        'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2'));
       const newLineFeed = '<br>';
       const wikiLinkText = (
         'this guide'.link(
@@ -720,15 +721,16 @@ describe('Pull Request Job Spec', () => {
     it('should ping server jobs admin', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       const author = payloadData.payload.pull_request.user.login;
-      const formText = 'server jobs form'.link(
-        'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
+      const formText = (
+        'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2'));
       const newLineFeed = '<br>';
       const wikiLinkText = (
         'this guide'.link(
           'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
           '#submitting-a-pr-with-a-new-job'));
-      const jobRegistryLink = 'job registry'.link(
-        'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py');
+      const jobRegistryLink = (
+        'job registry'.link(
+          'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py'));
       const jobNameLink = 'OppiabotContributionsOneOffJob'.
         link(modifiedExistingJobFileObj.blob_url);
       expect(github.issues.createComment).toHaveBeenCalledWith({
@@ -889,8 +891,9 @@ describe('Pull Request Job Spec', () => {
 
   describe('When pull request has datastore label', () => {
     beforeEach(async () => {
-      payloadData.payload.pull_request.labels =
-        [{ name: 'PR: Affects datastore layer' }];
+      payloadData.payload.pull_request.labels = [{
+        name: 'PR: Affects datastore layer'
+      }];
       github.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [

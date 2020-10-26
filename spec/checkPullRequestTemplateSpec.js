@@ -437,8 +437,7 @@ describe('Pull Request Template', () => {
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
           body:
-            'Hi @' +
-            payloadData.payload.pull_request.user.login +
+            'Hi @' + payloadData.payload.pull_request.user.login +
             ', the body of this PR is missing the required description, ' +
             'please update the body with a description of what this PR does. ' +
             'Thanks!',

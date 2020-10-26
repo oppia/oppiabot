@@ -203,12 +203,14 @@ describe('Critical Pull Request Spec', () => {
     ).and.callFake(() => { });
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
     spyOn(checkWIPModule, 'checkWIP').and.callFake(() => { });
-    spyOn(checkPullRequestTemplateModule, 'checkTemplate')
-      .and.callFake(() => { });
+    spyOn(
+      checkPullRequestTemplateModule, 'checkTemplate'
+    ).and.callFake(() => { });
     spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
 
-    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')
-      .and.callThrough();
+    spyOn(
+      checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'
+    ).and.callThrough();
   });
 
   describe('When a new model is created in a pull request', () => {
@@ -223,8 +225,9 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer)
-        .toHaveBeenCalled();
+      expect(
+        checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -280,8 +283,9 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer)
-        .toHaveBeenCalled();
+      expect(
+        checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -295,9 +299,7 @@ describe('Critical Pull Request Spec', () => {
       );
       const secondModels =
         'OppiabotSnapshotContentModel, OppiabotSnapshotTestingModel'
-          .link(
-            modifiedModelFileObj.blob_url
-          );
+          .link(modifiedModelFileObj.blob_url);
       expect(github.issues.createComment).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -343,8 +345,9 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer)
-        .toHaveBeenCalled();
+      expect(
+        checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -373,8 +376,9 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer)
-        .toHaveBeenCalled();
+      expect(
+        checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -403,8 +407,9 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer)
-        .toHaveBeenCalled();
+      expect(
+        checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -437,8 +442,9 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer)
-        .toHaveBeenCalled();
+      expect(
+        checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer
+      ).toHaveBeenCalled();
     });
 
     it('should not get modified files', () => {
