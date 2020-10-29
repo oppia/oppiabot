@@ -398,8 +398,7 @@ describe('Pull Request Template', () => {
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
           body:
-            'Hi @' +
-            payloadData.payload.pull_request.user.login +
+            'Hi @' + payloadData.payload.pull_request.user.login +
             ', the allow edits from maintainers checklist needs to ' +
             'be ticked so that maintainers can rerun failed tests. Endeavour ' +
             'to add this by ticking on the check box. Thanks!',

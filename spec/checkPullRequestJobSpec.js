@@ -731,8 +731,10 @@ describe('Pull Request Job Spec', () => {
       const jobRegistryLink = (
         'job registry'.link(
           'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py'));
-      const jobNameLink = 'OppiabotContributionsOneOffJob'.
-        link(modifiedExistingJobFileObj.blob_url);
+      const jobNameLink =
+        'OppiabotContributionsOneOffJob'.link(
+          modifiedExistingJobFileObj.blob_url
+        );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
