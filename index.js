@@ -121,6 +121,7 @@ const runChecks = async (context, checkEvent) => {
           case constants.periodicCheck:
             await periodicCheckModule.ensureAllPullRequestsAreAssigned(context);
             await periodicCheckModule.ensureAllIssuesHaveProjects(context);
+            await periodicCheckModule.checkAndTagPRsWithOldBuilds(context);
             break;
           case constants.respondToReviewCheck:
             await checkPullRequestReviewModule.handleResponseToReview(context);
@@ -159,7 +160,7 @@ function checkAuthor(context) {
 module.exports = (oppiabot) => {
   scheduler.createScheduler(oppiabot, {
     delay: !process.env.DISABLE_DELAY, // delay is enabled on first run
-    interval: 24 * 60 * 60 * 1000, // 1 day
+    interval: 2 * 60 * 1000, // 1 day
   });
 
   oppiabot.on('schedule.repository', async (context) => {
