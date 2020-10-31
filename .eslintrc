@@ -69,15 +69,7 @@
       "ignorePattern": "^import \\{"
     ],
     "no-compare-neg": "off",
-    "no-console": [
-      "error",
-      {
-        "allow": [
-          "error",
-          "warn"
-        ]
-      }
-    ],
+    "no-console": "off",
     "no-constant-condition": [
       "off"
     ],
