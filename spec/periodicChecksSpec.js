@@ -914,7 +914,7 @@ describe('Periodic Checks Module', () => {
     });
   });
 
-  describe('When pull request has an old build', () => {
+  describe('when pull request has an old build', () => {
     beforeEach(async () => {
       spyOn(
         periodicCheckModule,
@@ -935,12 +935,11 @@ describe('Periodic Checks Module', () => {
       // Mocking the minumum build date.
       utils.MIN_BUILD_DATE = new Date('2020-08-12T14:15:32Z');
 
-      github.pulls.listCommits = jasmine
-        .createSpy('listCommits')
-        .and.callFake(() => {
-          return {
-            data: [
-              {
+      github.repos = {
+        getCommit: jasmine.createSpy('getCommit').and.callFake((params) => {
+          if (params.ref === pullRequests.prWithOldBuild.head.sha) {
+            return {
+              data: {
                 sha: 'old-build-pr-sha',
                 node_id:
                   'MDY6Q29tbWl0MTczMDA0MDIyOmViNjk3ZTU1YTNkYTMwODUzNjBkODQzZGZiMTUwZjAzM2FhMTdlNjE=',
@@ -964,8 +963,7 @@ describe('Periodic Checks Module', () => {
                   url:
                     'https://api.github.com/repos/jameesjohn/oppia/git/commits/eb697e55a3da3085360d843dfb150f033aa17e61',
                   comment_count: 0,
-                  verification: {
-                  },
+                  verification: {},
                 },
                 url:
                   'https://api.github.com/repos/oppia/oppia/commits/eb697e55a3da3085360d843dfb150f033aa17e61',
@@ -977,50 +975,53 @@ describe('Periodic Checks Module', () => {
                 committer: {},
                 parents: [],
               },
-              {
-                sha: 'new-build-pr-sha',
-                node_id:
-                  'MDY6Q29tbWl0MTczMDA0MDIyOjUyNWQ2MDU4YTYyNmI0NjE1NGVkMzczMTE0MWE5NWU3MGViYjBhZWY=',
-                commit: {
-                  author: {
-                    name: 'James James',
-                    email: 'jamesjay4199@gmail.com',
-                    date: '2020-08-13T13:43:24Z',
-                  },
-                  committer: {
-                    name: 'James James',
-                    email: 'jamesjay4199@gmail.com',
-                    date: '2020-08-13T13:43:24Z',
-                  },
-                  message: 'new additions',
-                  tree: {
-                    sha: 'b5bf5af6ec0592bf3776b23d4355ff200549f427',
-                    url:
-                      'https://api.github.com/repos/jameesjohn/oppia/git/trees/b5bf5af6ec0592bf3776b23d4355ff200549f427',
-                  },
+            };
+          }
+          return {
+            data: {
+              sha: 'new-build-pr-sha',
+              node_id:
+                'MDY6Q29tbWl0MTczMDA0MDIyOjUyNWQ2MDU4YTYyNmI0NjE1NGVkMzczMTE0MWE5NWU3MGViYjBhZWY=',
+              commit: {
+                author: {
+                  name: 'James James',
+                  email: 'jamesjay4199@gmail.com',
+                  date: '2020-08-13T13:43:24Z',
+                },
+                committer: {
+                  name: 'James James',
+                  email: 'jamesjay4199@gmail.com',
+                  date: '2020-08-13T13:43:24Z',
+                },
+                message: 'new additions',
+                tree: {
+                  sha: 'b5bf5af6ec0592bf3776b23d4355ff200549f427',
                   url:
-                    'https://api.github.com/repos/jameesjohn/oppia/git/commits/525d6058a626b46154ed3731141a95e70ebb0aef',
-                  comment_count: 0,
-                  verification: {
-                    verified: false,
-                    reason: 'unsigned',
-                    signature: null,
-                    payload: null,
-                  },
+                    'https://api.github.com/repos/jameesjohn/oppia/git/trees/b5bf5af6ec0592bf3776b23d4355ff200549f427',
                 },
                 url:
-                  'https://api.github.com/repos/jameesjohn/oppia/commits/525d6058a626b46154ed3731141a95e70ebb0aef',
-                html_url:
-                  'https://github.com/jameesjohn/oppia/commit/525d6058a626b46154ed3731141a95e70ebb0aef',
-                comments_url:
-                  'https://api.github.com/repos/jameesjohn/oppia/commits/525d6058a626b46154ed3731141a95e70ebb0aef/comments',
-                author: [Object],
-                committer: [Object],
-                parents: [Array],
+                  'https://api.github.com/repos/jameesjohn/oppia/git/commits/525d6058a626b46154ed3731141a95e70ebb0aef',
+                comment_count: 0,
+                verification: {
+                  verified: false,
+                  reason: 'unsigned',
+                  signature: null,
+                  payload: null,
+                },
               },
-            ]
+              url:
+                'https://api.github.com/repos/jameesjohn/oppia/commits/525d6058a626b46154ed3731141a95e70ebb0aef',
+              html_url:
+                'https://github.com/jameesjohn/oppia/commit/525d6058a626b46154ed3731141a95e70ebb0aef',
+              comments_url:
+                'https://api.github.com/repos/jameesjohn/oppia/commits/525d6058a626b46154ed3731141a95e70ebb0aef/comments',
+              author: [Object],
+              committer: [Object],
+              parents: [Array],
+            },
           };
-        });
+        }),
+      };
       await robot.receive(payloadData);
     });
 

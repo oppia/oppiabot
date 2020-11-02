@@ -108,9 +108,6 @@ const checksWhitelist = {
     [issuesAssignedEvent]: [],
     [pushEvent]: []
   },
-  'comment-on-pr': {
-    [periodicCheckEvent]: [periodicCheck],
-  }
 };
 
 const blacklistedAuthors = ['translatewiki'];
