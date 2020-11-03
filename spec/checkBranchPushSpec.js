@@ -81,9 +81,11 @@ describe('Force Push Check', () => {
 
     it('should comment on pull request', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
-      const link = 'here (point 5)'.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
-        '#instructions-for-making-a-code-change');
+      const link = (
+        'here (point 5)'.link(
+          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
+        '#instructions-for-making-a-code-change')
+      );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         repo: pushPayload.payload.repository.name,
         owner: pushPayload.payload.repository.owner.login,

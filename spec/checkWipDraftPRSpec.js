@@ -126,9 +126,11 @@ describe('Oppiabot\'s', () => {
       expect(github.issues.createComment).toHaveBeenCalledTimes(1);
 
       // Comment on Pull Request.
-      const link = 'here'.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
-        '#wip--draft-pull-requests');
+      const link = (
+        'here'.link(
+          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
+        '#wip--draft-pull-requests')
+      );
       const author = pullRequestEditedPayload.payload.pull_request.user.login;
       const commentBody = (
         'Hi @' + author + ', when creating WIP/Draft PRs, ensure that ' +
@@ -287,9 +289,11 @@ describe('Oppiabot\'s', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledTimes(1);
 
-      const link = 'here'.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
-        '#wip--draft-pull-requests');
+      const link = (
+        'here'.link(
+          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
+        '#wip--draft-pull-requests')
+      );
       const author = pullRequestEditedPayload.payload.pull_request.user.login;
       const commentBody = (
         'Hi @' + author + ', when creating WIP/Draft PRs, ensure that ' +

@@ -155,8 +155,8 @@ describe('Utility module tests', () => {
       },
       modelRegex
     );
-    let itemLink = 'OppiabotTestActivitiesModel'.link(
-      firstModelFileObj.blob_url
+    let itemLink = (
+      'OppiabotTestActivitiesModel'.link(firstModelFileObj.blob_url)
     );
     expect(result).toBe(' The name of the model is ' + itemLink + '.');
 
@@ -168,12 +168,13 @@ describe('Utility module tests', () => {
       },
       modelRegex
     );
-    firstItemLink = 'OppiabotTestActivitiesModel'.link(
-      firstModelFileObj.blob_url
+    firstItemLink = (
+      'OppiabotTestActivitiesModel'.link(firstModelFileObj.blob_url)
     );
-    let secondItemLink =
+    let secondItemLink = (
       'OppiabotSnapshotContentModel, OppiabotSnapshotTestingModel'
-        .link(secondModelFileObj.blob_url);
+        .link(secondModelFileObj.blob_url)
+    );
     expect(result).toBe(
       ' The models are ' + itemLink + ', ' + secondItemLink + '.'
     );
@@ -186,7 +187,7 @@ describe('Utility module tests', () => {
       },
       jobRegex
     );
-    itemLink = 'FirstTestOneOffJob'.link(firstJobFileObj.blob_url);
+    itemLink = ('FirstTestOneOffJob'.link(firstJobFileObj.blob_url));
     expect(result).toBe(' The name of the job is ' + itemLink + '.');
 
     result = utilityModule.getNameString(
@@ -197,8 +198,8 @@ describe('Utility module tests', () => {
       },
       jobRegex
     );
-    itemLink = 'FirstTestOneOffJob'.link(firstJobFileObj.blob_url);
-    secondItemLink = 'SecondTestOneOffJob'.link(secondJobFileObj.blob_url);
+    itemLink = ('FirstTestOneOffJob'.link(firstJobFileObj.blob_url));
+    secondItemLink = ('SecondTestOneOffJob'.link(secondJobFileObj.blob_url));
     expect(result).toBe(
       ' The jobs are ' + itemLink + ', ' + secondItemLink + '.'
     );

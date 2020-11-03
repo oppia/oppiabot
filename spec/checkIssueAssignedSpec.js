@@ -97,9 +97,10 @@ describe('Check Issue Assignee Module', () => {
     });
 
     it('should comment on issue', () => {
-      const linkToCla = 'here'.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
-        '#setting-things-up'
+      const linkToCla = (
+        'here'.link(
+          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
+        '#setting-things-up')
       );
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledWith({

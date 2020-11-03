@@ -130,9 +130,10 @@ describe('Merge Conflict Check', () => {
     it('pings pr author regarding merge conflict', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
 
-      const link = 'link'.link(
-        'https://help.github.com/articles/resolving-a-merge' +
-        '-conflict-using-the-command-line/'
+      const link = (
+        'link'.link(
+          'https://help.github.com/articles/resolving-a-merge' +
+        '-conflict-using-the-command-line/')
       );
       const params = {
         repo: payloadData.payload.repository.name,
@@ -435,12 +436,14 @@ describe('Merge Conflict Check', () => {
     it('should comment on all open pull requests', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledTimes(2);
-      const linkToChange = 'new change'.link(
-        payloadData.payload.pull_request.html_url
+      const linkToChange = (
+        'new change'.link(
+          payloadData.payload.pull_request.html_url)
       );
-      const linkToWiki = 'link'.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-        'instructions-for-making-a-code-change'
+      const linkToWiki = (
+        'link'.link(
+          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+        'instructions-for-making-a-code-change')
       );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,

@@ -491,18 +491,23 @@ describe('Pull Request Job Spec', () => {
     it('should ping server jobs admin', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       const author = payloadData.payload.pull_request.user.login;
-      const formText = 'server jobs form'.link(
-        'https://goo.gl/forms/XIj00RJ2h5L55XzU2');
+      const formText = (
+        'server jobs form'.link(
+          'https://goo.gl/forms/XIj00RJ2h5L55XzU2')
+      );
       const newLineFeed = '<br>';
       const wikiLinkText = (
         'this guide'.link(
           'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
-          '#submitting-a-pr-with-a-new-job'));
-      const jobRegistryLink = 'job registry'.link(
-        'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py'
+          '#submitting-a-pr-with-a-new-job')
+      );
+      const jobRegistryLink = (
+        'job registry'.link(
+          'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py')
       );
       const jobNameLink = (
-        'FirstTestOneOffJob'.link(firstNewJobFileObj.blob_url));
+        'FirstTestOneOffJob'.link(firstNewJobFileObj.blob_url)
+      );
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
@@ -570,19 +575,24 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       const author = payloadData.payload.pull_request.user.login;
       const formText = (
-        'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2'));
+        'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
+      );
       const newLineFeed = '<br>';
       const wikiLinkText = (
         'this guide'.link(
           'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
-          '#submitting-a-pr-with-a-new-job'));
+          '#submitting-a-pr-with-a-new-job')
+      );
       const jobRegistryLink = (
         'job registry'.link(
-          'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py'));
-      const firstJobNameLink = 'FirstTestOneOffJob'
-        .link(firstNewJobFileObj.blob_url);
+          'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py')
+      );
+      const firstJobNameLink = (
+        'FirstTestOneOffJob'.link(firstNewJobFileObj.blob_url)
+      );
       const secondJobNameLink = (
-        'SecondTestOneOffJob'.link(secondNewJobFileObj.blob_url));
+        'SecondTestOneOffJob'.link(secondNewJobFileObj.blob_url)
+      );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
@@ -650,14 +660,17 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       const author = payloadData.payload.pull_request.user.login;
       const formText = (
-        'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2'));
+        'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
+      );
       const newLineFeed = '<br>';
       const wikiLinkText = (
         'this guide'.link(
           'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
-            '#submitting-a-pr-with-a-new-job'));
-      const jobNameLink = 'FirstTestOneOffJob'
-        .link(firstNewJobFileObj.blob_url);
+            '#submitting-a-pr-with-a-new-job')
+      );
+      const jobNameLink = (
+        'FirstTestOneOffJob'.link(firstNewJobFileObj.blob_url)
+      );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
@@ -722,19 +735,22 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       const author = payloadData.payload.pull_request.user.login;
       const formText = (
-        'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2'));
+        'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
+      );
       const newLineFeed = '<br>';
       const wikiLinkText = (
         'this guide'.link(
           'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
-          '#submitting-a-pr-with-a-new-job'));
+          '#submitting-a-pr-with-a-new-job')
+      );
       const jobRegistryLink = (
         'job registry'.link(
-          'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py'));
-      const jobNameLink =
-        'OppiabotContributionsOneOffJob'.link(
-          modifiedExistingJobFileObj.blob_url
-        );
+          'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py')
+      );
+      const jobNameLink = (
+        'OppiabotContributionsOneOffJob'
+          .link(modifiedExistingJobFileObj.blob_url)
+      );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:

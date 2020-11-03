@@ -399,9 +399,10 @@ describe('Pull Request Label Check', () => {
     it('comments on the PR', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
 
-      const link = 'here'.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-        'labeling-issues-and-pull-requests'
+      const link = (
+        'here'.link(
+          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+        'labeling-issues-and-pull-requests')
       );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         body: 'Hi @' + payloadData.payload.sender.login + ', the good ' +

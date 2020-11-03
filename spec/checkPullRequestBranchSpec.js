@@ -96,9 +96,10 @@ describe('Pull Request Branch Check', () => {
       it('should create appropriate comment', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
         const author = pullRequestPayload.payload.pull_request.user.login;
-        const wiki = 'wiki'.link(
-          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-          'instructions-for-making-a-code-change'
+        const wiki = (
+          'wiki'.link(
+            'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+          'instructions-for-making-a-code-change')
         );
         const commentBody =
           'Hi @' +
@@ -142,9 +143,10 @@ describe('Pull Request Branch Check', () => {
       it('should create appropriate comment', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
         const author = pullRequestPayload.payload.pull_request.user.login;
-        const wiki = 'wiki'.link(
-          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-          'instructions-for-making-a-code-change'
+        const wiki = (
+          'wiki'.link(
+            'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+          'instructions-for-making-a-code-change')
         );
         const commentBody =
           'Hi @' +
@@ -188,9 +190,10 @@ describe('Pull Request Branch Check', () => {
       it('should create appropriate comment', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
         const author = pullRequestPayload.payload.pull_request.user.login;
-        const wiki = 'wiki'.link(
-          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-          'instructions-for-making-a-code-change'
+        const wiki = (
+          'wiki'.link(
+            'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+          'instructions-for-making-a-code-change')
         );
         const commentBody =
           'Hi @' +

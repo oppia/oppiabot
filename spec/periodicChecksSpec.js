@@ -274,9 +274,10 @@ describe('Periodic Checks Module', () => {
     });
 
     it('should ping pr author', () => {
-      const link = 'link'.link(
-        'https://help.github.com/articles/resolving-a-merge' +
-        '-conflict-using-the-command-line/'
+      const link = (
+        'link'.link(
+          'https://help.github.com/articles/resolving-a-merge' +
+        '-conflict-using-the-command-line/')
       );
 
       expect(github.issues.createComment).toHaveBeenCalled();

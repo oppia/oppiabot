@@ -236,8 +236,8 @@ describe('Critical Pull Request Spec', () => {
 
     it('should ping release coordinator', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
-      const firstModel = 'OppiabotTestActivitiesModel'.link(
-        newModelFileObj.blob_url
+      const firstModel = (
+        'OppiabotTestActivitiesModel'.link(newModelFileObj.blob_url)
       );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
@@ -294,12 +294,13 @@ describe('Critical Pull Request Spec', () => {
 
     it('should ping release coordinator', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
-      const firstModel = 'OppiabotTestActivitiesModel'.link(
-        newModelFileObj.blob_url
+      const firstModel = (
+        'OppiabotTestActivitiesModel'.link(newModelFileObj.blob_url)
       );
-      const secondModels =
+      const secondModels = (
         'OppiabotSnapshotContentModel, OppiabotSnapshotTestingModel'
-          .link(modifiedModelFileObj.blob_url);
+          .link(modifiedModelFileObj.blob_url)
+      );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
