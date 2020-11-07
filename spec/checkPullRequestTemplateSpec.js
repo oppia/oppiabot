@@ -18,13 +18,15 @@
 require('dotenv').config();
 const { createProbot } = require('probot');
 const oppiaBot = require('../index');
-const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
+const checkPullRequestTemplateModule =
+  require('../lib/checkPullRequestTemplate');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
 const checkWIPModule = require('../lib/checkWipDraftPR');
-const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
+const checkCriticalPullRequestModule =
+  require('../lib/checkCriticalPullRequest');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
 const payloadData = JSON.parse(
@@ -185,7 +187,7 @@ describe('Pull Request Template', () => {
   let app;
 
   beforeEach(() => {
-    spyOn(scheduler, 'createScheduler').and.callFake(() => {});
+    spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
       issues: {
@@ -202,20 +204,20 @@ describe('Pull Request Template', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
-    spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => {});
+    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
       checkPullRequestLabelsModule,
       'checkChangelogLabel'
-    ).and.callFake(() => {});
+    ).and.callFake(() => { });
     spyOn(
       checkCriticalPullRequestModule,
       'checkIfPRAffectsDatastoreLayer'
-    ).and.callFake(() => {});
-    spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
-    spyOn(checkWIPModule, 'checkWIP').and.callFake(() => {});
+    ).and.callFake(() => { });
+    spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
+    spyOn(checkWIPModule, 'checkWIP').and.callFake(() => { });
     spyOn(checkPullRequestTemplateModule, 'checkTemplate').and.callThrough();
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
   });
 
   describe('when pull request with invalid template is created', () => {
@@ -239,8 +241,8 @@ describe('Pull Request Template', () => {
           'Hi @' +
           payloadData.payload.pull_request.user.login +
           ', the body of this PR is missing the required description, ' +
-          'please update the body with a description of what this PR does.<br>' +
-          'Also, the karma and linter checklist has not been checked, ' +
+          'please update the body with a description of what this PR does.' +
+          '<br>Also, the karma and linter checklist has not been checked, ' +
           'please make sure to run the frontend tests and lint tests before ' +
           'pushing. The allow edits from maintainers checklist needs to ' +
           'be ticked so that maintainers can rerun failed tests. Endeavour ' +
@@ -321,9 +323,9 @@ describe('Pull Request Template', () => {
           'Hi @' +
           payloadData.payload.pull_request.user.login +
           ', the body of this PR is missing the required description, ' +
-          'please update the body with a description of what this PR does.<br>' +
-          'Also, the body of this PR is missing the checklist section, please ' +
-          'update it to include the checklist. Thanks!',
+          'please update the body with a description of what this PR does.' +
+          '<br>Also, the body of this PR is missing the checklist section, ' +
+          'please update it to include the checklist. Thanks!',
       });
     });
 
@@ -377,79 +379,80 @@ describe('Pull Request Template', () => {
     });
   });
 
-  describe('when pull request contains description and filled karma/lint check', () => {
-    beforeEach(async () => {
-      payloadData.payload.pull_request.body = bodyWithExplanationAndLint;
-      payloadData.payload.pull_request.maintainer_can_modify = false;
-      await robot.receive(payloadData);
-    });
+  describe('when pull request contains description and filled karma/lint check',
+    () => {
+      beforeEach(async () => {
+        payloadData.payload.pull_request.body = bodyWithExplanationAndLint;
+        payloadData.payload.pull_request.maintainer_can_modify = false;
+        await robot.receive(payloadData);
+      });
 
-    it('should check the template', () => {
-      expect(checkPullRequestTemplateModule.checkTemplate).toHaveBeenCalled();
-    });
+      it('should check the template', () => {
+        expect(checkPullRequestTemplateModule.checkTemplate).toHaveBeenCalled();
+      });
 
-    it('should ping PR author', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
-        issue_number: payloadData.payload.pull_request.number,
-        repo: payloadData.payload.repository.name,
-        owner: payloadData.payload.repository.owner.login,
-        body:
-          'Hi @' +
-          payloadData.payload.pull_request.user.login +
-          ', the allow edits from maintainers checklist needs to ' +
-          'be ticked so that maintainers can rerun failed tests. Endeavour ' +
-          'to add this by ticking on the check box. Thanks!',
+      it('should ping PR author', () => {
+        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          issue_number: payloadData.payload.pull_request.number,
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          body:
+            'Hi @' + payloadData.payload.pull_request.user.login +
+            ', the allow edits from maintainers checklist needs to ' +
+            'be ticked so that maintainers can rerun failed tests. Endeavour ' +
+            'to add this by ticking on the check box. Thanks!',
+        });
+      });
+
+      it('should assign PR author', () => {
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          issue_number: payloadData.payload.pull_request.number,
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          assignees: [payloadData.payload.pull_request.user.login],
+        });
       });
     });
 
-    it('should assign PR author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
-        issue_number: payloadData.payload.pull_request.number,
-        repo: payloadData.payload.repository.name,
-        owner: payloadData.payload.repository.owner.login,
-        assignees: [payloadData.payload.pull_request.user.login],
+  describe('when pull request contains filled checklist without description',
+    () => {
+      beforeEach(async () => {
+        payloadData.payload.pull_request.body =
+          bodyWithValidChecklistButNoDescription;
+        payloadData.payload.pull_request.maintainer_can_modify = true;
+        await robot.receive(payloadData);
+      });
+
+      it('should check the template', () => {
+        expect(checkPullRequestTemplateModule.checkTemplate).toHaveBeenCalled();
+      });
+
+      it('should ping PR author', () => {
+        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          issue_number: payloadData.payload.pull_request.number,
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          body:
+            'Hi @' + payloadData.payload.pull_request.user.login +
+            ', the body of this PR is missing the required description, ' +
+            'please update the body with a description of what this PR does. ' +
+            'Thanks!',
+        });
+      });
+
+      it('should assign PR author', () => {
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          issue_number: payloadData.payload.pull_request.number,
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          assignees: [payloadData.payload.pull_request.user.login],
+        });
       });
     });
-  });
-
-  describe('when pull request contains filled checklist without description', () => {
-    beforeEach(async () => {
-      payloadData.payload.pull_request.body = bodyWithValidChecklistButNoDescription;
-      payloadData.payload.pull_request.maintainer_can_modify = true;
-      await robot.receive(payloadData);
-    });
-
-    it('should check the template', () => {
-      expect(checkPullRequestTemplateModule.checkTemplate).toHaveBeenCalled();
-    });
-
-    it('should ping PR author', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
-        issue_number: payloadData.payload.pull_request.number,
-        repo: payloadData.payload.repository.name,
-        owner: payloadData.payload.repository.owner.login,
-        body:
-          'Hi @' +
-          payloadData.payload.pull_request.user.login +
-          ', the body of this PR is missing the required description, ' +
-          'please update the body with a description of what this PR does. ' +
-          'Thanks!',
-      });
-    });
-
-    it('should assign PR author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
-        issue_number: payloadData.payload.pull_request.number,
-        repo: payloadData.payload.repository.name,
-        owner: payloadData.payload.repository.owner.login,
-        assignees: [payloadData.payload.pull_request.user.login],
-      });
-    });
-  });
 
   describe('when pull request contains a valid body', () => {
     beforeEach(async () => {

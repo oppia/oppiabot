@@ -81,16 +81,18 @@ describe('Force Push Check', () => {
 
     it('should comment on pull request', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
-      const link = 'here (point 5)'.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
-        '#instructions-for-making-a-code-change');
+      const link = (
+        'here (point 5)'.link(
+          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
+        '#instructions-for-making-a-code-change')
+      );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         repo: pushPayload.payload.repository.name,
         owner: pushPayload.payload.repository.owner.login,
         issue_number: pullRequestPayload.payload.pull_request.number,
-        body: 'Hi @'+ pushPayload.payload.sender.login +
+        body: 'Hi @' + pushPayload.payload.sender.login +
         ', force pushing is not allowed as it makes code reviews hard. ' +
-        'You can learn more about this '+ link + '. I’ll be closing this, ' +
+        'You can learn more about this ' + link + '. I’ll be closing this, ' +
         'please make a new PR with the required changes. Thanks!',
       });
     });
@@ -131,7 +133,7 @@ describe('Force Push Check', () => {
 
   describe('when a push is made from develop branch', () => {
     beforeEach(async () => {
-      pushPayload.payload.ref = "refs/heads/develop"
+      pushPayload.payload.ref = 'refs/heads/develop';
       pushPayload.payload.forced = true;
       await robot.receive(pushPayload);
     });
@@ -155,7 +157,7 @@ describe('Force Push Check', () => {
 
   describe('when a push is made from release branch', () => {
     beforeEach(async () => {
-      pushPayload.payload.ref = "refs/heads/release-1.234"
+      pushPayload.payload.ref = 'refs/heads/release-1.234';
       pushPayload.payload.forced = true;
       await robot.receive(pushPayload);
     });
@@ -179,7 +181,7 @@ describe('Force Push Check', () => {
 
   describe('when a push is made from a branch without a pr', () => {
     beforeEach(async () => {
-      pushPayload.payload.ref = "refs/heads/some-weird-branch"
+      pushPayload.payload.ref = 'refs/heads/some-weird-branch';
       pushPayload.payload.forced = true;
       github.search = {
         issuesAndPullRequests: jasmine
@@ -209,6 +211,5 @@ describe('Force Push Check', () => {
     it('should not close the pull request', () => {
       expect(github.issues.update).not.toHaveBeenCalled();
     });
-
-  })
+  });
 });

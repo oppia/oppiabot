@@ -21,4 +21,4 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run ESLint
-        run: npm run lint actions/**/*.js
+        run: npm run lint actions/**/*.js spec/**/*.js

@@ -48,7 +48,7 @@ describe('CI Checks', () => {
     user: {
       login: 'testUser'
     }
-  }
+  };
 
   beforeEach(() => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => {});
@@ -188,5 +188,5 @@ describe('CI Checks', () => {
     it('should not assign PR author', () => {
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
     });
-  })
+  });
 });
