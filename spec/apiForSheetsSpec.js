@@ -27,11 +27,13 @@ const pullRequestPayload = JSON.parse(
 const commitsData = JSON.parse(
   JSON.stringify(require('../fixtures/commits.json')));
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
-const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
-const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
+const checkCriticalPullRequestModule =
+  require('../lib/checkCriticalPullRequest');
+const checkPullRequestTemplateModule =
+  require('../lib/checkPullRequestTemplate');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
-const {google} = require('googleapis');
-const {OAuth2Client} = require('google-auth-library');
+const { google } = require('googleapis');
+const { OAuth2Client } = require('google-auth-library');
 
 describe('Api For Sheets Module', () => {
   /**
@@ -50,15 +52,17 @@ describe('Api For Sheets Module', () => {
   let app;
 
   beforeEach(function (done) {
-    spyOn(scheduler, 'createScheduler').and.callFake(() => {});
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
+    spyOn(scheduler, 'createScheduler').and.callFake(() => { });
+    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
     spyOn(checkPullRequestLabelsModule, 'checkChangelogLabel').and.callFake(
-      () => {});
-    spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
-    spyOn(checkWipModule, 'checkWIP').and.callFake(() => {});
-    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
-    spyOn(checkPullRequestTemplateModule,'checkTemplate').and.callFake(() => {});
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
+      () => { });
+    spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
+    spyOn(checkWipModule, 'checkWIP').and.callFake(() => { });
+    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')
+      .and.callFake(() => { });
+    spyOn(checkPullRequestTemplateModule, 'checkTemplate')
+      .and.callFake(() => { });
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
 
     github = {
       issues: {
@@ -110,7 +114,9 @@ describe('Api For Sheets Module', () => {
           values: {
             get: jasmine.createSpy('get').and.callFake(async (obj, cb) => {
               await cb(null, {
-                data : {values: [['test']]},
+                data: {
+                  values: [['test']]
+                },
               });
             }),
           },
@@ -142,10 +148,11 @@ describe('Api For Sheets Module', () => {
       );
     });
 
-    it('should be called with the correct username for the given payload', () => {
-      const context = apiForSheetsModule.checkClaStatus.calls.argsFor(0)[0];
-      expect(context.payload.pull_request.user.login).toEqual('testuser7777');
-    });
+    it('should be called with the correct username for the given payload',
+      () => {
+        const context = apiForSheetsModule.checkClaStatus.calls.argsFor(0)[0];
+        expect(context.payload.pull_request.user.login).toEqual('testuser7777');
+      });
 
     it('should call authorize', () => {
       expect(apiForSheetsModule.authorize).toHaveBeenCalled();
@@ -213,7 +220,7 @@ describe('Api For Sheets Module', () => {
       });
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callFake(() => ({}));
-      spyOn(apiForSheetsModule, 'checkClaSheet').and.callFake(() => {});
+      spyOn(apiForSheetsModule, 'checkClaSheet').and.callFake(() => { });
       robot.receive(pullRequestPayload);
       done();
     });
@@ -243,40 +250,39 @@ describe('Api For Sheets Module', () => {
       expect(github.issues.update).not.toHaveBeenCalled();
     });
 
-    it('should close the PR if atleast one user has not signed cla', async () => {
-      // Add username to CLA sheet.
-      await apiForSheetsModule.generateOutput(
-        [...claData, ['testuser7777']],
-        pullRequestPayload.payload.pull_request.number,
-        pullRequestPayload.payload.pull_request
-      );
+    it('should close the PR if atleast one user has not signed cla',
+      async () => {
+        // Add username to CLA sheet.
+        await apiForSheetsModule.generateOutput(
+          [...claData, ['testuser7777']],
+          pullRequestPayload.payload.pull_request.number,
+          pullRequestPayload.payload.pull_request
+        );
 
-      var linkText = 'here';
-      var linkResult = linkText.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-' +
-        'Oppia#setting-things-up'
-      );
-      expect(github.issues.createComment).toHaveBeenCalledWith({
-        owner: pullRequestPayload.payload.repository.owner.login,
-        repo: pullRequestPayload.payload.repository.name,
-        number: pullRequestPayload.payload.pull_request.number,
-        body:
-          'Hi! @testuser7778,' +
-          ' Welcome to Oppia! Please could you ' +
-          'follow the instructions ' +
-          linkResult +
-          " to get started? You'll need to do " +
-          'this before we can accept your PR. I am closing this PR for now. ' +
-          'Feel free to re-open it once you are done with the above ' +
-          'instructions. Thanks!',
+        var linkText = 'here';
+        var linkResult = linkText.link(
+          'https://github.com/oppia/oppia/wiki/Contributing-code-to-' +
+          'Oppia#setting-things-up'
+        );
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          owner: pullRequestPayload.payload.repository.owner.login,
+          repo: pullRequestPayload.payload.repository.name,
+          number: pullRequestPayload.payload.pull_request.number,
+          body:
+            'Hi! @testuser7778, Welcome to Oppia! Please could you ' +
+            'follow the instructions ' + linkResult +
+            ' to get started? You\'ll need to do ' +
+            'this before we can accept your PR. ' +
+            'I am closing this PR for now. Feel free to re-open it ' +
+            'once you are done with the above instructions. Thanks!',
+        });
+        expect(github.issues.update).toHaveBeenCalledWith({
+          issue_number: pullRequestPayload.payload.pull_request.number,
+          owner: pullRequestPayload.payload.repository.owner.login,
+          repo: pullRequestPayload.payload.repository.name,
+          state: 'closed',
+        });
       });
-      expect(github.issues.update).toHaveBeenCalledWith({
-        issue_number: pullRequestPayload.payload.pull_request.number,
-        owner: pullRequestPayload.payload.repository.owner.login,
-        repo: pullRequestPayload.payload.repository.name,
-        state: 'closed',
-      });
-    });
 
     it('should do nothing if no data is obtained from sheet', async () => {
       await apiForSheetsModule.generateOutput(
@@ -300,15 +306,17 @@ describe('Api For Sheets Module', () => {
           values: {
             get: jasmine.createSpy('get').and.callFake(async (obj, cb) => {
               await cb(null, {
-                data : {values: [['test']]},
+                data: {
+                  values: [['test']]
+                },
               });
             }),
           },
         },
       });
       spyOn(constants, 'getChecksWhitelist').and.returnValue({
-        'oppia': {
-          'opened': ['cla-check']
+        oppia: {
+          opened: ['cla-check']
         }
       });
       robot.receive(pullRequestPayload);
@@ -317,7 +325,8 @@ describe('Api For Sheets Module', () => {
 
     it('should not call non whitelisted checks', () => {
       expect(
-        checkPullRequestLabelsModule.checkChangelogLabel).not.toHaveBeenCalled();
+        checkPullRequestLabelsModule.checkChangelogLabel
+      ).not.toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
       expect(checkWipModule.checkWIP).not.toHaveBeenCalled();
     });
@@ -336,10 +345,13 @@ describe('Api For Sheets Module', () => {
       );
     });
 
-    it('should be called with the correct username for the given payload', () => {
-      const context = apiForSheetsModule.checkClaStatus.calls.argsFor(0)[0];
-      expect(context.payload.pull_request.user.login).toEqual('testuser7777');
-    });
+    it('should be called with the correct username for the given payload',
+      () => {
+        const context = apiForSheetsModule.checkClaStatus.calls.argsFor(0)[0];
+        expect(
+          context.payload.pull_request.user.login
+        ).toEqual('testuser7777');
+      });
 
     it('should call authorize', () => {
       expect(apiForSheetsModule.authorize).toHaveBeenCalled();
@@ -375,7 +387,7 @@ describe('Api For Sheets Module', () => {
       spyOn(apiForSheetsModule, 'checkClaSheet').and.callThrough();
       spyOn(constants, 'getChecksWhitelist').and.returnValue({
         'oppia-test': {
-          'opened': ['cla-check']
+          opened: ['cla-check']
         }
       });
       robot.receive(pullRequestPayload);
@@ -384,7 +396,8 @@ describe('Api For Sheets Module', () => {
 
     it('should not call any checks', () => {
       expect(
-        checkPullRequestLabelsModule.checkChangelogLabel).not.toHaveBeenCalled();
+        checkPullRequestLabelsModule.checkChangelogLabel
+      ).not.toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
       expect(checkWipModule.checkWIP).not.toHaveBeenCalled();
       expect(apiForSheetsModule.checkClaStatus).not.toHaveBeenCalled();
@@ -405,7 +418,8 @@ describe('Api For Sheets Module', () => {
 
     it('should not call any checks', () => {
       expect(
-        checkPullRequestLabelsModule.checkChangelogLabel).not.toHaveBeenCalled();
+        checkPullRequestLabelsModule.checkChangelogLabel
+      ).not.toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
       expect(checkWipModule.checkWIP).not.toHaveBeenCalled();
       expect(apiForSheetsModule.checkClaStatus).not.toHaveBeenCalled();

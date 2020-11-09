@@ -15,7 +15,7 @@
 /**
  * @fileoverview Tests for the helper module.
  */
-const { default: Axios } = require('axios');
+const { 'default': Axios } = require('axios');
 const utilityModule = require('../lib/utils');
 const pullRequest = require('../fixtures/pullRequestPayload.json').payload
   .pull_request;
@@ -155,8 +155,8 @@ describe('Utility module tests', () => {
       },
       modelRegex
     );
-    let itemLink = 'OppiabotTestActivitiesModel'.link(
-      firstModelFileObj.blob_url
+    let itemLink = (
+      'OppiabotTestActivitiesModel'.link(firstModelFileObj.blob_url)
     );
     expect(result).toBe(' The name of the model is ' + itemLink + '.');
 
@@ -168,11 +168,12 @@ describe('Utility module tests', () => {
       },
       modelRegex
     );
-    firstItemLink = 'OppiabotTestActivitiesModel'.link(
-      firstModelFileObj.blob_url
+    firstItemLink = (
+      'OppiabotTestActivitiesModel'.link(firstModelFileObj.blob_url)
     );
-    let secondItemLink = 'OppiabotSnapshotContentModel, OppiabotSnapshotTestingModel'.link(
-      secondModelFileObj.blob_url
+    let secondItemLink = (
+      'OppiabotSnapshotContentModel, OppiabotSnapshotTestingModel'
+        .link(secondModelFileObj.blob_url)
     );
     expect(result).toBe(
       ' The models are ' + itemLink + ', ' + secondItemLink + '.'
@@ -186,7 +187,7 @@ describe('Utility module tests', () => {
       },
       jobRegex
     );
-    itemLink = 'FirstTestOneOffJob'.link(firstJobFileObj.blob_url);
+    itemLink = ('FirstTestOneOffJob'.link(firstJobFileObj.blob_url));
     expect(result).toBe(' The name of the job is ' + itemLink + '.');
 
     result = utilityModule.getNameString(
@@ -197,8 +198,8 @@ describe('Utility module tests', () => {
       },
       jobRegex
     );
-    itemLink = 'FirstTestOneOffJob'.link(firstJobFileObj.blob_url);
-    secondItemLink = 'SecondTestOneOffJob'.link(secondJobFileObj.blob_url);
+    itemLink = ('FirstTestOneOffJob'.link(firstJobFileObj.blob_url));
+    secondItemLink = ('SecondTestOneOffJob'.link(secondJobFileObj.blob_url));
     expect(result).toBe(
       ' The jobs are ' + itemLink + ', ' + secondItemLink + '.'
     );
@@ -519,7 +520,8 @@ describe('Utility module tests', () => {
     expect(usernames[0]).toBe('aks681');
     expect(usernames[1]).toBe('seanlip');
 
-    text = `@DubeySandeep, done I've created the issue(#10419 ) and addressed your comments.
+    text = `@DubeySandeep, done I've created the issue(#10419 ) 
+      and addressed your comments.
       @seanlip @aks681 PTAL`;
     usernames = utilityModule.getUsernamesFromText(text);
     expect(usernames.length).toBe(3);
@@ -538,7 +540,8 @@ describe('Utility module tests', () => {
     expect(usernames[0]).toBe('aks681');
     expect(usernames[1]).toBe('seanlip');
 
-    text = `@DubeySandeep, done I've created the issue(#10419 ) and addressed your comments.
+    text = `@DubeySandeep, done I've created the issue(#10419 ) 
+      and addressed your comments.
       @seanlip @aks681 please take a look`;
     usernames = utilityModule.getUsernamesFromText(text);
     expect(usernames.length).toBe(3);

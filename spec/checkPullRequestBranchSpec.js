@@ -23,8 +23,10 @@ const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
-const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
-const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
+const checkCriticalPullRequestModule =
+  require('../lib/checkCriticalPullRequest');
+const checkPullRequestTemplateModule =
+  require('../lib/checkPullRequestTemplate');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 
 describe('Pull Request Branch Check', () => {
@@ -44,19 +46,23 @@ describe('Pull Request Branch Check', () => {
   let app;
 
   beforeEach(() => {
-    spyOn(scheduler, 'createScheduler').and.callFake(() => {});
+    spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     // Spy on other modules that will be triggered by the payload.
-    spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => {});
+    spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
       checkPullRequestLabelsModule,
       'checkChangelogLabel'
-    ).and.callFake(() => {});
-    spyOn(checkWipDraftPRModule, 'checkWIP').and.callFake(() => {});
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
-    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
-    spyOn(checkPullRequestTemplateModule,'checkTemplate').and.callFake(() => {});
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
+    ).and.callFake(() => { });
+    spyOn(checkWipDraftPRModule, 'checkWIP')
+      .and.callFake(() => { });
+    spyOn(checkPullRequestJobModule, 'checkForNewJob')
+      .and.callFake(() => { });
+    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')
+      .and.callFake(() => { });
+    spyOn(checkPullRequestTemplateModule, 'checkTemplate')
+      .and.callFake(() => { });
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
 
     github = {
       issues: {
@@ -90,9 +96,10 @@ describe('Pull Request Branch Check', () => {
       it('should create appropriate comment', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
         const author = pullRequestPayload.payload.pull_request.user.login;
-        const wiki = 'wiki'.link(
-          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-            'instructions-for-making-a-code-change'
+        const wiki = (
+          'wiki'.link(
+            'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+          'instructions-for-making-a-code-change')
         );
         const commentBody =
           'Hi @' +
@@ -136,9 +143,10 @@ describe('Pull Request Branch Check', () => {
       it('should create appropriate comment', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
         const author = pullRequestPayload.payload.pull_request.user.login;
-        const wiki = 'wiki'.link(
-          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-            'instructions-for-making-a-code-change'
+        const wiki = (
+          'wiki'.link(
+            'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+          'instructions-for-making-a-code-change')
         );
         const commentBody =
           'Hi @' +
@@ -182,9 +190,10 @@ describe('Pull Request Branch Check', () => {
       it('should create appropriate comment', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
         const author = pullRequestPayload.payload.pull_request.user.login;
-        const wiki = 'wiki'.link(
-          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-            'instructions-for-making-a-code-change'
+        const wiki = (
+          'wiki'.link(
+            'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+          'instructions-for-making-a-code-change')
         );
         const commentBody =
           'Hi @' +

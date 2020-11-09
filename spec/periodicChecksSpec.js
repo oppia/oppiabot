@@ -196,15 +196,15 @@ describe('Periodic Checks Module', () => {
   };
 
   beforeEach(async () => {
-    spyOn(scheduler, 'createScheduler').and.callFake(() => {});
+    spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
       issues: {
         createComment: jasmine
           .createSpy('createComment')
-          .and.callFake(() => {}),
-        addAssignees: jasmine.createSpy('addAssignees').and.callFake(() => {}),
-        addLabels: jasmine.createSpy('addLabels').and.callFake(() => {}),
+          .and.callFake(() => { }),
+        addAssignees: jasmine.createSpy('addAssignees').and.callFake(() => { }),
+        addLabels: jasmine.createSpy('addLabels').and.callFake(() => { }),
       },
       pulls: {
         get: jasmine.createSpy('get').and.callFake((params) => {
@@ -301,10 +301,10 @@ describe('Periodic Checks Module', () => {
       ).and.callThrough();
       spyOn(
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
-      ).and.callFake(() => {});
+      ).and.callFake(() => { });
       spyOn(
         periodicCheckModule, 'checkAndTagPRsWithOldBuilds'
-      ).and.callFake(() => {});
+      ).and.callFake(() => { });
       const mergeConflictPR = pullRequests.mergeConflictPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [mergeConflictPR, pullRequests.assignedPullRequest],
@@ -344,9 +344,10 @@ describe('Periodic Checks Module', () => {
     });
 
     it('should ping pr author', () => {
-      const link = 'link'.link(
-        'https://help.github.com/articles/resolving-a-merge' +
-          '-conflict-using-the-command-line/'
+      const link = (
+        'link'.link(
+          'https://help.github.com/articles/resolving-a-merge' +
+        '-conflict-using-the-command-line/')
       );
 
       expect(github.issues.createComment).toHaveBeenCalled();
@@ -371,10 +372,10 @@ describe('Periodic Checks Module', () => {
       ).and.callThrough();
       spyOn(
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
-      ).and.callFake(() => {});
+      ).and.callFake(() => { });
       spyOn(
         periodicCheckModule, 'checkAndTagPRsWithOldBuilds'
-      ).and.callFake(() => {});
+      ).and.callFake(() => { });
       const pendingReviewPR = pullRequests.pendingReviewPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [pendingReviewPR, pullRequests.assignedPullRequest],
@@ -426,10 +427,10 @@ describe('Periodic Checks Module', () => {
       ).and.callThrough();
       spyOn(
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
-      ).and.callFake(() => {});
+      ).and.callFake(() => { });
       spyOn(
         periodicCheckModule, 'checkAndTagPRsWithOldBuilds'
-      ).and.callFake(() => {});
+      ).and.callFake(() => { });
       const changesRequestedPR = pullRequests.hasChangesRequestedPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [changesRequestedPR, pullRequests.assignedPullRequest],
@@ -502,65 +503,66 @@ describe('Periodic Checks Module', () => {
 
   describe(
     'when pull request has been approved and author has merging rights', () => {
-    beforeEach(async () => {
-      spyOn(
-        periodicCheckModule, 'ensureAllPullRequestsAreAssigned'
-      ).and.callThrough();
-      spyOn(
-        periodicCheckModule, 'ensureAllIssuesHaveProjects'
-      ).and.callFake(() => {});
-      spyOn(
-        periodicCheckModule, 'checkAndTagPRsWithOldBuilds'
-      ).and.callFake(() => {});
-      const approvedPR = pullRequests.approvedPR;
-      github.pulls.list = jasmine.createSpy('list').and.resolveTo({
-        data: [approvedPR, pullRequests.assignedPullRequest],
+      beforeEach(async () => {
+        spyOn(
+          periodicCheckModule, 'ensureAllPullRequestsAreAssigned'
+        ).and.callThrough();
+        spyOn(
+          periodicCheckModule, 'ensureAllIssuesHaveProjects'
+        ).and.callFake(() => { });
+        spyOn(
+          periodicCheckModule, 'checkAndTagPRsWithOldBuilds'
+        ).and.callFake(() => { });
+        const approvedPR = pullRequests.approvedPR;
+        github.pulls.list = jasmine.createSpy('list').and.resolveTo({
+          data: [approvedPR, pullRequests.assignedPullRequest],
+        });
+
+        await robot.receive(payloadData);
       });
 
-      await robot.receive(payloadData);
-    });
+      it('should call periodic check module', () => {
+        expect(
+          periodicCheckModule.ensureAllPullRequestsAreAssigned
+        ).toHaveBeenCalled();
+      });
 
-    it('should call periodic check module', () => {
-      expect(
-        periodicCheckModule.ensureAllPullRequestsAreAssigned
-      ).toHaveBeenCalled();
-    });
+      it('should check if pr author has merging rights', () => {
+        expect(github.orgs.checkMembership).toHaveBeenCalled();
+        expect(github.orgs.checkMembership).toHaveBeenCalledWith({
+          org: 'oppia',
+          username: 'author4',
+        });
+      });
 
-    it('should check if pr author has merging rights', () => {
-      expect(github.orgs.checkMembership).toHaveBeenCalled();
-      expect(github.orgs.checkMembership).toHaveBeenCalledWith({
-        org: 'oppia',
-        username: 'author4',
+      it('should ping pr author', () => {
+        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          issue_number: 4,
+          owner: 'oppia',
+          repo: 'oppia',
+          body:
+            'Hi @author4, this PR is ready to be merged. Please address any ' +
+            'remaining comments prior to merging, and feel free to merge ' +
+            'this PR once the CI checks pass and you\'re happy with it. ' +
+            'Thanks!',
+        });
+      });
+
+      it('should assign pr author', () => {
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          issue_number: 4,
+          owner: 'oppia',
+          repo: 'oppia',
+          assignees: ['author4'],
+        });
       });
     });
-
-    it('should ping pr author', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
-        issue_number: 4,
-        owner: 'oppia',
-        repo: 'oppia',
-        body:
-          'Hi @author4, this PR is ready to be merged. Please address any ' +
-          'remaining comments prior to merging, and feel free to merge ' +
-          "this PR once the CI checks pass and you're happy with it. Thanks!",
-      });
-    });
-
-    it('should assign pr author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
-        issue_number: 4,
-        owner: 'oppia',
-        repo: 'oppia',
-        assignees: ['author4'],
-      });
-    });
-  });
 
   describe(
     'when pull request has been approved and has a changelog label but ' +
-      'author does not have merging rights',
+    'author does not have merging rights',
     () => {
       beforeEach(async () => {
         spyOn(
@@ -568,10 +570,10 @@ describe('Periodic Checks Module', () => {
         ).and.callThrough();
         spyOn(
           periodicCheckModule, 'ensureAllIssuesHaveProjects'
-        ).and.callFake(() => {});
+        ).and.callFake(() => { });
         spyOn(
           periodicCheckModule, 'checkAndTagPRsWithOldBuilds'
-        ).and.callFake(() => {});
+        ).and.callFake(() => { });
         const approvedPR = pullRequests.approvedPRWithLabel;
         github.pulls.list = jasmine.createSpy('list').and.resolveTo({
           data: [approvedPR, pullRequests.assignedPullRequest],
@@ -634,10 +636,10 @@ describe('Periodic Checks Module', () => {
       ).and.callThrough();
       spyOn(
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
-      ).and.callFake(() => {});
+      ).and.callFake(() => { });
       spyOn(
         periodicCheckModule, 'checkAndTagPRsWithOldBuilds'
-      ).and.callFake(() => {});
+      ).and.callFake(() => { });
       const approvedPR = pullRequests.unResolvablePR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [approvedPR, pullRequests.assignedPullRequest],
@@ -704,11 +706,13 @@ describe('Periodic Checks Module', () => {
             cards: [
               {
                 content_url:
-                  'https://api.github.com/repos/api-playground/projects-test/issues/3',
+                  'https://api.github.com/repos/api-playground/' +
+                  'projects-test/issues/3',
               },
               {
                 content_url:
-                  'https://api.github.com/repos/api-playground/projects-test/issues/4',
+                  'https://api.github.com/repos/api-playground/' +
+                  'projects-test/issues/4',
               },
             ],
           },
@@ -722,7 +726,8 @@ describe('Periodic Checks Module', () => {
             cards: [
               {
                 content_url:
-                  'https://api.github.com/repos/api-playground/projects-test/issues/30',
+                  'https://api.github.com/repos/api-playground/' +
+                  'projects-test/issues/30',
               },
             ],
           },
@@ -740,7 +745,7 @@ describe('Periodic Checks Module', () => {
       spyOn(
         periodicCheckModule,
         'ensureAllPullRequestsAreAssigned'
-      ).and.callFake(() => {});
+      ).and.callFake(() => { });
       spyOn(
         periodicCheckModule,
         'ensureAllIssuesHaveProjects'
@@ -915,6 +920,96 @@ describe('Periodic Checks Module', () => {
   });
 
   describe('when pull request has an old build', () => {
+    const oldBuildPRCommitData = {
+      sha: 'old-build-pr-sha',
+      node_id:
+        'MDY6Q29tbWl0MTczMDA0MDIyOmViNjk3ZTU1YTNkYTMwODUzNjBkODQz' +
+        'ZGZiMTUwZjAzM2FhMTdlNjE=',
+      commit: {
+        author: {
+          name: 'James James',
+          email: 'jamesjay4199@gmail.com',
+          date: '2020-08-10T14:15:32Z',
+        },
+        committer: {
+          name: 'James James',
+          email: 'jamesjay4199@gmail.com',
+          date: '2020-08-10T14:15:32Z',
+        },
+        message: 'changes',
+        tree: {
+          sha: 'f5f8be9b0e4ac9970f68d8945de3474581b20d03',
+          url:
+            'https://api.github.com/repos/jameesjohn/oppia/git/' +
+            'trees/f5f8be9b0e4ac9970f68d8945de3474581b20d03',
+        },
+        url:
+          'https://api.github.com/repos/jameesjohn/oppia/git/' +
+          'commits/eb697e55a3da3085360d843dfb150f033aa17e61',
+        comment_count: 0,
+        verification: {},
+      },
+      url:
+        'https://api.github.com/repos/oppia/oppia/commits/' +
+        'eb697e55a3da3085360d843dfb150f033aa17e61',
+      html_url:
+        'https://github.com/oppia/oppia/commit/' +
+        'eb697e55a3da3085360d843dfb150f033aa17e61',
+      comments_url:
+        'https://api.github.com/repos/oppia/oppia/commits/' +
+        'eb697e55a3da3085360d843dfb150f033aa17e61/comments',
+      author: {},
+      committer: {},
+      parents: [],
+    };
+    const newBuildPRCommitData = {
+      sha: 'new-build-pr-sha',
+      node_id:
+        'MDY6Q29tbWl0MTczMDA0MDIyOjUyNWQ2MDU4YTYyNmI0NjE1NGVkMz' +
+        'czMTE0MWE5NWU3MGViYjBhZWY=',
+      commit: {
+        author: {
+          name: 'James James',
+          email: 'jamesjay4199@gmail.com',
+          date: '2020-08-13T13:43:24Z',
+        },
+        committer: {
+          name: 'James James',
+          email: 'jamesjay4199@gmail.com',
+          date: '2020-08-13T13:43:24Z',
+        },
+        message: 'new additions',
+        tree: {
+          sha: 'b5bf5af6ec0592bf3776b23d4355ff200549f427',
+          url:
+            'https://api.github.com/repos/jameesjohn/oppia/git/' +
+            'trees/b5bf5af6ec0592bf3776b23d4355ff200549f427',
+        },
+        url:
+          'https://api.github.com/repos/jameesjohn/oppia/git/' +
+          'commits/525d6058a626b46154ed3731141a95e70ebb0aef',
+        comment_count: 0,
+        verification: {
+          verified: false,
+          reason: 'unsigned',
+          signature: null,
+          payload: null,
+        },
+      },
+      url:
+        'https://api.github.com/repos/jameesjohn/oppia/commits/' +
+        '525d6058a626b46154ed3731141a95e70ebb0aef',
+      html_url:
+        'https://github.com/jameesjohn/oppia/commit/' +
+        '525d6058a626b46154ed3731141a95e70ebb0aef',
+      comments_url:
+        'https://api.github.com/repos/jameesjohn/oppia/' +
+        'commits/525d6058a626b46154ed3731141a95e70ebb0aef/comments',
+      author: [],
+      committer: [],
+      parents: [],
+    };
+
     beforeEach(async () => {
       spyOn(
         periodicCheckModule,
@@ -939,86 +1034,11 @@ describe('Periodic Checks Module', () => {
         getCommit: jasmine.createSpy('getCommit').and.callFake((params) => {
           if (params.ref === pullRequests.prWithOldBuild.head.sha) {
             return {
-              data: {
-                sha: 'old-build-pr-sha',
-                node_id:
-                  'MDY6Q29tbWl0MTczMDA0MDIyOmViNjk3ZTU1YTNkYTMwODUzNjBkODQzZGZiMTUwZjAzM2FhMTdlNjE=',
-                commit: {
-                  author: {
-                    name: 'James James',
-                    email: 'jamesjay4199@gmail.com',
-                    date: '2020-08-10T14:15:32Z',
-                  },
-                  committer: {
-                    name: 'James James',
-                    email: 'jamesjay4199@gmail.com',
-                    date: '2020-08-10T14:15:32Z',
-                  },
-                  message: 'changes',
-                  tree: {
-                    sha: 'f5f8be9b0e4ac9970f68d8945de3474581b20d03',
-                    url:
-                      'https://api.github.com/repos/jameesjohn/oppia/git/trees/f5f8be9b0e4ac9970f68d8945de3474581b20d03',
-                  },
-                  url:
-                    'https://api.github.com/repos/jameesjohn/oppia/git/commits/eb697e55a3da3085360d843dfb150f033aa17e61',
-                  comment_count: 0,
-                  verification: {},
-                },
-                url:
-                  'https://api.github.com/repos/oppia/oppia/commits/eb697e55a3da3085360d843dfb150f033aa17e61',
-                html_url:
-                  'https://github.com/oppia/oppia/commit/eb697e55a3da3085360d843dfb150f033aa17e61',
-                comments_url:
-                  'https://api.github.com/repos/oppia/oppia/commits/eb697e55a3da3085360d843dfb150f033aa17e61/comments',
-                author: {},
-                committer: {},
-                parents: [],
-              },
+              data: oldBuildPRCommitData,
             };
           }
           return {
-            data: {
-              sha: 'new-build-pr-sha',
-              node_id:
-                'MDY6Q29tbWl0MTczMDA0MDIyOjUyNWQ2MDU4YTYyNmI0NjE1NGVkMzczMTE0MWE5NWU3MGViYjBhZWY=',
-              commit: {
-                author: {
-                  name: 'James James',
-                  email: 'jamesjay4199@gmail.com',
-                  date: '2020-08-13T13:43:24Z',
-                },
-                committer: {
-                  name: 'James James',
-                  email: 'jamesjay4199@gmail.com',
-                  date: '2020-08-13T13:43:24Z',
-                },
-                message: 'new additions',
-                tree: {
-                  sha: 'b5bf5af6ec0592bf3776b23d4355ff200549f427',
-                  url:
-                    'https://api.github.com/repos/jameesjohn/oppia/git/trees/b5bf5af6ec0592bf3776b23d4355ff200549f427',
-                },
-                url:
-                  'https://api.github.com/repos/jameesjohn/oppia/git/commits/525d6058a626b46154ed3731141a95e70ebb0aef',
-                comment_count: 0,
-                verification: {
-                  verified: false,
-                  reason: 'unsigned',
-                  signature: null,
-                  payload: null,
-                },
-              },
-              url:
-                'https://api.github.com/repos/jameesjohn/oppia/commits/525d6058a626b46154ed3731141a95e70ebb0aef',
-              html_url:
-                'https://github.com/jameesjohn/oppia/commit/525d6058a626b46154ed3731141a95e70ebb0aef',
-              comments_url:
-                'https://api.github.com/repos/jameesjohn/oppia/commits/525d6058a626b46154ed3731141a95e70ebb0aef/comments',
-              author: [Object],
-              committer: [Object],
-              parents: [Array],
-            },
+            data: newBuildPRCommitData,
           };
         }),
       };
@@ -1061,7 +1081,7 @@ describe('Periodic Checks Module', () => {
           labels: ["PR: don't merge - STALE BUILD"],
         }
       );
-    })
+    });
 
     it('should not ping author when build is new', () => {
       expect(github.issues.createComment).not.toHaveBeenCalledWith(
@@ -1086,7 +1106,7 @@ describe('Periodic Checks Module', () => {
         oldBuildPR.labels.push({
           name: "PR: don't merge - STALE BUILD"
         });
-      })
+      });
       beforeEach(() => {
         github.pulls.list = jasmine.createSpy('list').and.resolveTo({
           data: [oldBuildPR, pullRequests.prWithNewBuild],
@@ -1113,6 +1133,5 @@ describe('Periodic Checks Module', () => {
         expect(github.issues.addLabels).not.toHaveBeenCalled();
       });
     });
-
   });
 });

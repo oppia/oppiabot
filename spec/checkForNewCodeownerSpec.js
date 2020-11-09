@@ -21,7 +21,8 @@ const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
-const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
+const checkCriticalPullRequestModule =
+  require('../lib/checkCriticalPullRequest');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const mergeConflictModule = require('../lib/checkMergeConflicts');
 const utils = require('../lib/utils');
@@ -51,7 +52,8 @@ describe('check for new code owner', () => {
     /core/templates/google-analytics.initializer.ts @jameesjohn @vojtechjelinek
     /core/templates/base-components/ @jameesjohn @vojtechjelinek
     /core/templates/pages/Base.ts @jameesjohn @vojtechjelinek
-    /core/templates/pages/oppia_footer_directive.html @jameesjohn @vojtechjelinek
+    /core/templates/pages/oppia_footer_directive.html 
+    @jameesjohn @vojtechjelinek
     /core/templates/pages/OppiaFooterDirective.ts @jameesjohn @vojtechjelinek
     /core/templates/pages/footer_js_libs.html @jameesjohn @vojtechjelinek
     /core/templates/pages/header_css_libs.html @jameesjohn @vojtechjelinek
@@ -106,7 +108,8 @@ describe('check for new code owner', () => {
       '?ref=c876111ec9c743179483d7ca75e348b8680b13ec',
     patch:
       '@@ -523,7 +523,9 @@\n' +
-      ' /core/templates/pages/pending-account-deletion-page/ @jameesjohn @vojtechjelinek\n' +
+      ' /core/templates/pages/pending-account-deletion-page/ ' +
+      '@jameesjohn @vojtechjelinek\n' +
       ' /core/templates/pages/preferences-page/ @jameesjohn @vojtechjelinek\n' +
       '+/core/templates/pages/signup-page/ @testuser @vojtechjelinek\n' +
       ' /core/templates/pages/splash-page/ @jameesjohn @vojtechjelinek\n' +
@@ -133,7 +136,8 @@ describe('check for new code owner', () => {
       '?ref=c876111ec9c743179483d7ca75e348b8680b13ec',
     patch:
       '@@ -523,7 +523,9 @@\n' +
-      ' /core/templates/pages/pending-account-deletion-page/ @jameesjohn @vojtechjelinek\n' +
+      ' /core/templates/pages/pending-account-deletion-page/ ' +
+      '@jameesjohn @vojtechjelinek\n' +
       ' /core/templates/pages/preferences-page/ @jameesjohn @vojtechjelinek\n' +
       ' /core/templates/pages/signup-page/ @jameesjohn @vojtechjelinek\n' +
       '+/core/templates/pages/signup-page/ @testuser @vojtechjelinek\n' +
@@ -162,7 +166,8 @@ describe('check for new code owner', () => {
       '?ref=c876111ec9c743179483d7ca75e348b8680b13ec',
     patch:
       '@@ -523,7 +523,9 @@\n' +
-      ' /core/templates/pages/pending-account-deletion-page/ @jameesjohn @vojtechjelinek\n' +
+      ' /core/templates/pages/pending-account-deletion-page/ ' +
+      '@jameesjohn @vojtechjelinek\n' +
       ' /core/templates/pages/preferences-page/ @jameesjohn @vojtechjelinek\n' +
       ' /core/templates/pages/signup-page/ @jameesjohn @vojtechjelinek\n' +
       '+/core/templates/pages/signup-page/ @jameesjohn @vojtechjelinek\n' +
@@ -177,7 +182,7 @@ describe('check for new code owner', () => {
   });
 
   beforeEach(() => {
-    spyOn(scheduler, 'createScheduler').and.callFake(() => {});
+    spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
       issues: {
@@ -193,12 +198,13 @@ describe('check for new code owner', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
+    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
     spyOn(
       checkCriticalPullRequestModule,
       'checkIfPRAffectsDatastoreLayer'
-    ).and.callFake(() => {});
-    spyOn(mergeConflictModule, 'checkMergeConflictsInPullRequest').and.callFake(() => {});
+    ).and.callFake(() => { });
+    spyOn(mergeConflictModule, 'checkMergeConflictsInPullRequest')
+      .and.callFake(() => { });
 
     spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callThrough();
     spyOn(utils, 'getMainCodeOwnerfile').and.resolveTo(mainCodeOwnerFile);
@@ -237,7 +243,7 @@ describe('check for new code owner', () => {
 
       it('should get codeowner file from develop', () => {
         expect(utils.getMainCodeOwnerfile).toHaveBeenCalled();
-      })
+      });
 
       it('should ping project owner', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
@@ -261,7 +267,7 @@ describe('check for new code owner', () => {
       beforeEach(async () => {
         const reviewer = {
           login: 'reviewer'
-        }
+        };
         payloadData.payload.pull_request.requested_reviewers.push(reviewer);
         await robot.receive(payloadData);
       });
@@ -276,7 +282,7 @@ describe('check for new code owner', () => {
 
       it('should get codeowner file from develop', () => {
         expect(utils.getMainCodeOwnerfile).toHaveBeenCalled();
-      })
+      });
 
       it('should ping reviewer', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
@@ -285,15 +291,15 @@ describe('check for new code owner', () => {
           owner: payloadData.payload.repository.owner.login,
           issue_number: payloadData.payload.pull_request.number,
           body:
-          'Hi @reviewer, this PR adds a new code owner, @testuser to ' +
-          '/core/templates/pages/signup-page/. Please make sure the changes' +
-          ' are verified by the previous codeowner(s) of the file. Thanks!'
+            'Hi @reviewer, this PR adds a new code owner, @testuser to ' +
+            '/core/templates/pages/signup-page/. Please make sure the changes' +
+            ' are verified by the previous codeowner(s) of the file. Thanks!'
         });
       });
 
       afterEach(() => {
         payloadData.payload.pull_request.requested_reviewers.pop();
-      })
+      });
     });
   });
 
@@ -326,7 +332,7 @@ describe('check for new code owner', () => {
 
     it('should get codeowner file from develop', () => {
       expect(utils.getMainCodeOwnerfile).toHaveBeenCalled();
-    })
+    });
 
     it('should ping project owner', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
@@ -338,7 +344,7 @@ describe('check for new code owner', () => {
           'Hi @kevintab95, this PR adds the following new code owners ' +
           '@testuser, @testuser2 to the following files ' +
           '/core/templates/pages/signup-page/, ' +
-          '/core/templates/pages/signdown-page/'+
+          '/core/templates/pages/signdown-page/' +
           '. Please make sure the changes are ' +
           'verified by the previous codeowner(s) of the file. Thanks!'
       });
@@ -347,7 +353,7 @@ describe('check for new code owner', () => {
     afterEach(() => {
       payloadData.payload.pull_request.labels.pop();
     });
-  })
+  });
 
   describe('When an exisiting code owner gets added to another file', () => {
     beforeEach(async () => {
@@ -378,7 +384,7 @@ describe('check for new code owner', () => {
 
     it('should get codeowner file from develop', () => {
       expect(utils.getMainCodeOwnerfile).toHaveBeenCalled();
-    })
+    });
 
     it('should not ping project owner', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
@@ -418,7 +424,7 @@ describe('check for new code owner', () => {
 
     it('should not get codeowner file from develop', () => {
       expect(utils.getMainCodeOwnerfile).not.toHaveBeenCalled();
-    })
+    });
 
     it('should not ping project owner', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
@@ -448,34 +454,38 @@ describe('check for new code owner', () => {
         '680b13ec/.github/CODEOWNERS',
       contents_url:
         'https://api.github.com/repos/oppia/oppia/contents/.github/CODEOWNERS' +
-      '?ref=c876111ec9c743179483d7ca75e348b8680b13ec',
+        '?ref=c876111ec9c743179483d7ca75e348b8680b13ec',
       patch:
         '-/extensions/ @vojtechjelinek\r\n+# TODO(#10538): Revert ownership ' +
-        'to @vojtechjelinek after 2020-09-06.\r\n+/extensions/ @seanlip\r\n/'+
-        'core/templates/services/UpgradedServices.ts @bansalnitish '+
-        '@srijanreddy98\r\n/typings/ @ankita240796\r\n/tsconfig.json '+
+        'to @vojtechjelinek after 2020-09-06.\r\n+/extensions/ @seanlip\r\n/' +
+        'core/templates/services/UpgradedServices.ts @bansalnitish ' +
+        '@srijanreddy98\r\n/typings/ @ankita240796\r\n/tsconfig.json ' +
         '@ankita240796\r\n-/tsconfig-strict.json @nishantwrp @vojtechjelinek' +
         '\r\n+# TODO(#10538): Add @vojtechjelinek as an owner after 2020-09-' +
         '06.\r\n+/tsconfig-strict.json @nishantwrp\r\n-/core/controllers/' +
         'resources*.py @vojtechjelinek\r\n+# TODO(#10538): Revert ownership ' +
         'to @vojtechjelinek after 2020-09-06.\r\n-/core/controllers/' +
         'resources*.py @seanlip'
-    }
+    };
 
     let codeowners = newCodeOwnerModule.getNewCodeOwners(fileWithComments);
     expect(codeowners.length).toBe(2);
     expect(codeowners).toEqual(['@seanlip', '@nishantwrp']);
 
-    codeowners = newCodeOwnerModule.getNewCodeOwners(nonCodeOwnerFile)
-    expect(codeowners.length).toBe(0)
+    codeowners = newCodeOwnerModule.getNewCodeOwners(nonCodeOwnerFile);
+    expect(codeowners.length).toBe(0);
 
-    codeowners = newCodeOwnerModule.getNewCodeOwners(codeOwnerFileWithNewUser)
-    expect(codeowners.length).toBe(2)
+    codeowners = newCodeOwnerModule.getNewCodeOwners(codeOwnerFileWithNewUser);
+    expect(codeowners.length).toBe(2);
     expect(codeowners).toEqual(['@testuser', '@vojtechjelinek']);
 
-    codeowners = newCodeOwnerModule.getNewCodeOwners(codeOwnerFileWithMultipleNewUsers)
-    expect(codeowners.length).toBe(4)
-    expect(codeowners).toEqual(['@testuser', '@vojtechjelinek', '@testuser2', '@jameesjohn']);
+    codeowners = newCodeOwnerModule.getNewCodeOwners(
+      codeOwnerFileWithMultipleNewUsers
+    );
+    expect(codeowners.length).toBe(4);
+    expect(codeowners).toEqual([
+      '@testuser', '@vojtechjelinek', '@testuser2', '@jameesjohn'
+    ]);
   });
 });
 

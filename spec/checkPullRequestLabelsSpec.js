@@ -18,8 +18,10 @@ const { createProbot } = require('probot');
 const oppiaBot = require('../index');
 const checkPullRequestLabelModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
-const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
-const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
+const checkCriticalPullRequestModule =
+  require('../lib/checkCriticalPullRequest');
+const checkPullRequestTemplateModule =
+  require('../lib/checkPullRequestTemplate');
 const scheduler = require('../lib/scheduler');
 
 let payloadData = JSON.parse(
@@ -43,7 +45,7 @@ describe('Pull Request Label Check', () => {
   let app;
 
   beforeEach(() => {
-    spyOn(scheduler, 'createScheduler').and.callFake(() => {});
+    spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
       issues: {
@@ -56,9 +58,9 @@ describe('Pull Request Label Check', () => {
         checkCollaborator: jasmine.createSpy('checkCollaborator').and.callFake(
           (params) => {
             if (params.username === 'newuser') {
-              return {status: 404};
+              return { status: 404 };
             }
-            return {status: 204};
+            return { status: 204 };
           })
       }
     };
@@ -71,12 +73,13 @@ describe('Pull Request Label Check', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() =>{});
+    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
     spyOn(
-      checkCriticalPullRequestModule,
-      'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
+      checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'
+    ).and.callFake(() => { });
     spyOn(
-      checkPullRequestTemplateModule, 'checkTemplate').and.callFake(() => {});
+      checkPullRequestTemplateModule, 'checkTemplate'
+    ).and.callFake(() => { });
   });
 
   describe('when pull request gets labeled', () => {
@@ -227,7 +230,7 @@ describe('Pull Request Label Check', () => {
             payloadData.payload.pull_request.user.login +
             ' please assign the required reviewer(s) for this PR. Thanks!',
         });
-      })
+      });
     });
 
     describe('when pr changelog is excluded from codeowner assignment', () => {
@@ -371,7 +374,7 @@ describe('Pull Request Label Check', () => {
     });
   });
 
-  describe('when an issue label gets added', () =>{
+  describe('when an issue label gets added', () => {
     const label = {
       id: 638839900,
       node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
@@ -383,23 +386,26 @@ describe('Pull Request Label Check', () => {
     beforeEach(async () => {
       payloadData.payload.action = 'labeled';
       payloadData.payload.label = label;
-      spyOn(checkPullRequestLabelModule, 'checkForIssueLabel').and.callThrough();
+      spyOn(
+        checkPullRequestLabelModule, 'checkForIssueLabel'
+      ).and.callThrough();
       await robot.receive(payloadData);
     });
 
-    it('checks the label', () =>{
+    it('checks the label', () => {
       expect(checkPullRequestLabelModule.checkForIssueLabel).toHaveBeenCalled();
     });
 
     it('comments on the PR', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
 
-      const link = 'here'.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-          'labeling-issues-and-pull-requests'
+      const link = (
+        'here'.link(
+          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+        'labeling-issues-and-pull-requests')
       );
       expect(github.issues.createComment).toHaveBeenCalledWith({
-        body:'Hi @' + payloadData.payload.sender.login + ', the good ' +
+        body: 'Hi @' + payloadData.payload.sender.login + ', the good ' +
           'first issue label should only be used on issues, and I’m ' +
           'removing the label. You can learn more about ' +
           'labels ' + link + '. Thanks!',
@@ -418,10 +424,9 @@ describe('Pull Request Label Check', () => {
         repo: payloadData.payload.repository.name
       });
     });
-
   });
 
-  describe('when a pr label gets added', () =>{
+  describe('when a pr label gets added', () => {
     const label = {
       id: 638839900,
       node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
@@ -433,11 +438,13 @@ describe('Pull Request Label Check', () => {
     beforeEach(async () => {
       payloadData.payload.action = 'labeled';
       payloadData.payload.label = label;
-      spyOn(checkPullRequestLabelModule, 'checkForIssueLabel').and.callThrough();
+      spyOn(
+        checkPullRequestLabelModule, 'checkForIssueLabel'
+      ).and.callThrough();
       await robot.receive(payloadData);
     });
 
-    it('checks the label', () =>{
+    it('checks the label', () => {
       expect(checkPullRequestLabelModule.checkForIssueLabel).toHaveBeenCalled();
     });
 
@@ -462,7 +469,9 @@ describe('Pull Request Label Check', () => {
     beforeEach(async () => {
       payloadData.payload.action = 'unlabeled';
       payloadData.payload.label = label;
-      spyOn(checkPullRequestLabelModule, 'checkCriticalLabel').and.callThrough();
+      spyOn(
+        checkPullRequestLabelModule, 'checkCriticalLabel'
+      ).and.callThrough();
       await robot.receive(payloadData);
     });
 
@@ -473,15 +482,17 @@ describe('Pull Request Label Check', () => {
     it('should comment on PR', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledWith({
-        body: 'Hi @' + payloadData.payload.sender.login +
-          ', only members of the release team /cc @oppia/release-coordinators ' +
+        body:
+          'Hi @' + payloadData.payload.sender.login +
+          ', only members of the release team ' +
+          '/cc @oppia/release-coordinators ' +
           'are allowed to remove PR: Affects datastore layer labels. ' +
           'I will be adding it back. Thanks!',
         number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name
-      })
-    })
+      });
+    });
 
     it('should add the datastore label', () => {
       expect(github.issues.addLabels).toHaveBeenCalled();
@@ -492,7 +503,6 @@ describe('Pull Request Label Check', () => {
         repo: payloadData.payload.repository.name
       });
     });
-
   });
 
   describe('when datastore label gets removed by whitelisted user', () => {
@@ -508,11 +518,13 @@ describe('Pull Request Label Check', () => {
       payloadData.payload.action = 'unlabeled';
       payloadData.payload.label = label;
       payloadData.payload.sender.login = 'seanlip';
-      spyOn(checkPullRequestLabelModule, 'checkCriticalLabel').and.callThrough();
+      spyOn(
+        checkPullRequestLabelModule, 'checkCriticalLabel'
+      ).and.callThrough();
       await robot.receive(payloadData);
     });
 
-    it('checks for datastore label', () =>{
+    it('checks for datastore label', () => {
       expect(checkPullRequestLabelModule.checkCriticalLabel).toHaveBeenCalled();
     });
 
@@ -523,7 +535,6 @@ describe('Pull Request Label Check', () => {
     it('does not comment on the PR', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
     });
-
   });
 
   describe('when another label gets removed', () => {
@@ -538,11 +549,13 @@ describe('Pull Request Label Check', () => {
     beforeEach(async () => {
       payloadData.payload.action = 'unlabeled';
       payloadData.payload.label = label;
-      spyOn(checkPullRequestLabelModule, 'checkCriticalLabel').and.callThrough();
+      spyOn(
+        checkPullRequestLabelModule, 'checkCriticalLabel'
+      ).and.callThrough();
       await robot.receive(payloadData);
     });
 
-    it('checks for datastore label', () =>{
+    it('checks for datastore label', () => {
       expect(checkPullRequestLabelModule.checkCriticalLabel).toHaveBeenCalled();
     });
 
@@ -553,7 +566,6 @@ describe('Pull Request Label Check', () => {
     it('does not comment on the PR', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
     });
-
   });
 
   describe('when pull request gets opened or reopened', () => {
@@ -561,8 +573,7 @@ describe('Pull Request Label Check', () => {
       payloadData.payload.action = 'reopened';
 
       spyOn(
-        checkPullRequestLabelModule,
-        'checkChangelogLabel'
+        checkPullRequestLabelModule, 'checkChangelogLabel'
       ).and.callThrough();
       await robot.receive(payloadData);
 
@@ -598,7 +609,7 @@ describe('Pull Request Label Check', () => {
 
     it(
       'adds a default label when pr author is not a collaborator and PR ' +
-        'has one reviewer',
+      'has one reviewer',
       async () => {
         payloadData.payload.action = 'reopened';
         payloadData.payload.pull_request.user.login = 'newuser';
@@ -609,8 +620,7 @@ describe('Pull Request Label Check', () => {
         ];
 
         spyOn(
-          checkPullRequestLabelModule,
-          'checkChangelogLabel'
+          checkPullRequestLabelModule, 'checkChangelogLabel'
         ).and.callThrough();
         await robot.receive(payloadData);
 
@@ -649,7 +659,7 @@ describe('Pull Request Label Check', () => {
 
     it(
       'adds a default label when pr author is not a collaborator and PR ' +
-        'reviewers are more than one',
+      'reviewers are more than one',
       async () => {
         payloadData.payload.action = 'reopened';
         payloadData.payload.pull_request.user.login = 'newuser';
@@ -666,8 +676,7 @@ describe('Pull Request Label Check', () => {
         ];
 
         spyOn(
-          checkPullRequestLabelModule,
-          'checkChangelogLabel'
+          checkPullRequestLabelModule, 'checkChangelogLabel'
         ).and.callThrough();
         await robot.receive(payloadData);
 
@@ -705,7 +714,7 @@ describe('Pull Request Label Check', () => {
     );
 
 
-    it('should not ping pr author if there is a changelog label', async() => {
+    it('should not ping pr author if there is a changelog label', async () => {
       const label = {
         id: 638839900,
         node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
@@ -715,10 +724,9 @@ describe('Pull Request Label Check', () => {
       };
       payloadData.payload.action = 'reopened';
       // Add changelog label.
-      payloadData.payload.pull_request.labels.push(label)
+      payloadData.payload.pull_request.labels.push(label);
       spyOn(
-        checkPullRequestLabelModule,
-        'checkChangelogLabel'
+        checkPullRequestLabelModule, 'checkChangelogLabel'
       ).and.callThrough();
       await robot.receive(payloadData);
 
@@ -741,8 +749,7 @@ describe('Pull Request Label Check', () => {
       payloadData.payload.action = 'reopened';
       payloadData.payload.pull_request.labels = [label];
       spyOn(
-        checkPullRequestLabelModule,
-        'checkChangelogLabel'
+        checkPullRequestLabelModule, 'checkChangelogLabel'
       ).and.callThrough();
       await robot.receive(payloadData);
 
@@ -762,28 +769,28 @@ describe('Pull Request Label Check', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith(params);
     });
 
-    it('does not ping dev workflow team for valid changelog label', async () => {
-      const label = {
-        id: 638839900,
-        node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-        url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
-        color: '00FF00',
-      };
+    it('does not ping dev workflow team for valid changelog label',
+      async () => {
+        const label = {
+          id: 638839900,
+          node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+          url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+          name: 'PR CHANGELOG: Server Errors -- @kevintab95',
+          color: '00FF00',
+        };
 
-      payloadData.payload.action = 'reopened';
+        payloadData.payload.action = 'reopened';
 
-      payloadData.payload.pull_request.labels = [label];
-      spyOn(
-        checkPullRequestLabelModule,
-        'checkChangelogLabel'
-      ).and.callThrough();
-      await robot.receive(payloadData);
+        payloadData.payload.pull_request.labels = [label];
+        spyOn(
+          checkPullRequestLabelModule, 'checkChangelogLabel'
+        ).and.callThrough();
+        await robot.receive(payloadData);
 
-      expect(
-        checkPullRequestLabelModule.checkChangelogLabel
-      ).toHaveBeenCalled();
-      expect(github.issues.createComment).not.toHaveBeenCalled();
-    });
+        expect(
+          checkPullRequestLabelModule.checkChangelogLabel
+        ).toHaveBeenCalled();
+        expect(github.issues.createComment).not.toHaveBeenCalled();
+      });
   });
 });
