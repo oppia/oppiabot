@@ -13,19 +13,22 @@
     "kevintab95",
     "seanlip",
     "ankita240796",
-    "Showtim3",
+    "DubeySandeep",
     "bansalnitish",
     "vojtechjelinek",
     "marianazangrossi",
     "brianrodri",
     "nithusha21",
-    "aks681"
+    "aks681",
+    "srijanreddy98"
   ],
   "teamLeads": {
-    "onboardingTeam": "Showtim3",
-    "releaseTeam": "ankita240796",
-    "welfareTeam": "Showtim3"
+    "onboardingTeam": "DubeySandeep",
+    "releaseTeam": "vojtechjelinek",
+    "welfareTeam": "DubeySandeep"
   },
   "oppiaMaintainers": "oppia/core-maintainers",
+  "oppiaReleaseCoordinators": "oppia/release-coordinators",
+  "oppiaDevWorkflowTeam": "oppia/dev-workflow-team",
   "SERVER_JOBS_ADMIN": "seanlip"
 }
