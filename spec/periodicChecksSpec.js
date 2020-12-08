@@ -661,7 +661,7 @@ describe('Periodic Checks Module', () => {
         owner: 'oppia',
         repo: 'oppia',
         body:
-          'Hi @vojtechjelinek, @oppia/core-maintainers -- flagging this PR ' +
+          'Hi @DubeySandeep, @oppia/core-maintainers -- flagging this PR ' +
           'since it needs some assistance. PTAL, thanks!',
       });
     });
@@ -672,7 +672,7 @@ describe('Periodic Checks Module', () => {
         issue_number: 6,
         owner: 'oppia',
         repo: 'oppia',
-        assignees: ['vojtechjelinek'],
+        assignees: ['DubeySandeep'],
       });
     });
   });
