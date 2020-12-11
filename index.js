@@ -24,8 +24,12 @@ const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
 const checkWipModule = require('./lib/checkWipDraftPR');
 const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
-const checkPullRequestTemplateModule = require('./lib/checkPullRequestTemplate');
-const checkCriticalPullRequestModule = require('./lib/checkCriticalPullRequest');
+const checkPullRequestTemplateModule = require(
+  './lib/checkPullRequestTemplate'
+);
+const checkCriticalPullRequestModule = require(
+  './lib/checkCriticalPullRequest'
+);
 const checkBranchPushModule = require('./lib/checkBranchPush');
 const checkPullRequestReviewModule = require('./lib/checkPullRequestReview');
 const newCodeOwnerModule = require('./lib/checkForNewCodeowner');
@@ -49,9 +53,9 @@ const whitelistedAccounts = (process.env.WHITELISTED_ACCOUNTS || '')
 const runChecks = async (context, checkEvent) => {
   const repoName = context.repo().repo.toLowerCase();
   const checksWhitelist = constants.getChecksWhitelist();
-  if (checksWhitelist.hasOwnProperty(repoName)) {
+  if (Object.prototype.hasOwnProperty.call(checksWhitelist, repoName)) {
     const checks = checksWhitelist[repoName];
-    if (checks.hasOwnProperty(checkEvent)) {
+    if (Object.prototype.hasOwnProperty.call(checks, checkEvent)) {
       const checkList = checks[checkEvent];
       for (var i = 0; i < checkList.length; i++) {
         switch (checkList[i]) {
@@ -77,9 +81,10 @@ const runChecks = async (context, checkEvent) => {
             );
             break;
           case constants.allMergeConflictCheck:
-            await checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(
-              context
-            );
+            await checkMergeConflictsModule
+              .checkMergeConflictsInAllPullRequests(
+                context
+              );
             break;
           case constants.jobCheck:
             await checkPullRequestJobModule.checkForNewJob(context);
@@ -114,14 +119,17 @@ const runChecks = async (context, checkEvent) => {
             await ciCheckModule.handleFailure(context);
             break;
           case constants.updateWithDevelopCheck:
-            await checkMergeConflictsModule.pingAllPullRequestsToMergeFromDevelop(
-              context
-            );
+            await checkMergeConflictsModule
+              .pingAllPullRequestsToMergeFromDevelop(
+                context
+              );
             break;
           case constants.periodicCheck:
-            await periodicCheckModule.ensureAllPullRequestsAreAssigned(context);
-            await periodicCheckModule.ensureAllIssuesHaveProjects(context);
-            await periodicCheckModule.checkAndTagPRsWithOldBuilds(context);
+            await Promise.all([
+              periodicCheckModule.ensureAllPullRequestsAreAssigned(context),
+              periodicCheckModule.ensureAllIssuesHaveProjects(context),
+              periodicCheckModule.checkAndTagPRsWithOldBuilds(context)
+            ]);
             break;
           case constants.respondToReviewCheck:
             await checkPullRequestReviewModule.handleResponseToReview(context);
@@ -130,16 +138,16 @@ const runChecks = async (context, checkEvent) => {
       }
     }
   }
-}
+};
 
 /**
  * This function checks if repo owner is whitelisted for Oppiabot checks.
  *
  * @param {import('probot').Context} context
  */
-function checkWhitelistedAccounts(context) {
+const checkWhitelistedAccounts = (context) => {
   return whitelistedAccounts.includes(context.repo().owner.toLowerCase());
-}
+};
 
 /**
  * This function checks if pull request author is blacklisted for
@@ -147,14 +155,14 @@ function checkWhitelistedAccounts(context) {
  *
  * @param {import('probot').Context} context
  */
-function checkAuthor(context) {
+const checkAuthor = (context) => {
   const pullRequest = context.payload.pull_request;
   const author = pullRequest.user.login;
   return !constants.getBlacklistedAuthors().includes(author);
-}
+};
 
 /**
- * This is the main entrypoint to the Probot app
+ * This is the main entry point to the Probot app
  * @param {import('probot').Application} oppiabot
  */
 module.exports = (oppiabot) => {
@@ -182,7 +190,7 @@ module.exports = (oppiabot) => {
       console.log('COMMENT CREATED ON ISSUE OR PULL REQUEST...');
       await runChecks(context, constants.issueCommentCreatedEvent);
     }
-  })
+  });
 
   oppiabot.on('pull_request.opened', async (context) => {
     // The oppiabot runs only for repositories belonging to certain
@@ -255,7 +263,7 @@ module.exports = (oppiabot) => {
   });
 
   oppiabot.on('pull_request_review.submitted', async (context) => {
-    if(checkWhitelistedAccounts(context)) {
+    if (checkWhitelistedAccounts(context)) {
       console.log('A Pull Request got reviewed');
       await runChecks(context, constants.pullRequestReviewEvent);
     }
