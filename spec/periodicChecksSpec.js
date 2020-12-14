@@ -1066,7 +1066,7 @@ describe('Periodic Checks Module', () => {
             'Hi @' + pullRequests.prWithOldBuild.user.login + ', the build ' +
             'of this PR is stale and this could result in tests failing in ' +
             'develop. Please update this pull request with the latest ' +
-            'changes from develop, Thanks.',
+            'changes from develop. Thanks!',
         }
       );
     });
@@ -1093,7 +1093,7 @@ describe('Periodic Checks Module', () => {
             'Hi @' + pullRequests.prWithNewBuild.user.login + ', the build ' +
             'of this PR is stale and this could result in tests failing in ' +
             'develop. Please update this pull request with the latest ' +
-            'changes from develop, Thanks.',
+            'changes from develop. Thanks!',
         }
       );
     });
@@ -1124,7 +1124,7 @@ describe('Periodic Checks Module', () => {
               'Hi @' + pullRequests.prWithNewBuild.user.login + ', the build ' +
               'of this PR is stale and this could result in tests failing in ' +
               'develop. Please update this pull request with the latest ' +
-              'changes from develop, Thanks.',
+              'changes from develop. Thanks!',
           }
         );
       });
