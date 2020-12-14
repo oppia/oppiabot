@@ -15,13 +15,13 @@
   },
   "dependencies": {
     "@actions/core": "^1.2.6",
-    "@actions/github": "^4.0.0",
+    "@actions/github": "^2.2.0",
     "axios": "^0.21.0",
-    "dotenv": "^8.2.0",
+    "dotenv": "^6.0.0",
     "google-auth-library": "^6.0.0",
-    "googleapis": "^66.0.0",
-    "newrelic": "^7.0.2",
-    "probot": "^9.15.1",
+    "googleapis": "^51.0.0",
+    "newrelic": "^6.6.0",
+    "probot": "^10.0.3",
     "probot-config": "^1.1.0",
     "probot-scheduler": "^2.0.0-beta.1",
     "probot-stale": "github:oppia/oppiabot-stale"
