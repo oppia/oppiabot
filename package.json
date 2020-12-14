@@ -21,7 +21,7 @@
     "google-auth-library": "^6.0.0",
     "googleapis": "^51.0.0",
     "newrelic": "^6.6.0",
-    "probot": "^10.0.3",
+    "probot": "^9.11.3",
     "probot-config": "^1.1.0",
     "probot-scheduler": "^2.0.0-beta.1",
     "probot-stale": "github:oppia/oppiabot-stale"
@@ -40,7 +40,7 @@
     "nodemon": "^2.0.6",
     "nyc": "^15.1.0",
     "smee-client": "^1.2.2",
-    "standard": "^16.0.3"
+    "standard": "^10.0.3"
   },
   "engines": {
     "node": ">= 8.3.0"
