@@ -31,11 +31,7 @@ const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
-const {
-  teamLeads,
-  oppiaMaintainers,
-  SERVER_JOBS_ADMIN,
-} = require('../userWhitelist.json');
+
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
@@ -244,7 +240,7 @@ describe('Critical Pull Request Spec', () => {
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @' + SERVER_JOBS_ADMIN + ' and @' + teamLeads.releaseTeam +
+          'Hi @seanlip and @vojtechjelinek' +
           ', PTAL at this PR, it adds a model that needs to be validated. ' +
           'The name of the model is ' + firstModel + '.<br>Thanks!',
       });
@@ -256,7 +252,7 @@ describe('Critical Pull Request Spec', () => {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
-        assignees: [teamLeads.releaseTeam, SERVER_JOBS_ADMIN],
+        assignees: ['seanlip', 'vojtechjelinek'],
       });
     });
 
@@ -306,7 +302,7 @@ describe('Critical Pull Request Spec', () => {
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @' + SERVER_JOBS_ADMIN + ' and @' + teamLeads.releaseTeam +
+          'Hi @seanlip and @vojtechjelinek' +
           ', PTAL at this PR, it adds new models that need to be validated. ' +
           'The models are ' + firstModel + ', ' + secondModels + '.<br>Thanks!'
       });
@@ -318,7 +314,7 @@ describe('Critical Pull Request Spec', () => {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
-        assignees: [teamLeads.releaseTeam, SERVER_JOBS_ADMIN],
+        assignees: ['seanlip', 'vojtechjelinek'],
       });
     });
 
