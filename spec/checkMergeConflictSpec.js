@@ -171,6 +171,7 @@ describe('Merge Conflict Check', () => {
         issue_number: payloadData.payload.pull_request.number,
         assignees: [payloadData.payload.pull_request.user.login],
       };
+      expect(github.issues.addAssignees).toHaveBeenCalledWith(params);
     });
   });
 
@@ -556,6 +557,56 @@ describe('Merge Conflict Check', () => {
     });
 
     it('should not assign PR author', () => {
+      expect(github.issues.addAssignees).not.toHaveBeenCalled();
+    });
+  });
+
+  fdescribe('When polling takes longer than maximum time', () => {
+    beforeEach(async () => {
+      // Simulate a merged pull request.
+      payloadData.payload.pull_request.merged = true;
+      payloadData.payload.action = 'closed';
+
+      // Create new pull request from payload data.
+      const pullRequestToBeChecked = { ...payloadData.payload.pull_request };
+      pullRequestToBeChecked.merged = false;
+      // Simulate unknown mergeable state.
+      pullRequestToBeChecked.mergeable = null;
+
+      github.pulls = {
+        get: jasmine.createSpy('get').and.resolveTo({
+          data: pullRequestToBeChecked,
+        }),
+        list: jasmine.createSpy('list').and.resolveTo({
+          data: [pullRequestToBeChecked],
+        }),
+      };
+
+      spyOn(
+        checkMergeConflictModule,
+        'checkMergeConflictsInAllPullRequests'
+      ).and.callThrough();
+      await robot.receive(payloadData);
+    });
+
+    it('should check for merge conflict', () => {
+      expect(
+        checkMergeConflictModule.checkMergeConflictsInAllPullRequests
+      ).toHaveBeenCalled();
+      expect(
+        checkMergeConflictModule.checkMergeConflictsInPullRequest
+      ).toHaveBeenCalled();
+    });
+
+    it('pings pr author regarding merge conflict', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('adds merge conflict label', () => {
+      expect(github.issues.addLabels).not.toHaveBeenCalled();
+    });
+
+    it('assigns pr author', () => {
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
