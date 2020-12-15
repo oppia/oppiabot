@@ -30,5 +30,5 @@
   "oppiaMaintainers": "oppia/core-maintainers",
   "oppiaReleaseCoordinators": "oppia/release-coordinators",
   "oppiaDevWorkflowTeam": "oppia/dev-workflow-team",
-  "SERVER_JOBS_ADMIN": "seanlip"
+  "serverJobAdmins": ["seanlip", "vojtechjelinek"]
 }

@@ -316,7 +316,7 @@ module.exports = require("https");
 /***/ 35:
 /***/ (function(module) {
 
-module.exports = {"releaseCoordinators":["nithusha21","aks681","vojtechjelinek","ankita240796","DubeySandeep","BenHenning","kevintab95"],"goodFirstIssue":["U8NWXD","kevintab95","seanlip","ankita240796","DubeySandeep","bansalnitish","vojtechjelinek","marianazangrossi","brianrodri","nithusha21","aks681","srijanreddy98"],"teamLeads":{"onboardingTeam":"vojtechjelinek","releaseTeam":"ankita240796","welfareTeam":"DubeySandeep"},"oppiaMaintainers":"oppia/core-maintainers","oppiaReleaseCoordinators":"oppia/release-coordinators","oppiaDevWorkflowTeam":"oppia/dev-workflow-team","SERVER_JOBS_ADMIN":"seanlip"};
+module.exports = {"releaseCoordinators":["nithusha21","aks681","vojtechjelinek","ankita240796","DubeySandeep","BenHenning","kevintab95"],"goodFirstIssue":["U8NWXD","kevintab95","seanlip","ankita240796","DubeySandeep","bansalnitish","vojtechjelinek","marianazangrossi","brianrodri","nithusha21","aks681","srijanreddy98"],"teamLeads":{"onboardingTeam":"vojtechjelinek","releaseTeam":"ankita240796","welfareTeam":"DubeySandeep"},"oppiaMaintainers":"oppia/core-maintainers","oppiaReleaseCoordinators":"oppia/release-coordinators","oppiaDevWorkflowTeam":"oppia/dev-workflow-team","serverJobAdmins":"seanlip"};
 
 /***/ }),
 
