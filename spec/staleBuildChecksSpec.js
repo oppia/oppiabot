@@ -31,7 +31,6 @@ describe('Stale build check', () => {
   let app;
 
   let pullRequests = {
-
     prWithOldBuild: {
       number: 9,
       head: {
