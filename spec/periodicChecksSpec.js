@@ -23,7 +23,7 @@ const scheduler = require('../lib/scheduler');
 const payloadData = require('../fixtures/periodicCheckPayload.json');
 const periodicCheckModule = require('../lib/periodicChecks');
 const mergeConflictModule = require('../lib/checkMergeConflicts');
-const utils = require('../lib/utils');
+const staleBuildModule = require('../lib/staleBuildChecks');
 
 describe('Periodic Checks Module', () => {
   /**
@@ -126,72 +126,6 @@ describe('Periodic Checks Module', () => {
           login: 'someone',
         },
       ],
-    },
-
-    prWithOldBuild: {
-      number: 9,
-      head: {
-        sha: 'old-build-pr-sha',
-      },
-      labels: [],
-      user: {
-        login: 'testuser',
-        id: 11153258,
-        node_id: 'MDQ6VXNlcjExMTUzMjU4',
-        avatar_url: 'https://avatars2.githubusercontent.com/u/11153258?v=4',
-        gravatar_id: '',
-        url: 'https://api.github.com/users/testuser',
-        html_url: 'https://github.com/testuser',
-        followers_url: 'https://api.github.com/users/testuser/followers',
-        following_url:
-          'https://api.github.com/users/testuser/following{/other_user}',
-        gists_url: 'https://api.github.com/users/testuser/gists{/gist_id}',
-        starred_url:
-          'https://api.github.com/users/testuser/starred{/owner}{/repo}',
-        subscriptions_url:
-          'https://api.github.com/users/testuser/subscriptions',
-        organizations_url: 'https://api.github.com/users/testuser/orgs',
-        repos_url: 'https://api.github.com/users/testuser/repos',
-        events_url:
-          'https://api.github.com/users/testuser/events{/privacy}',
-        received_events_url:
-          'https://api.github.com/users/testuser/received_events',
-        type: 'User',
-        site_admin: false,
-      },
-    },
-
-    prWithNewBuild: {
-      number: 10,
-      head: {
-        sha: 'new-build-pr-sha',
-      },
-      labels: [],
-      user: {
-        login: 'testuser2',
-        id: 11153258,
-        node_id: 'MDQ6VXNlcjExMTUzMjU4',
-        avatar_url: 'https://avatars2.githubusercontent.com/u/11153258?v=4',
-        gravatar_id: '',
-        url: 'https://api.github.com/users/testuser2',
-        html_url: 'https://github.com/testuser2',
-        followers_url: 'https://api.github.com/users/testuser2/followers',
-        following_url:
-          'https://api.github.com/users/testuser2/following{/other_user}',
-        gists_url: 'https://api.github.com/users/testuser2/gists{/gist_id}',
-        starred_url:
-          'https://api.github.com/users/testuser2/starred{/owner}{/repo}',
-        subscriptions_url:
-          'https://api.github.com/users/testuser2/subscriptions',
-        organizations_url: 'https://api.github.com/users/testuser2/orgs',
-        repos_url: 'https://api.github.com/users/testuser2/repos',
-        events_url:
-          'https://api.github.com/users/testuser2/events{/privacy}',
-        received_events_url:
-          'https://api.github.com/users/testuser2/received_events',
-        type: 'User',
-        site_admin: false,
-      },
     },
   };
 
@@ -303,7 +237,7 @@ describe('Periodic Checks Module', () => {
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => { });
       spyOn(
-        periodicCheckModule, 'checkAndTagPRsWithOldBuilds'
+        staleBuildModule, 'checkAndTagPRsWithOldBuilds'
       ).and.callFake(() => { });
       const mergeConflictPR = pullRequests.mergeConflictPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
@@ -374,7 +308,7 @@ describe('Periodic Checks Module', () => {
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => { });
       spyOn(
-        periodicCheckModule, 'checkAndTagPRsWithOldBuilds'
+        staleBuildModule, 'checkAndTagPRsWithOldBuilds'
       ).and.callFake(() => { });
       const pendingReviewPR = pullRequests.pendingReviewPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
@@ -429,7 +363,7 @@ describe('Periodic Checks Module', () => {
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => { });
       spyOn(
-        periodicCheckModule, 'checkAndTagPRsWithOldBuilds'
+        staleBuildModule, 'checkAndTagPRsWithOldBuilds'
       ).and.callFake(() => { });
       const changesRequestedPR = pullRequests.hasChangesRequestedPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
@@ -511,7 +445,7 @@ describe('Periodic Checks Module', () => {
           periodicCheckModule, 'ensureAllIssuesHaveProjects'
         ).and.callFake(() => { });
         spyOn(
-          periodicCheckModule, 'checkAndTagPRsWithOldBuilds'
+          staleBuildModule, 'checkAndTagPRsWithOldBuilds'
         ).and.callFake(() => { });
         const approvedPR = pullRequests.approvedPR;
         github.pulls.list = jasmine.createSpy('list').and.resolveTo({
@@ -572,7 +506,7 @@ describe('Periodic Checks Module', () => {
           periodicCheckModule, 'ensureAllIssuesHaveProjects'
         ).and.callFake(() => { });
         spyOn(
-          periodicCheckModule, 'checkAndTagPRsWithOldBuilds'
+          staleBuildModule, 'checkAndTagPRsWithOldBuilds'
         ).and.callFake(() => { });
         const approvedPR = pullRequests.approvedPRWithLabel;
         github.pulls.list = jasmine.createSpy('list').and.resolveTo({
@@ -638,7 +572,7 @@ describe('Periodic Checks Module', () => {
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => { });
       spyOn(
-        periodicCheckModule, 'checkAndTagPRsWithOldBuilds'
+        staleBuildModule, 'checkAndTagPRsWithOldBuilds'
       ).and.callFake(() => { });
       const approvedPR = pullRequests.unResolvablePR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
@@ -740,7 +674,7 @@ describe('Periodic Checks Module', () => {
     ];
     beforeEach(() => {
       spyOn(
-        periodicCheckModule, 'checkAndTagPRsWithOldBuilds'
+        staleBuildModule, 'checkAndTagPRsWithOldBuilds'
       ).and.callFake(() => {});
       spyOn(
         periodicCheckModule,
@@ -915,222 +849,6 @@ describe('Periodic Checks Module', () => {
             'Hi @oppia/core-maintainers, this issue is not assigned ' +
             'to any project. Can you please update the same? Thanks!',
         });
-      });
-    });
-  });
-
-  describe('when pull request has an old build', () => {
-    const oldBuildPRCommitData = {
-      sha: 'old-build-pr-sha',
-      node_id:
-        'MDY6Q29tbWl0MTczMDA0MDIyOmViNjk3ZTU1YTNkYTMwODUzNjBkODQz' +
-        'ZGZiMTUwZjAzM2FhMTdlNjE=',
-      commit: {
-        author: {
-          name: 'James James',
-          email: 'jamesjay4199@gmail.com',
-          date: '2020-08-10T14:15:32Z',
-        },
-        committer: {
-          name: 'James James',
-          email: 'jamesjay4199@gmail.com',
-          date: '2020-08-10T14:15:32Z',
-        },
-        message: 'changes',
-        tree: {
-          sha: 'f5f8be9b0e4ac9970f68d8945de3474581b20d03',
-          url:
-            'https://api.github.com/repos/jameesjohn/oppia/git/' +
-            'trees/f5f8be9b0e4ac9970f68d8945de3474581b20d03',
-        },
-        url:
-          'https://api.github.com/repos/jameesjohn/oppia/git/' +
-          'commits/eb697e55a3da3085360d843dfb150f033aa17e61',
-        comment_count: 0,
-        verification: {},
-      },
-      url:
-        'https://api.github.com/repos/oppia/oppia/commits/' +
-        'eb697e55a3da3085360d843dfb150f033aa17e61',
-      html_url:
-        'https://github.com/oppia/oppia/commit/' +
-        'eb697e55a3da3085360d843dfb150f033aa17e61',
-      comments_url:
-        'https://api.github.com/repos/oppia/oppia/commits/' +
-        'eb697e55a3da3085360d843dfb150f033aa17e61/comments',
-      author: {},
-      committer: {},
-      parents: [],
-    };
-    const newBuildPRCommitData = {
-      sha: 'new-build-pr-sha',
-      node_id:
-        'MDY6Q29tbWl0MTczMDA0MDIyOjUyNWQ2MDU4YTYyNmI0NjE1NGVkMz' +
-        'czMTE0MWE5NWU3MGViYjBhZWY=',
-      commit: {
-        author: {
-          name: 'James James',
-          email: 'jamesjay4199@gmail.com',
-          date: '2020-08-13T13:43:24Z',
-        },
-        committer: {
-          name: 'James James',
-          email: 'jamesjay4199@gmail.com',
-          date: '2020-08-13T13:43:24Z',
-        },
-        message: 'new additions',
-        tree: {
-          sha: 'b5bf5af6ec0592bf3776b23d4355ff200549f427',
-          url:
-            'https://api.github.com/repos/jameesjohn/oppia/git/' +
-            'trees/b5bf5af6ec0592bf3776b23d4355ff200549f427',
-        },
-        url:
-          'https://api.github.com/repos/jameesjohn/oppia/git/' +
-          'commits/525d6058a626b46154ed3731141a95e70ebb0aef',
-        comment_count: 0,
-        verification: {
-          verified: false,
-          reason: 'unsigned',
-          signature: null,
-          payload: null,
-        },
-      },
-      url:
-        'https://api.github.com/repos/jameesjohn/oppia/commits/' +
-        '525d6058a626b46154ed3731141a95e70ebb0aef',
-      html_url:
-        'https://github.com/jameesjohn/oppia/commit/' +
-        '525d6058a626b46154ed3731141a95e70ebb0aef',
-      comments_url:
-        'https://api.github.com/repos/jameesjohn/oppia/' +
-        'commits/525d6058a626b46154ed3731141a95e70ebb0aef/comments',
-      author: [],
-      committer: [],
-      parents: [],
-    };
-
-    beforeEach(async () => {
-      spyOn(
-        periodicCheckModule,
-        'checkAndTagPRsWithOldBuilds'
-      ).and.callThrough();
-      spyOn(
-        periodicCheckModule,
-        'ensureAllPullRequestsAreAssigned'
-      ).and.callFake(() => {});
-      spyOn(
-        periodicCheckModule,
-        'ensureAllIssuesHaveProjects'
-      ).and.callFake(() => {});
-
-      github.pulls.list = jasmine.createSpy('list').and.resolveTo({
-        data: [pullRequests.prWithOldBuild, pullRequests.prWithNewBuild],
-      });
-      // Mocking the minumum build date.
-      utils.MIN_BUILD_DATE = new Date('2020-08-12T14:15:32Z');
-
-      github.repos = {
-        getCommit: jasmine.createSpy('getCommit').and.callFake((params) => {
-          if (params.ref === pullRequests.prWithOldBuild.head.sha) {
-            return {
-              data: oldBuildPRCommitData,
-            };
-          }
-          return {
-            data: newBuildPRCommitData,
-          };
-        }),
-      };
-      await robot.receive(payloadData);
-    });
-
-    it('should call periodic check module', () => {
-      expect(
-        periodicCheckModule.checkAndTagPRsWithOldBuilds
-      ).toHaveBeenCalled();
-    });
-
-    it('should fetch all open pull requests', () => {
-      expect(github.pulls.list).toHaveBeenCalled();
-    });
-
-    it('should ping author when build is old', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith(
-        {
-          owner: 'oppia',
-          repo: 'oppia',
-          issue_number: pullRequests.prWithOldBuild.number,
-          body:
-            'Hi @' + pullRequests.prWithOldBuild.user.login + ', the build ' +
-            'of this PR is stale and this could result in tests failing in ' +
-            'develop. Please update this pull request with the latest ' +
-            'changes from develop. Thanks!',
-        }
-      );
-    });
-
-    it('should add old build label when build is old', () => {
-      expect(github.issues.addLabels).toHaveBeenCalled();
-      expect(github.issues.addLabels).toHaveBeenCalledWith(
-        {
-          owner: 'oppia',
-          repo: 'oppia',
-          issue_number: pullRequests.prWithOldBuild.number,
-          labels: ["PR: don't merge - STALE BUILD"],
-        }
-      );
-    });
-
-    it('should not ping author when build is new', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalledWith(
-        {
-          owner: 'oppia',
-          repo: 'oppia',
-          issue_number: pullRequests.prWithNewBuild.number,
-          body:
-            'Hi @' + pullRequests.prWithNewBuild.user.login + ', the build ' +
-            'of this PR is stale and this could result in tests failing in ' +
-            'develop. Please update this pull request with the latest ' +
-            'changes from develop. Thanks!',
-        }
-      );
-    });
-
-    describe('when pull request author has already been pinged', () => {
-      let oldBuildPR;
-      beforeAll(() => {
-        // Add stale build label to PR.
-        oldBuildPR = {...pullRequests.prWithOldBuild};
-        oldBuildPR.labels.push({
-          name: "PR: don't merge - STALE BUILD"
-        });
-      });
-      beforeEach(() => {
-        github.pulls.list = jasmine.createSpy('list').and.resolveTo({
-          data: [oldBuildPR, pullRequests.prWithNewBuild],
-        });
-      });
-
-      it('should not ping author', () => {
-        expect(github.issues.createComment).not.toHaveBeenCalled();
-        expect(github.issues.createComment).not.toHaveBeenCalledWith(
-          {
-            owner: 'oppia',
-            repo: 'oppia',
-            issue_number: oldBuildPR.number,
-            body:
-              'Hi @' + pullRequests.prWithNewBuild.user.login + ', the build ' +
-              'of this PR is stale and this could result in tests failing in ' +
-              'develop. Please update this pull request with the latest ' +
-              'changes from develop. Thanks!',
-          }
-        );
-      });
-
-      it('should not add old build label', () => {
-        expect(github.issues.addLabels).not.toHaveBeenCalled();
       });
     });
   });

@@ -25,6 +25,7 @@ const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const mergeConflictModule = require('../lib/checkMergeConflicts');
+const staleBuildModule = require('../lib/staleBuildChecks');
 const utils = require('../lib/utils');
 const scheduler = require('../lib/scheduler');
 let payloadData = JSON.parse(
@@ -52,7 +53,7 @@ describe('check for new code owner', () => {
     /core/templates/google-analytics.initializer.ts @jameesjohn @vojtechjelinek
     /core/templates/base-components/ @jameesjohn @vojtechjelinek
     /core/templates/pages/Base.ts @jameesjohn @vojtechjelinek
-    /core/templates/pages/oppia_footer_directive.html 
+    /core/templates/pages/oppia_footer_directive.html
     @jameesjohn @vojtechjelinek
     /core/templates/pages/OppiaFooterDirective.ts @jameesjohn @vojtechjelinek
     /core/templates/pages/footer_js_libs.html @jameesjohn @vojtechjelinek
@@ -205,6 +206,7 @@ describe('check for new code owner', () => {
     ).and.callFake(() => { });
     spyOn(mergeConflictModule, 'checkMergeConflictsInPullRequest')
       .and.callFake(() => { });
+    spyOn(staleBuildModule, 'removeOldBuildLabel').and.callFake(() => { });
 
     spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callThrough();
     spyOn(utils, 'getMainCodeOwnerfile').and.resolveTo(mainCodeOwnerFile);
