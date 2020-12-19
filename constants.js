@@ -86,15 +86,14 @@ const checksWhitelist = {
       mergeConflictCheck,
       jobCheck,
       modelCheck,
-      codeOwnerCheck,
-      oldBuildLabelCheck
+      codeOwnerCheck
     ],
     [closeEvent]: [allMergeConflictCheck, updateWithDevelopCheck],
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
     [unlabelEvent]: [datastoreLabelCheck],
-    [pushEvent]: [forcePushCheck],
+    [pushEvent]: [forcePushCheck, oldBuildLabelCheck],
     [periodicCheckEvent]: [periodicCheck],
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
     [checkCompletedEvent]: [ciFailureCheck],

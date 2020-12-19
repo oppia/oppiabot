@@ -23,7 +23,6 @@ const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const checkCriticalPullRequestModule = require(
   '../lib/checkCriticalPullRequest'
 );
-const staleBuildModule = require('../lib/staleBuildChecks');
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
@@ -80,7 +79,6 @@ describe('Merge Conflict Check', () => {
       checkCriticalPullRequestModule,
       'checkIfPRAffectsDatastoreLayer'
     ).and.callFake(() => { });
-    spyOn(staleBuildModule, 'removeOldBuildLabel').and.callFake(() => { });
 
     spyOn(
       checkMergeConflictModule,

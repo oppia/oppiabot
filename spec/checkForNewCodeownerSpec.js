@@ -25,7 +25,6 @@ const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const mergeConflictModule = require('../lib/checkMergeConflicts');
-const staleBuildModule = require('../lib/staleBuildChecks');
 const utils = require('../lib/utils');
 const scheduler = require('../lib/scheduler');
 let payloadData = JSON.parse(
@@ -206,7 +205,6 @@ describe('check for new code owner', () => {
     ).and.callFake(() => { });
     spyOn(mergeConflictModule, 'checkMergeConflictsInPullRequest')
       .and.callFake(() => { });
-    spyOn(staleBuildModule, 'removeOldBuildLabel').and.callFake(() => { });
 
     spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callThrough();
     spyOn(utils, 'getMainCodeOwnerfile').and.resolveTo(mainCodeOwnerFile);

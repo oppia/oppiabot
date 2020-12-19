@@ -6,13 +6,9 @@ const periodicCheckModule = require('../lib/periodicChecks');
 const staleBuildModule = require('../lib/staleBuildChecks');
 const periodicCheckPayload = require('../fixtures/periodicCheckPayload.json');
 const utils = require('../lib/utils');
-const synchronizePayload = require('../fixtures/pullRequestPayload.json');
-const checkMergeConflictModule = require('../lib/checkMergeConflicts');
-const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
-const checkCriticalPullRequestModule = require(
-  '../lib/checkCriticalPullRequest'
-);
-const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
+const pushPayload = require('../fixtures/push.json');
+const checkBranchPushModule = require('../lib/checkBranchPush');
+const pullRequestPayload = require('../fixtures/pullRequestPayload.json');
 
 describe('Stale build check', () => {
   /**
@@ -100,16 +96,7 @@ describe('Stale build check', () => {
 
   beforeEach(async () => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
-    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')
-      .and
-      .callFake(() => {});
-    spyOn(checkPullRequestJobModule, 'checkForNewJob')
-      .and
-      .callFake(() => {});
-    spyOn(checkMergeConflictModule, 'checkMergeConflictsInPullRequest')
-      .and
-      .callFake(() => {});
+    spyOn(checkBranchPushModule, 'handleForcePush').and.callFake(() => { });
 
     github = {
       issues: {
@@ -118,6 +105,15 @@ describe('Stale build check', () => {
           .and.callFake(() => { }),
         addLabels: jasmine.createSpy('addLabels').and.callFake(() => { }),
         removeLabel: jasmine.createSpy('removeLabel').and.callFake(() => { }),
+      },
+      search:{
+        issuesAndPullRequests: jasmine
+          .createSpy('issuesAndPullRequests')
+          .and.resolveTo({
+            data: {
+              items: [pullRequestPayload.payload.pull_request],
+            },
+          })
       },
     };
 
@@ -352,28 +348,27 @@ describe('Stale build check', () => {
   });
 
   describe('when a pull request with an old build gets updated', () => {
-    const originalPayloadAction = synchronizePayload.payload.action;
+    const originalForcedData = pushPayload.payload.forced;
     const originalPayloadLabels = (
-      synchronizePayload.payload.pull_request.labels
+      pullRequestPayload.payload.pull_request.labels
     );
     beforeAll(() => {
-      // Set payload action to synchronize;
-      synchronizePayload.payload.action = 'synchronize';
+      // Set force push to false.
+      pushPayload.payload.forced = false;
       // Add Old build label to PR.
-      synchronizePayload.payload.pull_request.labels = [
+      pullRequestPayload.payload.pull_request.labels = [
         {name: utils.OLD_BUILD_LABEL}
       ];
     });
 
     afterAll(() =>{
-      synchronizePayload.payload.action = originalPayloadAction;
-      synchronizePayload.payload.pull_request.labels = originalPayloadLabels;
+      pushPayload.payload.forced = originalForcedData;
+      pullRequestPayload.payload.pull_request.labels = originalPayloadLabels;
     });
 
     beforeEach(async() => {
       spyOn(staleBuildModule, 'removeOldBuildLabel').and.callThrough();
-
-      await robot.receive(synchronizePayload);
+      await robot.receive(pushPayload);
     });
 
     it('should check if pull request contains old build label', () => {
@@ -383,33 +378,65 @@ describe('Stale build check', () => {
     it('should remove old build label', () => {
       expect(github.issues.removeLabel).toHaveBeenCalled();
       expect(github.issues.removeLabel).toHaveBeenCalledWith({
-        issue_number: synchronizePayload.payload.pull_request.number,
+        issue_number: pullRequestPayload.payload.pull_request.number,
         name: utils.OLD_BUILD_LABEL,
-        owner: synchronizePayload.payload.repository.owner.login,
-        repo: synchronizePayload.payload.repository.name
+        owner: pullRequestPayload.payload.repository.owner.login,
+        repo: pullRequestPayload.payload.repository.name
       });
     });
   });
 
   describe('when a pull request without an old build gets updated', () => {
-    const originalPayloadAction = synchronizePayload.payload.action;
+    const originalForcedData = pushPayload.payload.forced;
 
     beforeAll(() => {
       // Set payload action to synchronize;
-      synchronizePayload.payload.action = 'synchronize';
+      pushPayload.payload.forced = false;
     });
 
     afterAll(() =>{
-      synchronizePayload.payload.action = originalPayloadAction;
+      pushPayload.payload.forced = originalForcedData;
     });
 
     beforeEach(async() => {
       spyOn(staleBuildModule, 'removeOldBuildLabel').and.callThrough();
-      await robot.receive(synchronizePayload);
+      await robot.receive(pushPayload);
     });
 
     it('should check if pull request contains old build label', () => {
       expect(staleBuildModule.removeOldBuildLabel).toHaveBeenCalled();
+    });
+
+    it('should not remove any label', () => {
+      expect(github.issues.removeLabel).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('when a push is made from a branch without a pr', () => {
+    beforeEach(async () => {
+      spyOn(staleBuildModule, 'removeOldBuildLabel').and.callThrough();
+
+      pushPayload.payload.ref = 'refs/heads/some-weird-branch';
+      pushPayload.payload.forced = true;
+      github.search = {
+        issuesAndPullRequests: jasmine
+          .createSpy('issuesAndPullRequests')
+          .and.resolveTo({
+            data: {
+              // Return an empty payload since PR can't be found.
+              items: [],
+            },
+          }),
+      };
+      await robot.receive(pushPayload);
+    }, 20000);
+
+    it('should check if pull request contains old build label', () => {
+      expect(staleBuildModule.removeOldBuildLabel).toHaveBeenCalled();
+    });
+
+    it('should search for pull request', () => {
+      expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
     });
 
     it('should not remove any label', () => {
