@@ -52,7 +52,7 @@ describe('check for new code owner', () => {
     /core/templates/google-analytics.initializer.ts @jameesjohn @vojtechjelinek
     /core/templates/base-components/ @jameesjohn @vojtechjelinek
     /core/templates/pages/Base.ts @jameesjohn @vojtechjelinek
-    /core/templates/pages/oppia_footer_directive.html 
+    /core/templates/pages/oppia_footer_directive.html
     @jameesjohn @vojtechjelinek
     /core/templates/pages/OppiaFooterDirective.ts @jameesjohn @vojtechjelinek
     /core/templates/pages/footer_js_libs.html @jameesjohn @vojtechjelinek

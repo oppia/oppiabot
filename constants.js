@@ -46,10 +46,11 @@ const issuesLabelCheck = 'issues-labeled-check';
 const issuesAssignedCheck = 'issues-assigned-check';
 const forcePushCheck = 'force-push-check';
 const pullRequestReviewCheck = 'pr-review-check';
-const codeOwnerCheck = 'code-owner-check'
+const codeOwnerCheck = 'code-owner-check';
 const ciFailureCheck = 'ci-failure-check';
 const updateWithDevelopCheck = 'update-with-develop-check';
 const respondToReviewCheck = 'respond-to-review-check';
+const oldBuildLabelCheck = 'old-build-label-check';
 
 const checksWhitelist = {
   'oppia-android': {
@@ -92,7 +93,7 @@ const checksWhitelist = {
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
     [unlabelEvent]: [datastoreLabelCheck],
-    [pushEvent]: [forcePushCheck],
+    [pushEvent]: [forcePushCheck, oldBuildLabelCheck],
     [periodicCheckEvent]: [periodicCheck],
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
     [checkCompletedEvent]: [ciFailureCheck],
@@ -147,7 +148,8 @@ module.exports.pullRequestReviewCheck = pullRequestReviewCheck;
 module.exports.codeOwnerCheck = codeOwnerCheck;
 module.exports.ciFailureCheck = ciFailureCheck;
 module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
-module.exports.respondToReviewCheck = respondToReviewCheck
+module.exports.respondToReviewCheck = respondToReviewCheck;
+module.exports.oldBuildLabelCheck = oldBuildLabelCheck;
 
 module.exports.getBlacklistedAuthors = function() {
   return blacklistedAuthors;
