@@ -10,7 +10,6 @@ const mergeConflictCheckModule = require('../lib/checkMergeConflicts');
 const jobCheckModule = require('../lib/checkPullRequestJob');
 const criticalPullRequestModule = require('../lib/checkCriticalPullRequest');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
-const checkBranchPushModule = require('../lib/checkBranchPush');
 const pullRequestPayload = require('../fixtures/pullRequestPayload.json');
 
 describe('Stale build check', () => {
@@ -150,7 +149,6 @@ describe('Stale build check', () => {
       committer: {},
       parents: [],
     };
-
     const newBuildPRCommitData = {
       sha: 'new-build-pr-sha',
       node_id:
@@ -198,7 +196,6 @@ describe('Stale build check', () => {
       committer: [],
       parents: [],
     };
-
 
     github = {
       issues: {
