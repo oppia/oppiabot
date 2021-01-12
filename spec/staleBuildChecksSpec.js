@@ -6,8 +6,10 @@ const periodicCheckModule = require('../lib/periodicChecks');
 const staleBuildModule = require('../lib/staleBuildChecks');
 const periodicCheckPayload = require('../fixtures/periodicCheckPayload.json');
 const utils = require('../lib/utils');
-const pushPayload = require('../fixtures/push.json');
-const checkBranchPushModule = require('../lib/checkBranchPush');
+const mergeConflictCheckModule = require('../lib/checkMergeConflicts');
+const jobCheckModule = require('../lib/checkPullRequestJob');
+const criticalPullRequestModule = require('../lib/checkCriticalPullRequest');
+const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const pullRequestPayload = require('../fixtures/pullRequestPayload.json');
 
 describe('Stale build check', () => {
@@ -96,38 +98,15 @@ describe('Stale build check', () => {
 
   beforeEach(async () => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
-    spyOn(checkBranchPushModule, 'handleForcePush').and.callFake(() => { });
+    spyOn(mergeConflictCheckModule, 'checkMergeConflictsInPullRequest')
+      .and
+      .callFake(() => { });
+    spyOn(jobCheckModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(criticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')
+      .and
+      .callFake(() => { });
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
 
-    github = {
-      issues: {
-        createComment: jasmine
-          .createSpy('createComment')
-          .and.callFake(() => { }),
-        addLabels: jasmine.createSpy('addLabels').and.callFake(() => { }),
-        removeLabel: jasmine.createSpy('removeLabel').and.callFake(() => { }),
-      },
-      search:{
-        issuesAndPullRequests: jasmine
-          .createSpy('issuesAndPullRequests')
-          .and.resolveTo({
-            data: {
-              items: [pullRequestPayload.payload.pull_request],
-            },
-          })
-      },
-    };
-
-    robot = createProbot({
-      id: 1,
-      cert: 'test',
-      githubToken: 'test',
-    });
-
-    app = robot.load(oppiaBot);
-    spyOn(app, 'auth').and.resolveTo(github);
-  });
-
-  describe('when pull request has an old build', () => {
     const oldBuildPRCommitData = {
       sha: 'old-build-pr-sha',
       node_id:
@@ -218,6 +197,48 @@ describe('Stale build check', () => {
       parents: [],
     };
 
+    github = {
+      issues: {
+        createComment: jasmine
+          .createSpy('createComment')
+          .and.callFake(() => { }),
+        addLabels: jasmine.createSpy('addLabels').and.callFake(() => { }),
+        removeLabel: jasmine.createSpy('removeLabel').and.callFake(() => { }),
+      },
+      search:{
+        issuesAndPullRequests: jasmine
+          .createSpy('issuesAndPullRequests')
+          .and.resolveTo({
+            data: {
+              items: [pullRequestPayload.payload.pull_request],
+            },
+          })
+      },
+      repos: {
+        getCommit: jasmine.createSpy('getCommit').and.callFake((params) => {
+          if (params.ref === pullRequests.prWithOldBuild.head.sha) {
+            return {
+              data: oldBuildPRCommitData,
+            };
+          }
+          return {
+            data: newBuildPRCommitData,
+          };
+        }),
+      }
+    };
+
+    robot = createProbot({
+      id: 1,
+      cert: 'test',
+      githubToken: 'test',
+    });
+
+    app = robot.load(oppiaBot);
+    spyOn(app, 'auth').and.resolveTo(github);
+  });
+
+  describe('when pull request has an old build', () => {
     beforeEach(async () => {
       spyOn(
         staleBuildModule,
@@ -240,18 +261,6 @@ describe('Stale build check', () => {
       // Mocking the minimum build date.
       utils.MIN_BUILD_DATE = new Date('2020-08-12T14:15:32Z');
 
-      github.repos = {
-        getCommit: jasmine.createSpy('getCommit').and.callFake((params) => {
-          if (params.ref === pullRequests.prWithOldBuild.head.sha) {
-            return {
-              data: oldBuildPRCommitData,
-            };
-          }
-          return {
-            data: newBuildPRCommitData,
-          };
-        }),
-      };
       await robot.receive(periodicCheckPayload);
     });
 
@@ -348,27 +357,28 @@ describe('Stale build check', () => {
   });
 
   describe('when a pull request with an old build gets updated', () => {
-    const originalForcedData = pushPayload.payload.forced;
     const originalPayloadLabels = (
       pullRequestPayload.payload.pull_request.labels
     );
+    const originalSha = pullRequestPayload.payload.pull_request.head.sha;
     beforeAll(() => {
-      // Set force push to false.
-      pushPayload.payload.forced = false;
       // Add Old build label to PR.
       pullRequestPayload.payload.pull_request.labels = [
         {name: utils.OLD_BUILD_LABEL}
       ];
+      pullRequestPayload.payload.pull_request.head.sha = 'new-build-pr-sha';
     });
 
     afterAll(() =>{
-      pushPayload.payload.forced = originalForcedData;
       pullRequestPayload.payload.pull_request.labels = originalPayloadLabels;
+      pullRequestPayload.payload.pull_request.head.sha = originalSha;
     });
 
     beforeEach(async() => {
       spyOn(staleBuildModule, 'removeOldBuildLabel').and.callThrough();
-      await robot.receive(pushPayload);
+      // Set payload action to synchronize.
+      pullRequestPayload.payload.action = 'synchronize';
+      await robot.receive(pullRequestPayload);
     });
 
     it('should check if pull request contains old build label', () => {
@@ -387,59 +397,61 @@ describe('Stale build check', () => {
   });
 
   describe('when a pull request without an old build gets updated', () => {
-    const originalForcedData = pushPayload.payload.forced;
-
+    const originalSha = pullRequestPayload.payload.pull_request.head.sha;
     beforeAll(() => {
-      // Set payload action to synchronize;
-      pushPayload.payload.forced = false;
+      pullRequestPayload.payload.pull_request.head.sha = 'new-build-pr-sha';
     });
 
     afterAll(() =>{
-      pushPayload.payload.forced = originalForcedData;
+      pullRequestPayload.payload.pull_request.head.sha = originalSha;
     });
 
     beforeEach(async() => {
       spyOn(staleBuildModule, 'removeOldBuildLabel').and.callThrough();
-      await robot.receive(pushPayload);
+      // Set payload action to synchronize.
+      pullRequestPayload.payload.action = 'synchronize';
+      await robot.receive(pullRequestPayload);
     });
 
     it('should check if pull request contains old build label', () => {
       expect(staleBuildModule.removeOldBuildLabel).toHaveBeenCalled();
     });
 
-    it('should not remove any label', () => {
+    it('should not remove old build label', () => {
       expect(github.issues.removeLabel).not.toHaveBeenCalled();
     });
   });
 
-  describe('when a push is made from a branch without a pr', () => {
-    beforeEach(async () => {
-      spyOn(staleBuildModule, 'removeOldBuildLabel').and.callThrough();
+  describe('when develop branch gets updated', () => {
+    const originalPayloadLabels = (
+      pullRequestPayload.payload.pull_request.labels
+    );
+    const originalSha = pullRequestPayload.payload.pull_request.head.sha;
+    beforeAll(() => {
+      // Add Old build label to PR.
+      pullRequestPayload.payload.pull_request.labels = [
+        {name: utils.OLD_BUILD_LABEL}
+      ];
+      pullRequestPayload.payload.pull_request.head.sha = 'old-build-pr-sha';
+    });
 
-      pushPayload.payload.ref = 'refs/heads/some-weird-branch';
-      pushPayload.payload.forced = true;
-      github.search = {
-        issuesAndPullRequests: jasmine
-          .createSpy('issuesAndPullRequests')
-          .and.resolveTo({
-            data: {
-              // Return an empty payload since PR can't be found.
-              items: [],
-            },
-          }),
-      };
-      await robot.receive(pushPayload);
-    }, 20000);
+    afterAll(() =>{
+      pullRequestPayload.payload.pull_request.labels = originalPayloadLabels;
+      pullRequestPayload.payload.pull_request.head.sha = originalSha;
+    });
+
+    beforeEach(async() => {
+      spyOn(staleBuildModule, 'removeOldBuildLabel').and.callThrough();
+      // Set payload action to synchronize.
+      pullRequestPayload.payload.action = 'synchronize';
+      await robot.receive(pullRequestPayload);
+    });
 
     it('should check if pull request contains old build label', () => {
       expect(staleBuildModule.removeOldBuildLabel).toHaveBeenCalled();
     });
 
-    it('should search for pull request', () => {
-      expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
-    });
-
-    it('should not remove any label', () => {
+    it('should not remove old build label', () => {
       expect(github.issues.removeLabel).not.toHaveBeenCalled();
     });
   });

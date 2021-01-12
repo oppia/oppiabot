@@ -58,88 +58,108 @@ const runChecks = async (context, checkEvent) => {
     const checks = checksWhitelist[repoName];
     if (Object.prototype.hasOwnProperty.call(checks, checkEvent)) {
       const checkList = checks[checkEvent];
+      const callable = [];
       for (var i = 0; i < checkList.length; i++) {
         switch (checkList[i]) {
           case constants.claCheck:
-            await apiForSheetsModule.checkClaStatus(context);
+            callable.push(apiForSheetsModule.checkClaStatus(context));
             break;
           case constants.changelogCheck:
-            await checkPullRequestLabelsModule.checkChangelogLabel(context);
+            callable.push(
+              checkPullRequestLabelsModule.checkChangelogLabel(context)
+            );
             break;
           case constants.branchCheck:
-            await checkPullRequestBranchModule.checkBranch(context);
+            callable.push(checkPullRequestBranchModule.checkBranch(context));
             break;
           case constants.wipCheck:
-            await checkWipModule.checkWIP(context);
+            callable.push(checkWipModule.checkWIP(context));
             break;
           case constants.assigneeCheck:
-            await checkPullRequestLabelsModule.checkAssignee(context);
+            callable.push(checkPullRequestLabelsModule.checkAssignee(context));
             break;
           case constants.mergeConflictCheck:
-            await checkMergeConflictsModule.checkMergeConflictsInPullRequest(
-              context,
-              context.payload.pull_request
+            callable.push(
+              checkMergeConflictsModule.checkMergeConflictsInPullRequest(
+                context, context.payload.pull_request
+              )
             );
             break;
           case constants.allMergeConflictCheck:
-            await checkMergeConflictsModule
-              .checkMergeConflictsInAllPullRequests(
+            callable.push(
+              checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(
                 context
-              );
+              )
+            );
             break;
           case constants.jobCheck:
-            await checkPullRequestJobModule.checkForNewJob(context);
+            callable.push(checkPullRequestJobModule.checkForNewJob(context));
             break;
           case constants.modelCheck:
-            await checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer(
-              context
+            callable.push(
+              checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer(
+                context
+              )
             );
             break;
           case constants.issuesAssignedCheck:
-            await checkIssueAssigneeModule.checkAssignees(context);
+            callable.push(checkIssueAssigneeModule.checkAssignees(context));
             break;
           case constants.prLabelCheck:
-            await checkPullRequestLabelsModule.checkForIssueLabel(context);
+            callable.push(
+              checkPullRequestLabelsModule.checkForIssueLabel(context)
+            );
             break;
           case constants.datastoreLabelCheck:
-            await checkPullRequestLabelsModule.checkCriticalLabel(context);
+            callable.push(
+              checkPullRequestLabelsModule.checkCriticalLabel(context)
+            );
             break;
           case constants.forcePushCheck:
-            await checkBranchPushModule.handleForcePush(context);
+            callable.push(checkBranchPushModule.handleForcePush(context));
             break;
           case constants.prTemplateCheck:
-            await checkPullRequestTemplateModule.checkTemplate(context);
+            callable.push(
+              checkPullRequestTemplateModule.checkTemplate(context)
+            );
             break;
           case constants.pullRequestReviewCheck:
-            await checkPullRequestReviewModule.handlePullRequestReview(context);
+            callable.push(
+              checkPullRequestReviewModule.handlePullRequestReview(context)
+            );
             break;
           case constants.codeOwnerCheck:
-            await newCodeOwnerModule.checkForNewCodeowner(context);
+            callable.push(newCodeOwnerModule.checkForNewCodeowner(context));
             break;
           case constants.ciFailureCheck:
-            await ciCheckModule.handleFailure(context);
+            callable.push(ciCheckModule.handleFailure(context));
             break;
           case constants.updateWithDevelopCheck:
-            await checkMergeConflictsModule
-              .pingAllPullRequestsToMergeFromDevelop(
+            callable.push(
+              checkMergeConflictsModule.pingAllPullRequestsToMergeFromDevelop(
                 context
-              );
+              )
+            );
             break;
           case constants.periodicCheck:
-            await Promise.all([
+            callable.push(...[
               periodicCheckModule.ensureAllPullRequestsAreAssigned(context),
               periodicCheckModule.ensureAllIssuesHaveProjects(context),
-              staleBuildModule.checkAndTagPRsWithOldBuilds(context)
+              staleBuildModule.checkAndTagPRsWithOldBuilds(context),
             ]);
             break;
           case constants.respondToReviewCheck:
-            await checkPullRequestReviewModule.handleResponseToReview(context);
+            callable.push(
+              checkPullRequestReviewModule.handleResponseToReview(context)
+            );
             break;
           case constants.oldBuildLabelCheck:
-            await staleBuildModule.removeOldBuildLabel(context);
+            callable.push(staleBuildModule.removeOldBuildLabel(context));
             break;
         }
       }
+      // Wait for all checks to resolve or reject.
+      await Promise.allSettled(callable);
     }
   }
 };

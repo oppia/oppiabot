@@ -20,7 +20,6 @@ const scheduler = require('../lib/scheduler');
 const pushPayload = require('../fixtures/push.json');
 const pullRequestPayload = require('../fixtures/pullRequestPayload.json');
 const checkBranchPushModule = require('../lib/checkBranchPush');
-const staleBuildModule = require('../lib/staleBuildChecks');
 
 describe('Force Push Check', () => {
   /**
@@ -40,7 +39,7 @@ describe('Force Push Check', () => {
 
   beforeEach(() => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => {});
-    spyOn(staleBuildModule, 'removeOldBuildLabel').and.callFake(() => {});
+
     github = {
       issues: {
         createComment: jasmine.createSpy('createComment').and.returnValue({}),
