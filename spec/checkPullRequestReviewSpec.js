@@ -689,9 +689,13 @@ describe('Pull Request Review Module', () => {
               }),
           };
           github.orgs = {
-            checkMembership: jasmine.createSpy('checkMembership')
-              .and.resolveTo({
-                status: 404,
+            checkMembership: jasmine
+              .createSpy('checkMembership')
+              .and.callFake(() => {
+                throw new Error(
+                  'User does not exist or is not a public member of ' +
+                  'the organization.'
+                );
               }),
           };
           await robot.receive(reviewPayloadData);
