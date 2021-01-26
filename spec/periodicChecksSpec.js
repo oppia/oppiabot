@@ -160,9 +160,11 @@ describe('Periodic Checks Module', () => {
                 status: 204,
               };
             }
-            return {
-              status: 404,
-            };
+
+            throw new Error(
+              'User does not exist or is not a public member of ' +
+              'the organization.'
+            );
           }),
       },
       search: {

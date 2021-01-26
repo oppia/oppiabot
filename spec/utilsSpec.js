@@ -477,9 +477,13 @@ describe('Utility module tests', () => {
 
     context.github.orgs.checkMembership = jasmine
       .createSpy('checkMembership')
-      .and.resolveTo({
-        status: 404,
-      });
+      .and.callFake(() => {
+        throw new Error(
+          'User does not exist or is not a public member of ' +
+          'the organization.'
+        );
+      }),
+
     response = await utilityModule.isUserAMemberOfTheOrganisation(
       context,
       'testuser'
@@ -520,7 +524,7 @@ describe('Utility module tests', () => {
     expect(usernames[0]).toBe('aks681');
     expect(usernames[1]).toBe('seanlip');
 
-    text = `@DubeySandeep, done I've created the issue(#10419 ) 
+    text = `@DubeySandeep, done I've created the issue(#10419 )
       and addressed your comments.
       @seanlip @aks681 PTAL`;
     usernames = utilityModule.getUsernamesFromText(text);
@@ -540,7 +544,7 @@ describe('Utility module tests', () => {
     expect(usernames[0]).toBe('aks681');
     expect(usernames[1]).toBe('seanlip');
 
-    text = `@DubeySandeep, done I've created the issue(#10419 ) 
+    text = `@DubeySandeep, done I've created the issue(#10419 )
       and addressed your comments.
       @seanlip @aks681 please take a look`;
     usernames = utilityModule.getUsernamesFromText(text);
