@@ -763,9 +763,11 @@ describe('Pull Request Review Module', () => {
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
             body:
-              'Hi @kevintab95, this PR is ready to be merged. Before you ' +
+              'Hi @kevintab95, this PR is ready to be merged. ' +
+              'Author of this PR does not have permissions ' +
+              'to merge this PR. Before you ' +
               'merge it, please make sure that there are no pending comments ' +
-              "that require action from the author's end. Thanks!",
+              'that require action from the author\'s end. Thanks!',
           });
         });
 

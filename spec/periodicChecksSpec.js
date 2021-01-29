@@ -538,9 +538,11 @@ describe('Periodic Checks Module', () => {
           owner: 'oppia',
           repo: 'oppia',
           body:
-            'Hi @ankita240796, this PR is ready to be merged. Before you ' +
+            'Hi @ankita240796, this PR is ready to be merged. ' +
+            'Author of this PR does not have permissions ' +
+            'to merge this PR. Before you ' +
             'merge it, please make sure that there are no pending comments ' +
-            "that require action from the author's end. Thanks!",
+            'that require action from the author\'s end. Thanks!',
         });
       });
 
