@@ -1522,5 +1522,21 @@ describe('Pull Request Review Module', () => {
         });
       }
     );
+    describe(
+      'when author asks some question/comment and asks reviewer to ptal',
+      () => {
+        beforeEach(async () => {
+          pushPayload.payload.forced = false;
+          await robot.receive(pushPayload);
+        });
+        it('should not comment on pull request', () => {
+          expect(github.issues.createComment).not.toHaveBeenCalled();
+        });
+        afterAll(() => {
+          reviewPayloadData.payload.pull_request.requested_reviewers = (
+            initialReviewers
+          );
+        });
+      });
   });
 });
