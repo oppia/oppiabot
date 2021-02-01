@@ -1526,8 +1526,7 @@ describe('Pull Request Review Module', () => {
       'when author asks some question/comment and asks reviewer to ptal',
       () => {
         beforeEach(async () => {
-          pushPayload.payload.forced = false;
-          await robot.receive(pushPayload);
+          await robot.receive(commentPayloadData);
         });
         it('should not comment on pull request', () => {
           expect(github.issues.createComment).not.toHaveBeenCalled();
