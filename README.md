@@ -55,12 +55,9 @@ Please refer to the following instructions to setup Oppiabot for the first time 
     * **Permissions & events** The following permissions and events must be subscribed.If, for example, you only enable issue events, you will not be able to listen on pull request webhooks with the bot.
 
      <p align="center">
-    <img src="images/docs/repo1-permissions.jpg" height="600" width="450">
-    <img src="images/docs/repo2-permissions.jpg" height="600" width="450">
-    <img src="images/docs/org-permissions.jpg" height="600" width="450">
-    <img src="images/docs/user-permissions.jpg" height="600" width="450">
-    <img src="images/docs/events1.jpg" height="600" width="450">
-    <img src="images/docs/events2.jpg" height="600" width="450">
+    <img src="images/docs/repository-permissions.png>
+    <img src="images/docs/other-permissions.png>
+    <img src="images/docs/events.png>
     </p>
 
 7. Download the private key. It will be a `.pem` file. Move it to the root directory of the project. As long as it's in the root directory, it will be automatically detected regardless of the filename.
