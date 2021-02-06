@@ -52,8 +52,13 @@ Please refer to the following instructions to setup Oppiabot for the first time 
 6. [Create a new GitHub App](https://github.com/settings/apps/new) with:
     * **Webhook URL**: Use your `WEBHOOK_PROXY_URL` from the previous step.
     * **Webhook Secret**: `development`
-    * **Permissions & events** is located lower down the page and will depend on what data you want the bot to have access to. Currently, the bot requires read and write access to issues and pull requests and read-only access to the file in the path `.github/stale.yml`.
-    If, for example, you only enable issue events, you will not be able to listen on pull request webhooks with the bot.
+    * **Permissions & events** The following permissions and events must be subscribed.If, for example, you only enable issue events, you will not be able to listen on pull request webhooks with the bot.
+
+<p align="center">
+  <img src="images/docs/repository-permissions.png">
+  <img src="images/docs/other-permissions.png">
+  <img src="images/docs/events.png">
+</p>
 
 7. Download the private key. It will be a `.pem` file. Move it to the root directory of the project. As long as it's in the root directory, it will be automatically detected regardless of the filename.
 
