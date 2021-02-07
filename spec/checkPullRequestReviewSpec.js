@@ -1525,6 +1525,11 @@ describe('Pull Request Review Module', () => {
     describe(
       'when author asks some question/comment and asks reviewer to ptal',
       () => {
+        const initialCommentBody = commentPayloadData.payload.comment.body;
+        beforeAll(() => {
+          commentPayloadData.payload.comment.body =
+          'Hi I have a doubt @reviewer PTAL';
+        });
         beforeEach(async () => {
           await robot.receive(commentPayloadData);
         });
@@ -1532,9 +1537,7 @@ describe('Pull Request Review Module', () => {
           expect(github.issues.createComment).not.toHaveBeenCalled();
         });
         afterAll(() => {
-          reviewPayloadData.payload.pull_request.requested_reviewers = (
-            initialReviewers
-          );
+          commentPayloadData.payload.comment.body = initialCommentBody;
         });
       });
   });
