@@ -155,8 +155,8 @@ describe('Utility module tests', () => {
       },
       modelRegex
     );
-    let itemLink = (
-      'OppiabotTestActivitiesModel'.link(firstModelFileObj.blob_url)
+    let itemLink = 'OppiabotTestActivitiesModel'.link(
+      firstModelFileObj.blob_url
     );
     expect(result).toBe(' The name of the model is ' + itemLink + '.');
 
@@ -168,12 +168,11 @@ describe('Utility module tests', () => {
       },
       modelRegex
     );
-    firstItemLink = (
-      'OppiabotTestActivitiesModel'.link(firstModelFileObj.blob_url)
+    firstItemLink = 'OppiabotTestActivitiesModel'.link(
+      firstModelFileObj.blob_url
     );
-    let secondItemLink = (
-      'OppiabotSnapshotContentModel, OppiabotSnapshotTestingModel'
-        .link(secondModelFileObj.blob_url)
+    let secondItemLink = 'OppiabotSnapshotContentModel, OppiabotSnapshotTestingModel'.link(
+      secondModelFileObj.blob_url
     );
     expect(result).toBe(
       ' The models are ' + itemLink + ', ' + secondItemLink + '.'
@@ -187,7 +186,7 @@ describe('Utility module tests', () => {
       },
       jobRegex
     );
-    itemLink = ('FirstTestOneOffJob'.link(firstJobFileObj.blob_url));
+    itemLink = 'FirstTestOneOffJob'.link(firstJobFileObj.blob_url);
     expect(result).toBe(' The name of the job is ' + itemLink + '.');
 
     result = utilityModule.getNameString(
@@ -198,8 +197,8 @@ describe('Utility module tests', () => {
       },
       jobRegex
     );
-    itemLink = ('FirstTestOneOffJob'.link(firstJobFileObj.blob_url));
-    secondItemLink = ('SecondTestOneOffJob'.link(secondJobFileObj.blob_url));
+    itemLink = 'FirstTestOneOffJob'.link(firstJobFileObj.blob_url);
+    secondItemLink = 'SecondTestOneOffJob'.link(secondJobFileObj.blob_url);
     expect(result).toBe(
       ' The jobs are ' + itemLink + ', ' + secondItemLink + '.'
     );
@@ -480,11 +479,55 @@ describe('Utility module tests', () => {
       .and.callFake(() => {
         throw new Error(
           'User does not exist or is not a public member of ' +
-          'the organization.'
+            'the organization.'
         );
-      }),
-
+      });
     response = await utilityModule.isUserAMemberOfTheOrganisation(
+      context,
+      'testuser'
+    );
+    expect(response).toBe(false);
+  });
+
+  it('should check if a user is a collaborator', async () => {
+    const context = {
+      repo() {
+        return {
+          owner: 'oppia',
+          repo: 'oppia'
+        };
+      },
+      github: {
+        repos: {
+          checkCollaborator: jasmine
+            .createSpy('checkCollaborator')
+            .and.resolveTo({
+              status: 204,
+            }),
+        },
+      },
+    };
+
+    let response = await utilityModule.isUserACollaborator(
+      context,
+      'testuser'
+    );
+    expect(response).toBe(true);
+    expect(context.github.repos.checkCollaborator).toHaveBeenCalled();
+    expect(context.github.repos.checkCollaborator).toHaveBeenCalledWith({
+      owner: 'oppia',
+      repo: 'oppia',
+      username: 'testuser',
+    });
+
+    context.github.repos.checkCollaborator = jasmine
+      .createSpy('checkCollaborator')
+      .and.callFake(() => {
+        throw new Error(
+          'User is not a collaborator.'
+        );
+      });
+    response = await utilityModule.isUserACollaborator(
       context,
       'testuser'
     );
