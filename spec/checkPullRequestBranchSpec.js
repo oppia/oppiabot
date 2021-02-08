@@ -104,6 +104,52 @@ describe('Pull Request Branch Check', () => {
         const commentBody =
           'Hi @' +
           author +
+          ', PRs made from develop branch are ' +
+          'not allowed. So this PR is being closed. Please make your changes ' +
+          'in another branch and send in the PR. To learn more about ' +
+          'contributing to Oppia, take a look at our ' +
+          wiki +
+          ' (Rule 1 specifically). Thanks!';
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          issue_number: pullRequestPayload.payload.pull_request.number,
+          owner: pullRequestPayload.payload.repository.owner.login,
+          repo: pullRequestPayload.payload.repository.name,
+          body: commentBody,
+        });
+      });
+
+      it('should close pull request', () => {
+        expect(github.issues.update).toHaveBeenCalled();
+        expect(github.issues.update).toHaveBeenCalledWith({
+          issue_number: pullRequestPayload.payload.pull_request.number,
+          owner: pullRequestPayload.payload.repository.owner.login,
+          repo: pullRequestPayload.payload.repository.name,
+          state: 'closed',
+        });
+      });
+    });
+
+    describe('develop prefixed branch check', () => {
+      beforeEach(async () => {
+        pullRequestPayload.payload.pull_request.head.ref = 'develop-2';
+        await app.receive(pullRequestPayload);
+      });
+
+      it('should call appropriate module', async () => {
+        expect(checkPullRequestBranchModule.checkBranch).toHaveBeenCalled();
+      });
+
+      it('should create appropriate comment', () => {
+        expect(github.issues.createComment).toHaveBeenCalled();
+        const author = pullRequestPayload.payload.pull_request.user.login;
+        const wiki = (
+          'wiki'.link(
+            'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+          'instructions-for-making-a-code-change')
+        );
+        const commentBody =
+          'Hi @' +
+          author +
           ', PRs made from develop branch or from a ' +
           'branch whose name is prefixed with develop, release or test are ' +
           'not allowed. So this PR is being closed. Please make your changes ' +
@@ -129,6 +175,7 @@ describe('Pull Request Branch Check', () => {
         });
       });
     });
+
 
     describe('release branch check', () => {
       beforeEach(async () => {
