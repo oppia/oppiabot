@@ -508,7 +508,7 @@ describe('Utility module tests', () => {
       },
     };
 
-    let response = await utilityModule.isUserACollaborator(
+    let response = await utilityModule.isUserCollaborator(
       context,
       'testuser'
     );
@@ -527,7 +527,7 @@ describe('Utility module tests', () => {
           'User is not a collaborator.'
         );
       });
-    response = await utilityModule.isUserACollaborator(
+    response = await utilityModule.isUserCollaborator(
       context,
       'testuser'
     );
