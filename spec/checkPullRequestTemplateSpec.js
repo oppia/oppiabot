@@ -477,7 +477,7 @@ describe('Pull Request Template', () => {
   describe('when pull request head and base are from the same repository.' +
   'and inter/karma checks aren\'t checked.', () => {
     beforeEach(async () => {
-      payloadData.payload.pull_request.head.label = 'oppia:test_pr';
+      payloadData.payload.pull_request.head.repo.full_name = 'oppia/oppia';
       payloadData.payload.pull_request.body = bodyWithExplanation;
       payloadData.payload.pull_request.maintainer_can_modify = false;
       await robot.receive(payloadData);
