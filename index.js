@@ -95,6 +95,10 @@ const runChecks = async (context, checkEvent) => {
           case constants.jobCheck:
             callable.push(checkPullRequestJobModule.checkForNewJob(context));
             break;
+          case constants.cronJobCheck:
+            callable.push(
+              checkPullRequestJobModule.checkForNewCronJob(context));
+            break;
           case constants.modelCheck:
             callable.push(
               checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer(
