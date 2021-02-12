@@ -501,15 +501,5 @@ describe('Pull Request Template', () => {
           'before pushing. Thanks!',
       });
     });
-
-    it('should assign PR author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
-        issue_number: payloadData.payload.pull_request.number,
-        repo: payloadData.payload.repository.name,
-        owner: payloadData.payload.repository.owner.login,
-        assignees: [payloadData.payload.pull_request.user.login],
-      });
-    });
   });
 });
