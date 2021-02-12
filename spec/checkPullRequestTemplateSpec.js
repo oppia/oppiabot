@@ -473,4 +473,33 @@ describe('Pull Request Template', () => {
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
+
+  describe('when pull request head and base are from the same repository.' +
+  'and inter/karma checks aren\'t checked.', () => {
+    beforeEach(async () => {
+      payloadData.payload.pull_request.head.repo.full_name = 'oppia/oppia';
+      payloadData.payload.pull_request.body = bodyWithExplanation;
+      payloadData.payload.pull_request.maintainer_can_modify = false;
+      await robot.receive(payloadData);
+    });
+
+    it('should check the template', () => {
+      expect(checkPullRequestTemplateModule.checkTemplate).toHaveBeenCalled();
+    });
+
+    it('should not comment about maintainers checklist', () => {
+      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        issue_number: payloadData.payload.pull_request.number,
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        body:
+          'Hi @' +
+          payloadData.payload.pull_request.user.login +
+          ', the karma and linter checklist has not been checked, ' +
+          'please make sure to run the frontend tests and lint tests ' +
+          'before pushing. Thanks!',
+      });
+    });
+  });
 });
