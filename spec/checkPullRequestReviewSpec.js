@@ -1522,20 +1522,23 @@ describe('Pull Request Review Module', () => {
         });
       }
     );
+
     describe(
       'when author asks some question/comment and asks reviewer to ptal',
       () => {
         const initialCommentBody = commentPayloadData.payload.comment.body;
         beforeAll(() => {
           commentPayloadData.payload.comment.body =
-          'Hi I have a doubt @reviewer PTAL';
+          '{{Question/comment}} @{{reviewer_username}} PTAL';
         });
         beforeEach(async () => {
           await robot.receive(commentPayloadData);
         });
+
         it('should not comment on pull request', () => {
           expect(github.issues.createComment).not.toHaveBeenCalled();
         });
+        
         afterAll(() => {
           commentPayloadData.payload.comment.body = initialCommentBody;
         });
