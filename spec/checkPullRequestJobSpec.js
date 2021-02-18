@@ -451,6 +451,7 @@ describe('Pull Request Job Spec', () => {
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callThrough();
+    spyOn(checkPullRequestJobModule, 'checkForNewCronJob').and.callThrough();
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
       checkPullRequestLabelsModule, 'checkChangelogLabel'
@@ -481,6 +482,10 @@ describe('Pull Request Job Spec', () => {
 
     it('should check for jobs', () => {
       expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+    });
+
+    it('should check for cron jobs', () => {
+      expect(checkPullRequestJobModule.checkForNewCronJob).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -564,6 +569,10 @@ describe('Pull Request Job Spec', () => {
 
     it('should check for jobs', () => {
       expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+    });
+
+    it('should check for cron jobs', () => {
+      expect(checkPullRequestJobModule.checkForNewCronJob).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -651,6 +660,10 @@ describe('Pull Request Job Spec', () => {
       expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
     });
 
+    it('should check for cron jobs', () => {
+      expect(checkPullRequestJobModule.checkForNewCronJob).toHaveBeenCalled();
+    });
+
     it('should get modified files', () => {
       expect(github.pulls.listFiles).toHaveBeenCalled();
     });
@@ -723,6 +736,10 @@ describe('Pull Request Job Spec', () => {
 
     it('should check for jobs', () => {
       expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+    });
+
+    it('should check for cron jobs', () => {
+      expect(checkPullRequestJobModule.checkForNewCronJob).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -809,6 +826,10 @@ describe('Pull Request Job Spec', () => {
       expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
     });
 
+    it('should check for cron jobs', () => {
+      expect(checkPullRequestJobModule.checkForNewCronJob).toHaveBeenCalled();
+    });
+
     it('should get modified files', () => {
       expect(github.pulls.listFiles).toHaveBeenCalled();
     });
@@ -843,6 +864,10 @@ describe('Pull Request Job Spec', () => {
       expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
     });
 
+    it('should check for cron jobs', () => {
+      expect(checkPullRequestJobModule.checkForNewCronJob).toHaveBeenCalled();
+    });
+
     it('should not get modified files', () => {
       expect(github.pulls.listFiles).toHaveBeenCalled();
     });
@@ -870,6 +895,10 @@ describe('Pull Request Job Spec', () => {
       expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
     });
 
+    it('should check for cron jobs', () => {
+      expect(checkPullRequestJobModule.checkForNewCronJob).toHaveBeenCalled();
+    });
+
     it('should get modified files', () => {
       expect(github.pulls.listFiles).toHaveBeenCalled();
     });
@@ -895,6 +924,10 @@ describe('Pull Request Job Spec', () => {
 
     it('should check for jobs', () => {
       expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+    });
+
+    it('should check for cron jobs', () => {
+      expect(checkPullRequestJobModule.checkForNewCronJob).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -925,6 +958,10 @@ describe('Pull Request Job Spec', () => {
 
     it('should check for jobs', () => {
       expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+    });
+
+    it('should check for cron jobs', () => {
+      expect(checkPullRequestJobModule.checkForNewCronJob).toHaveBeenCalled();
     });
 
     it('should not get modified files', () => {

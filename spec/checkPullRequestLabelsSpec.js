@@ -74,6 +74,7 @@ describe('Pull Request Label Check', () => {
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(checkPullRequestJobModule, 'checkForNewCronJob').and.callFake(() => { });
     spyOn(
       checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'
     ).and.callFake(() => { });

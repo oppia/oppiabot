@@ -205,6 +205,7 @@ describe('Pull Request Template', () => {
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(checkPullRequestJobModule, 'checkForNewCronJob').and.callFake(() => { });
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
       checkPullRequestLabelsModule,

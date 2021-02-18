@@ -58,6 +58,8 @@ describe('Pull Request Branch Check', () => {
       .and.callFake(() => { });
     spyOn(checkPullRequestJobModule, 'checkForNewJob')
       .and.callFake(() => { });
+    spyOn(checkPullRequestJobModule, 'checkForNewCronJob')
+      .and.callFake(() => { });
     spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')
       .and.callFake(() => { });
     spyOn(checkPullRequestTemplateModule, 'checkTemplate')

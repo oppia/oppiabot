@@ -102,6 +102,7 @@ describe('Stale build check', () => {
       .and
       .callFake(() => { });
     spyOn(jobCheckModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(checkPullRequestJobModule, 'checkForNewCronJob').and.callFake(() => { });
     spyOn(criticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')
       .and
       .callFake(() => { });
