@@ -110,6 +110,26 @@ const checksWhitelist = {
     [issuesAssignedEvent]: [],
     [pushEvent]: []
   },
+  'oppiabot-test-repo': {
+    [openEvent]: [
+      claCheck,
+      changelogCheck,
+      codeOwnerCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+      prTemplateCheck
+    ],
+    [reopenEvent]: [
+      changelogCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+      prTemplateCheck
+    ],
+  }
 };
 
 const blacklistedAuthors = ['translatewiki'];
