@@ -249,7 +249,7 @@ describe('Pull Request Template', () => {
   const incompleteProofOfChangesSection =
     'The proof that changes are correct has not been provided, ' +
     'please make sure to upload a image/video showing that the changes ' +
-    'are correct. ';
+    'are correct.';
 
   const absentProofOfChangesSection =
     'The body of this PR is missing the proof that changes ' +
