@@ -58,7 +58,7 @@ describe('Pull Request Label Check', () => {
         checkCollaborator: jasmine.createSpy('checkCollaborator').and.callFake(
           (params) => {
             if (params.username === 'newuser') {
-              return { status: 404 };
+              throw new Error('User is not a collaborator.');
             }
             return { status: 204 };
           })
