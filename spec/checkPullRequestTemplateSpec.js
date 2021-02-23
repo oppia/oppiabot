@@ -232,15 +232,14 @@ describe('Pull Request Template', () => {
     'The body of this PR is missing the overview section, please ' +
     'update it to include the overview.';
 
-  const incompleteChecklistSection1 =
-    'The karma and linter checklist has not been checked, ' +
-    'please make sure to run the frontend tests and lint tests before ' +
-    'pushing. ';
-
-  const incompleteChecklistSection2 =
-    'The allow edits from maintainers checklist needs to ' +
-    'be ticked so that maintainers can rerun failed tests. ' +
-    'Endeavour to add this by ticking on the check box. ';
+  const incompleteChecklistSection = {
+    karma_linter: 'The karma and linter checklist has not been checked, ' +
+      'please make sure to run the frontend tests and lint tests before ' +
+      'pushing. ',
+    maintainers_text: 'The allow edits from maintainers checklist needs to ' +
+      'be ticked so that maintainers can rerun failed tests. ' +
+      'Endeavour to add this by ticking on the check box. '
+  };
 
   const absentChecklistSection =
     'The body of this PR is missing the checklist section, please ' +
@@ -249,7 +248,9 @@ describe('Pull Request Template', () => {
   const incompleteProofOfChangesSection =
     'The proof that changes are correct has not been provided, ' +
     'please make sure to upload a image/video showing that the changes ' +
-    'are correct.';
+    'are correct. Or include a sentence saying "No proof of changes' +
+    'needed because" and the reason why proof of changes ' +
+    'cannot be provided.';
 
   const absentProofOfChangesSection =
     'The body of this PR is missing the proof that changes ' +
@@ -326,8 +327,9 @@ describe('Pull Request Template', () => {
           payloadData.payload.pull_request.user.login +
           ', can you complete the following:' + '\n' +
           '1. ' + incompleteOverviewSection + '\n' +
-          '2. ' + incompleteChecklistSection1 + incompleteChecklistSection2 +
-          '\n' + '3. ' + incompleteProofOfChangesSection + '\nThanks!',
+          '2. ' + incompleteChecklistSection.karma_linter +
+          incompleteChecklistSection.maintainers_text + '\n' +
+          '3. ' + incompleteProofOfChangesSection + '\nThanks!',
       });
     });
 
@@ -364,8 +366,9 @@ describe('Pull Request Template', () => {
           payloadData.payload.pull_request.user.login +
           ', can you complete the following:' + '\n' +
           '1. ' + absentOverviewSection + '\n' +
-          '2. ' + incompleteChecklistSection1 + incompleteChecklistSection2 +
-          '\n' + '3. ' + incompleteProofOfChangesSection + '\nThanks!',
+          '2. ' + incompleteChecklistSection.karma_linter +
+          incompleteChecklistSection.maintainers_text + '\n' +
+          '3. ' + incompleteProofOfChangesSection + '\nThanks!',
       });
     });
 
@@ -441,8 +444,9 @@ describe('Pull Request Template', () => {
         payloadData.payload.pull_request.user.login +
         ', can you complete the following:' + '\n' +
         '1. ' + incompleteOverviewSection + '\n' +
-        '2. ' + incompleteChecklistSection1 + incompleteChecklistSection2 +
-        '\n' + '3. ' + absentProofOfChangesSection + '\nThanks!',
+        '2. ' + incompleteChecklistSection.karma_linter +
+        incompleteChecklistSection.maintainers_text + '\n' +
+        '3. ' + absentProofOfChangesSection + '\nThanks!',
       });
     });
 
@@ -478,8 +482,9 @@ describe('Pull Request Template', () => {
         'Hi @' +
         payloadData.payload.pull_request.user.login +
         ', can you complete the following:' + '\n' +
-        '1. ' + incompleteChecklistSection1 + incompleteChecklistSection2 +
-        '\n' + '2. ' + incompleteProofOfChangesSection + '\nThanks!',
+        '1. ' + incompleteChecklistSection.karma_linter +
+        incompleteChecklistSection.maintainers_text + '\n' +
+        '2. ' + incompleteProofOfChangesSection + '\nThanks!',
       });
     });
 
@@ -516,7 +521,7 @@ describe('Pull Request Template', () => {
           'Hi @' +
           payloadData.payload.pull_request.user.login +
           ', can you complete the following:' + '\n' +
-          '1. ' + incompleteChecklistSection2 +
+          '1. ' + incompleteChecklistSection.maintainers_text +
           '\n' + '2. ' + incompleteProofOfChangesSection + '\nThanks!',
         });
       });
@@ -651,7 +656,7 @@ describe('Pull Request Template', () => {
         'Hi @' +
         payloadData.payload.pull_request.user.login +
         ', can you complete the following:' + '\n' +
-        '1. ' + incompleteChecklistSection1 +
+        '1. ' + incompleteChecklistSection.karma_linter +
         '\n' + '2. ' + incompleteProofOfChangesSection + '\nThanks!',
       });
     });
