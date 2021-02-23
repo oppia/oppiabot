@@ -2380,6 +2380,7 @@ const assigneeCheck = 'assignee-check';
 const mergeConflictCheck = 'merge-conflict-check';
 const allMergeConflictCheck = 'all-merge-conflict-check';
 const jobCheck = 'job-check';
+const cronJobCheck = 'cron-job-check';
 const modelCheck = 'model-check';
 const issuesLabelCheck = 'issues-labeled-check';
 const issuesAssignedCheck = 'issues-assigned-check';
@@ -2408,6 +2409,7 @@ const checksWhitelist = {
       branchCheck,
       wipCheck,
       jobCheck,
+      cronJobCheck,
       modelCheck,
       prTemplateCheck
     ],
