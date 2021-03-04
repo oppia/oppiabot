@@ -248,7 +248,7 @@ describe('Pull Request Template', () => {
   const incompleteProofOfChangesSection =
     'The proof that changes are correct has not been provided, ' +
     'please make sure to upload a image/video showing that the changes ' +
-    'are correct. Or include a sentence saying "No proof of changes' +
+    'are correct. Or include a sentence saying "No proof of changes ' +
     'needed because" and the reason why proof of changes ' +
     'cannot be provided.';
 
@@ -661,4 +661,50 @@ describe('Pull Request Template', () => {
       });
     });
   });
+
+  describe('testing generateComment function with bodyWithInvalidTemplate',
+    () => {
+      it('should return comment for bodyWithInvalidTemplate', () => {
+        const payloadData = JSON.parse(
+          JSON.stringify(require('../fixtures/pullRequestPayload.json'))
+        );
+        payloadData.payload.pull_request.body = bodyWithInvalidTemplate;
+        payloadData.payload.pull_request.maintainer_can_modify = false;
+        spyOn(checkPullRequestTemplateModule, 'generateComment')
+          .and.callThrough();
+        expect(
+          checkPullRequestTemplateModule.generateComment(
+            payloadData.payload.pull_request)).toBe(
+          'Hi @' +
+          payloadData.payload.pull_request.user.login +
+          ', can you complete the following:' + '\n' +
+          '1. ' + incompleteOverviewSection + '\n' +
+          '2. ' + incompleteChecklistSection.karma_linter +
+          incompleteChecklistSection.maintainers_text + '\n' +
+          '3. ' + incompleteProofOfChangesSection + '\nThanks!');
+      });
+    });
+
+  describe('testing generateComment function with bodyWithInvalidTemplate',
+    () => {
+      it('should return comment for bodyWithInvalidTemplate', () => {
+        const payloadData = JSON.parse(
+          JSON.stringify(require('../fixtures/pullRequestPayload.json'))
+        );
+        payloadData.payload.pull_request.body = bodyWithNoOverview;
+        payloadData.payload.pull_request.maintainer_can_modify = false;
+        spyOn(checkPullRequestTemplateModule, 'generateComment')
+          .and.callThrough();
+        expect(
+          checkPullRequestTemplateModule.generateComment(
+            payloadData.payload.pull_request)).toBe(
+          'Hi @' +
+          payloadData.payload.pull_request.user.login +
+          ', can you complete the following:' + '\n' +
+          '1. ' + absentOverviewSection + '\n' +
+          '2. ' + incompleteChecklistSection.karma_linter +
+          incompleteChecklistSection.maintainers_text + '\n' +
+          '3. ' + incompleteProofOfChangesSection + '\nThanks!');
+      });
+    });
 });
