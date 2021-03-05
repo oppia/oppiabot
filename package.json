@@ -60,7 +60,8 @@
   "lint-staged": {
     "actions/**/*.+(js|json)": [
       "npm run update-actions-build"
-    ]
+    ],
+    "*.js": "npm run lint"
   },
   "husky": {
     "hooks": {
