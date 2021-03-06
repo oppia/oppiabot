@@ -104,9 +104,10 @@ describe('Pull Request Branch Check', () => {
         const commentBody =
           'Hi @' +
           author +
-          ', PRs made from develop branch are not allowed. Also branches ' +
-          'whose name is prefixed with develop, release or test are not '+
-          'allowed. So this PR is being closed. Please make your changes ' +
+          ', PRs made from develop branch are not allowed. Also PRs made from' +
+          ' develop branch or from a branch whose name is prefixed with '+
+          'develop, release or test are not allowed. '+
+          'So this PR is being closed. Please make your changes ' +
           'in another branch and send in the PR. To learn more about ' +
           'contributing to Oppia, take a look at our ' +
           wiki +
@@ -153,7 +154,7 @@ describe('Pull Request Branch Check', () => {
           author +
           ', PRs made from a branch whose name is prefixed with develop ' +
           'are not allowed. Also PRs made from develop branch or from a branch '+
-          'whose name is prefixed with release or test are not '+
+          'whose name is prefixed with develop, release or test are not '+
           'allowed. So this PR is being closed. Please make your changes ' +
           'in another branch and send in the PR. To learn more about ' +
           'contributing to Oppia, take a look at our ' +
@@ -202,7 +203,7 @@ describe('Pull Request Branch Check', () => {
           author +
           ', PRs made from a branch whose name is prefixed with release ' +
           'are not allowed. Also PRs made from develop branch or from a branch '+
-          'whose name is prefixed with develop or test are not '+
+          'whose name is prefixed with develop, release or test are not '+
           'allowed. So this PR is being closed. Please make your changes ' +
           'in another branch and send in the PR. To learn more about ' +
           'contributing to Oppia, take a look at our ' +
@@ -250,7 +251,7 @@ describe('Pull Request Branch Check', () => {
           author +
           ', PRs made from a branch whose name is prefixed with test ' +
           'are not allowed. Also PRs made from develop branch or from a branch '+
-          'whose name is prefixed with develop or release are not '+
+          'whose name is prefixed with develop, release or test are not '+
           'allowed. So this PR is being closed. Please make your changes ' +
           'in another branch and send in the PR. To learn more about ' +
           'contributing to Oppia, take a look at our ' +
