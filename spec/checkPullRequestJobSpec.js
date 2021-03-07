@@ -511,7 +511,7 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @seanlip, @vojtechjelinek, PTAL at this PR, ' +
+          'Hi @vojtechjelinek, PTAL at this PR, ' +
           'it adds a new one off job. The name of the job is ' +
           jobNameLink + '.' + newLineFeed + 'Also @' + author +
           ', please add the new job ' + 'to the ' + jobRegistryLink +
@@ -531,7 +531,7 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        assignees: ['seanlip', 'vojtechjelinek']
+        assignees: ['vojtechjelinek']
       });
     });
 
@@ -595,7 +595,7 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @seanlip, @vojtechjelinek, PTAL at this PR, ' +
+          'Hi @vojtechjelinek, PTAL at this PR, ' +
           'it adds new one off jobs. The jobs are ' + firstJobNameLink +
           ', ' + secondJobNameLink + '.' + newLineFeed + 'Also @' +
           author + ', please add the new jobs ' + 'to the ' +
@@ -615,7 +615,7 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        assignees: ['seanlip', 'vojtechjelinek']
+        assignees: ['vojtechjelinek']
       });
     });
 
@@ -673,7 +673,7 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-            'Hi @seanlip, @vojtechjelinek, PTAL at this PR, ' +
+            'Hi @vojtechjelinek, PTAL at this PR, ' +
             'it adds a new one off job. The name of the job is ' +
             jobNameLink + '.' + newLineFeed + 'Also @' + author +
             ', please make sure to fill in the ' + formText +
@@ -692,7 +692,7 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        assignees: ['seanlip', 'vojtechjelinek']
+        assignees: ['vojtechjelinek']
       });
     });
 
@@ -753,7 +753,7 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @seanlip, @vojtechjelinek, PTAL at this PR, ' +
+          'Hi @vojtechjelinek, PTAL at this PR, ' +
           'it adds a new one off job. The name of the job is ' + jobNameLink +
           '.' + newLineFeed + 'Also @' + author + ', please add the new job ' +
           'to the ' + jobRegistryLink + ' and please make sure to fill ' +
@@ -772,7 +772,7 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        assignees: ['seanlip', 'vojtechjelinek']
+        assignees: ['vojtechjelinek']
       });
     });
 
