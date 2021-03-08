@@ -61,7 +61,7 @@
     "actions/**/*.+(js|json)": [
       "npm run update-actions-build"
     ],
-    "*.+(js/json) ./spec/**/*.+(js/json) ./lib/*.js ./fixtures/*.js actions/**/*.+(js|json) ": "npm run lint"
+    "*.+(js/json) ./spec/**/*.+(js/json) ./lib/*.js ./fixtures/*.js actions/**/*.+(js|json)": "npm run lint"
   },
   "husky": {
     "hooks": {
