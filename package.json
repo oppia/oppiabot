@@ -7,7 +7,7 @@
   "repository": "https://github.com/oppiabot/oppiabot.git",
   "scripts": {
     "dev": "nodemon",
-    "lint": "eslint *.js *.json ./spec/**/*.json ./lib/*.js ./fixtures/*.json actions/**/*.js --fix",
+    "lint": "eslint *.js ./spec/*.js ./lib/*.js actions/**/*.js --fix",
     "start": "probot run ./index.js",
     "test": "node ./spec/setup.js",
     "actions-build": "ncc build actions/main.js -o actions_build",
@@ -64,7 +64,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged "
+      "pre-commit": "lint-staged && npm run lint"
     }
   }
 }
