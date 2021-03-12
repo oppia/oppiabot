@@ -171,7 +171,9 @@ describe('Utility module tests', () => {
     firstItemLink = 'OppiabotTestActivitiesModel'.link(
       firstModelFileObj.blob_url
     );
-    let secondItemLink = 'OppiabotSnapshotContentModel, OppiabotSnapshotTestingModel'.link(
+    let secondItemLink = 
+    'OppiabotSnapshotContentModel, OppiabotSnapshotTestingModel'
+    .link(
       secondModelFileObj.blob_url
     );
     expect(result).toBe(
