@@ -58,7 +58,7 @@ describe('Pull Request Label Check', () => {
         checkCollaborator: jasmine.createSpy('checkCollaborator').and.callFake(
           (params) => {
             if (params.username === 'newuser') {
-              return { status: 404 };
+              throw new Error('User is not a collaborator.');
             }
             return { status: 204 };
           })
@@ -622,6 +622,13 @@ describe('Pull Request Label Check', () => {
         spyOn(
           checkPullRequestLabelModule, 'checkChangelogLabel'
         ).and.callThrough();
+
+        github.pulls = {
+          get: jasmine
+            .createSpy('get')
+            .and.resolveTo({data: payloadData.payload.pull_request}),
+        };
+
         await robot.receive(payloadData);
 
         expect(
@@ -654,7 +661,7 @@ describe('Pull Request Label Check', () => {
           issue_number: payloadData.payload.number,
           assignees: ['reviewer']
         });
-      }
+      }, 10000
     );
 
     it(
@@ -678,6 +685,13 @@ describe('Pull Request Label Check', () => {
         spyOn(
           checkPullRequestLabelModule, 'checkChangelogLabel'
         ).and.callThrough();
+
+        github.pulls = {
+          get: jasmine
+            .createSpy('get')
+            .and.resolveTo({data: payloadData.payload.pull_request}),
+        };
+
         await robot.receive(payloadData);
 
         expect(
@@ -710,7 +724,7 @@ describe('Pull Request Label Check', () => {
           issue_number: payloadData.payload.number,
           assignees: ['reviewer1', 'reviewer2']
         });
-      }
+      }, 10000
     );
 
 

@@ -253,7 +253,7 @@ describe('check for new code owner', () => {
           owner: payloadData.payload.repository.owner.login,
           issue_number: payloadData.payload.pull_request.number,
           body:
-            'Hi @kevintab95, this PR adds a new code owner, @testuser to ' +
+            'Hi @DubeySandeep, this PR adds a new code owner, @testuser to ' +
             '/core/templates/pages/signup-page/. Please make sure the changes' +
             ' are verified by the previous codeowner(s) of the file. Thanks!'
         });
@@ -292,7 +292,7 @@ describe('check for new code owner', () => {
           owner: payloadData.payload.repository.owner.login,
           issue_number: payloadData.payload.pull_request.number,
           body:
-            'Hi @reviewer, this PR adds a new code owner, @testuser to ' +
+            'Hi @DubeySandeep, this PR adds a new code owner, @testuser to ' +
             '/core/templates/pages/signup-page/. Please make sure the changes' +
             ' are verified by the previous codeowner(s) of the file. Thanks!'
         });
@@ -342,7 +342,7 @@ describe('check for new code owner', () => {
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @kevintab95, this PR adds the following new code owners ' +
+          'Hi @DubeySandeep, this PR adds the following new code owners ' +
           '@testuser, @testuser2 to the following files ' +
           '/core/templates/pages/signup-page/, ' +
           '/core/templates/pages/signdown-page/' +

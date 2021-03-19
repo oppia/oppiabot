@@ -6,7 +6,8 @@
     "ankita240796",
     "DubeySandeep",
     "BenHenning",
-    "kevintab95"
+    "kevintab95",
+    "seanlip"
   ],
   "goodFirstIssue": [
     "U8NWXD",
@@ -22,6 +23,7 @@
     "aks681",
     "srijanreddy98"
   ],
+  "codeOwnerFileReviewer":"DubeySandeep",
   "teamLeads": {
     "onboardingTeam": "DubeySandeep",
     "releaseTeam": "vojtechjelinek",
@@ -30,5 +32,5 @@
   "oppiaMaintainers": "oppia/core-maintainers",
   "oppiaReleaseCoordinators": "oppia/release-coordinators",
   "oppiaDevWorkflowTeam": "oppia/dev-workflow-team",
-  "serverJobAdmins": ["seanlip", "vojtechjelinek"]
+  "serverJobAdmins": ["vojtechjelinek"]
 }
