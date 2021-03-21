@@ -44,6 +44,10 @@ const whitelistedAccounts = (process.env.WHITELISTED_ACCOUNTS || '')
   .toLowerCase()
   .split(',');
 
+const PrWithMoreThan24Hrs = require(
+  './lib/pingCodeOwnerAfter24hrs'
+);
+
 /**
  * This function checks the event type and accordingly invokes the right
  * checks.
@@ -146,6 +150,7 @@ const runChecks = async (context, checkEvent) => {
               periodicCheckModule.ensureAllPullRequestsAreAssigned(context),
               periodicCheckModule.ensureAllIssuesHaveProjects(context),
               staleBuildModule.checkAndTagPRsWithOldBuilds(context),
+              periodicCheckModule.PrWithMoreThan24Hrs(context),
             ]);
             break;
           case constants.respondToReviewCheck:
@@ -192,7 +197,8 @@ const checkAuthor = (context) => {
 module.exports = (oppiabot) => {
   scheduler.createScheduler(oppiabot, {
     delay: !process.env.DISABLE_DELAY, // delay is enabled on first run
-    interval: 24 * 60 * 60 * 1000, // 1 day
+    //* Changing Temporarily to 10000sec in order to get better testing
+    interval: 10000, // 1 day
   });
 
   oppiabot.on('schedule.repository', async (context) => {
