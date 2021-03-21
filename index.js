@@ -24,6 +24,7 @@ const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
 const checkWipModule = require('./lib/checkWipDraftPR');
 const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
+const checkCronJobModule = require('./lib/checkNewCronJobs');
 const checkPullRequestTemplateModule = require(
   './lib/checkPullRequestTemplate'
 );
@@ -94,6 +95,9 @@ const runChecks = async (context, checkEvent) => {
             break;
           case constants.jobCheck:
             callable.push(checkPullRequestJobModule.checkForNewJob(context));
+            break;
+          case constants.cronJobCheck:
+            this.call.push(checkCronJobModule.checkForNewCronJob(context));
             break;
           case constants.modelCheck:
             callable.push(
