@@ -793,9 +793,12 @@ describe('Pull Request Label Check', () => {
           color: '00FF00',
         };
 
+        const assigned = [{ login: 'SAEb-ai' }];
         payloadData.payload.action = 'reopened';
-
+        payloadData.payload.pull_request.user.login = 'SAEb-ai';
         payloadData.payload.pull_request.labels = [label];
+        payloadData.payload.pull_request.assignees = assigned;
+        payloadData.payload.pull_request.review_comments = 0;
         spyOn(
           checkPullRequestLabelModule, 'checkChangelogLabel'
         ).and.callThrough();
@@ -804,7 +807,7 @@ describe('Pull Request Label Check', () => {
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
-        expect(github.issues.createComment).not.toHaveBeenCalled();
+        expect(github.issues.createComment).toHaveBeenCalled();
       });
   });
 });
