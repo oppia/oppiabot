@@ -1535,10 +1535,10 @@ describe('Pull Request Review Module', () => {
           await robot.receive(commentPayloadData);
         });
 
-        it('should not comment on pull request', () => {
+        it('should not trigger on comment with PTAL template', () => {
           expect(github.issues.createComment).not.toHaveBeenCalled();
         });
-        
+
         afterAll(() => {
           commentPayloadData.payload.comment.body = initialCommentBody;
         });
