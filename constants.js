@@ -114,6 +114,44 @@ const checksWhitelist = {
     [issuesAssignedEvent]: [],
     [pushEvent]: []
   },
+  'oppia-bot-test-repo-': {
+    [openEvent]: [
+      claCheck,
+      changelogCheck,
+      codeOwnerCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+      prTemplateCheck
+    ],
+    [reopenEvent]: [
+      changelogCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+      prTemplateCheck
+    ],
+    [PRLabelEvent]: [assigneeCheck, prLabelCheck],
+    [synchronizeEvent]: [
+      mergeConflictCheck,
+      jobCheck,
+      modelCheck,
+      codeOwnerCheck,
+      oldBuildLabelCheck
+    ],
+    [closeEvent]: [allMergeConflictCheck, updateWithDevelopCheck],
+    [editEvent]: [wipCheck],
+    [issuesLabelEvent]: [issuesLabelCheck],
+    [issuesAssignedEvent]: [issuesAssignedCheck],
+    [unlabelEvent]: [datastoreLabelCheck],
+    [pushEvent]: [forcePushCheck],
+    [periodicCheckEvent]: [periodicCheck],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
+    [checkCompletedEvent]: [ciFailureCheck],
+    [issueCommentCreatedEvent]: [respondToReviewCheck]
+  }
 };
 
 const blacklistedAuthors = ['translatewiki'];

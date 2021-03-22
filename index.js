@@ -97,7 +97,7 @@ const runChecks = async (context, checkEvent) => {
             callable.push(checkPullRequestJobModule.checkForNewJob(context));
             break;
           case constants.cronJobCheck:
-            this.call.push(checkCronJobModule.checkForNewCronJob(context));
+            callable.push(checkCronJobModule.checkForNewCronJob(context));
             break;
           case constants.modelCheck:
             callable.push(
