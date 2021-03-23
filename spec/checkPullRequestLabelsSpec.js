@@ -23,6 +23,8 @@ const checkCriticalPullRequestModule =
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
 const scheduler = require('../lib/scheduler');
+const utilityModule = require('../lib/utils');
+const reviewPayloadData = require('../fixtures/pullRequestReview.json');
 
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
@@ -793,12 +795,9 @@ describe('Pull Request Label Check', () => {
           color: '00FF00',
         };
 
-        const assigned = [{ login: 'username' }];
         payloadData.payload.action = 'reopened';
-        payloadData.payload.pull_request.user.login = 'username';
+
         payloadData.payload.pull_request.labels = [label];
-        payloadData.payload.pull_request.assignees = assigned;
-        payloadData.payload.pull_request.review_comments = 0;
         spyOn(
           checkPullRequestLabelModule, 'checkChangelogLabel'
         ).and.callThrough();
@@ -807,7 +806,51 @@ describe('Pull Request Label Check', () => {
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.issues.createComment).not.toHaveBeenCalled();
       });
+  });
+
+  describe('when valid changelog added with no review comments', () => {
+    beforeEach(async () => {
+      spyOn(
+        utilityModule, 'doesPullRequestHaveChangesRequested'
+        ).and.resolveTo(false);
+      github.search = {
+        issuesAndPullRequests: jasmine
+          .createSpy('issuesAndPullRequests')
+          .and.resolveTo({
+            data: {
+              items: [reviewPayloadData.payload.pull_request],
+            },
+          }),
+      };
+      await robot.receive(reviewPayloadData);
+    });
+    it('should unassign the author', async () => {
+      spyOn(
+        checkPullRequestLabelModule, 'checkChangelogLabel'
+      ).and.callThrough();
+      await robot.receive(payloadData);
+
+      expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
+      expect(
+        checkPullRequestLabelModule.checkChangelogLabel
+      ).toHaveBeenCalled();
+      expect(github.issues.removeAssignees).toHaveBeenCalled();
+      expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        issue_number: payloadData.payload.number,
+        assignees: ['username']
+      });
+      const params = {
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        number: payloadData.payload.number,
+        body: 'Unassigning @username since the changelog label was added.'
+      };
+      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalled(params);
+    });
   });
 });
