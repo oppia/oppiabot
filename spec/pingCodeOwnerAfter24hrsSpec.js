@@ -45,6 +45,15 @@ describe('Should Ping after 24 hrs without review in PR', ()=> {
         createComment: jasmine.createSpy('createComment').and.returnValue({}),
         update: jasmine.createSpy('update').and.resolveTo({}),
       },
+      search: {
+        issuesAndPullRequests: jasmine
+          .createSpy('issuesAndPullRequests')
+          .and.resolveTo({
+            data: {
+              items: [pullRequestPayload.payload.pull_request],
+            },
+          }),
+      },
     };
 
     robot = createProbot({
@@ -68,27 +77,22 @@ describe('Should Ping after 24 hrs without review in PR', ()=> {
     });
 
     it('should comment on pull request', ()=>{
-      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not close the pull request', () => {
       expect(github.issues.update).not.toHaveBeenCalled();
-    });
-
-    it('should check for force push', () => {
-      expect(checkBranchPushModule.handleForcePush).toHaveBeenCalled();
     });
   });
 
   describe('Less than 24 Hrs', ()=>{
     // In this beforeEach is not Required as we don't require any
     // data before Performing these tests
+    beforeEach(async () => {
+      await robot.receive(pushPayload);
+    });
     it('should not close the pull request', () => {
       expect(github.issues.update).not.toHaveBeenCalled();
-    });
-
-    it('should check for force push', () => {
-      expect(checkBranchPushModule.handleForcePush).toHaveBeenCalled();
     });
 
     it('should not comment on pull request', ()=>{
