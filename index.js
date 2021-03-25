@@ -66,100 +66,100 @@ const runChecks = async (context, checkEvent) => {
       for (var i = 0; i < checkList.length; i++) {
         switch (checkList[i]) {
           case constants.claCheck:
-            // callable.push(apiForSheetsModule.checkClaStatus(context));
+            callable.push(apiForSheetsModule.checkClaStatus(context));
             break;
           case constants.changelogCheck:
-            // callable.push(
-            //   checkPullRequestLabelsModule.checkChangelogLabel(context)
-            // );
+            callable.push(
+              checkPullRequestLabelsModule.checkChangelogLabel(context)
+            );
             break;
           case constants.branchCheck:
-            // callable.push(checkPullRequestBranchModule.checkBranch(context));
+            callable.push(checkPullRequestBranchModule.checkBranch(context));
             break;
           case constants.wipCheck:
-            // callable.push(checkWipModule.checkWIP(context));
+            callable.push(checkWipModule.checkWIP(context));
             break;
           case constants.assigneeCheck:
-          // callable.push(checkPullRequestLabelsModule.checkAssignee(context));
+            callable.push(checkPullRequestLabelsModule.checkAssignee(context));
             break;
           case constants.mergeConflictCheck:
-            // callable.push(
-            //   checkMergeConflictsModule.checkMergeConflictsInPullRequest(
-            //     context, context.payload.pull_request
-            //   )
-            // );
+            callable.push(
+              checkMergeConflictsModule.checkMergeConflictsInPullRequest(
+                context, context.payload.pull_request
+              )
+            );
             break;
           case constants.allMergeConflictCheck:
-            // callable.push(
-            //   checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(
-            //     context
-            //   )
-            // );
+            callable.push(
+              checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(
+                context
+              )
+            );
             break;
           case constants.jobCheck:
-            //callable.push(checkPullRequestJobModule.checkForNewJob(context));
+            callable.push(checkPullRequestJobModule.checkForNewJob(context));
             break;
           case constants.modelCheck:
-            // callable.push(
-            //   checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer(
-            //     context
-            //   )
-            // );
+            callable.push(
+              checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer(
+                context
+              )
+            );
             break;
           case constants.issuesAssignedCheck:
-            //callable.push(checkIssueAssigneeModule.checkAssignees(context));
+            callable.push(checkIssueAssigneeModule.checkAssignees(context));
             break;
           case constants.prLabelCheck:
-            // callable.push(
-            //   checkPullRequestLabelsModule.checkForIssueLabel(context)
-            // );
+            callable.push(
+              checkPullRequestLabelsModule.checkForIssueLabel(context)
+            );
             break;
           case constants.datastoreLabelCheck:
-            // callable.push(
-            //   checkPullRequestLabelsModule.checkCriticalLabel(context)
-            // );
+            callable.push(
+              checkPullRequestLabelsModule.checkCriticalLabel(context)
+            );
             break;
           case constants.forcePushCheck:
-            // callable.push(checkBranchPushModule.handleForcePush(context));
+            callable.push(checkBranchPushModule.handleForcePush(context));
             break;
           case constants.prTemplateCheck:
-            // callable.push(
-            //   checkPullRequestTemplateModule.checkTemplate(context)
-            // );
+            callable.push(
+              checkPullRequestTemplateModule.checkTemplate(context)
+            );
             break;
           case constants.pullRequestReviewCheck:
-            // callable.push(
-            //   checkPullRequestReviewModule.handlePullRequestReview(context)
-            // );
+            callable.push(
+              checkPullRequestReviewModule.handlePullRequestReview(context)
+            );
             break;
           case constants.codeOwnerCheck:
-            // callable.push(newCodeOwnerModule.checkForNewCodeowner(context));
+            callable.push(newCodeOwnerModule.checkForNewCodeowner(context));
             break;
           case constants.ciFailureCheck:
-            // callable.push(ciCheckModule.handleFailure(context));
+            callable.push(ciCheckModule.handleFailure(context));
             break;
           case constants.updateWithDevelopCheck:
-            // callable.push(
-          //   checkMergeConflictsModule.pingAllPullRequestsToMergeFromDevelop(
-            //     context
-            //   )
-            // );
+            callable.push(
+              checkMergeConflictsModule.pingAllPullRequestsToMergeFromDevelop(
+                context
+              )
+            );
             break;
           case constants.periodicCheck:
             callable.push(
-            // periodicCheckModule.ensureAllPullRequestsAreAssigned(context),
-            // periodicCheckModule.ensureAllIssuesHaveProjects(context),
-            // staleBuildModule.checkAndTagPRsWithOldBuilds(context),
+              periodicCheckModule.ensureAllPullRequestsAreAssigned(context),
+              periodicCheckModule.ensureAllIssuesHaveProjects(context),
+              staleBuildModule.checkAndTagPRsWithOldBuilds(context),
               checkAfter24Hrs.checkAnyReviewRequiredPr(context),
             );
             break;
           case constants.respondToReviewCheck:
-            // callable.push(
-            //   checkPullRequestReviewModule.handleResponseToReview(context)
-            // );
+            callable.push(
+              checkPullRequestReviewModule.handleResponseToReview(context)
+            );
             break;
           case constants.oldBuildLabelCheck:
-            // callable.push(staleBuildModule.removeOldBuildLabel(context));
+            callable.push(staleBuildModule.removeOldBuildLabel(context));
             break;
         }
       }
@@ -198,7 +198,7 @@ module.exports = (oppiabot) => {
   scheduler.createScheduler(oppiabot, {
     delay: !process.env.DISABLE_DELAY, // delay is enabled on first run
     //* Changing Temporarily to 10000sec in order to get better testing
-    interval: 50000, // 1 day
+    interval: 24 * 60 * 60 * 1000, // 1 day
   });
 
   oppiabot.on('schedule.repository', async (context) => {
