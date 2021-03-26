@@ -197,7 +197,6 @@ const checkAuthor = (context) => {
 module.exports = (oppiabot) => {
   scheduler.createScheduler(oppiabot, {
     delay: !process.env.DISABLE_DELAY, // delay is enabled on first run
-    //* Changing Temporarily to 10000sec in order to get better testing
     interval: 24 * 60 * 60 * 1000, // 1 day
   });
 
