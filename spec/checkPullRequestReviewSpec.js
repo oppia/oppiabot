@@ -1,11 +1,11 @@
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
-//
+
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
+
 //      http://www.apache.org/licenses/LICENSE-2.0
-//
+
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,6 +65,7 @@ describe('Pull Request Review Module', () => {
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(pullRequestReviewModule, 'handlePullRequestReview').and.callThrough();
     spyOn(pullRequestReviewModule, 'handleResponseToReview').and.callThrough();
+    spyOn(pullRequestReviewModule, 'handleLabels').and.callThrough();
     spyOn(utilityModule, 'sleep').and.callFake(() => { });
   });
 
@@ -76,7 +77,24 @@ describe('Pull Request Review Module', () => {
         }),
       };
     });
+    describe('LGTM Label is there', ()=>{
+      beforeEach(async () => {
+        await robot.receive(reviewPayloadData);
+      });
+      it('should check type of review', () => {
+        expect(
+          pullRequestReviewModule.handlePullRequestReview
+        ).toHaveBeenCalled();
+      });
 
+      it('Should comment on PR', ()=>{
+        expect(github.issues.createComment)
+          .toHaveBeenCalled();
+      });
+      it('Should Remove the LGTM Label', ()=>{
+        expect(github.issues.removeLabels).toHaveBeenCalled();
+      });
+    });
     describe('when reviewer is assigned and pr author is not assigned', () => {
       beforeEach(async () => {
         await robot.receive(reviewPayloadData);
