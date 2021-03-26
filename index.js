@@ -35,6 +35,7 @@ const checkPullRequestReviewModule = require('./lib/checkPullRequestReview');
 const newCodeOwnerModule = require('./lib/checkForNewCodeowner');
 const ciCheckModule = require('./lib/ciChecks');
 const periodicCheckModule = require('./lib/periodicChecks');
+const issueAndPrAuthorClaCheck = require('./lib/alertOnBoardingTeam');
 
 const constants = require('./constants');
 const checkIssueAssigneeModule = require('./lib/checkIssueAssignee');
@@ -156,6 +157,10 @@ const runChecks = async (context, checkEvent) => {
           case constants.oldBuildLabelCheck:
             callable.push(staleBuildModule.removeOldBuildLabel(context));
             break;
+          case constants.issueAndPrAuthorClaCheck:
+            callable.push(issueAndPrAuthorClaCheck.alertOnboardingTeam(context)
+            );
+            break;
         }
       }
       // Wait for all checks to resolve or reject.
@@ -227,7 +232,6 @@ module.exports = (oppiabot) => {
       await runChecks(context, constants.openEvent);
     }
   });
-
   oppiabot.on('pull_request.reopened', async (context) => {
     if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
       await runChecks(context, constants.reopenEvent);

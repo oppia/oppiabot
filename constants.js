@@ -51,6 +51,7 @@ const ciFailureCheck = 'ci-failure-check';
 const updateWithDevelopCheck = 'update-with-develop-check';
 const respondToReviewCheck = 'respond-to-review-check';
 const oldBuildLabelCheck = 'old-build-label-check';
+const issueAndPrAuthorClaCheck = 'issue-and-pr-author-cla-check';
 
 const checksWhitelist = {
   'oppia-android': {
@@ -62,7 +63,7 @@ const checksWhitelist = {
     [editEvent]: [],
     [issuesLabelEvent]: []
   },
-  'oppia': {
+  oppia: {
     [openEvent]: [
       claCheck,
       changelogCheck,
@@ -100,7 +101,7 @@ const checksWhitelist = {
     [checkCompletedEvent]: [ciFailureCheck],
     [issueCommentCreatedEvent]: [respondToReviewCheck]
   },
-  'oppiabot': {
+  oppiabot: {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
     [synchronizeEvent]: [mergeConflictCheck],
@@ -110,6 +111,45 @@ const checksWhitelist = {
     [issuesAssignedEvent]: [],
     [pushEvent]: []
   },
+  sahaayak: {
+    [openEvent]: [
+      issueAndPrAuthorClaCheck,
+      claCheck,
+      changelogCheck,
+      codeOwnerCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+      prTemplateCheck
+    ],
+    [reopenEvent]: [
+      changelogCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+      prTemplateCheck
+    ],
+    [PRLabelEvent]: [assigneeCheck, prLabelCheck],
+    [synchronizeEvent]: [
+      mergeConflictCheck,
+      jobCheck,
+      modelCheck,
+      codeOwnerCheck,
+      oldBuildLabelCheck
+    ],
+    [closeEvent]: [allMergeConflictCheck, updateWithDevelopCheck],
+    [editEvent]: [wipCheck],
+    [issuesLabelEvent]: [issuesLabelCheck],
+    [issuesAssignedEvent]: [issuesAssignedCheck],
+    [unlabelEvent]: [datastoreLabelCheck],
+    [pushEvent]: [forcePushCheck],
+    [periodicCheckEvent]: [periodicCheck],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
+    [checkCompletedEvent]: [ciFailureCheck],
+    [issueCommentCreatedEvent]: [respondToReviewCheck]
+  }
 };
 
 const blacklistedAuthors = ['translatewiki'];
@@ -151,6 +191,7 @@ module.exports.ciFailureCheck = ciFailureCheck;
 module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
 module.exports.respondToReviewCheck = respondToReviewCheck;
 module.exports.oldBuildLabelCheck = oldBuildLabelCheck;
+module.exports.issueAndPrAuthorClaCheck = issueAndPrAuthorClaCheck;
 
 module.exports.getBlacklistedAuthors = function() {
   return blacklistedAuthors;
