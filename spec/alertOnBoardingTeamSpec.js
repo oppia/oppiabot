@@ -186,7 +186,7 @@ describe('Alert onboarding team for author who do not signed CLA module', ()=>{
 
     it('should not be called for the payload', () => {
       expect(alertOnBoardingTeamModule.alertOnboardingTeam).not
-      .toHaveBeenCalled();
+        .toHaveBeenCalled();
     });
 
     it('should not comment on pullrequest', () => {
