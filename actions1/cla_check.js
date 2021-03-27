@@ -54,9 +54,9 @@ const claCheck = async (auth) => {
         console.log('Checking if ', PR_AUTHOR, ' has signed the CLA');
         const isSign = flatRows.includes(PR_AUTHOR);
         if (!isSign) {
-          comment = ('Hi! ' +
+          comment = ('Hi! @' +
               PR_AUTHOR +
-              'Welcome to Oppia! Please could you ' +
+              ' Welcome to Oppia! Please could you ' +
               'follow the instructions ' + LINK_RESULT +
               " to get started? You'll need to do " +
               'this before we can accept your PR. Thanks!');
