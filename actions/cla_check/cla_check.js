@@ -27,9 +27,6 @@ const SPREADSHEET_ID = '1naQC7iEfnro5iOjTFEn7iPCxNMPaPa4YnIddjT5CTM8';
 const RANGE = 'Usernames';
 const PR_AUTHOR = context.payload.pull_request.user.login;
 const PR_NUMBER = context.payload.pull_request.number;
-const LINK_RESULT = (
-  'https://github.com/oppia/oppia/wiki' +
-  '/Contributing-code-to-Oppia#setting-things-up');
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -48,7 +45,11 @@ const authorize = function() {
 };
 
 const generateOutput = (hasClaSigned) => {
-  console.log('🚀gp201 ~ generateOutput ~ hasClaSigned', hasClaSigned);
+  const LINK_RESULT = 'here'.link(
+    'https://github.com/oppia/oppia/wiki/' +
+    'Contributing-code-to-Oppia#setting-things-up'
+  );
+
   let comment = '';
   let cmd = '';
   if (!hasClaSigned) {
@@ -101,7 +102,10 @@ const checkSheet = (auth) => {
 };
 
 const claCheck = () =>{
+  // Authorize a client with the loaded credentials.
   const auth = authorize();
+
+  // Call the sheets API with the authorized client.
   checkSheet(auth);
 };
 claCheck();
