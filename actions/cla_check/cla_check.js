@@ -83,7 +83,7 @@ const claCheck = async () =>{
 
   const auth = authorize();
 
-  checkSheet(auth).then((hasClaSigned) => {
+  await checkSheet(auth).then((hasClaSigned) => {
     console.log('🚀gp201 ~ checkSheet ~ hasClaSigned', hasClaSigned);
     if (!hasClaSigned) {
       comment = ('Hi! @' +
