@@ -12,15 +12,13 @@ const PR_AUTHOR = context.payload.pull_request.user.login;
 //   'https://github.com/oppia/oppia/wiki' +
 //   '/Contributing-code-to-Oppia#setting-things-up')
 
-authorize(claCheck);
-
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
  * given callback function.
  * @param {Object} CREDENTIALS The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-var authorize = function(callback) {
+const authorize = function(callback) {
   const { clinetSecret, clinetId, redirectUris } = CREDENTIALS.web;
   const oAuth2Client = new google.auth.OAuth2(
     clinetId,
@@ -35,7 +33,7 @@ var authorize = function(callback) {
  * Prints the names and majors of students in a sample spreadsheet:
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
-var claCheck = function(auth) {
+const claCheck = function(auth) {
   const sheets = google.sheets({ version: 'v4', auth });
   sheets.spreadsheets.values.get(
     {
@@ -60,3 +58,5 @@ var claCheck = function(auth) {
     }
   );
 };
+
+authorize(claCheck);
