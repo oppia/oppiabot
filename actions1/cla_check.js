@@ -1,5 +1,23 @@
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview File to check if PR Author has signed the CLA
+ */
+
 const core = require('@actions/core');
-const { context, GitHub } = require('@actions/github');
+const { context } = require('@actions/github');
 const { execSync } = require('child_process');
 const { google } = require('googleapis');
 
@@ -11,15 +29,14 @@ const PR_AUTHOR = context.payload.pull_request.user.login;
 const PR_NUMBER = context.payload.pull_request.number;
 const LINK_RESULT = (
   'https://github.com/oppia/oppia/wiki' +
-  '/Contributing-code-to-Oppia#setting-things-up')
+  '/Contributing-code-to-Oppia#setting-things-up');
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
- * given callback function.
- * @param {Object} CREDENTIALS The authorization client credentials.
- * @param {function} callback The callback to call with the authorized client.
+ * given claCheck function.
  */
 const authorize = function(callback) {
+  // eslint-disable-next-line camelcase
   const { client_secret, client_id, redirect_uris } = CREDENTIALS.installed;
   const oAuth2Client = new google.auth.OAuth2(
     client_id,
@@ -27,12 +44,12 @@ const authorize = function(callback) {
     redirect_uris[0]
   );
   oAuth2Client.setCredentials(JSON.parse(SHEETS_TOKEN));
-  callback(oAuth2Client);
+  claCheck(oAuth2Client);
 };
 
 
 /**
- * Prints the names and majors of students in a sample spreadsheet:
+ * Checks if the PR Author has signed the CLA Sheet.
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
 const claCheck = async (auth) => {
@@ -76,4 +93,4 @@ const claCheck = async (auth) => {
   );
 };
 
-authorize(claCheck);
+authorize();
