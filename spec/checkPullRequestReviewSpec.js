@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -77,10 +77,12 @@ describe('Pull Request Review Module', () => {
         }),
       };
     });
+
     describe('LGTM Label is there', ()=>{
       beforeEach(async () => {
         await robot.receive(reviewPayloadData);
       });
+
       it('should check type of review', () => {
         expect(
           pullRequestReviewModule.handlePullRequestReview
@@ -91,6 +93,7 @@ describe('Pull Request Review Module', () => {
         expect(github.issues.createComment)
           .toHaveBeenCalled();
       });
+
       it('Should Remove the LGTM Label', ()=>{
         expect(github.issues.removeLabels).toHaveBeenCalled();
       });
