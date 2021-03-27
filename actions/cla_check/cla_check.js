@@ -52,7 +52,7 @@ const authorize = function() {
  * Checks if the PR Author has signed the CLA Sheet.
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
-const checkSheet = async (auth) => {
+const checkSheet = (auth) => {
   const sheets = google.sheets({ version: 'v4', auth });
   sheets.spreadsheets.values.get(
     {
@@ -82,24 +82,24 @@ const claCheck = async () =>{
   let cmd = '';
 
   const auth = authorize();
-  const hasClaSigned = checkSheet(auth);
-  console.log('🚀gp201 ~ claCheck ~ hasClaSigned', hasClaSigned);
 
-  if (!hasClaSigned) {
-    comment = ('Hi! @' +
-        PR_AUTHOR +
-        ' Welcome to Oppia! Please could you ' +
-        'follow the instructions ' + LINK_RESULT +
-        " to get started? You'll need to do " +
-        'this before we can accept your PR. Thanks!');
-    cmd = 'gh pr comment ' + PR_NUMBER + ' --body "' + comment + '"';
-    console.log(cmd);
-    try {
-      execSync(cmd);
-      core.setFailed(PR_AUTHOR + ' has not signed the CLA');
-    } catch (err){
-      core.setFailed('Comment failed: ' + err);
+  checkSheet(auth).then((hasClaSigned) => {
+    if (!hasClaSigned) {
+      comment = ('Hi! @' +
+          PR_AUTHOR +
+          ' Welcome to Oppia! Please could you ' +
+          'follow the instructions ' + LINK_RESULT +
+          " to get started? You'll need to do " +
+          'this before we can accept your PR. Thanks!');
+      cmd = 'gh pr comment ' + PR_NUMBER + ' --body "' + comment + '"';
+      console.log(cmd);
+      try {
+        execSync(cmd);
+        core.setFailed(PR_AUTHOR + ' has not signed the CLA');
+      } catch (err){
+        core.setFailed('Comment failed: ' + err);
+      }
     }
-  }
+  });
 };
 claCheck();
