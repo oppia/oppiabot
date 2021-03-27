@@ -52,7 +52,7 @@ const authorize = function() {
  * Checks if the PR Author has signed the CLA Sheet.
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
-const checkSheet = (auth) => {
+const checkSheet = async (auth) => {
   const sheets = google.sheets({ version: 'v4', auth });
   sheets.spreadsheets.values.get(
     {
@@ -83,7 +83,7 @@ const claCheck = () =>{
   let cmd = '';
 
   const auth = authorize();
-  const hasClaSigned = checkSheet(auth);
+  const hasClaSigned = await(checkSheet(auth));
   console.log('🚀gp201 ~ claCheck ~ hasClaSigned', hasClaSigned);
   if (!hasClaSigned) {
     comment = ('Hi! @' +
