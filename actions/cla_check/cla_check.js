@@ -23,7 +23,7 @@ const { google } = require('googleapis');
 
 const SHEETS_TOKEN = process.env.SHEETS_TOKEN;
 const CREDENTIALS = JSON.parse(process.env.SHEETS_CRED);
-const SPREADSHEET_ID = '1naQC7iEfnro5iOjTFEn7iPCxNMPaPa4YnIddjT5CTM8';
+const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 const RANGE = 'Usernames';
 const PR_AUTHOR = context.payload.pull_request.user.login;
 const PR_NUMBER = context.payload.pull_request.number;
