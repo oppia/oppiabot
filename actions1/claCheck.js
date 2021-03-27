@@ -11,7 +11,7 @@ const PR_AUTHOR = context.payload.pull_request.user.login;
 const PR_NUMBER = context.payload.pull_request.number;
 const LINK_RESULT = (
   'https://github.com/oppia/oppia/wiki' +
-  '/Contributing-code-to-Oppia#setting-things-up')
+  '/Contributing-code-to-Oppia#setting-things-up');
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
