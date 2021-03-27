@@ -19,11 +19,11 @@ const PR_AUTHOR = context.payload.pull_request.user.login;
  * @param {function} callback The callback to call with the authorized client.
  */
 const authorize = function(callback) {
-  const { clinetSecret, clinetId, redirectUris } = CREDENTIALS.web;
+  const { clinetSecret, clinetId, redirect_uris } = CREDENTIALS.web;
   const oAuth2Client = new google.auth.OAuth2(
     clinetId,
     clinetSecret,
-    redirectUris[0]
+    redirect_uris[0]
   );
   oAuth2Client.setCredentials(JSON.parse(SHEETS_TOKEN));
   callback(oAuth2Client);
