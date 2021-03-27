@@ -35,7 +35,7 @@ const authorize = function(callback) {
  * Prints the names and majors of students in a sample spreadsheet:
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
-const claCheck = function(auth) {
+const claCheck = async (auth) => {
   const sheets = google.sheets({ version: 'v4', auth });
   sheets.spreadsheets.values.get(
     {
