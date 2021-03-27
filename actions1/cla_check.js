@@ -19,7 +19,7 @@ const PR_AUTHOR = context.payload.pull_request.user.login;
  * @param {function} callback The callback to call with the authorized client.
  */
 const authorize = function(callback) {
-  const { client_secret, client_id, redirect_uris } = CREDENTIALS.web;
+  const { client_secret, client_id, redirect_uris } = CREDENTIALS.installed;
   const oAuth2Client = new google.auth.OAuth2(
     client_id,
     client_secret,
@@ -42,7 +42,7 @@ const claCheck = function(auth) {
     },
     (err, res) => {
       if (err) {
-        return console.log('The API returned an error: ' + err);
+        core.setFailed('The API returned an error: ' + err);
       }
       const rows = res.data.values;
       const flatRows = [].concat.apply([], rows);
