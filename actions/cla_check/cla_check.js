@@ -67,6 +67,8 @@ const checkSheet = async (auth) => {
       const flatRows = [].concat.apply([], rows);
       if (rows.length) {
         console.log('Checking if ', PR_AUTHOR, ' has signed the CLA');
+        console.log('🚀gp201 ~ checkSheet ~ flatRows.includes(PR_AUTHOR)',
+          flatRows.includes(PR_AUTHOR));
         return flatRows.includes(PR_AUTHOR);
       } else {
         core.setFailed('No data found.');
@@ -81,6 +83,7 @@ const claCheck = async () =>{
 
   const auth = authorize();
   const hasClaSigned = checkSheet(auth);
+  console.log('🚀gp201 ~ claCheck ~ hasClaSigned', hasClaSigned);
 
   if (!hasClaSigned) {
     comment = ('Hi! @' +
