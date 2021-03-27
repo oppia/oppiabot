@@ -52,10 +52,7 @@ const authorize = function() {
  * Checks if the PR Author has signed the CLA Sheet.
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
-const claCheck = async () => {
-  let comment = '';
-  let cmd = '';
-  const auth = authorize();
+const checkSheet = async (auth) => {
   const sheets = google.sheets({ version: 'v4', auth });
   sheets.spreadsheets.values.get(
     {
@@ -70,23 +67,7 @@ const claCheck = async () => {
       const flatRows = [].concat.apply([], rows);
       if (rows.length) {
         console.log('Checking if ', PR_AUTHOR, ' has signed the CLA');
-        const hasClaSigned = flatRows.includes(PR_AUTHOR);
-        if (!hasClaSigned) {
-          comment = ('Hi! @' +
-              PR_AUTHOR +
-              ' Welcome to Oppia! Please could you ' +
-              'follow the instructions ' + LINK_RESULT +
-              " to get started? You'll need to do " +
-              'this before we can accept your PR. Thanks!');
-          cmd = 'gh pr comment ' + PR_NUMBER + ' --body "' + comment + '"';
-          console.log(cmd);
-          try {
-            execSync(cmd);
-            core.setFailed(PR_AUTHOR + ' has not signed the CLA');
-          } catch (err){
-            core.setFailed('Comment failed: ' + err);
-          }
-        }
+        return flatRows.includes(PR_AUTHOR);
       } else {
         core.setFailed('No data found.');
       }
@@ -94,4 +75,28 @@ const claCheck = async () => {
   );
 };
 
+const claCheck = async () =>{
+  let comment = '';
+  let cmd = '';
+
+  const auth = authorize();
+  const hasClaSigned = checkSheet(auth);
+
+  if (!hasClaSigned) {
+    comment = ('Hi! @' +
+        PR_AUTHOR +
+        ' Welcome to Oppia! Please could you ' +
+        'follow the instructions ' + LINK_RESULT +
+        " to get started? You'll need to do " +
+        'this before we can accept your PR. Thanks!');
+    cmd = 'gh pr comment ' + PR_NUMBER + ' --body "' + comment + '"';
+    console.log(cmd);
+    try {
+      execSync(cmd);
+      core.setFailed(PR_AUTHOR + ' has not signed the CLA');
+    } catch (err){
+      core.setFailed('Comment failed: ' + err);
+    }
+  }
+};
 claCheck();
