@@ -12,7 +12,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install Dependecies
-        run:  npm install googleapis@39
+        run: |
+          npm install googleapis@39
+          npm run actions-build
+          git add actions_build/index.js
       - name: CLA check
         uses: ./actions1
         id: hello
