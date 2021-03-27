@@ -1,5 +1,5 @@
-name: 'CLA Check'
-description: 'Checks if PR author has signed the CLA Sheet.'
+name: 'Hello World'
+description: 'Greet someone and record the time'
 runs:
   using: 'node12'
   main: 'build.js'

@@ -16,14 +16,8 @@
  * @fileoverview Automatically compile github actions when
  * actions related file changes.
  */
-const core = require('@actions/core');
 const { authorizeAndCheck } = require('./claCheck');
 const { execSync } = require('child_process');
-
-core.info(
-  'Installing Dependencies'
-);
-
 // Install the google api library.
 execSync('npm install googleapis@39');
 // Build the actions file.
