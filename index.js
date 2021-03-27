@@ -35,7 +35,9 @@ const checkPullRequestReviewModule = require('./lib/checkPullRequestReview');
 const newCodeOwnerModule = require('./lib/checkForNewCodeowner');
 const ciCheckModule = require('./lib/ciChecks');
 const periodicCheckModule = require('./lib/periodicChecks');
-
+const checkAfter24Hrs = require(
+  './lib/pingCodeOwner'
+);
 const constants = require('./constants');
 const checkIssueAssigneeModule = require('./lib/checkIssueAssignee');
 const staleBuildModule = require('./lib/staleBuildChecks');
@@ -44,9 +46,7 @@ const whitelistedAccounts = (process.env.WHITELISTED_ACCOUNTS || '')
   .toLowerCase()
   .split(',');
 
-const checkAfter24Hrs = require(
-  './lib/pingCodeOwnerAfter24hrs'
-);
+
 
 /**
  * This function checks the event type and accordingly invokes the right

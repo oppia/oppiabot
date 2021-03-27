@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ const oppiaBot = require('../index');
 const scheduler = require('../lib/scheduler');
 const pushPayload = require('../fixtures/push.json');
 const pullRequestPayload = require('../fixtures/pullRequestPayload.json');
-const pingCodeOwnerModule = require('../lib/pingCodeOwnerAfter24hrs');
+const pingCodeOwnerModule = require('../lib/pingCodeOwner');
 const checkBranchPushModule = require('../lib/checkBranchPush');
 
 describe('Should Ping after 24 hrs without review in PR', ()=> {
@@ -100,3 +100,4 @@ describe('Should Ping after 24 hrs without review in PR', ()=> {
     });
   });
 });
+
