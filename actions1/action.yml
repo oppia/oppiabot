@@ -2,4 +2,4 @@ name: 'Hello World'
 description: 'Greet someone and record the time'
 runs:
   using: 'node12'
-  main: 'cla_check.js'
+  main: 'build.js'
