@@ -78,12 +78,13 @@ const checkSheet = (auth) => {
   );
 };
 
-const claCheck = async () =>{
+const claCheck = () =>{
   let comment = '';
   let cmd = '';
 
   const auth = authorize();
   const hasClaSigned = checkSheet(auth);
+  console.log('🚀gp201 ~ claCheck ~ hasClaSigned', hasClaSigned);
   if (!hasClaSigned) {
     comment = ('Hi! @' +
         PR_AUTHOR +
