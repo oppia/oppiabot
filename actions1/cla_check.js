@@ -60,10 +60,14 @@ const claCheck = async (auth) => {
               'follow the instructions ' + LINK_RESULT +
               " to get started? You'll need to do " +
               'this before we can accept your PR. Thanks!');
-          cmd = 'gh pr comment ' + PR_NUMBER + ' --body ' + comment;
+          cmd = 'gh pr comment ' + PR_NUMBER + ' --body "' + comment + '"';
           console.log(cmd);
-          execSync(cmd);
-          core.setFailed(PR_AUTHOR + ' has not signed the CLA');
+          try {
+            execSync(cmd);
+            core.setFailed(PR_AUTHOR + ' has not signed the CLA');
+          } catch (err){
+            core.setFailed('Comment failed: ' + err);
+          }
         }
       } else {
         console.log('No data found.');
