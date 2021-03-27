@@ -53,6 +53,7 @@ const respondToReviewCheck = 'respond-to-review-check';
 const oldBuildLabelCheck = 'old-build-label-check';
 
 const checksWhitelist = {
+  // eslint-disable-next-line quote-props
   'oppia-android': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
@@ -62,6 +63,7 @@ const checksWhitelist = {
     [editEvent]: [],
     [issuesLabelEvent]: []
   },
+  // eslint-disable-next-line quote-props
   'oppia': {
     [openEvent]: [
       claCheck,
@@ -100,6 +102,7 @@ const checksWhitelist = {
     [checkCompletedEvent]: [ciFailureCheck],
     [issueCommentCreatedEvent]: [respondToReviewCheck]
   },
+  // eslint-disable-next-line quote-props
   'oppiabot': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
