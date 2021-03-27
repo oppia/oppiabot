@@ -1,0 +1,5 @@
+name: 'CLA Check'
+description: 'checks if the PR author has signed the CLA Sheet.'
+runs:
+  using: 'node12'
+  main: 'cla_check.js'
