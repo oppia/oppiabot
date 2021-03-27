@@ -13,4 +13,4 @@
 ## Checklist
 - [ ] I have successfully deployed my own instance of Oppiabot.
   - You can find instructions for doing this [here](https://github.com/oppia/oppiabot/wiki/Deploying-your-own-instance-of-the-oppiabot).
-- [ ] I have manually tested all the changes made in this PR following the [manual tests matrix](https://github.com/oppia/oppiabot/wiki/Manual-Tests-Matrix).
+- [ ] I have manually tested algsvsdvvsl the changes made in this PR following the [manual tests matrix](https://github.com/oppia/oppiabot/wiki/Manual-Tests-Matrix).
