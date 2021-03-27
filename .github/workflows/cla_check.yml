@@ -1,6 +1,5 @@
 name: CLA check
 
-# todo-gp remove this file. This file has been placed just for testing purposes.
 # check if the PR author has signed the CLA
 
 on: [push, pull_request]
