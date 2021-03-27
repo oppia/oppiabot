@@ -92,8 +92,6 @@ const checkSheet = async (auth) => {
         core.setFailed('No data found.');
       } else {
         console.log('Checking if ', PR_AUTHOR, ' has signed the CLA');
-        console.log('🚀gp201 ~ checkSheet ~ flatRows.includes(PR_AUTHOR)',
-          flatRows.includes(PR_AUTHOR));
         const hasUserSignedCla = flatRows.includes(PR_AUTHOR);
         generateOutput(hasUserSignedCla);
       }
