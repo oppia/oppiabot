@@ -52,9 +52,9 @@ const authorize = function() {
  * Checks if the PR Author has signed the CLA Sheet.
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
-const checkSheet = (auth) => {
+const checkSheet = async (auth) => {
   const sheets = google.sheets({ version: 'v4', auth });
-  sheets.spreadsheets.values.get(
+  await sheets.spreadsheets.values.get(
     {
       spreadsheetId: SPREADSHEET_ID,
       range: RANGE,
@@ -69,7 +69,7 @@ const checkSheet = (auth) => {
         console.log('Checking if ', PR_AUTHOR, ' has signed the CLA');
         console.log('🚀gp201 ~ checkSheet ~ flatRows.includes(PR_AUTHOR)',
           flatRows.includes(PR_AUTHOR));
-        return flatRows.includes(PR_AUTHOR);
+        return Promise.resolve(flatRows.includes(PR_AUTHOR));
       } else {
         core.setFailed('No data found.');
       }
