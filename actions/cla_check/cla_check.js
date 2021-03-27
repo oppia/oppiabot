@@ -75,14 +75,14 @@ const generateOutput = (hasClaSigned) => {
  * Checks if the PR Author has signed the CLA Sheet.
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
-const checkSheet = (auth) => {
+const checkSheet = async (auth) => {
   const sheets = google.sheets({ version: 'v4', auth });
-  sheets.spreadsheets.values.get(
+  await sheets.spreadsheets.values.get(
     {
       spreadsheetId: SPREADSHEET_ID,
       range: RANGE,
     },
-    (err, res) => {
+    async (err, res) => {
       if (err) {
         core.setFailed('The API returned an error: ' + err);
       }
