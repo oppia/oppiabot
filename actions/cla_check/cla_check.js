@@ -82,23 +82,24 @@ const claCheck = async () =>{
   let cmd = '';
 
   const auth = authorize();
-  const hasClaSigned = await checkSheet(auth);
-  console.log('🚀gp201 ~ checkSheet ~ hasClaSigned', hasClaSigned);
-  if (!hasClaSigned) {
-    comment = ('Hi! @' +
-        PR_AUTHOR +
-        ' Welcome to Oppia! Please could you ' +
-        'follow the instructions ' + LINK_RESULT +
-        " to get started? You'll need to do " +
-        'this before we can accept your PR. Thanks!');
-    cmd = 'gh pr comment ' + PR_NUMBER + ' --body "' + comment + '"';
-    console.log(cmd);
-    try {
-      execSync(cmd);
-      core.setFailed(PR_AUTHOR + ' has not signed the CLA');
-    } catch (err){
-      core.setFailed('Comment failed: ' + err);
+  checkSheet(auth).then((hasClaSigned) => {
+    console.log('🚀gp201 ~ checkSheet ~ hasClaSigned', hasClaSigned);
+    if (!hasClaSigned) {
+      comment = ('Hi! @' +
+          PR_AUTHOR +
+          ' Welcome to Oppia! Please could you ' +
+          'follow the instructions ' + LINK_RESULT +
+          " to get started? You'll need to do " +
+          'this before we can accept your PR. Thanks!');
+      cmd = 'gh pr comment ' + PR_NUMBER + ' --body "' + comment + '"';
+      console.log(cmd);
+      try {
+        execSync(cmd);
+        core.setFailed(PR_AUTHOR + ' has not signed the CLA');
+      } catch (err){
+        core.setFailed('Comment failed: ' + err);
+      }
     }
-  }
+  });
 };
 claCheck();
