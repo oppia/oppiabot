@@ -7,6 +7,8 @@ const CREDENTIALS = JSON.parse(process.env.SHEETS_CRED);
 const SPREADSHEET_ID = '1naQC7iEfnro5iOjTFEn7iPCxNMPaPa4YnIddjT5CTM8';
 const RANGE = 'Usernames';
 const PR_AUTHOR = context.payload.pull_request.user.login;
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const octokit = new GitHub(GITHUB_TOKEN);
 // const PR_NUMBER = context.payload.pull_request.number;
 // const LINK_RESULT = (
 //   'https://github.com/oppia/oppia/wiki' +
@@ -50,6 +52,19 @@ const claCheck = function(auth) {
         console.log('Checking if ', PR_AUTHOR, ' has signed the CLA');
         const isSign = flatRows.includes(PR_AUTHOR);
         if (!isSign) {
+          await octokit.issues.createComment(
+            {
+              body: 'Hi! ' +
+              PR_AUTHOR +
+              'Welcome to Oppia! Please could you ' +
+              'follow the instructions ' +
+              " to get started? You'll need to do " +
+              'this before we can accept your PR. Thanks!',
+              issue_number: issueNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            }
+          );
           core.setFailed(PR_AUTHOR + ' has not signed the CLA');
         }
       } else {

@@ -6,7 +6,7 @@ name: CLA check
 on: [push, pull_request]
 
 jobs:
-  hello_world_job:
+  cla_check_job:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,7 +18,6 @@ jobs:
           git add actions_build/index.js
       - name: CLA check
         uses: ./actions1
-        id: hello
         env:
           SHEETS_TOKEN: ${{ secrets.SHEETS_TOKEN }}
           SHEETS_CRED: ${{ secrets.SHEETS_CRED }}
