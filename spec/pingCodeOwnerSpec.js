@@ -19,7 +19,7 @@ const oppiaBot = require('../index');
 const scheduler = require('../lib/scheduler');
 const pushPayload = require('../fixtures/push.json');
 const pullRequestPayload = require('../fixtures/pullRequestPayload.json');
-const pingCodeOwnerModule = require('../lib/pingCodeOwner');
+const pingCodeOwnerModule = require('../lib/checkPullRequestReview');
 const checkBranchPushModule = require('../lib/checkBranchPush');
 
 describe('Should Ping after 24 hrs without review in PR', ()=> {
@@ -64,7 +64,8 @@ describe('Should Ping after 24 hrs without review in PR', ()=> {
     );
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-    spyOn(pingCodeOwnerModule, 'checkAnyReviewRequiredPr').and.callThrough();
+    spyOn(pingCodeOwnerModule.checkAnyReviewRequiredPr,
+      'checkAnyReviewRequiredPr').and.callThrough();
   });
 
   //BeforeEach Ends here
