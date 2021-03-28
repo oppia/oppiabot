@@ -65,7 +65,7 @@ const runChecks = async (context, checkEvent) => {
           case constants.claCheck:
             callable.push(apiForSheetsModule.checkClaStatus(context));
             break;
-          case constants.changelogCheck:
+         /* case constants.changelogCheck:
             callable.push(
               checkPullRequestLabelsModule.checkChangelogLabel(context)
             );
@@ -156,11 +156,7 @@ const runChecks = async (context, checkEvent) => {
             break;
           case constants.oldBuildLabelCheck:
             callable.push(staleBuildModule.removeOldBuildLabel(context));
-            break;
-          case constants.issueAndPrAuthorClaCheck:
-            callable.push(issueAndPrAuthorClaCheck.alertOnboardingTeam(context)
-            );
-            break;
+            break;*/
         }
       }
       // Wait for all checks to resolve or reject.

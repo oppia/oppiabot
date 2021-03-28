@@ -51,7 +51,6 @@ const ciFailureCheck = 'ci-failure-check';
 const updateWithDevelopCheck = 'update-with-develop-check';
 const respondToReviewCheck = 'respond-to-review-check';
 const oldBuildLabelCheck = 'old-build-label-check';
-const issueAndPrAuthorClaCheck = 'issue-and-pr-author-cla-check';
 
 const checksWhitelist = {
   'oppia-android': {
@@ -110,7 +109,45 @@ const checksWhitelist = {
     [issuesLabelEvent]: [],
     [issuesAssignedEvent]: [],
     [pushEvent]: []
-  }
+  },
+  'sahaayak': {
+    [openEvent]: [
+      claCheck,
+      changelogCheck,
+      codeOwnerCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+      prTemplateCheck
+    ],
+    [reopenEvent]: [
+      changelogCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+      prTemplateCheck
+    ],
+    [PRLabelEvent]: [assigneeCheck, prLabelCheck],
+    [synchronizeEvent]: [
+      mergeConflictCheck,
+      jobCheck,
+      modelCheck,
+      codeOwnerCheck,
+      oldBuildLabelCheck
+    ],
+    [closeEvent]: [allMergeConflictCheck, updateWithDevelopCheck],
+    [editEvent]: [wipCheck],
+    [issuesLabelEvent]: [issuesLabelCheck],
+    [issuesAssignedEvent]: [issuesAssignedCheck],
+    [unlabelEvent]: [datastoreLabelCheck],
+    [pushEvent]: [forcePushCheck],
+    [periodicCheckEvent]: [periodicCheck],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
+    [checkCompletedEvent]: [ciFailureCheck],
+    [issueCommentCreatedEvent]: [respondToReviewCheck]
+  },
 };
 
 const blacklistedAuthors = ['translatewiki'];
