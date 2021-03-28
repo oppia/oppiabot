@@ -975,9 +975,10 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should check if author can merge', () => {
-          expect(github.orgs.checkMembership).toHaveBeenCalled();
-          expect(github.orgs.checkMembership).toHaveBeenCalledWith({
-            org: reviewPayloadData.payload.organization.login,
+          expect(github.repos.getCollaboratorPermissionLevel).toHaveBeenCalled();
+          expect(github.repos.getCollaboratorPermissionLevel).toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
             username: reviewPayloadData.payload.pull_request.user.login,
           });
         });
