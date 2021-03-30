@@ -63,7 +63,7 @@ const checksWhitelist = {
     [editEvent]: [],
     [issuesLabelEvent]: []
   },
-  oppia: {
+  'oppia': {
     [openEvent]: [
       claCheck,
       changelogCheck,
@@ -103,7 +103,7 @@ const checksWhitelist = {
     [issueCommentCreatedEvent]: [respondToReviewCheck],
     [ensureAllIssuesHaveProject]: [ensureAllIssuesHaveProject]
   },
-  oppiabot: {
+  'oppiabot': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
     [synchronizeEvent]: [mergeConflictCheck],
