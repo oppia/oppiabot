@@ -122,6 +122,7 @@ const checksWhitelist = {
       branchCheck,
       wipCheck,
       jobCheck,
+      cronJobCheck,
       modelCheck,
       prTemplateCheck
     ],
@@ -130,6 +131,7 @@ const checksWhitelist = {
       branchCheck,
       wipCheck,
       jobCheck,
+      cronJobCheck,
       modelCheck,
       prTemplateCheck
     ],
@@ -137,6 +139,7 @@ const checksWhitelist = {
     [synchronizeEvent]: [
       mergeConflictCheck,
       jobCheck,
+      cronJobCheck,
       modelCheck,
       codeOwnerCheck,
       oldBuildLabelCheck
