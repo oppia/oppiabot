@@ -38,6 +38,7 @@ module.exports = {
               await issueLabelsModule.checkLabels();
               break;
             case constants.claCheckGithubAction:
+              console.log('CLA Check triggered');
               await claCheckGithubActionModule.claCheckGithubAction();
               break;
           }

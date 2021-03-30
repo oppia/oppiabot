@@ -101,8 +101,10 @@ const checkSheet = async (auth) => {
 
 const claCheckGithubAction = () =>{
   // Authorize a client with the loaded credentials.
+  console.log('Auth');
   const auth = authorize();
 
+  console.log('Sheet check!');
   // Call the sheets API with the authorized client.
   checkSheet(auth);
 };
