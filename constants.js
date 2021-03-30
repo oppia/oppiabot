@@ -115,7 +115,7 @@ const checksWhitelist = {
     [pushEvent]: []
   },
   'test-github-actions': {
-    [openEvent]: [claCheck, claCheckGithubAction],
+    [openEvent]: [claCheckGithubAction],
     [reopenEvent]: [claCheckGithubAction],
     [synchronizeEvent]: [mergeConflictCheck],
     [closeEvent]: [allMergeConflictCheck],

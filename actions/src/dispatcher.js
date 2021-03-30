@@ -28,9 +28,10 @@ module.exports = {
     const checkEvent = `${event}_${action}`;
     const repoName = context.payload.repository.name.toLowerCase();
     const checksWhitelist = constants.getChecksWhitelist();
+    core.info(`🚀gp201 ~ dispatch ~ checksWhitelist ${checksWhitelist}`);
     if (Object.prototype.hasOwnProperty.call(checksWhitelist, repoName)) {
       const checks = checksWhitelist[repoName];
-      core.info('🚀gp201 ~ dispatch ~ checks', checks);
+      core.info(`🚀gp201 ~ dispatch ~ checks ${checks}`);
       if ((Object.prototype.hasOwnProperty.call(checks, checkEvent))) {
         const checkList = checks[checkEvent];
         for (var i = 0; i < checkList.length; i++) {
