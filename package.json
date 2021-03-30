@@ -19,7 +19,7 @@
     "axios": "^0.19.2",
     "dotenv": "^6.0.0",
     "google-auth-library": "^6.0.0",
-    "googleapis": "^51.0.0",
+    "googleapis": "^39.2.0",
     "newrelic": "^6.6.0",
     "probot": "^9.11.3",
     "probot-config": "^1.1.0",
