@@ -29,6 +29,7 @@ const issueCommentCreatedEvent = 'comment_created';
 
 const periodicCheck = 'periodic-check';
 const claCheck = 'cla-check';
+const claCheckGithubAction = 'cla-check-github-action';
 const changelogCheck = 'changelog-check';
 const datastoreLabelCheck = 'datastore-label-check';
 const prLabelCheck = 'pr-label-check';
@@ -113,6 +114,16 @@ const checksWhitelist = {
     [issuesAssignedEvent]: [],
     [pushEvent]: []
   },
+  'test-github-actions': {
+    [openEvent]: [claCheck, claCheckGithubAction],
+    [reopenEvent]: [claCheckGithubAction],
+    [synchronizeEvent]: [mergeConflictCheck],
+    [closeEvent]: [allMergeConflictCheck],
+    [editEvent]: [],
+    [issuesLabelEvent]: [],
+    [issuesAssignedEvent]: [],
+    [pushEvent]: []
+  },
 };
 
 const blacklistedAuthors = ['translatewiki'];
@@ -134,6 +145,7 @@ module.exports.issueCommentCreatedEvent = issueCommentCreatedEvent;
 
 module.exports.periodicCheck = periodicCheck;
 module.exports.claCheck = claCheck;
+module.exports.claCheckGithubAction = claCheckGithubAction;
 module.exports.changelogCheck = changelogCheck;
 module.exports.branchCheck = branchCheck;
 module.exports.wipCheck = wipCheck;

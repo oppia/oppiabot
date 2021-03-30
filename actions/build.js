@@ -23,3 +23,5 @@ const { execSync } = require('child_process');
 execSync('npm run actions-build');
 // Automatically add the build file to the commit index.
 execSync('git add actions_build/index.js');
+// Install Google Api (Google sheets and OAuth)
+execSync('npm install googleapis@39');
