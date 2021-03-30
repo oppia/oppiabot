@@ -26,6 +26,7 @@ const pullRequestReviewEvent = 'pr_review';
 const checkCompletedEvent = 'check_completed';
 const periodicCheckEvent = 'periodic-check-event';
 const issueCommentCreatedEvent = 'comment_created';
+const ensureAllIssuesHaveProject = 'issues_have_project';
 
 const periodicCheck = 'periodic-check';
 const claCheck = 'cla-check';
@@ -62,7 +63,7 @@ const checksWhitelist = {
     [editEvent]: [],
     [issuesLabelEvent]: []
   },
-  'oppia': {
+  oppia: {
     [openEvent]: [
       claCheck,
       changelogCheck,
@@ -71,7 +72,8 @@ const checksWhitelist = {
       wipCheck,
       jobCheck,
       modelCheck,
-      prTemplateCheck
+      prTemplateCheck,
+      ensureAllIssuesHaveProject
     ],
     [reopenEvent]: [
       changelogCheck,
@@ -98,9 +100,10 @@ const checksWhitelist = {
     [periodicCheckEvent]: [periodicCheck],
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
     [checkCompletedEvent]: [ciFailureCheck],
-    [issueCommentCreatedEvent]: [respondToReviewCheck]
+    [issueCommentCreatedEvent]: [respondToReviewCheck],
+    [ensureAllIssuesHaveProject]: [ensureAllIssuesHaveProject]
   },
-  'oppiabot': {
+  oppiabot: {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
     [synchronizeEvent]: [mergeConflictCheck],
@@ -128,6 +131,7 @@ module.exports.pullRequestReviewEvent = pullRequestReviewEvent;
 module.exports.checkCompletedEvent = checkCompletedEvent;
 module.exports.periodicCheckEvent = periodicCheckEvent;
 module.exports.issueCommentCreatedEvent = issueCommentCreatedEvent;
+module.exports.ensureAllIssuesHaveProject = ensureAllIssuesHaveProject;
 
 module.exports.periodicCheck = periodicCheck;
 module.exports.claCheck = claCheck;

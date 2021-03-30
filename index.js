@@ -64,13 +64,13 @@ const runChecks = async (context, checkEvent) => {
           case constants.claCheck:
             callable.push(apiForSheetsModule.checkClaStatus(context));
             break;
+          case constants.branchCheck:
+            callable.push(checkPullRequestBranchModule.checkBranch(context));
+            break;
           case constants.changelogCheck:
             callable.push(
               checkPullRequestLabelsModule.checkChangelogLabel(context)
             );
-            break;
-          case constants.branchCheck:
-            callable.push(checkPullRequestBranchModule.checkBranch(context));
             break;
           case constants.wipCheck:
             callable.push(checkWipModule.checkWIP(context));
@@ -155,6 +155,10 @@ const runChecks = async (context, checkEvent) => {
             break;
           case constants.oldBuildLabelCheck:
             callable.push(staleBuildModule.removeOldBuildLabel(context));
+            break;
+          case constants.ensureAllIssuesHaveProject:
+            callable.push(periodicCheckModule.
+              ensureAllIssuesHaveProjects(context));
             break;
         }
       }
@@ -298,6 +302,13 @@ module.exports = (oppiabot) => {
       // eslint-disable-next-line no-console
       console.log('A CHECK SUITE HAS BEEN COMPLETED...');
       await runChecks(context, constants.checkCompletedEvent);
+    }
+  });
+
+  oppiabot.on('issues.opened', async (context) => {
+    if (checkWhitelistedAccounts(context)) {
+      console.log('An Issue is Opened');
+      await runChecks(context, constants.ensureAllIssuesHaveProject);
     }
   });
 };
