@@ -13,7 +13,7 @@
 // limitations under the License.
 
 const openEvent = 'opened';
-const reopenEvent = 'reopened';
+const reopenEvent = 'pull_request_reopened';
 const unlabelEvent = 'unlabeled';
 const PRLabelEvent = 'labeled';
 const synchronizeEvent = 'synchronize';
