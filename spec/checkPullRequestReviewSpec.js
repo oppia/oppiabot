@@ -66,6 +66,38 @@ describe('Pull Request Review Module', () => {
     spyOn(pullRequestReviewModule, 'handlePullRequestReview').and.callThrough();
     spyOn(pullRequestReviewModule, 'handleResponseToReview').and.callThrough();
     spyOn(utilityModule, 'sleep').and.callFake(() => { });
+    spyOn(pingCodeOwnerModule,
+      'checkForReviewersWithPendingReview').and.callThrough();s
+  });
+
+  describe('Its been more than 24 Hrs since' +
+  'last review and there is no Code Review till now ', ()=>{
+    beforeEach(async () => {
+      await robot.receive(pushPayload);
+    });
+
+    it('should comment on pull request', ()=>{
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('should not close the pull request', () => {
+      expect(github.issues.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Less than 24 Hrs', ()=>{
+    // In this beforeEach is not Required as we don't require any
+    // data before Performing these tests
+    beforeEach(async () => {
+      await robot.receive(pushPayload);
+    });
+    it('should not close the pull request', () => {
+      expect(github.issues.update).not.toHaveBeenCalled();
+    });
+
+    it('should not comment on pull request', ()=>{
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
   });
 
   describe('A reviewer requests changes to the PR', () => {
