@@ -33,15 +33,19 @@ const PR_NUMBER = context.payload.pull_request.number;
  * given claCheck function.
  */
 const authorize = function() {
-  // eslint-disable-next-line camelcase
-  const { client_secret, client_id, redirect_uris } = CREDENTIALS.installed;
-  const oAuth2Client = new google.auth.OAuth2(
-    client_id,
-    client_secret,
-    redirect_uris[0]
-  );
-  oAuth2Client.setCredentials(JSON.parse(SHEETS_TOKEN));
-  return oAuth2Client;
+  try {
+    // eslint-disable-next-line camelcase
+    const { client_secret, client_id, redirect_uris } = CREDENTIALS.installed;
+    const oAuth2Client = new google.auth.OAuth2(
+      client_id,
+      client_secret,
+      redirect_uris[0]
+    );
+    oAuth2Client.setCredentials(JSON.parse(SHEETS_TOKEN));
+    return oAuth2Client;
+  } catch (err){
+    core.setFailed('Auth failure: ' + err);
+  }
 };
 
 const generateOutput = (hasClaSigned) => {
