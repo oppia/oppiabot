@@ -103,7 +103,7 @@ const checkSheet = async (auth) => {
   );
 };
 
-const claCheckGithubAction = () =>{
+const claCheckGithubAction = () => {
   // Authorize a client with the loaded credentials.
   const auth = authorize();
 
