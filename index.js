@@ -144,7 +144,7 @@ const runChecks = async (context, checkEvent) => {
           case constants.periodicCheck:
             callable.push(...[
               periodicCheckModule.ensureAllPullRequestsAreAssigned(context),
-              periodicCheckModule.ensureAllIssuesHaveProjects(context),
+              // periodicCheckModule.ensureAllIssuesHaveProjects(context),
               staleBuildModule.checkAndTagPRsWithOldBuilds(context),
             ]);
             break;
@@ -156,9 +156,9 @@ const runChecks = async (context, checkEvent) => {
           case constants.oldBuildLabelCheck:
             callable.push(staleBuildModule.removeOldBuildLabel(context));
             break;
-          case constants.ensureAllIssuesHaveProject:
+          case constants.ensureNewIssuesHaveProjects:
             callable.push(periodicCheckModule.
-              ensureAllIssuesHaveProjects(context));
+              ensureNewIssuesHaveProjects(context));
             break;
         }
       }
@@ -308,7 +308,7 @@ module.exports = (oppiabot) => {
   oppiabot.on('issues.opened', async (context) => {
     if (checkWhitelistedAccounts(context)) {
       console.log('An Issue is Opened');
-      await runChecks(context, constants.ensureAllIssuesHaveProject);
+      await runChecks(context, constants.ensureNewIssuesHaveProjects);
     }
   });
 };
