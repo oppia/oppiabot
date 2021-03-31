@@ -75,7 +75,8 @@ describe('Pull Request Review Module', () => {
       };
     });
 
-    describe('LGTM Label is there', ()=>{
+    describe('When reviewer requests changes and LGTM label' +
+     'was already added to the pull request.', ()=>{
       beforeEach(async () => {
         await robot.receive(reviewPayloadData);
       });
