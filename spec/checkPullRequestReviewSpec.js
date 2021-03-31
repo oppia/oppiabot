@@ -49,6 +49,7 @@ describe('Pull Request Review Module', () => {
           .createSpy('removeAssignees')
           .and.returnValue({}),
         addLabels: jasmine.createSpy('addLabels').and.returnValue({}),
+        removeLabels: jasmine.createSpy('removeLabels').and.returnValue({}),
       },
     };
 
@@ -62,7 +63,7 @@ describe('Pull Request Review Module', () => {
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(pullRequestReviewModule, 'handlePullRequestReview').and.callThrough();
     spyOn(pullRequestReviewModule, 'handleResponseToReview').and.callThrough();
-    spyOn(pullRequestReviewModule, 'handleLabels').and.callThrough();
+    spyOn(pullRequestReviewModule, 'handleChangesRequested').and.callThrough();
     spyOn(utilityModule, 'sleep').and.callFake(() => { });
   });
 
