@@ -22,7 +22,7 @@ const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
-const checkStaleBuildLabelRemovalModule =
+const checkStaleBuildLabelRemovedModule =
   require('../lib/checkPullRequestLabels');
 const scheduler = require('../lib/scheduler');
 
@@ -552,23 +552,23 @@ describe('Pull Request Label Check', () => {
       payloadData.payload.action = 'unlabeled';
       payloadData.payload.label = label;
       spyOn(
-        checkStaleBuildLabelRemovalModule, 'checkstaleBuildLabel'
+        checkStaleBuildLabelRemovedModule, 'checkstaleBuildLabel'
       ).and.callThrough();
       await robot.receive(payloadData);
     });
 
     it('should check for datastore label', () => {
-      expect(checkStaleBuildLabelRemovalModule.checkStaleBuildLabelRemoval).
-      toHaveBeenCalled();
+      expect(checkStaleBuildLabelRemovedModule.checkStaleBuildLabelRemoved).
+        toHaveBeenCalled();
     });
 
     it('should comment on PR', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledWith({
         body:
-        'Hi @' + payloadData.payload.sender.login + ', the build of this '
-        + ' pr is ' + ' stale please do not remove ' + 'PR: don' / 't merge '
-        + ' - STALE BUILD' + ' label. ',
+        'Hi @' + payloadData.payload.sender.login + ', the build of this ' +
+        ' pr is ' + ' stale please do not remove ' + 'PR: don' / 't merge ' +
+        ' - STALE BUILD' + ' label. ',
         number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name
@@ -600,14 +600,14 @@ describe('Pull Request Label Check', () => {
       payloadData.payload.label = label;
       payloadData.payload.sender.login = 'seanlip';
       spyOn(
-        checkStaleBuildLabelRemovalModule, 'checkstaleBuildLabel'
+        checkStaleBuildLabelRemoedlModule, 'checkstaleBuildLabel'
       ).and.callThrough();
       await robot.receive(payloadData);
     });
 
     it('checks for stale build label', () => {
-      expect(checkStaleBuildLabelRemovalModule.checkStaleBuildLabelRemoval).
-      toHaveBeenCalled();
+      expect(checkStaleBuildLabelRemovedModule.checkStaleBuildLabelRemoved).
+        toHaveBeenCalled();
     });
 
     it('does not add back the label', () => {
