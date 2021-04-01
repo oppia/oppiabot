@@ -22,6 +22,8 @@ const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
+const checkStaleBuildLabelRemovalModule =
+  require('../lib/checkPullRequestLabels');
 const scheduler = require('../lib/scheduler');
 
 let payloadData = JSON.parse(
@@ -526,6 +528,86 @@ describe('Pull Request Label Check', () => {
 
     it('checks for datastore label', () => {
       expect(checkPullRequestLabelModule.checkCriticalLabel).toHaveBeenCalled();
+    });
+
+    it('does not add back the label', () => {
+      expect(github.issues.addLabels).not.toHaveBeenCalled();
+    });
+
+    it('does not comment on the PR', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('when stale build label gets removed before updating branch', () => {
+    const label = {
+      id: 638839900,
+      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+      name: 'PR: don' / 't merge - STALE BUILD',
+      color: '00FF00',
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'unlabeled';
+      payloadData.payload.label = label;
+      spyOn(
+        checkStaleBuildLabelRemovalModule, 'checkstaleBuildLabel'
+      ).and.callThrough();
+      await robot.receive(payloadData);
+    });
+
+    it('should check for datastore label', () => {
+      expect(checkStaleBuildLabelRemovalModule.checkStaleBuildLabelRemoval).
+      toHaveBeenCalled();
+    });
+
+    it('should comment on PR', () => {
+      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        body:
+        'Hi @' + payloadData.payload.sender.login + ', the build of this '
+        + ' pr is ' + ' stale please do not remove ' + 'PR: don' / 't merge '
+        + ' - STALE BUILD' + ' label. ',
+        number: payloadData.payload.pull_request.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name
+      });
+    });
+
+    it('should add the stale build label', () => {
+      expect(github.issues.addLabels).toHaveBeenCalled();
+      expect(github.issues.addLabels).toHaveBeenCalledWith({
+        labels: ['PR: don' / 't merge - STALE BUILD'],
+        number: payloadData.payload.pull_request.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name
+      });
+    });
+  });
+
+  describe('when stale build label removed after updating branch', () => {
+    const label = {
+      id: 638839900,
+      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+      name: 'PR: don' / 't merge - STALE BUILD',
+      color: '00FF00',
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'unlabeled';
+      payloadData.payload.label = label;
+      payloadData.payload.sender.login = 'seanlip';
+      spyOn(
+        checkStaleBuildLabelRemovalModule, 'checkstaleBuildLabel'
+      ).and.callThrough();
+      await robot.receive(payloadData);
+    });
+
+    it('checks for stale build label', () => {
+      expect(checkStaleBuildLabelRemovalModule.checkStaleBuildLabelRemoval).
+      toHaveBeenCalled();
     });
 
     it('does not add back the label', () => {
