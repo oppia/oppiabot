@@ -117,7 +117,7 @@ const runChecks = async (context, checkEvent) => {
             break;
           case constants.staleBuildLabelCheck:
             callable.push(
-              checkPullRequestLabelsModule.checkStaleBuildLabelRemoval(context)
+              checkPullRequestLabelsModule.checkStaleBuildLabelRemoved(context)
             );
             break;
           case constants.forcePushCheck:
