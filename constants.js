@@ -62,7 +62,7 @@ const checksWhitelist = {
     [editEvent]: [],
     [issuesLabelEvent]: []
   },
-  'oppia': {
+  oppia: {
     [openEvent]: [
       claCheck,
       changelogCheck,
@@ -100,7 +100,7 @@ const checksWhitelist = {
     [checkCompletedEvent]: [ciFailureCheck],
     [issueCommentCreatedEvent]: [respondToReviewCheck]
   },
-  'oppiabot': {
+  oppiabot: {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
     [synchronizeEvent]: [mergeConflictCheck],
@@ -109,6 +109,44 @@ const checksWhitelist = {
     [issuesLabelEvent]: [],
     [issuesAssignedEvent]: [],
     [pushEvent]: []
+  },
+  sahaayak: {
+    [openEvent]: [
+      claCheck,
+      changelogCheck,
+      codeOwnerCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+      prTemplateCheck
+    ],
+    [reopenEvent]: [
+      changelogCheck,
+      branchCheck,
+      wipCheck,
+      jobCheck,
+      modelCheck,
+      prTemplateCheck
+    ],
+    [PRLabelEvent]: [assigneeCheck, prLabelCheck],
+    [synchronizeEvent]: [
+      mergeConflictCheck,
+      jobCheck,
+      modelCheck,
+      codeOwnerCheck,
+      oldBuildLabelCheck
+    ],
+    [closeEvent]: [allMergeConflictCheck, updateWithDevelopCheck],
+    [editEvent]: [wipCheck],
+    [issuesLabelEvent]: [issuesLabelCheck],
+    [issuesAssignedEvent]: [issuesAssignedCheck],
+    [unlabelEvent]: [datastoreLabelCheck],
+    [pushEvent]: [forcePushCheck],
+    [periodicCheckEvent]: [periodicCheck],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
+    [checkCompletedEvent]: [ciFailureCheck],
+    [issueCommentCreatedEvent]: [respondToReviewCheck]
   },
 };
 

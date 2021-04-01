@@ -194,7 +194,7 @@ module.exports = (oppiabot) => {
     delay: !process.env.DISABLE_DELAY, // delay is enabled on first run
     interval: 24 * 60 * 60 * 1000, // 1 day
   });
-
+  
   oppiabot.on('schedule.repository', async (context) => {
     console.log('PERIODIC CHECKS RUNNING...');
     if (checkWhitelistedAccounts(context)) {
