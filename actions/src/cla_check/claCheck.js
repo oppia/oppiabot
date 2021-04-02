@@ -18,7 +18,6 @@
 
 const core = require('@actions/core');
 const { context, GitHub } = require('@actions/github');
-const { execSync } = require('child_process');
 const { google } = require('googleapis');
 const RANGE = 'Usernames';
 
@@ -27,8 +26,8 @@ const RANGE = 'Usernames';
  * given claCheck function.
  */
 const authorize = async function() {
-  const SHEETS_TOKEN = JSON.parse(process.env.SHEETS_TOKEN);
   const CREDENTIALS = JSON.parse(process.env.SHEETS_CRED);
+  const SHEETS_TOKEN = JSON.parse(process.env.SHEETS_TOKEN);
   try {
     // eslint-disable-next-line camelcase
     const { client_secret, client_id, redirect_uris } = CREDENTIALS.installed;
@@ -45,17 +44,16 @@ const authorize = async function() {
 };
 
 const generateOutput = async (hasClaSigned) => {
+  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
   const LINK_RESULT = 'here'.link(
     'https://github.com/oppia/oppia/wiki/' +
     'Contributing-code-to-Oppia#setting-things-up'
   );
+  const octokit = new GitHub(GITHUB_TOKEN);
   const PR_NUMBER = context.payload.pull_request.number;
   const PR_AUTHOR = context.payload.pull_request.user.login;
-  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-  const octokit = new GitHub(GITHUB_TOKEN);
 
   let comment = '';
-  let cmd = '';
   if (!hasClaSigned) {
     comment = ('Hi! @' +
         PR_AUTHOR +
@@ -64,6 +62,7 @@ const generateOutput = async (hasClaSigned) => {
         " to get started? You'll need to do " +
         'this before we can accept your PR. Thanks!');
     core.info('Commenting in PR...');
+
     await octokit.issues.createComment(
       {
         body: comment,
@@ -85,8 +84,8 @@ const generateOutput = async (hasClaSigned) => {
  */
 const checkSheet = async (auth) => {
   const PR_AUTHOR = context.payload.pull_request.user.login;
-  const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
   const sheets = google.sheets({ version: 'v4', auth });
+  const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
   await sheets.spreadsheets.values.get(
     {
       spreadsheetId: SPREADSHEET_ID,
