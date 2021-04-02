@@ -26,7 +26,7 @@ const RANGE = 'Usernames';
  * Create an OAuth2 client with the given credentials, and then execute the
  * given claCheck function.
  */
-const authorize = function() {
+const authorize = async function() {
   const SHEETS_TOKEN = JSON.parse(process.env.SHEETS_TOKEN);
   const CREDENTIALS = JSON.parse(process.env.SHEETS_CRED);
   try {
@@ -63,8 +63,7 @@ const generateOutput = async (hasClaSigned) => {
         'follow the instructions ' + LINK_RESULT +
         " to get started? You'll need to do " +
         'this before we can accept your PR. Thanks!');
-    cmd = 'gh pr comment ' + PR_NUMBER + ' --body "' + comment + '"';
-    core.info(`${cmd}`);
+    core.info('Commenting in PR...');
     await octokit.issues.createComment(
       {
         body: comment,
@@ -104,18 +103,18 @@ const checkSheet = async (auth) => {
       } else {
         core.info(`Checking if ${PR_AUTHOR} has signed the CLA`);
         const hasUserSignedCla = flatRows.includes(PR_AUTHOR);
-        generateOutput(hasUserSignedCla);
+        await generateOutput(hasUserSignedCla);
       }
     }
   );
 };
 
-const claCheckGithubAction = () => {
+const claCheckGithubAction = async () => {
   // Authorize a client with the loaded credentials.
-  const auth = authorize();
+  const auth = await authorize();
 
   // Call the sheets API with the authorized client.
-  checkSheet(auth);
+  await checkSheet(auth);
 };
 
 module.exports = {
