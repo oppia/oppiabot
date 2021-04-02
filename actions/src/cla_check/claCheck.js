@@ -17,7 +17,7 @@
  */
 
 const core = require('@actions/core');
-const { context } = require('@actions/github');
+const { context, GitHub } = require('@actions/github');
 const { execSync } = require('child_process');
 const { google } = require('googleapis');
 const RANGE = 'Usernames';
