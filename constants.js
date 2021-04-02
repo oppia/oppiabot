@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const openEvent = 'pull_request_opened';
+const openEvent = 'opened';
+// Github action sends a different type of event.
+const openEventGithubActions = 'pull_request_opened';
 const reopenEvent = 'pull_request_reopened';
 const unlabelEvent = 'unlabeled';
 const PRLabelEvent = 'labeled';
@@ -76,8 +78,10 @@ const checksWhitelist = {
       modelCheck,
       prTemplateCheck
     ],
+    [openEventGithubActions]: [claCheckGithubAction],
     [reopenEvent]: [
       changelogCheck,
+      claCheckGithubAction,
       branchCheck,
       wipCheck,
       jobCheck,

@@ -20,19 +20,15 @@ const core = require('@actions/core');
 const { context } = require('@actions/github');
 const { execSync } = require('child_process');
 const { google } = require('googleapis');
-
-const SHEETS_TOKEN = process.env.SHEETS_TOKEN;
-const CREDENTIALS = JSON.parse(process.env.SHEETS_CRED);
-const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 const RANGE = 'Usernames';
-const PR_AUTHOR = context.payload.pull_request.user.login;
-const PR_NUMBER = context.payload.pull_request.number;
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
  * given claCheck function.
  */
 const authorize = function() {
+  const SHEETS_TOKEN = JSON.parse(process.env.SHEETS_TOKEN);
+  const CREDENTIALS = JSON.parse(process.env.SHEETS_CRED);
   try {
     // eslint-disable-next-line camelcase
     const { client_secret, client_id, redirect_uris } = CREDENTIALS.installed;
@@ -41,18 +37,22 @@ const authorize = function() {
       client_secret,
       redirect_uris[0]
     );
-    oAuth2Client.setCredentials(JSON.parse(SHEETS_TOKEN));
+    oAuth2Client.setCredentials(SHEETS_TOKEN);
     return oAuth2Client;
   } catch (err){
     core.setFailed('Auth failure: ' + err);
   }
 };
 
-const generateOutput = (hasClaSigned) => {
+const generateOutput = async (hasClaSigned) => {
   const LINK_RESULT = 'here'.link(
     'https://github.com/oppia/oppia/wiki/' +
     'Contributing-code-to-Oppia#setting-things-up'
   );
+  const PR_NUMBER = context.payload.pull_request.number;
+  const PR_AUTHOR = context.payload.pull_request.user.login;
+  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+  const octokit = new GitHub(GITHUB_TOKEN);
 
   let comment = '';
   let cmd = '';
@@ -64,13 +64,18 @@ const generateOutput = (hasClaSigned) => {
         " to get started? You'll need to do " +
         'this before we can accept your PR. Thanks!');
     cmd = 'gh pr comment ' + PR_NUMBER + ' --body "' + comment + '"';
-    console.log(cmd);
-    try {
-      execSync(cmd);
-      core.setFailed(PR_AUTHOR + ' has not signed the CLA');
-    } catch (err){
-      core.setFailed('Comment failed: ' + err);
-    }
+    core.info(`${cmd}`);
+    await octokit.issues.createComment(
+      {
+        body: comment,
+        issue_number: PR_NUMBER,
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+      }
+    );
+    core.setFailed(PR_AUTHOR + ' has not signed the CLA');
+  } else {
+    core.info(`${PR_AUTHOR} has signed the CLA`);
   }
 };
 
@@ -80,6 +85,8 @@ const generateOutput = (hasClaSigned) => {
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
 const checkSheet = async (auth) => {
+  const PR_AUTHOR = context.payload.pull_request.user.login;
+  const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
   const sheets = google.sheets({ version: 'v4', auth });
   await sheets.spreadsheets.values.get(
     {
@@ -95,7 +102,7 @@ const checkSheet = async (auth) => {
       if (!rows || rows.length === 0) {
         core.setFailed('No data found.');
       } else {
-        console.log('Checking if ', PR_AUTHOR, ' has signed the CLA');
+        core.info(`Checking if ${PR_AUTHOR} has signed the CLA`);
         const hasUserSignedCla = flatRows.includes(PR_AUTHOR);
         generateOutput(hasUserSignedCla);
       }

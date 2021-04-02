@@ -19,7 +19,7 @@
 const core = require('@actions/core');
 const { context } = require('@actions/github');
 const issueLabelsModule = require('./issues/checkIssueLabels');
-const claCheckGithubActionModule = require('./cla_check/cla_check');
+const claCheckGithubActionModule = require('./cla_check/claCheck');
 const constants = require('../../constants');
 
 module.exports = {
