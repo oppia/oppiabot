@@ -23,6 +23,12 @@ Please refer to the following instructions to setup Oppiabot for the first time 
 
 2. Install [Node.Js](https://nodejs.org/) and [NPM](https://www.npmjs.com/) on your machine using the following commands:
 
+    First check if you already have Node.js and NPM using:
+    ```bash
+    node -v
+    npm -v
+    ```
+    If these commands show some versions, then you can jump to Point No. 3, else proceed in this point:
     #### Using Ubuntu
     ```bash
     curl -sL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
@@ -39,6 +45,9 @@ Please refer to the following instructions to setup Oppiabot for the first time 
     ```bash
     sudo brew install node
     ```
+
+    #### Using Windows
+    Install using following [link](https://nodejs.org/en/download/). (Its always preferred to use LTS Version).
     
 3. Setup probot and other dependencies by running the following command:
   ```bash
