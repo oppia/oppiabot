@@ -156,7 +156,7 @@ const runChecks = async (context, checkEvent) => {
           case constants.oldBuildLabelCheck:
             callable.push(staleBuildModule.removeOldBuildLabel(context));
             break;
-          case constants.ensureNewIssuesHaveProjects:
+          case constants.ensureNewIssuesHaveProjectsCheck:
             callable.push(periodicCheckModule.
               ensureNewIssuesHaveProjects(context));
             break;
@@ -308,7 +308,7 @@ module.exports = (oppiabot) => {
   oppiabot.on('issues.opened', async (context) => {
     if (checkWhitelistedAccounts(context)) {
       console.log('An Issue is Opened');
-      await runChecks(context, constants.ensureNewIssuesHaveProjects);
+      await runChecks(context, constants.ensureNewIssuesHaveProjectsEvent);
     }
   });
 };

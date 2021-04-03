@@ -26,7 +26,7 @@ const pullRequestReviewEvent = 'pr_review';
 const checkCompletedEvent = 'check_completed';
 const periodicCheckEvent = 'periodic-check-event';
 const issueCommentCreatedEvent = 'comment_created';
-const ensureNewIssuesHaveProjects = 'new_issues_have_project';
+const ensureNewIssuesHaveProjectsEvent = 'new-issues-have-project-event';
 
 const periodicCheck = 'periodic-check';
 const claCheck = 'cla-check';
@@ -52,6 +52,7 @@ const ciFailureCheck = 'ci-failure-check';
 const updateWithDevelopCheck = 'update-with-develop-check';
 const respondToReviewCheck = 'respond-to-review-check';
 const oldBuildLabelCheck = 'old-build-label-check';
+const ensureNewIssuesHaveProjectsCheck = 'new-issues-have-project';
 
 const checksWhitelist = {
   'oppia-android': {
@@ -72,7 +73,7 @@ const checksWhitelist = {
       wipCheck,
       jobCheck,
       modelCheck,
-      prTemplateCheck,
+      prTemplateCheck
     ],
     [reopenEvent]: [
       changelogCheck,
@@ -100,7 +101,7 @@ const checksWhitelist = {
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
     [checkCompletedEvent]: [ciFailureCheck],
     [issueCommentCreatedEvent]: [respondToReviewCheck],
-    [ensureNewIssuesHaveProjects]: [ensureNewIssuesHaveProjects]
+    [ensureNewIssuesHaveProjectsEvent]: [ensureNewIssuesHaveProjectsCheck]
   },
   'oppiabot': {
     [openEvent]: [claCheck],
@@ -130,7 +131,8 @@ module.exports.pullRequestReviewEvent = pullRequestReviewEvent;
 module.exports.checkCompletedEvent = checkCompletedEvent;
 module.exports.periodicCheckEvent = periodicCheckEvent;
 module.exports.issueCommentCreatedEvent = issueCommentCreatedEvent;
-module.exports.ensureNewIssuesHaveProjects = ensureNewIssuesHaveProjects;
+module.exports.ensureNewIssuesHaveProjectsEvent =
+ ensureNewIssuesHaveProjectsEvent;
 
 module.exports.periodicCheck = periodicCheck;
 module.exports.claCheck = claCheck;
