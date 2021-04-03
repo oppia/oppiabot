@@ -64,7 +64,7 @@ const checksWhitelist = {
     [editEvent]: [],
     [issuesLabelEvent]: []
   },
-  'oppia': {
+  oppia: {
     [openEvent]: [
       claCheck,
       changelogCheck,
@@ -103,7 +103,7 @@ const checksWhitelist = {
     [issueCommentCreatedEvent]: [respondToReviewCheck],
     [ensureNewIssuesHaveProjectsEvent]: [ensureNewIssuesHaveProjectsCheck]
   },
-  'oppiabot': {
+  oppiabot: {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
     [synchronizeEvent]: [mergeConflictCheck],
@@ -156,6 +156,8 @@ module.exports.ciFailureCheck = ciFailureCheck;
 module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
 module.exports.respondToReviewCheck = respondToReviewCheck;
 module.exports.oldBuildLabelCheck = oldBuildLabelCheck;
+module.exports.ensureNewIssuesHaveProjectsCheck =
+ensureNewIssuesHaveProjectsCheck;
 
 module.exports.getBlacklistedAuthors = function() {
   return blacklistedAuthors;
