@@ -26,7 +26,7 @@ const pullRequestReviewEvent = 'pr_review';
 const checkCompletedEvent = 'check_completed';
 const periodicCheckEvent = 'periodic-check-event';
 const issueCommentCreatedEvent = 'comment_created';
-const ensureNewIssuesHaveProjectsEvent = 'new-issues-have-project-event';
+const issueOpenedEvent = 'issue_opened';
 
 const periodicCheck = 'periodic-check';
 const claCheck = 'cla-check';
@@ -101,7 +101,7 @@ const checksWhitelist = {
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
     [checkCompletedEvent]: [ciFailureCheck],
     [issueCommentCreatedEvent]: [respondToReviewCheck],
-    [ensureNewIssuesHaveProjectsEvent]: [ensureNewIssuesHaveProjectsCheck]
+    [issueOpenedEvent]: [ensureNewIssuesHaveProjectsCheck]
   },
   'oppiabot': {
     [openEvent]: [claCheck],
@@ -131,8 +131,8 @@ module.exports.pullRequestReviewEvent = pullRequestReviewEvent;
 module.exports.checkCompletedEvent = checkCompletedEvent;
 module.exports.periodicCheckEvent = periodicCheckEvent;
 module.exports.issueCommentCreatedEvent = issueCommentCreatedEvent;
-module.exports.ensureNewIssuesHaveProjectsEvent =
- ensureNewIssuesHaveProjectsEvent;
+module.exports.issueOpenedEvent =
+ issueOpenedEvent;
 
 module.exports.periodicCheck = periodicCheck;
 module.exports.claCheck = claCheck;

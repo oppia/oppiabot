@@ -308,7 +308,7 @@ module.exports = (oppiabot) => {
   oppiabot.on('issues.opened', async (context) => {
     if (checkWhitelistedAccounts(context)) {
       console.log('An Issue is Opened');
-      await runChecks(context, constants.ensureNewIssuesHaveProjectsEvent);
+      await runChecks(context, constants.issueOpenedEvent);
     }
   });
 };
