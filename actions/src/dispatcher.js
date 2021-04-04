@@ -30,8 +30,10 @@ module.exports = {
     const checksWhitelist = constants.getChecksWhitelist();
     if (Object.prototype.hasOwnProperty.call(checksWhitelist, repoName)) {
       const checks = checksWhitelist[repoName];
+      console.log('🚀gp201 ~ dispatch ~ checkEvent', checkEvent);
       if ((Object.prototype.hasOwnProperty.call(checks, checkEvent))) {
         const checkList = checks[checkEvent];
+        console.log('triggered');
         for (var i = 0; i < checkList.length; i++) {
           switch (checkList[i]) {
             case constants.issuesLabelCheck:
