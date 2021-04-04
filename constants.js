@@ -15,6 +15,7 @@
 const openEvent = 'opened';
 // Github action sends a different type of event.
 const openEventGithubActions = 'pull_request_target_opened';
+const reopenEventGithubActions = 'pull_request_target_reopened';
 const reopenEvent = 'pull_request_reopened';
 const unlabelEvent = 'unlabeled';
 const PRLabelEvent = 'labeled';
