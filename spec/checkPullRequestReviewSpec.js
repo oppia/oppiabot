@@ -82,6 +82,25 @@ describe('Pull Request Review Module', () => {
     describe('When reviewer requests changes and LGTM label' +
      'was already added to the pull request.', ()=>{
       beforeEach(async () => {
+        const label = {
+          id: 248679580,
+          node_id: 'MDU6TGFiZWwyNDg2Nzk1ODA=  ',
+          url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20LGTM',
+          name: 'PR: LGTM',
+          color: '009800',
+        };
+        // Set the payload action and label which will simulate adding
+        // the changelog label.
+        payloadData.payload.action = 'labeled';
+        payloadData.payload.label = label;
+        payloadData.payload.pull_request.requested_reviewers = [
+          { login: 'reviewer1' },
+          { login: 'reviewer2' },
+        ];
+        payloadData.payload.pull_request.assignees = [];
+        // Set project owner to be pr author.
+        payloadData.payload.pull_request.user.login = 'kevintab95';
+        spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
         await robot.receive(reviewPayloadData);
       });
 
@@ -100,6 +119,7 @@ describe('Pull Request Review Module', () => {
         expect(github.issues.removeLabels).toHaveBeenCalled();
       });
     });
+
     describe('when reviewer is assigned and pr author is not assigned', () => {
       beforeEach(async () => {
         await robot.receive(reviewPayloadData);
