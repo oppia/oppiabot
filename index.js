@@ -145,7 +145,8 @@ const runChecks = async (context, checkEvent) => {
               periodicCheckModule.ensureAllPullRequestsAreAssigned(context),
               periodicCheckModule.ensureAllIssuesHaveProjects(context),
               staleBuildModule.checkAndTagPRsWithOldBuilds(context),
-              checkPullRequestReviewModule.checkAnyReviewRequiredPr(context)
+              checkPullRequestReviewModule.
+                checkForReviewersWithPendingReview(context)
             );
             break;
           case constants.respondToReviewCheck:
