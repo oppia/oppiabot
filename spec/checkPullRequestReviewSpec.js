@@ -66,7 +66,6 @@ describe('Pull Request Review Module', () => {
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(pullRequestReviewModule, 'handlePullRequestReview').and.callThrough();
     spyOn(pullRequestReviewModule, 'handleResponseToReview').and.callThrough();
-    spyOn(pullRequestReviewModule, 'handleChangesRequested').and.callThrough();
     spyOn(utilityModule, 'sleep').and.callFake(() => { });
   });
 
@@ -100,7 +99,8 @@ describe('Pull Request Review Module', () => {
         payloadData.payload.pull_request.assignees = [];
         // Set project owner to be pr author.
         payloadData.payload.pull_request.user.login = 'kevintab95';
-        spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
+        spyOn(pullRequestReviewModule, 'handleChangesRequested').
+          and.callThrough();
         await robot.receive(reviewPayloadData);
       });
 
