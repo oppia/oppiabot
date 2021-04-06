@@ -156,8 +156,8 @@ module.exports.ciFailureCheck = ciFailureCheck;
 module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
 module.exports.respondToReviewCheck = respondToReviewCheck;
 module.exports.oldBuildLabelCheck = oldBuildLabelCheck;
-module.exports.ensureNewIssuesHaveProjectsCheck =
-ensureNewIssuesHaveProjectsCheck;
+module.exports.ensureNewIssuesHaveProjectsCheck = (
+  ensureNewIssuesHaveProjectsCheck);
 
 module.exports.getBlacklistedAuthors = function() {
   return blacklistedAuthors;

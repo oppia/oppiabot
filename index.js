@@ -157,8 +157,8 @@ const runChecks = async (context, checkEvent) => {
             callable.push(staleBuildModule.removeOldBuildLabel(context));
             break;
           case constants.ensureNewIssuesHaveProjectsCheck:
-            callable.push(periodicCheckModule.
-              ensureNewIssuesHaveProjects(context));
+            callable.push(
+              periodicCheckModule.ensureNewIssuesHaveProjects(context));
             break;
         }
       }
