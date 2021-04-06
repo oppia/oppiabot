@@ -4,6 +4,5 @@
   "functions": 100,
   "statements": 100,
   "check-coverage": true,
-  "reporter": ["lcov", "text"],
-  "exclude": ["./sheetsSetup.js"]
+  "reporter": ["lcov", "text"]
 }
