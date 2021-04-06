@@ -38,7 +38,7 @@ const authorize = async function() {
     );
     oAuth2Client.setCredentials(SHEETS_TOKEN);
     return oAuth2Client;
-  } catch (err){
+  } catch (err) {
     core.setFailed('Auth failure: ' + err);
   }
 };
@@ -57,9 +57,9 @@ const generateOutput = async (hasClaSigned) => {
   if (!hasClaSigned) {
     comment = ('Hi! @' +
         PR_AUTHOR +
-        ' Welcome to Oppia! Please could you ' +
+        ' Welcome to Oppia! Could you please ' +
         'follow the instructions ' + LINK_RESULT +
-        " to get started? You'll need to do " +
+        " and sign the CLA Sheet to get started? You'll need to do " +
         'this before we can accept your PR. Thanks!');
     core.info('Commenting in PR...');
 
