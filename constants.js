@@ -100,7 +100,7 @@ const checksWhitelist = {
     [checkCompletedEvent]: [ciFailureCheck],
     [issueCommentCreatedEvent]: [respondToReviewCheck]
   },
-  'oppiabot': {
+'oppiabot': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
     [synchronizeEvent]: [mergeConflictCheck],
