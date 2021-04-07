@@ -48,7 +48,8 @@ describe('Pull Request Label Check', () => {
 
   beforeEach(() => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
-
+    spyOn(utilityModule, 'sleep').and.callFake(() => { });
+    
     github = {
       issues: {
         createComment: jasmine.createSpy('createComment').and.returnValue({}),
@@ -743,16 +744,7 @@ describe('Pull Request Label Check', () => {
 
 
     it('should not ping pr author if there is a changelog label', async () => {
-      const label = {
-        id: 638839900,
-        node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-        url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
-        color: '00FF00',
-      };
-      payloadData.payload.action = 'reopened';
-      // Add changelog label.
-      payloadData.payload.pull_request.labels.push(label);
+      cccccccccccccc
       spyOn(
         checkPullRequestLabelModule, 'checkChangelogLabel'
       ).and.callThrough();
@@ -800,6 +792,19 @@ describe('Pull Request Label Check', () => {
 
   describe('when valid changelog added with no review comments', () => {
     beforeEach(async () => {
+      const label = {
+        id: 638839900,
+        node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+        url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
+        color: '00FF00',
+      };
+      payloadData.payload.action = 'reopened';
+      // Add changelog label.
+      payloadData.payload.pull_request.labels.push(label);
+      payloadData.payload.pull_request.user.login = 'username'
+      payloadData.payload.pull_request.assignees = [{"login": 'username'}],
+      payloadData.payload.pull_request.review_comments = 0;
       spyOn(
         utilityModule, 'doesPullRequestHaveChangesRequested'
       ).and.resolveTo(false);
