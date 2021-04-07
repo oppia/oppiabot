@@ -108,8 +108,8 @@ describe('CLA check github action Module', () => {
       await dispatcher.dispatch('pull_request_target', 'reopened');
       expect(claCheckGithubActionModule.claCheckGithubAction)
         .toHaveBeenCalled();
-      expect(github.issues.createComment).not.toHaveBeenCalled();
-      expect(github.issues.createComment).not.toHaveBeenCalledWith({});
+      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+      expect(octokit.issues.createComment).not.toHaveBeenCalledWith({});
       expect(core.info).toHaveBeenCalledWith('testuser7777 has signed the CLA');
     });
   });

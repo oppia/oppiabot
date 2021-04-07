@@ -80,6 +80,7 @@ const checksWhitelist = {
       prTemplateCheck
     ],
     [openEventGithubActions]: [claCheckGithubAction],
+    [reopenEventGithubActions]: [claCheckGithubAction],
     [reopenEvent]: [
       changelogCheck,
       claCheckGithubAction,
