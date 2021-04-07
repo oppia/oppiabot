@@ -72,14 +72,14 @@ describe('CLA check github action Module', () => {
     });
 
     it('should be called for PR opened action', async () => {
-      await dispatcher.dispatch('pull_request', 'opened');
+      await dispatcher.dispatch('pull_request_target', 'opened');
 
       expect(claCheckGithubActionModule.claCheckGithubAction)
         .toHaveBeenCalled();
     });
 
     it('should be called for PR reopened action', async () => {
-      await dispatcher.dispatch('pull_request', 'reopened');
+      await dispatcher.dispatch('pull_request_target', 'reopened');
 
       expect(claCheckGithubActionModule.claCheckGithubAction)
         .toHaveBeenCalled();
@@ -105,9 +105,11 @@ describe('CLA check github action Module', () => {
     });
 
     it('should not fail', async () => {
-      await dispatcher.dispatch('pull_request', 'reopened');
+      await dispatcher.dispatch('pull_request_target', 'reopened');
       expect(claCheckGithubActionModule.claCheckGithubAction)
         .toHaveBeenCalled();
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.issues.createComment).not.toHaveBeenCalledWith({});
       expect(core.info).toHaveBeenCalledWith('testuser7777 has signed the CLA');
     });
   });
@@ -128,7 +130,7 @@ describe('CLA check github action Module', () => {
           },
         },
       });
-      await dispatcher.dispatch('pull_request', 'opened');
+      await dispatcher.dispatch('pull_request_target', 'opened');
     });
 
     it('should comment in PR', async () => {
@@ -140,9 +142,9 @@ describe('CLA check github action Module', () => {
       const body = (
         'Hi! @' +
         PR_AUTHOR +
-        ' Welcome to Oppia! Please could you ' +
+        ' Welcome to Oppia! Could you please ' +
         'follow the instructions ' + LINK_RESULT +
-        " to get started? You'll need to do " +
+        " and sign the CLA Sheet to get started? You'll need to do " +
         'this before we can accept your PR. Thanks!');
 
       expect(octokit.issues.createComment).toHaveBeenCalled();
@@ -183,7 +185,7 @@ describe('CLA check github action Module', () => {
         },
       });
 
-      await dispatcher.dispatch('pull_request', 'opened');
+      await dispatcher.dispatch('pull_request_target', 'opened');
 
       expect(core.setFailed).toHaveBeenCalledWith('No data found.');
     });
@@ -203,7 +205,7 @@ describe('CLA check github action Module', () => {
         },
       });
 
-      await dispatcher.dispatch('pull_request', 'opened');
+      await dispatcher.dispatch('pull_request_target', 'opened');
 
       expect(core.setFailed).toHaveBeenCalledWith(
         'The API returned an error: error');
