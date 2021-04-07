@@ -19,7 +19,6 @@
 const core = require('@actions/core');
 const { context, GitHub } = require('@actions/github');
 const { google } = require('googleapis');
-const RANGE = 'Usernames';
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -89,7 +88,7 @@ const checkSheet = async (auth) => {
   await sheets.spreadsheets.values.get(
     {
       spreadsheetId: SPREADSHEET_ID,
-      range: RANGE,
+      range: 'Usernames',
     },
     async (err, res) => {
       if (err) {
