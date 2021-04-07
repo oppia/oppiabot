@@ -66,8 +66,6 @@ describe('Pull Request Review Module', () => {
     spyOn(pullRequestReviewModule, 'handlePullRequestReview').and.callThrough();
     spyOn(pullRequestReviewModule, 'handleResponseToReview').and.callThrough();
     spyOn(utilityModule, 'sleep').and.callFake(() => { });
-    spyOn(pingCodeOwnerModule,
-      'checkForReviewersWithPendingReview').and.callThrough();s
   });
 
   describe('Its been more than 24 Hrs since' +
