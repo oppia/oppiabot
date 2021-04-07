@@ -49,7 +49,7 @@ describe('Pull Request Label Check', () => {
   beforeEach(() => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
     spyOn(utilityModule, 'sleep').and.callFake(() => { });
-    
+
     github = {
       issues: {
         createComment: jasmine.createSpy('createComment').and.returnValue({}),
@@ -591,7 +591,7 @@ describe('Pull Request Label Check', () => {
         checkPullRequestLabelModule, 'checkChangelogLabel'
       ).and.callThrough();
       await robot.receive(payloadData);
-      
+
       expect(
         checkPullRequestLabelModule.checkChangelogLabel
       ).toHaveBeenCalled();
@@ -645,7 +645,7 @@ describe('Pull Request Label Check', () => {
         };
 
         await robot.receive(payloadData);
-        
+
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
@@ -708,7 +708,7 @@ describe('Pull Request Label Check', () => {
         };
 
         await robot.receive(payloadData);
-        
+
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
@@ -744,12 +744,11 @@ describe('Pull Request Label Check', () => {
 
 
     it('should not ping pr author if there is a changelog label', async () => {
-      cccccccccccccc
       spyOn(
         checkPullRequestLabelModule, 'checkChangelogLabel'
       ).and.callThrough();
       await robot.receive(payloadData);
-      
+
       expect(
         checkPullRequestLabelModule.checkChangelogLabel
       ).toHaveBeenCalled();
@@ -772,7 +771,7 @@ describe('Pull Request Label Check', () => {
         checkPullRequestLabelModule, 'checkChangelogLabel'
       ).and.callThrough();
       await robot.receive(payloadData);
-      
+
       expect(
         checkPullRequestLabelModule.checkChangelogLabel
       ).toHaveBeenCalled();
@@ -802,8 +801,8 @@ describe('Pull Request Label Check', () => {
       payloadData.payload.action = 'reopened';
       // Add changelog label.
       payloadData.payload.pull_request.labels.push(label);
-      payloadData.payload.pull_request.user.login = 'username'
-      payloadData.payload.pull_request.assignees = [{"login": 'username'}],
+      payloadData.payload.pull_request.user.login = 'username';
+      payloadData.payload.pull_request.assignees = [{login: 'username'}],
       payloadData.payload.pull_request.review_comments = 0;
       spyOn(
         utilityModule, 'doesPullRequestHaveChangesRequested'
