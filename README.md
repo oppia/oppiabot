@@ -74,6 +74,10 @@ Please refer to the following instructions to setup Oppiabot for the first time 
 
 7. Download the private key. It will be a `.pem` file. Move it to the root directory of the project. As long as it's in the root directory, it will be automatically detected regardless of the filename.
 
+Make sure you remove
+ > PRIVATE_KEY=example_private_key
+from .env file, Otherwise app will not work locally.
+
 8. Edit `.env` and set `APP_ID` to the ID of the app you just created. The App ID can be found in your app settings page here.
 
 <p align="center">
