@@ -34,7 +34,7 @@ describe('CLA check github action Module', () => {
     process.env.SHEETS_CRED = sheetsCredentials;
     process.env.SHEETS_TOKEN = sheetsToken;
     process.env.GITHUB_TOKEN = 'sample-token';
-    github.context.eventName = 'pull_request';
+    github.context.eventName = 'pull_request_target';
     github.context.payload = pullRequestPayload.payload;
 
     octokit = {
