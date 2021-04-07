@@ -131,8 +131,7 @@ module.exports.pullRequestReviewEvent = pullRequestReviewEvent;
 module.exports.checkCompletedEvent = checkCompletedEvent;
 module.exports.periodicCheckEvent = periodicCheckEvent;
 module.exports.issueCommentCreatedEvent = issueCommentCreatedEvent;
-module.exports.issueOpenedEvent =
- issueOpenedEvent;
+module.exports.issueOpenedEvent = issueOpenedEvent;
 
 module.exports.periodicCheck = periodicCheck;
 module.exports.claCheck = claCheck;
