@@ -55,7 +55,7 @@ describe('Pull Request Review Module', () => {
           .createSpy('removeAssignees')
           .and.returnValue({}),
         addLabels: jasmine.createSpy('addLabels').and.returnValue({}),
-        removeLabels: jasmine.createSpy('removeLabels').and.returnValue({}),
+        removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
       },
     };
 
@@ -67,7 +67,8 @@ describe('Pull Request Review Module', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-    spyOn(pullRequestReviewModule, 'handlePullRequestReview').and.callThrough();
+    spyOn(pullRequestReviewModule, 'handlePullRequestReview').
+      and.callThrough();
     spyOn(pullRequestReviewModule, 'handleResponseToReview').and.callThrough();
     spyOn(utilityModule, 'sleep').and.callFake(() => { });
   });
@@ -86,14 +87,14 @@ describe('Pull Request Review Module', () => {
       beforeEach(async () => {
         const label = {
           id: 248679580,
-          node_id: 'MDU6TGFiZWwyNDg2Nzk1ODA=  ',
+          node_id: 'MDU6TGFiZWwyNDg2Nzk1ODA=',
           url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20LGTM',
           name: 'PR: LGTM',
           color: '009800',
         };
         // Set the payload action and label which will simulate removing
         // the LGTM label.
-        payloadData.payload.action = 'unlabeled';
+        payloadData.payload.action = 'labeled';
         payloadData.payload.label = label;
         payloadData.payload.pull_request.requested_reviewers = [
           { login: 'reviewer1' },
@@ -102,8 +103,6 @@ describe('Pull Request Review Module', () => {
         payloadData.payload.pull_request.assignees = [];
         // Set project owner to be pr author.
         payloadData.payload.pull_request.user.login = 'kevintab95';
-        spyOn(pullRequestReviewModule, 'handleChangesRequested').
-          and.callThrough();
         await robot.receive(reviewPayloadData);
       });
 
@@ -113,13 +112,19 @@ describe('Pull Request Review Module', () => {
         ).toHaveBeenCalled();
       });
 
-      it('Should comment on PR', ()=>{
+      it('should wait for 3 minutes before performing any action', () => {
+        expect(utilityModule.sleep).toHaveBeenCalled();
+        expect(utilityModule.sleep).toHaveBeenCalledWith(
+          utilityModule.THREE_MINUTES);
+      });
+
+      it('Should comment on PR', () => {
         expect(github.issues.createComment)
           .toHaveBeenCalled();
       });
 
-      it('Should Remove the LGTM Label', ()=>{
-        expect(github.issues.removeLabels).toHaveBeenCalled();
+      it('Should Remove the LGTM Label', () => {
+        expect(github.issues.removeLabel).toHaveBeenCalled();
       });
     });
 
