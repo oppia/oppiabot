@@ -24,6 +24,9 @@ const pullRequestReviewModule = require('../lib/checkPullRequestReview');
 const reviewPayloadData = require('../fixtures/pullRequestReview.json');
 const commentPayloadData = require('../fixtures/pullRequestComment.json');
 const utilityModule = require('../lib/utils');
+let payloadData = JSON.parse(
+  JSON.stringify(require('../fixtures/pullRequestPayload.json'))
+);
 
 describe('Pull Request Review Module', () => {
   /**
@@ -88,9 +91,9 @@ describe('Pull Request Review Module', () => {
           name: 'PR: LGTM',
           color: '009800',
         };
-        // Set the payload action and label which will simulate adding
-        // the changelog label.
-        payloadData.payload.action = 'labeled';
+        // Set the payload action and label which will simulate removing
+        // the LGTM label.
+        payloadData.payload.action = 'unlabeled';
         payloadData.payload.label = label;
         payloadData.payload.pull_request.requested_reviewers = [
           { login: 'reviewer1' },
