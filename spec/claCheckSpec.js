@@ -17,7 +17,7 @@
  */
 
 const claCheckGithubActionModule =
- require('../actions/src/cla_check/claCheck.js');
+ require('../actions/src/pull_requests/claCheck.js');
 const core = require('@actions/core');
 const dispatcher = require('../actions/src/dispatcher');
 const github = require('@actions/github');
