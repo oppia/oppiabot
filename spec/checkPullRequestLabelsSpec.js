@@ -23,6 +23,8 @@ const checkCriticalPullRequestModule =
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
 const scheduler = require('../lib/scheduler');
+const utilityModule = require('../lib/utils');
+const reviewPayloadData = require('../fixtures/pullRequestReview.json');
 
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
@@ -46,6 +48,7 @@ describe('Pull Request Label Check', () => {
 
   beforeEach(() => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
+    spyOn(utilityModule, 'sleep').and.callFake(() => { });
 
     github = {
       issues: {
@@ -569,6 +572,18 @@ describe('Pull Request Label Check', () => {
   });
 
   describe('when pull request gets opened or reopened', () => {
+    beforeEach(async () => {
+      github.search = {
+        issuesAndPullRequests: jasmine
+          .createSpy('issuesAndPullRequests')
+          .and.resolveTo({
+            data: {
+              items: [payloadData.payload.pull_request],
+            },
+          }),
+      };
+      await robot.receive(payloadData);
+    });
     it('pings pr author when there is no changelog label', async () => {
       payloadData.payload.action = 'reopened';
 
@@ -729,16 +744,6 @@ describe('Pull Request Label Check', () => {
 
 
     it('should not ping pr author if there is a changelog label', async () => {
-      const label = {
-        id: 638839900,
-        node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-        url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
-        color: '00FF00',
-      };
-      payloadData.payload.action = 'reopened';
-      // Add changelog label.
-      payloadData.payload.pull_request.labels.push(label);
       spyOn(
         checkPullRequestLabelModule, 'checkChangelogLabel'
       ).and.callThrough();
@@ -782,29 +787,71 @@ describe('Pull Request Label Check', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledWith(params);
     });
+  });
 
-    it('does not ping dev workflow team for valid changelog label',
-      async () => {
-        const label = {
-          id: 638839900,
-          node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-          url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-          name: 'PR CHANGELOG: Server Errors -- @kevintab95',
-          color: '00FF00',
-        };
-
-        payloadData.payload.action = 'reopened';
-
-        payloadData.payload.pull_request.labels = [label];
-        spyOn(
-          checkPullRequestLabelModule, 'checkChangelogLabel'
-        ).and.callThrough();
-        await robot.receive(payloadData);
-
-        expect(
-          checkPullRequestLabelModule.checkChangelogLabel
-        ).toHaveBeenCalled();
-        expect(github.issues.createComment).not.toHaveBeenCalled();
+  describe('when valid changelog added with no review comments', () => {
+    beforeEach(async () => {
+      const label = {
+        id: 638839900,
+        node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+        url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
+        color: '00FF00',
+      };
+      payloadData.payload.action = 'reopened';
+      // Add changelog label.
+      payloadData.payload.pull_request.labels.push(label);
+      payloadData.payload.pull_request.user.login = 'username';
+      payloadData.payload.pull_request.assignees = [{login: 'username'}],
+      payloadData.payload.pull_request.review_comments = 0;
+      spyOn(
+        utilityModule, 'doesPullRequestHaveChangesRequested'
+      ).and.resolveTo(false);
+      github.search = {
+        issuesAndPullRequests: jasmine
+          .createSpy('issuesAndPullRequests')
+          .and.resolveTo({
+            data: {
+              items: [payloadData.payload.pull_request],
+            },
+          }),
+      };
+      await robot.receive(payloadData);
+    });
+    it('should unassign the author', async () => {
+      spyOn(
+        checkPullRequestLabelModule, 'checkChangelogLabel'
+      ).and.callThrough();
+      await robot.receive(payloadData);
+      expect(
+        utilityModule.doesPullRequestHaveChangesRequested
+      ).toHaveBeenCalled();
+      expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
+      expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+        owner: reviewPayloadData.payload.repository.owner.login,
+        repo: reviewPayloadData.payload.repository.name,
+        q:
+        'repo:oppia/oppia review:changes_requested ' +
+        payloadData.payload.pull_request.number,
       });
+      expect(
+        checkPullRequestLabelModule.checkChangelogLabel
+      ).toHaveBeenCalled();
+      expect(github.issues.removeAssignees).toHaveBeenCalled();
+      expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        issue_number: payloadData.payload.number,
+        assignees: ['username']
+      });
+      const params = {
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        number: payloadData.payload.number,
+        body: 'Unassigning @username since the changelog label was added.'
+      };
+      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalled(params);
+    });
   });
 });
