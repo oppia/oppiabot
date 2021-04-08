@@ -53,6 +53,7 @@ describe('Pull Request Label Check', () => {
         addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
         removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
         addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
+        update: jasmine.createSpy('update').and.resolveTo({}),
       },
       repos: {
         checkCollaborator: jasmine.createSpy('checkCollaborator').and.callFake(
@@ -457,7 +458,7 @@ describe('Pull Request Label Check', () => {
     });
   });
 
-  describe('when a pr is milestoned', () => {
+  fdescribe('when a pr is milestoned', () => {
     const milestone = {
       title: 'Blocking Bugs',
     };
