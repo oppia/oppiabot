@@ -24,6 +24,7 @@ const pullRequestReviewModule = require('../lib/checkPullRequestReview');
 const reviewPayloadData = require('../fixtures/pullRequestReview.json');
 const commentPayloadData = require('../fixtures/pullRequestComment.json');
 const utilityModule = require('../lib/utils');
+const pushPayload = require('../fixtures/push.json');
 
 describe('Pull Request Review Module', () => {
   /**
@@ -52,6 +53,7 @@ describe('Pull Request Review Module', () => {
           .createSpy('removeAssignees')
           .and.returnValue({}),
         addLabels: jasmine.createSpy('addLabels').and.returnValue({}),
+        update: jasmine.createSpy('update').and.returnValue({}),
       },
     };
 
