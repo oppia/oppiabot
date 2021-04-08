@@ -856,5 +856,54 @@ describe('Periodic Checks Module', () => {
         });
       });
     });
+
+    describe('Should Check If a Opened Issue is Assigned to a project', () => {
+      beforeEach(async () => {
+        github.issues.listForRepo = jasmine
+          .createSpy('listForRepo')
+          .and.resolveTo({
+            data: [
+              issues.withProject,
+              issues.anotherWithProject,
+              issues.withoutProject,
+            ],
+          });
+        spyOn(periodicCheckModule, 'ensureNewIssuesHaveProjects').
+          and.callThrough();
+        await robot.receive(payloadData);
+      });
+
+      it('Should Call ensureNewIssuesHaveProjects function', () => {
+        expect(periodicCheckModule.ensureNewIssuesHaveProjects).
+          toHaveBeenCalled();
+      });
+      it('should get all project cards', () => {
+        expect(github.projects.listForRepo).toHaveBeenCalled();
+        expect(github.projects.listForRepo).toHaveBeenCalledWith({
+          repo: 'oppia',
+          owner: 'oppia',
+        });
+
+        expect(github.projects.listColumns).toHaveBeenCalled();
+        expect(github.projects.listColumns).toHaveBeenCalledTimes(2);
+        expect(github.projects.listColumns).toHaveBeenCalledWith({
+          project_id: 101,
+        });
+        expect(github.projects.listColumns).toHaveBeenCalledWith({
+          project_id: 102,
+        });
+
+        expect(github.projects.listCards).toHaveBeenCalled();
+        expect(github.projects.listCards).toHaveBeenCalledTimes(3);
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 111,
+        });
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 112,
+        });
+      });
+    });
   });
 });
