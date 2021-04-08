@@ -456,10 +456,10 @@ describe('Pull Request Label Check', () => {
       expect(github.issues.removeLabel).not.toHaveBeenCalled();
     });
   });
-  
+
   describe('when a pr is milestoned', () => {
     const milestone = {
-      "title": "Blocking Bugs",
+      title: 'Blocking Bugs',
     };
 
     beforeEach(async () => {
@@ -477,12 +477,20 @@ describe('Pull Request Label Check', () => {
 
     it('should create comment on the PR', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        body: 'Hi @' + payloadData.payload.sender.login + ', the Blocking ' +
+          'bugs milestone should only be used on issues, and I’m ' +
+          'removing the milestone. Thanks!',
+        number: payloadData.payload.pull_request.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name
+      });
     });
 
     it('should remove the milestone', () => {
       expect(github.issues.update).toHaveBeenCalled();
     });
-  })
+  });
 
   describe('when datastore label gets removed by non whitelisted user', () => {
     const label = {
