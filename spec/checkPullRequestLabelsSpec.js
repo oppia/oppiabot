@@ -456,6 +456,33 @@ describe('Pull Request Label Check', () => {
       expect(github.issues.removeLabel).not.toHaveBeenCalled();
     });
   });
+  
+  describe('when a pr is milestoned', () => {
+    const milestone = {
+      "title": "Blocking Bugs",
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'milestoned';
+      payloadData.payload.milestone = milestone;
+      spyOn(
+        checkPullRequestLabelModule, 'checkForMilestone'
+      ).and.callThrough();
+      await robot.receive(payloadData);
+    });
+
+    it('should check the milestone', () => {
+      expect(checkPullRequestLabelModule.checkForMilestone).toHaveBeenCalled();
+    });
+
+    it('should create comment on the PR', () => {
+      expect(github.issues.createComment).toHaveBeenCalled();
+    });
+
+    it('should remove the milestone', () => {
+      expect(github.issues.update).toHaveBeenCalled();
+    });
+  })
 
   describe('when datastore label gets removed by non whitelisted user', () => {
     const label = {
