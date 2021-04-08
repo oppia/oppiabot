@@ -47,6 +47,10 @@ describe('CLA check github action Module', () => {
       return octokit;
     });
 
+    Object.setPrototypeOf(OAuth2Client, function () {
+      return {};
+    });
+
     spyOnProperty(github.context, 'repo').and.returnValue({
       owner: pullRequestPayload.payload.repository.owner.login,
       repo: pullRequestPayload.payload.repository.name,
@@ -165,7 +169,7 @@ describe('CLA check github action Module', () => {
     });
   });
 
-  describe('user has not signed cla sheet', () => {
+  describe('testing http req fails', () => {
     beforeEach(async () => {
       spyOn(core, 'setFailed');
     });
@@ -190,7 +194,7 @@ describe('CLA check github action Module', () => {
       expect(core.setFailed).toHaveBeenCalledWith('No data found.');
     });
 
-    it('should fail if no data is present in sheet', async () => {
+    it('should fail if spreadsheet value fetch fails', async () => {
       spyOn(google, 'sheets').and.returnValue({
         spreadsheets: {
           values: {
@@ -209,6 +213,15 @@ describe('CLA check github action Module', () => {
 
       expect(core.setFailed).toHaveBeenCalledWith(
         'The API returned an error: error');
+    });
+
+    it('should fail if Auth fails', async () => {
+      process.env.SHEETS_CRED = {};
+
+      await dispatcher.dispatch('pull_request_target', 'opened');
+
+      expect(core.setFailed).toHaveBeenCalledWith(
+        'Auth failure: SyntaxError: Unexpected token o in JSON at position 1');
     });
   });
 });

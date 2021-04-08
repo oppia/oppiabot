@@ -25,17 +25,17 @@ const { google } = require('googleapis');
  * given claCheck function.
  */
 const authorize = async function() {
-  const CREDENTIALS = JSON.parse(process.env.SHEETS_CRED);
-  const SHEETS_TOKEN = JSON.parse(process.env.SHEETS_TOKEN);
   try {
+    const CREDENTIALS = JSON.parse(process.env.SHEETS_CRED);
+    const SHEETS_TOKEN = JSON.parse(process.env.SHEETS_TOKEN);
     // eslint-disable-next-line camelcase
     const { client_secret, client_id, redirect_uris } = CREDENTIALS.installed;
-    const oAuth2Client = new google.auth.OAuth2(
+    var oAuth2Client = new google.auth.OAuth2(
       client_id,
       client_secret,
       redirect_uris[0]
     );
-    oAuth2Client.setCredentials(SHEETS_TOKEN);
+    oAuth2Client.credentials = SHEETS_TOKEN;
     return oAuth2Client;
   } catch (err) {
     core.setFailed('Auth failure: ' + err);
