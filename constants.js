@@ -32,6 +32,7 @@ const claCheck = 'cla-check';
 const changelogCheck = 'changelog-check';
 const datastoreLabelCheck = 'datastore-label-check';
 const prLabelCheck = 'pr-label-check';
+const prMilestoneCheck = 'pr-milestone-check';
 const prTemplateCheck = 'pr-template-check';
 // This check is required in re-open events as well to
 // prevent user from reopening the PR.
@@ -143,6 +144,7 @@ module.exports.issuesLabelCheck = issuesLabelCheck;
 module.exports.issuesAssignedCheck = issuesAssignedCheck;
 module.exports.datastoreLabelCheck = datastoreLabelCheck;
 module.exports.prLabelCheck = prLabelCheck;
+module.exports.prMilestoneCheck = prMilestoneCheck;
 module.exports.prTemplateCheck = prTemplateCheck;
 module.exports.forcePushCheck = forcePushCheck;
 module.exports.pullRequestReviewCheck = pullRequestReviewCheck;
