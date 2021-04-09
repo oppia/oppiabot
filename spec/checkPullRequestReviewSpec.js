@@ -128,6 +128,12 @@ describe('Pull Request Review Module', () => {
       });
     });
 
+    describe('When reviewer requests changes' +
+          'and there is no label', () => {
+      it('Should Remove the LGTM Label', () => {
+        expect(github.issues.removeLabel).not.toHaveBeenCalled();
+      });
+    });
     describe('when reviewer is assigned and pr author is not assigned', () => {
       beforeEach(async () => {
         await robot.receive(reviewPayloadData);
