@@ -458,14 +458,14 @@ describe('Pull Request Label Check', () => {
     });
   });
 
-  describe('when a pr is milestoned', () => {
+  fdescribe('when a pr is milestoned', () => {
     const milestone = {
       title: 'Blocking Bugs',
     };
 
     beforeEach(async () => {
       payloadData.payload.action = 'milestoned';
-      payloadData.payload.milestone = milestone;
+      payloadData.payload.pull_request.milestone = milestone;
       spyOn(
         checkPullRequestLabelModule, 'checkForMilestone'
       ).and.callThrough();

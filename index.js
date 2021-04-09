@@ -113,7 +113,7 @@ const runChecks = async (context, checkEvent) => {
           case constants.prMilestoneCheck:
             callable.push(
               checkPullRequestLabelsModule.checkForMilestone(context)
-            )
+            );
             break;
           case constants.datastoreLabelCheck:
             callable.push(
