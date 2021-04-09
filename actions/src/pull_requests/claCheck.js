@@ -88,7 +88,7 @@ const checkSheet = async (auth) => {
   await sheets.spreadsheets.values.get(
     {
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Usernames',
+      range: 'Usernames!A:A',
     },
     async (err, res) => {
       if (err) {
