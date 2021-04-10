@@ -56,9 +56,13 @@ Please refer to the following instructions to setup Oppiabot for the first time 
 
 4. The Oppiabot uses environment variables. These are configured in the server settings. To deploy the bot locally, create a `.env` file and copy the contents of `.env.example` to it. You will need to adjust these variables accordingly following the instructions in the subsequent steps. Run following command to copy `.env.example` to `.env`
 
-If using windows cmd and Say you have made folder as instructed in point 1 and on Desktop then run below command, Replace <username> with Name of your computer.
+If using windows cmd, go to oppiabot folder type
+``` bash 
+echo "%cd%"
+```
+The above command will give you <b>path</b>
 ``` bash
-copy C:\Users\<username>\Desktop\opensource\oppiabot\.env.example  C:\Users\<username>\Desktop\opensource\oppiabot\.env 
+copy  <path>\.env.example <path>\.env 
 ``` 
 else run this command
   ```bash
