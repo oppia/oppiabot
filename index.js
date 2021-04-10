@@ -227,7 +227,6 @@ module.exports = (oppiabot) => {
       await runChecks(context, constants.openEvent);
     }
   });
-
   oppiabot.on('pull_request.reopened', async (context) => {
     if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
       await runChecks(context, constants.reopenEvent);
