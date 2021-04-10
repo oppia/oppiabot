@@ -542,10 +542,10 @@ describe('Pull Request Label Check', () => {
   describe('when stale build label gets removed before updating branch', () => {
     const label = {
       id: 638839900,
-      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-      name: 'PR: don' / 't merge - STALE BUILD',
-      color: '00FF00',
+      node_id: "MDU6TGFiZWw2Mzg4Mzk5MDA=",
+      url: "https://api.github.com/repos/oppia/oppia/labels/PR:%20released",
+      name: "PR: don't merge - STALE BUILD",
+      color: "00FF00",
     };
 
     beforeEach(async () => {
@@ -589,10 +589,10 @@ describe('Pull Request Label Check', () => {
   describe('when stale build label removed after updating branch', () => {
     const label = {
       id: 638839900,
-      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-      name: 'PR: don' / 't merge - STALE BUILD',
-      color: '00FF00',
+      node_id: "MDU6TGFiZWw2Mzg4Mzk5MDA=",
+      url: "https://api.github.com/repos/oppia/oppia/labels/PR:%20released",
+      name: "PR: don't merge - STALE BUILD",
+      color: "00FF00",
     };
 
     beforeEach(async () => {
