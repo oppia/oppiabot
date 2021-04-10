@@ -557,7 +557,7 @@ describe('Pull Request Label Check', () => {
       await robot.receive(payloadData);
     });
 
-    it('should check for datastore label', () => {
+    it('checks for stale build label', () => {
       expect(checkStaleBuildLabelRemovedModule.checkStaleBuildLabelRemoved).
         toHaveBeenCalled();
     });
