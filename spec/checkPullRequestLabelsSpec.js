@@ -806,7 +806,7 @@ describe('Pull Request Label Check', () => {
       payloadData.payload.pull_request.review_comments = 0;
       spyOn(
         utilityModule, 'doesPullRequestHaveChangesRequested'
-      ).and.resolveTo(false);
+      ).and.callThrough();
       github.search = {
         issuesAndPullRequests: jasmine
           .createSpy('issuesAndPullRequests')
