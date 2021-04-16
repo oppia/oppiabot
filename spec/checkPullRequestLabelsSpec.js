@@ -480,7 +480,7 @@ describe('Pull Request Label Check', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledWith({
         body: 'Hi @' + payloadData.payload.sender.login + ', the Blocking ' +
-          'bugs milestone should only be used on issues, and I’m ' +
+          'Bugs milestone should only be used on issues, and I’m ' +
           'removing the milestone. Thanks!',
         number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
@@ -490,6 +490,7 @@ describe('Pull Request Label Check', () => {
 
     it('should remove the milestone', () => {
       expect(github.issues.update).toHaveBeenCalled();
+      expect(github.issues.update).toHaveBeenCalledWith({milestone: null});
     });
   });
 

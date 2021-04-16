@@ -16,6 +16,7 @@ const openEvent = 'opened';
 const reopenEvent = 'reopened';
 const unlabelEvent = 'unlabeled';
 const PRLabelEvent = 'labeled';
+const PRMilestoneEvent = 'milestoned';
 const synchronizeEvent = 'synchronize';
 const closeEvent = 'closed';
 const editEvent = 'edited';
@@ -83,6 +84,7 @@ const checksWhitelist = {
       prTemplateCheck
     ],
     [PRLabelEvent]: [assigneeCheck, prLabelCheck],
+    [PRMilestoneEvent]: [prMilestoneCheck],
     [synchronizeEvent]: [
       mergeConflictCheck,
       jobCheck,
@@ -119,6 +121,7 @@ module.exports.openEvent = openEvent;
 module.exports.reopenEvent = reopenEvent;
 module.exports.unlabelEvent = unlabelEvent;
 module.exports.PRLabelEvent = PRLabelEvent;
+module.exports.PRMilestoneEvent = PRMilestoneEvent;
 module.exports.synchronizeEvent = synchronizeEvent;
 module.exports.closeEvent = closeEvent;
 module.exports.editEvent = editEvent;
