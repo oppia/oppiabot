@@ -53,6 +53,7 @@ describe('Pull Request Label Check', () => {
         addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
         removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
         addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
+        update: jasmine.createSpy('update').and.resolveTo({}),
       },
       repos: {
         checkCollaborator: jasmine.createSpy('checkCollaborator').and.callFake(
@@ -454,6 +455,41 @@ describe('Pull Request Label Check', () => {
 
     it('does not remove the label', () => {
       expect(github.issues.removeLabel).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('when a pr is milestoned', () => {
+    const milestone = {
+      title: 'Blocking Bugs',
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'milestoned';
+      payloadData.payload.milestone = milestone;
+      spyOn(
+        checkPullRequestLabelModule, 'checkForMilestone'
+      ).and.callThrough();
+      await robot.receive(payloadData);
+    });
+
+    it('should check the milestone', () => {
+      expect(checkPullRequestLabelModule.checkForMilestone).toHaveBeenCalled();
+    });
+
+    it('should create comment on the PR', () => {
+      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        body: 'Hi @' + payloadData.payload.sender.login + ', the Blocking ' +
+          'bugs milestone should only be used on issues, and I’m ' +
+          'removing the milestone. Thanks!',
+        number: payloadData.payload.pull_request.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name
+      });
+    });
+
+    it('should remove the milestone', () => {
+      expect(github.issues.update).toHaveBeenCalled();
     });
   });
 
