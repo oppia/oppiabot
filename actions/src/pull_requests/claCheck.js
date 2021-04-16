@@ -93,7 +93,9 @@ const checkSheet = async (auth) => {
     async (err, res) => {
       if (err) {
         core.setFailed('The API returned an error: ' + err);
+        return;
       }
+
       const rows = res.data.values;
       const flatRows = [].concat.apply([], rows);
       if (!rows || rows.length === 0) {
