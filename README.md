@@ -23,6 +23,12 @@ Please refer to the following instructions to setup Oppiabot for the first time 
 
 2. Install [Node.Js](https://nodejs.org/) and [NPM](https://www.npmjs.com/) on your machine using the following commands:
 
+    First check if you already have Node.js and NPM using:
+    ```bash
+    node -v
+    npm -v
+    ```
+    If these commands show some versions, then you can jump to Point No. 3, else proceed in this point:
     #### Using Ubuntu
     ```bash
     curl -sL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
@@ -39,13 +45,19 @@ Please refer to the following instructions to setup Oppiabot for the first time 
     ```bash
     sudo brew install node
     ```
+
+    #### Using Windows
+    Install using following [link](https://nodejs.org/en/download/). (Its always preferred to use LTS Version).
     
 3. Setup probot and other dependencies by running the following command:
   ```bash
     npm install
   ```
 
-4. The Oppiabot uses environment variables. These are configured in the server settings. To deploy the bot locally, create a `.env` file and copy the contents of `.env.example` to it. You will need to adjust these variables accordingly following the instructions in the subsequent steps.
+4. The Oppiabot uses environment variables. These are configured in the server settings. To deploy the bot locally, create a `.env` file and copy the contents of `.env.example` to it. You will need to adjust these variables accordingly following the instructions in the subsequent steps. Run following command to copy `.env.example` to `.env`
+  ```bash
+    cp .env.example .env
+  ```
 
 5. Go to [smee.io](https://smee.io/) and click **Start a new channel**. Set `WEBHOOK_PROXY_URL` in `.env` to the URL that you are redirected to.
 
@@ -62,6 +74,10 @@ Please refer to the following instructions to setup Oppiabot for the first time 
 
 7. Download the private key. It will be a `.pem` file. Move it to the root directory of the project. As long as it's in the root directory, it will be automatically detected regardless of the filename.
 
+Make sure you remove
+ > PRIVATE_KEY=example_private_key
+from .env file, Otherwise app will not work locally.
+
 8. Edit `.env` and set `APP_ID` to the ID of the app you just created. The App ID can be found in your app settings page here.
 
 <p align="center">
@@ -71,7 +87,8 @@ Please refer to the following instructions to setup Oppiabot for the first time 
 
 ## Installing the bot on a repository
 
-You'll need to identify a target repository and install the bot by clicking the **Install** button on the settings page of your app, e.g `https://github.com/apps/your-app-name`
+You'll need to identify a target repository and install the bot by clicking the **Install** button on the settings page of your app, e.g `https://github.com/apps/your-app-name`. In the `.env` file put your github account name in 
+`WHITELISTED_ACCOUNTS` and also add your repository (name in small caps) in the `constants.js` file locally.
 
 
 ## Running the bot locally
@@ -87,6 +104,7 @@ The `dev` script will start the bot using [nodemon](https://github.com/remy/node
 ## Debugging
 Always run `$ npm install` and restart the server if `package.json` has changed.
 To turn on verbose logging, start server by running: `$ LOG_LEVEL=trace npm start`.
+Run `npm test` to run all the tests locally.
 
 
 ## Support
