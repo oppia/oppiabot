@@ -82,7 +82,7 @@ describe('Pull Request Review Module', () => {
       };
     });
 
-    describe('When reviewer requests changes and LGTM label' +
+    describe('When reviewer requests changes and LGTM label ' +
      'was already added to the pull request.', ()=>{
       beforeEach(async () => {
         const label = {
