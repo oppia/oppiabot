@@ -94,7 +94,6 @@ describe('Pull Request Review Module', () => {
         };
         // Set the payload action and label which will simulate removing
         // the LGTM label.
-        payloadData.payload.action = 'labeled';
         payloadData.payload.label = label;
         payloadData.payload.pull_request.requested_reviewers = [
           { login: 'reviewer1' },
@@ -103,6 +102,7 @@ describe('Pull Request Review Module', () => {
         payloadData.payload.pull_request.assignees = [];
         // Set project owner to be pr author.
         payloadData.payload.pull_request.user.login = 'kevintab95';
+        reviewPayloadData.payload.pull_request.labels.push(label);
         await robot.receive(reviewPayloadData);
       });
 
