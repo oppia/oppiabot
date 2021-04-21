@@ -25,6 +25,7 @@ const checkPullRequestTemplateModule =
 const checkStaleBuildLabelRemovedModule =
   require('../lib/checkPullRequestLabels');
 const scheduler = require('../lib/scheduler');
+const OLD_BUILD_LABEL = "PR: don't merge - STALE BUILD";
 
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
@@ -567,8 +568,8 @@ describe('Pull Request Label Check', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         body:
         'Hi @' + payloadData.payload.sender.login + ', the build of this ' +
-        ' pr is ' + ' stale please do not remove ' + 'PR: don' / 't merge ' +
-        ' - STALE BUILD' + ' label. ',
+        ' PR is stale please do not remove \'' + OLD_BUILD_LABEL + '\'' +
+        ' label. ',
         number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name
@@ -578,7 +579,7 @@ describe('Pull Request Label Check', () => {
     it('should add the stale build label', () => {
       expect(github.issues.addLabels).toHaveBeenCalled();
       expect(github.issues.addLabels).toHaveBeenCalledWith({
-        labels: ['PR: don' / 't merge - STALE BUILD'],
+        labels: [OLD_BUILD_LABEL],
         number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name
