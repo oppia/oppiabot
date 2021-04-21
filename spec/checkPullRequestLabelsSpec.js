@@ -552,7 +552,7 @@ describe('Pull Request Label Check', () => {
       payloadData.payload.action = 'unlabeled';
       payloadData.payload.label = label;
       spyOn(
-        checkStaleBuildLabelRemovedModule, 'checkstaleBuildLabel'
+        checkStaleBuildLabelRemovedModule, 'checkStaleBuildLabelRemoved',
       ).and.callThrough();
       await robot.receive(payloadData);
     });
@@ -600,7 +600,7 @@ describe('Pull Request Label Check', () => {
       payloadData.payload.label = label;
       payloadData.payload.sender.login = 'seanlip';
       spyOn(
-        checkStaleBuildLabelRemoedlModule, 'checkstaleBuildLabel'
+        checkStaleBuildLabelRemovedModule, 'checkStaleBuildLabelRemoved'
       ).and.callThrough();
       await robot.receive(payloadData);
     });
