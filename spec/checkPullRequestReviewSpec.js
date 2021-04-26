@@ -126,6 +126,10 @@ describe('Pull Request Review Module', () => {
       it('Should Remove the LGTM Label', () => {
         expect(github.issues.removeLabel).toHaveBeenCalled();
       });
+
+      afterAll(() => {
+        payloadData.payload.pull_request.requested_reviewers = [];
+      });
     });
 
     describe('When reviewer requests changes' +
