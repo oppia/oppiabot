@@ -264,17 +264,37 @@ describe('Api For Sheets Module', () => {
           'https://github.com/oppia/oppia/wiki/Contributing-code-to-' +
           'Oppia#setting-things-up'
         );
-        expect(github.issues.createComment).toHaveBeenCalledWith({
-          owner: pullRequestPayload.payload.repository.owner.login,
-          repo: pullRequestPayload.payload.repository.name,
-          number: pullRequestPayload.payload.pull_request.number,
-          body:
+        var oppiaAndroidLinkText = 'here';
+        var linkOppiaAndroid = oppiaAndroidLinkText.link(
+          'https://github.com/oppia/oppia-android/wiki#onboarding-instructions'
+        );
+
+        var commentBody = "";
+          if(pullRequestPayload.payload.repository.name === 'oppia-android') {
+            commentBody = 'Hi! ' +
+            '@testuser7778' +
+            'Welcome to Oppia! Please could you ' +
+            'follow the instructions ' +
+            linkOppiaAndroid +
+            ' to get started with oppia-android? You\'ll need to do this ' +
+            'before we can accept your PR. I am closing this PR for now. ' +
+            'Feel free to re-open it once you are done with the above ' +
+            'instructions. Thanks!';
+          } else {
+            commentBody = 
             'Hi! @testuser7778, Welcome to Oppia! Please could you ' +
             'follow the instructions ' + linkResult +
             ' to get started? You\'ll need to do ' +
             'this before we can accept your PR. ' +
             'I am closing this PR for now. Feel free to re-open it ' +
-            'once you are done with the above instructions. Thanks!',
+            'once you are done with the above instructions. Thanks!';
+          }
+
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          owner: pullRequestPayload.payload.repository.owner.login,
+          repo: pullRequestPayload.payload.repository.name,
+          number: pullRequestPayload.payload.pull_request.number,
+          body: commentBody,
         });
         expect(github.issues.update).toHaveBeenCalledWith({
           issue_number: pullRequestPayload.payload.pull_request.number,
