@@ -27,6 +27,7 @@ const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
+const checkCronJobModule = require('../lib/checkNewCronJobs');
 
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
@@ -459,6 +460,7 @@ describe('Pull Request Job Spec', () => {
       checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'
     ).and.callFake(() => { });
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
+    spyOn(checkCronJobModule, 'checkForNewCronJob').and.callThrough();
     spyOn(checkWIPModule, 'checkWIP').and.callFake(() => { });
     spyOn(
       checkPullRequestTemplateModule, 'checkTemplate'
