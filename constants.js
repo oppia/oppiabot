@@ -65,7 +65,9 @@ const checksWhitelist = {
     [synchronizeEvent]: [],
     [closeEvent]: [],
     [editEvent]: [],
-    [issuesLabelEvent]: []
+    [issuesLabelEvent]: [],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
+    [pushEvent]: [forcePushCheck],
   },
   // eslint-disable-next-line quote-props
   'oppia': {
