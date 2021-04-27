@@ -128,7 +128,15 @@ describe('Pull Request Review Module', () => {
       });
 
       afterAll(() => {
+        const label = {
+          id: 248679580,
+          node_id: 'MDU6TGFiZWwyNDg2Nzk1ODA=',
+          url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20LGTM',
+          name: 'PR: LGTM',
+          color: '009800',
+        };
         payloadData.payload.pull_request.requested_reviewers = [];
+        reviewPayloadData.payload.pull_request.labels.pop(label);
       });
     });
 
