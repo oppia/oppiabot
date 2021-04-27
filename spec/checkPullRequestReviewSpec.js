@@ -136,7 +136,11 @@ describe('Pull Request Review Module', () => {
           color: '009800',
         };
         payloadData.payload.pull_request.requested_reviewers = [];
-        reviewPayloadData.payload.pull_request.labels.pop(label);
+        const indexOfLabel = reviewPayloadData.payload.
+          pull_request.labels.indexOf(label);
+        if (indexOfLabel !== -1) {
+          reviewPayloadData.payload.pull_request.labels.shift(indexOfLabel, 1);
+        }
       });
     });
 
