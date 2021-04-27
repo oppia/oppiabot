@@ -67,7 +67,6 @@ const checksWhitelist = {
     [editEvent]: [],
     [issuesLabelEvent]: [],
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
-    [pushEvent]: [forcePushCheck],
   },
   // eslint-disable-next-line quote-props
   'oppia': {
@@ -120,7 +119,8 @@ const checksWhitelist = {
     [editEvent]: [],
     [issuesLabelEvent]: [],
     [issuesAssignedEvent]: [],
-    [pushEvent]: []
+    [pushEvent]: [],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
   },
 };
 
