@@ -85,7 +85,7 @@ describe('Cron Job Spec', () => {
     '(key name %s) failed. \'\n+      \'More info:\\n\\n\'\n+'
   };
 
-  const modifiedExistingJobFileObj = {
+  const urlJobFileObj = {
     sha: 'f06a0d3ea104733080c4dad4a4e5aa7fb76d8f5d',
     filename: 'main_cron.py',
     status: 'modified',
@@ -198,10 +198,10 @@ describe('Cron Job Spec', () => {
     });
 
     app = robot.load(oppiaBot);
-    app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callThrough();
     spyOn(checkCronJobModule, 'checkForNewCronJob').and.callThrough();
+    spyOn(
+      checkPullRequestJobModule, 'checkForNewJob').and.callThrough(() => { });
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
       checkPullRequestLabelsModule, 'checkChangelogLabel'
@@ -217,7 +217,7 @@ describe('Cron Job Spec', () => {
     spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
   });
 
-  describe('When a new cron job is created in a pull request', () => {
+  describe('When a new cron job is added in a pull request', () => {
     beforeEach(async () => {
       github.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
@@ -282,7 +282,7 @@ describe('Cron Job Spec', () => {
       github.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
-            modifiedExistingJobFileObj,
+            urlJobFileObj, jobTestFile, firstNewJobFileObj
           ],
         }),
       };
@@ -369,7 +369,7 @@ describe('Cron Job Spec', () => {
       github.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
-            jobTestFile
+            jobTestFile, urlJobFileObj
           ],
         }),
       };
