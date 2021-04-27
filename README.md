@@ -55,6 +55,12 @@ Please refer to the following instructions to setup Oppiabot for the first time 
   ```
 
 4. The Oppiabot uses environment variables. These are configured in the server settings. To deploy the bot locally, create a `.env` file and copy the contents of `.env.example` to it. You will need to adjust these variables accordingly following the instructions in the subsequent steps. Run following command to copy `.env.example` to `.env`
+
+If you're using Windows cmd, go to Oppiabot folder and type:
+``` bash
+copy .env.example .env 
+``` 
+If you have Linux terminal type:
   ```bash
     cp .env.example .env
   ```
@@ -87,7 +93,8 @@ from .env file, Otherwise app will not work locally.
 
 ## Installing the bot on a repository
 
-You'll need to identify a target repository and install the bot by clicking the **Install** button on the settings page of your app, e.g `https://github.com/apps/your-app-name`
+You'll need to identify a target repository and install the bot by clicking the **Install** button on the settings page of your app, e.g `https://github.com/apps/your-app-name`. In the `.env` file put your github account name in 
+`WHITELISTED_ACCOUNTS` and also add your repository (name in small caps) in the `constants.js` file locally.
 
 
 ## Running the bot locally
@@ -103,6 +110,7 @@ The `dev` script will start the bot using [nodemon](https://github.com/remy/node
 ## Debugging
 Always run `$ npm install` and restart the server if `package.json` has changed.
 To turn on verbose logging, start server by running: `$ LOG_LEVEL=trace npm start`.
+Run `npm test` to run all the tests locally.
 
 
 ## Support
