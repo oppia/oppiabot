@@ -269,9 +269,9 @@ describe('Api For Sheets Module', () => {
           'https://github.com/oppia/oppia-android/wiki#onboarding-instructions'
         );
 
-        var commentBody = "";
-          if(pullRequestPayload.payload.repository.name === 'oppia-android') {
-            commentBody = 'Hi! ' +
+        var commentBody = '';
+        if (pullRequestPayload.payload.repository.name === 'oppia-android') {
+          commentBody = 'Hi! ' +
             '@testuser7778' +
             'Welcome to Oppia! Please could you ' +
             'follow the instructions ' +
@@ -280,15 +280,15 @@ describe('Api For Sheets Module', () => {
             'before we can accept your PR. I am closing this PR for now. ' +
             'Feel free to re-open it once you are done with the above ' +
             'instructions. Thanks!';
-          } else {
-            commentBody = 
+        } else {
+          commentBody =
             'Hi! @testuser7778, Welcome to Oppia! Please could you ' +
             'follow the instructions ' + linkResult +
             ' to get started? You\'ll need to do ' +
             'this before we can accept your PR. ' +
             'I am closing this PR for now. Feel free to re-open it ' +
             'once you are done with the above instructions. Thanks!';
-          }
+        }
 
         expect(github.issues.createComment).toHaveBeenCalledWith({
           owner: pullRequestPayload.payload.repository.owner.login,
