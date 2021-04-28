@@ -64,7 +64,10 @@ describe('Pull Request Label Check', () => {
               throw new Error('User is not a collaborator.');
             }
             return { status: 204 };
-          })
+          }),
+        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
+          data: lastCommit
+        })
       }
     };
 
@@ -566,13 +569,13 @@ describe('Pull Request Label Check', () => {
     it('should comment on PR', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledWith({
-        body:
-        'Hi @' + payloadData.payload.sender.login + ', the build of this ' +
-        ' PR is stale please do not remove \'' + OLD_BUILD_LABEL + '\'' +
-        ' label. ',
         number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
-        repo: payloadData.payload.repository.name
+        repo: payloadData.payload.repository.name,
+        body:
+        'Hi @' + payloadData.payload.sender.login + ', the build of this' +
+        ' PR is stale please do not remove \'' + OLD_BUILD_LABEL + '\'' +
+        ' label. ',
       });
     });
 
