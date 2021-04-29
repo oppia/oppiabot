@@ -688,9 +688,9 @@ describe('Pull Request Review Module', () => {
                 },
               }),
           };
-          github.orgs = {
-            checkMembership: jasmine
-              .createSpy('checkMembership')
+          github.repos = {
+            getCollaboratorPermissionLevel: jasmine
+              .createSpy('getCollaboratorPermissionLevel')
               .and.callFake(() => {
                 throw new Error(
                   'User does not exist or is not a public member of ' +
@@ -739,8 +739,10 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should check if author can merge', () => {
-          expect(github.repos.getCollaboratorPermissionLevel).toHaveBeenCalled();
-          expect(github.repos.getCollaboratorPermissionLevel).toHaveBeenCalledWith({
+          expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalled();
+          expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repo.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             username: reviewPayloadData.payload.pull_request.user.login,
@@ -805,10 +807,11 @@ describe('Pull Request Review Module', () => {
                 },
               }),
           };
-          github.orgs = {
-            checkMembership: jasmine.createSpy('checkMembership')
+          github.repos = {
+            getCollaboratorPermissionLevel: jasmine
+            .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
-                status: 204,
+                status: 200,
               }),
           };
           await robot.receive(reviewPayloadData);
@@ -858,8 +861,10 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should check if author can merge', () => {
-          expect(github.repos.getCollaboratorPermissionLevel).toHaveBeenCalled();
-          expect(github.repos.getCollaboratorPermissionLevel).toHaveBeenCalledWith({
+          expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalled();
+          expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             username: reviewPayloadData.payload.pull_request.user.login,
@@ -928,10 +933,11 @@ describe('Pull Request Review Module', () => {
                 },
               }),
           };
-          github.orgs = {
-            checkMembership: jasmine.createSpy('checkMembership')
+          github.repos = {
+            getCollaboratorPermissionLevel: jasmine
+            .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
-                status: 204,
+                status: 200,
               }),
           };
           await robot.receive(reviewPayloadData);
@@ -975,8 +981,10 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should check if author can merge', () => {
-          expect(github.repos.getCollaboratorPermissionLevel).toHaveBeenCalled();
-          expect(github.repos.getCollaboratorPermissionLevel).toHaveBeenCalledWith({
+          expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalled();
+          expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             username: reviewPayloadData.payload.pull_request.user.login,
@@ -1029,11 +1037,11 @@ describe('Pull Request Review Module', () => {
                 },
               }),
           };
-          github.orgs = {
-            checkMembership: jasmine
-              .createSpy('checkMembership')
+          github.repos = {
+            getCollaboratorPermissionLevel: jasmine
+              .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
-                status: 204,
+                status: 200,
               }),
           };
           await robot.receive(reviewPayloadData);
@@ -1081,7 +1089,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should not check if author can merge', () => {
-          expect(github.repos.getCollaboratorPermissionLevel).not.toHaveBeenCalled();
+          expect(github.repos.getCollaboratorPermissionLevel)
+          .not.toHaveBeenCalled();
         });
 
         it('should not assign pr author', () => {
