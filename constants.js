@@ -121,10 +121,6 @@ const checksWhitelist = {
     [issuesAssignedEvent]: [],
     [pushEvent]: []
   },
-  'certificate-generator' : {
-    [unlabelEvent]: [datastoreLabelCheck, staleBuildLabelCheck],
-    [issueCommentCreatedEvent]: [respondToReviewCheck]
-  }
 };
 
 const blacklistedAuthors = ['translatewiki'];
