@@ -868,6 +868,8 @@ describe('Periodic Checks Module', () => {
               issues.withoutProject,
             ],
           });
+        payloadData.name = 'issued';
+        payloadData.payload.action = 'opened';
         spyOn(periodicCheckModule, 'ensureNewIssuesHaveProjects').
           and.callThrough();
         await robot.receive(payloadData);
@@ -903,6 +905,11 @@ describe('Periodic Checks Module', () => {
           archived_state: 'not_archived',
           column_id: 112,
         });
+      });
+
+      afterAll(() => {
+        payloadData.name = 'schedule';
+        payloadData.payload.action = 'repository';
       });
     });
   });
