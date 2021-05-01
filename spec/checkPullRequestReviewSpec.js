@@ -84,6 +84,9 @@ describe('Pull Request Review Module', () => {
 
     describe('When reviewer requests changes and LGTM label ' +
      'was already added to the pull request.', ()=>{
+      const originalPayloadLabels = (
+        reviewPayloadData.payload.pull_request.labels
+      );
       beforeEach(async () => {
         const label = {
           id: 248679580,
@@ -128,19 +131,8 @@ describe('Pull Request Review Module', () => {
       });
 
       afterAll(() => {
-        const label = {
-          id: 248679580,
-          node_id: 'MDU6TGFiZWwyNDg2Nzk1ODA=',
-          url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20LGTM',
-          name: 'PR: LGTM',
-          color: '009800',
-        };
         payloadData.payload.pull_request.requested_reviewers = [];
-        const indexOfLabel = reviewPayloadData.payload.
-          pull_request.labels.indexOf(label);
-        if (indexOfLabel !== -1) {
-          reviewPayloadData.payload.pull_request.labels.shift(indexOfLabel, 1);
-        }
+        reviewPayloadData.payload.pull_request.labels = originalPayloadLabels;
       });
     });
 
