@@ -17,6 +17,7 @@ require('dotenv').config();
 const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
+const constants = require('../constants');
 const checkCronJobModule = require('../lib/checkNewCronJobs');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const apiForSheetsModule = require('../lib/apiForSheets');
@@ -29,7 +30,7 @@ const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
-
+const WIKI_LINK = constants.getWikiLink();
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
@@ -201,7 +202,7 @@ describe('Cron Job Spec', () => {
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(checkCronJobModule, 'checkForNewCronJob').and.callThrough();
     spyOn(
-      checkPullRequestJobModule, 'checkForNewJob').and.callThrough(() => { });
+      checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
       checkPullRequestLabelsModule, 'checkChangelogLabel'
@@ -246,17 +247,14 @@ describe('Cron Job Spec', () => {
           'https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText = (
-        'this guide'.link('https://github.com/oppia/oppia/wiki/' +
-      'Testing-jobs-and-other-features-on-production')
-      );
+      const wikiLinkText = ('this guide'.link(WIKI_LINK));
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
         'Hi @vojtechjelinek, PTAL at this PR, it adds a new cron job.' +
         newLineFeed + 'Also @' + author + ' please add the new test' +
-        ' and URL redirects for new cron jobs It seems you have added or' +
+        ' and URL redirects for the new CRON jobs It seems you have added or' +
         ' edited a CRON job,if so please request a testing of this ' +
         'CRON job with this ' + formText + ' Please refer to ' +
         wikiLinkText + ' for details.' +
@@ -306,11 +304,7 @@ describe('Cron Job Spec', () => {
         'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText = (
-        'this guide'.link(
-          'https://github.com/oppia/oppia/wiki/' +
-      'Testing-jobs-and-other-features-on-production')
-      );
+      const wikiLinkText = ('this guide'.link(WIKI_LINK));
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
@@ -364,7 +358,7 @@ describe('Cron Job Spec', () => {
     });
   });
 
-  describe('When test are added with cron job', () => {
+  describe('When test and URL redirects are added for a  cron job', () => {
     beforeEach(async () => {
       github.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
@@ -393,11 +387,53 @@ describe('Cron Job Spec', () => {
         'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText = (
-        'this guide'.link(
-          'https://github.com/oppia/oppia/wiki/' +
-      'Testing-jobs-and-other-features-on-production')
+      const wikiLinkText = ('this guide'.link(WIKI_LINK));
+
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        issue_number: payloadData.payload.pull_request.number,
+        body:
+        'Hi @vojtechjelinek, PTAL at this PR, it adds a new cron job.' +
+        newLineFeed + 'Also @' + author + ' It seems you have added or' +
+        ' edited a CRON job,if so please request a testing of this ' +
+        'CRON job with this ' + formText + ' Please refer to ' +
+        wikiLinkText + ' for details.' +
+        newLineFeed + 'Thanks!',
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+      });
+    });
+  });
+
+  describe('When only tests are added for a  cron job', () => {
+    beforeEach(async () => {
+      github.pulls = {
+        listFiles: jasmine.createSpy('listFiles').and.resolveTo({
+          data: [
+            jobTestFile
+          ],
+        }),
+      };
+
+      payloadData.payload.pull_request.changed_files = 1;
+      await robot.receive(payloadData);
+    });
+
+    it('should check for cron jobs', () => {
+      expect(checkCronJobModule.checkForNewCronJob).toHaveBeenCalled();
+    });
+
+    it('should get modified files', () => {
+      expect(github.pulls.listFiles).toHaveBeenCalled();
+    });
+
+    it('should ping server job admin', () => {
+      expect(github.issues.createComment).toHaveBeenCalled();
+      const author = payloadData.payload.pull_request.user.login;
+      const formText = (
+        'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
+      const newLineFeed = '<br>';
+      const wikiLinkText = ('this guide'.link(WIKI_LINK));
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
