@@ -150,14 +150,17 @@ describe('Periodic Checks Module', () => {
           };
         }),
       },
-      orgs: {
-        checkMembership: jasmine
-          .createSpy('checkMembership')
+      repos: {
+        getCollaboratorPermissionLevel: jasmine
+          .createSpy('getCollaboratorPermissionLevel')
           .and.callFake((params) => {
             // pullRequests.approvedPR is the only user that has merging rights.
             if (params.username === pullRequests.approvedPR.user.login) {
               return {
-                status: 204,
+                data: {
+                  status: 200,
+                  permission: ['admin', 'write'],
+                }
               };
             }
 
@@ -464,8 +467,10 @@ describe('Periodic Checks Module', () => {
       });
 
       it('should check if pr author has merging rights', () => {
-        expect(github.orgs.checkMembership).toHaveBeenCalled();
-        expect(github.orgs.checkMembership).toHaveBeenCalledWith({
+        expect(github.repos.getCollaboratorPermissionLevel)
+        .toHaveBeenCalled();
+        expect(github.repos.getCollaboratorPermissionLevel)
+        .toHaveBeenCalledWith({
           org: 'oppia',
           username: 'author4',
         });
@@ -524,8 +529,10 @@ describe('Periodic Checks Module', () => {
       });
 
       it('should check if pr author has merging rights', () => {
-        expect(github.orgs.checkMembership).toHaveBeenCalled();
-        expect(github.orgs.checkMembership).toHaveBeenCalledWith({
+        expect(github.repos.getCollaboratorPermissionLevel)
+        .toHaveBeenCalled();
+        expect(github.repos.getCollaboratorPermissionLevel)
+        .toHaveBeenCalledWith({
           org: 'oppia',
           username: 'author5',
         });

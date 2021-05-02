@@ -811,7 +811,10 @@ describe('Pull Request Review Module', () => {
             getCollaboratorPermissionLevel: jasmine
             .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
+                 data: {
                 status: 200,
+                permission: ['admin', 'write'],
+                }
               }),
           };
           await robot.receive(reviewPayloadData);
@@ -937,7 +940,10 @@ describe('Pull Request Review Module', () => {
             getCollaboratorPermissionLevel: jasmine
             .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
-                status: 200,
+                data: {
+                 status: 200,
+                 permission: ['admin', 'write'],
+                }
               }),
           };
           await robot.receive(reviewPayloadData);
@@ -1041,7 +1047,10 @@ describe('Pull Request Review Module', () => {
             getCollaboratorPermissionLevel: jasmine
               .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
+                data: {
                 status: 200,
+                permission: ['admin', 'write'],
+                }
               }),
           };
           await robot.receive(reviewPayloadData);
