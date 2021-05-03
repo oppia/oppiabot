@@ -84,9 +84,9 @@ describe('Pull Request Review Module', () => {
 
     describe('When reviewer requests changes and LGTM label ' +
      'was already added to the pull request.', ()=>{
-      const originalPayloadLabels = (
-        reviewPayloadData.payload.pull_request.labels
-      );
+      const originalPayloadLabels = [
+        ...reviewPayloadData.payload.pull_request.labels
+      ];
       beforeEach(async () => {
         const label = {
           id: 248679580,
