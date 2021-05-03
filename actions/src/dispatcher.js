@@ -40,6 +40,8 @@ module.exports = {
             case constants.claCheckGithubAction:
               await claCheckGithubActionModule.claCheckGithubAction();
               break;
+            case constants.prLabelCheck:
+              await
           }
         }
       }
