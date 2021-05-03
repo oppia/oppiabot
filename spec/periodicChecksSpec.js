@@ -868,7 +868,7 @@ describe('Periodic Checks Module', () => {
               issues.withoutProject,
             ],
           });
-        payloadData.name = 'issued';
+        payloadData.name = 'issues';
         payloadData.payload.action = 'opened';
         spyOn(periodicCheckModule, 'ensureNewIssuesHaveProjects').
           and.callThrough();
