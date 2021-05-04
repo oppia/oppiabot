@@ -127,8 +127,10 @@ const checksWhitelist = {
 };
 
 const blacklistedAuthors = ['translatewiki'];
-const WIKI_LINK = 'https://github.com/oppia/oppia/wiki/' +
- 'Testing-jobs-and-other-features-on-production';
+const JOBS_AND_FETURES_TESTING_WIKI_LINK = (
+  'https://github.com/oppia/oppia/wiki/' +
+  'Testing-jobs-and-other-features-on-production'
+);
 
 module.exports.openEvent = openEvent;
 module.exports.reopenEvent = reopenEvent;
@@ -179,5 +181,5 @@ module.exports.getChecksWhitelist = function() {
 };
 
 module.exports.getWikiLink = function() {
-  return WIKI_LINK;
+  return JOBS_AND_FETURES_TESTING_WIKI_LINK;
 };

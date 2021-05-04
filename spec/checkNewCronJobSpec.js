@@ -30,7 +30,7 @@ const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
-const WIKI_LINK = constants.getWikiLink();
+const JOBS_AND_FETURES_TESTING_WIKI_LINK = constants.getWikiLink();
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
@@ -247,7 +247,8 @@ describe('Cron Job Spec', () => {
           'https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText = ('this guide'.link(WIKI_LINK));
+      const wikiLinkText =
+      ('this guide'.link(JOBS_AND_FETURES_TESTING_WIKI_LINK));
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
@@ -304,7 +305,8 @@ describe('Cron Job Spec', () => {
         'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText = ('this guide'.link(WIKI_LINK));
+      const wikiLinkText =
+       ('this guide'.link(JOBS_AND_FETURES_TESTING_WIKI_LINK));
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
@@ -387,7 +389,8 @@ describe('Cron Job Spec', () => {
         'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText = ('this guide'.link(WIKI_LINK));
+      const wikiLinkText =
+       ('this guide'.link(JOBS_AND_FETURES_TESTING_WIKI_LINK));
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
@@ -433,7 +436,8 @@ describe('Cron Job Spec', () => {
         'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText = ('this guide'.link(WIKI_LINK));
+      const wikiLinkText =
+       ('this guide'.link(JOBS_AND_FETURES_TESTING_WIKI_LINK));
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
