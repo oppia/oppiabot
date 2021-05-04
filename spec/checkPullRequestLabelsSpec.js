@@ -661,7 +661,111 @@ describe('Pull Request Label Check', () => {
           issue_number: payloadData.payload.number,
           assignees: ['reviewer']
         });
-      }, 10000
+      }
+    );
+
+    it(
+      'adds a default label when pr author is not a collaborator and PR ' +
+      'is in draft mode',
+      async () => {
+        payloadData.payload.action = 'reopened';
+        payloadData.payload.pull_request.user.login = 'newuser';
+        payloadData.payload.pull_request.draft = true;
+        payloadData.payload.pull_request.requested_reviewers = [];
+
+        spyOn(
+          checkPullRequestLabelModule, 'checkChangelogLabel'
+        ).and.callThrough();
+
+        github.pulls = {
+          get: jasmine
+            .createSpy('get')
+            .and.resolveTo({data: payloadData.payload.pull_request}),
+        };
+
+        await robot.receive(payloadData);
+
+        expect(
+          checkPullRequestLabelModule.checkChangelogLabel
+        ).toHaveBeenCalled();
+        expect(github.issues.addLabels).toHaveBeenCalled();
+        const labelParams = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          labels: ['REVIEWERS: Please add changelog label'],
+        };
+        expect(github.issues.addLabels).toHaveBeenCalledWith(labelParams);
+
+        expect(github.issues.createComment).not.toHaveBeenCalled();
+        const commentParams = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          body:
+            'Hi @reviewer, could you please add the appropriate ' +
+            'changelog label to this pull request? Thanks!',
+        };
+        expect(github.issues.createComment)
+          .not
+          .toHaveBeenCalledWith(commentParams);
+
+        expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      }
+    );
+
+    it(
+      'adds a default label when pr author is not a collaborator and PR ' +
+      'has no reviewer',
+      async () => {
+        payloadData.payload.action = 'reopened';
+        payloadData.payload.pull_request.user.login = 'newuser';
+        payloadData.payload.pull_request.draft = false;
+        payloadData.payload.pull_request.requested_reviewers = [];
+
+        spyOn(
+          checkPullRequestLabelModule, 'checkChangelogLabel'
+        ).and.callThrough();
+
+        github.pulls = {
+          get: jasmine
+            .createSpy('get')
+            .and.resolveTo({data: payloadData.payload.pull_request}),
+        };
+
+        await robot.receive(payloadData);
+
+        expect(
+          checkPullRequestLabelModule.checkChangelogLabel
+        ).toHaveBeenCalled();
+        expect(github.issues.addLabels).toHaveBeenCalled();
+        const labelParams = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          labels: ['REVIEWERS: Please add changelog label'],
+        };
+        expect(github.issues.addLabels).toHaveBeenCalledWith(labelParams);
+
+        expect(github.issues.createComment).toHaveBeenCalled();
+        const commentParams = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          body:
+            'Hi @DubeySandeep, could you please add the appropriate ' +
+            'changelog label to this pull request? Thanks!',
+        };
+        expect(github.issues.createComment).toHaveBeenCalledWith(commentParams);
+
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          assignees: ['DubeySandeep']
+        });
+      }
     );
 
     it(
@@ -724,7 +828,7 @@ describe('Pull Request Label Check', () => {
           issue_number: payloadData.payload.number,
           assignees: ['reviewer1', 'reviewer2']
         });
-      }, 10000
+      }
     );
 
 
