@@ -17,7 +17,6 @@ require('dotenv').config();
 const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
-const constants = require('../constants');
 const checkCronJobModule = require('../lib/checkNewCronJobs');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const apiForSheetsModule = require('../lib/apiForSheets');
@@ -247,8 +246,8 @@ describe('Cron Job Spec', () => {
           'https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText =
-      ('this guide'.link(JOBS_AND_FETURES_TESTING_WIKI_LINK));
+      const wikiLinkText = 'this guide'.link(
+        JOBS_AND_FETURES_TESTING_WIKI_LINK);
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
@@ -256,7 +255,7 @@ describe('Cron Job Spec', () => {
         'Hi @vojtechjelinek, PTAL at this PR, it adds a new cron job.' +
         newLineFeed + 'Also @' + author + ' please add the new test' +
         ' and URL redirects for the new CRON jobs It seems you have added or' +
-        ' edited a CRON job,if so please request a testing of this ' +
+        ' edited a CRON job, if so please request a testing of this ' +
         'CRON job with this ' + formText + ' Please refer to ' +
         wikiLinkText + ' for details.' +
         newLineFeed + 'Thanks!',
@@ -305,15 +304,15 @@ describe('Cron Job Spec', () => {
         'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText =
-       ('this guide'.link(JOBS_AND_FETURES_TESTING_WIKI_LINK));
+      const wikiLinkText = 'this guide'.link(
+        JOBS_AND_FETURES_TESTING_WIKI_LINK);
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
         'Hi @vojtechjelinek, PTAL at this PR, it adds a new cron job.' +
         newLineFeed + 'Also @' + author + ' It seems you have added or' +
-        ' edited a CRON job,if so please request a testing of this ' +
+        ' edited a CRON job, if so please request a testing of this ' +
         'CRON job with this ' + formText + ' Please refer to ' +
         wikiLinkText + ' for details.' +
         newLineFeed + 'Thanks!',
@@ -389,15 +388,15 @@ describe('Cron Job Spec', () => {
         'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText =
-       ('this guide'.link(JOBS_AND_FETURES_TESTING_WIKI_LINK));
+      const wikiLinkText = 'this guide'.link(
+        JOBS_AND_FETURES_TESTING_WIKI_LINK);
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
         'Hi @vojtechjelinek, PTAL at this PR, it adds a new cron job.' +
         newLineFeed + 'Also @' + author + ' It seems you have added or' +
-        ' edited a CRON job,if so please request a testing of this ' +
+        ' edited a CRON job, if so please request a testing of this ' +
         'CRON job with this ' + formText + ' Please refer to ' +
         wikiLinkText + ' for details.' +
         newLineFeed + 'Thanks!',
@@ -436,15 +435,15 @@ describe('Cron Job Spec', () => {
         'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText =
-       ('this guide'.link(JOBS_AND_FETURES_TESTING_WIKI_LINK));
+      const wikiLinkText = 'this guide'.link(
+        JOBS_AND_FETURES_TESTING_WIKI_LINK);
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
         'Hi @vojtechjelinek, PTAL at this PR, it adds a new cron job.' +
         newLineFeed + 'Also @' + author + ' It seems you have added or' +
-        ' edited a CRON job,if so please request a testing of this ' +
+        ' edited a CRON job, if so please request a testing of this ' +
         'CRON job with this ' + formText + ' Please refer to ' +
         wikiLinkText + ' for details.' +
         newLineFeed + 'Thanks!',
