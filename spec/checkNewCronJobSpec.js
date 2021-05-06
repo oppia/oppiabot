@@ -30,7 +30,7 @@ const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
-const JOBS_AND_FETURES_TESTING_WIKI_LINK = constants.getWikiLink();
+const { JOBS_AND_FETURES_TESTING_WIKI_LINK } = require('../lib/utils');
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
