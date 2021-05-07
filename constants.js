@@ -13,7 +13,10 @@
 // limitations under the License.
 
 const openEvent = 'opened';
-const reopenEvent = 'reopened';
+// Github action sends a different type of event.
+const openEventGithubActions = 'pull_request_target_opened';
+const reopenEventGithubActions = 'pull_request_target_reopened';
+const reopenEvent = 'pull_request_reopened';
 const unlabelEvent = 'unlabeled';
 const PRLabelEvent = 'labeled';
 const synchronizeEvent = 'synchronize';
@@ -29,6 +32,7 @@ const issueCommentCreatedEvent = 'comment_created';
 
 const periodicCheck = 'periodic-check';
 const claCheck = 'cla-check';
+const claCheckGithubAction = 'cla-check-github-action';
 const changelogCheck = 'changelog-check';
 const datastoreLabelCheck = 'datastore-label-check';
 const prLabelCheck = 'pr-label-check';
@@ -53,6 +57,7 @@ const respondToReviewCheck = 'respond-to-review-check';
 const oldBuildLabelCheck = 'old-build-label-check';
 
 const checksWhitelist = {
+  // eslint-disable-next-line quote-props
   'oppia-android': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
@@ -60,8 +65,11 @@ const checksWhitelist = {
     [synchronizeEvent]: [],
     [closeEvent]: [],
     [editEvent]: [],
-    [issuesLabelEvent]: []
+    [issuesLabelEvent]: [],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
+    [issueCommentCreatedEvent]: [respondToReviewCheck],
   },
+  // eslint-disable-next-line quote-props
   'oppia': {
     [openEvent]: [
       claCheck,
@@ -73,8 +81,11 @@ const checksWhitelist = {
       modelCheck,
       prTemplateCheck
     ],
+    [openEventGithubActions]: [claCheckGithubAction],
+    [reopenEventGithubActions]: [claCheckGithubAction],
     [reopenEvent]: [
       changelogCheck,
+      claCheckGithubAction,
       branchCheck,
       wipCheck,
       jobCheck,
@@ -100,6 +111,7 @@ const checksWhitelist = {
     [checkCompletedEvent]: [ciFailureCheck],
     [issueCommentCreatedEvent]: [respondToReviewCheck]
   },
+  // eslint-disable-next-line quote-props
   'oppiabot': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
@@ -108,7 +120,9 @@ const checksWhitelist = {
     [editEvent]: [],
     [issuesLabelEvent]: [],
     [issuesAssignedEvent]: [],
-    [pushEvent]: []
+    [pushEvent]: [],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
+    [issueCommentCreatedEvent]: [respondToReviewCheck],
   },
 };
 
@@ -131,6 +145,7 @@ module.exports.issueCommentCreatedEvent = issueCommentCreatedEvent;
 
 module.exports.periodicCheck = periodicCheck;
 module.exports.claCheck = claCheck;
+module.exports.claCheckGithubAction = claCheckGithubAction;
 module.exports.changelogCheck = changelogCheck;
 module.exports.branchCheck = branchCheck;
 module.exports.wipCheck = wipCheck;

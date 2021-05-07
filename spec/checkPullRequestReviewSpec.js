@@ -25,6 +25,9 @@ const reviewPayloadData = require('../fixtures/pullRequestReview.json');
 const commentPayloadData = require('../fixtures/pullRequestComment.json');
 const utilityModule = require('../lib/utils');
 const pushPayload = require('../fixtures/push.json');
+let payloadData = JSON.parse(
+  JSON.stringify(require('../fixtures/pullRequestPayload.json'))
+);
 
 describe('Pull Request Review Module', () => {
   /**
@@ -54,6 +57,7 @@ describe('Pull Request Review Module', () => {
           .and.returnValue({}),
         addLabels: jasmine.createSpy('addLabels').and.returnValue({}),
         update: jasmine.createSpy('update').and.returnValue({}),
+        removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
       },
     };
 
@@ -65,7 +69,8 @@ describe('Pull Request Review Module', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-    spyOn(pullRequestReviewModule, 'handlePullRequestReview').and.callThrough();
+    spyOn(pullRequestReviewModule, 'handlePullRequestReview').
+      and.callThrough();
     spyOn(pullRequestReviewModule, 'handleResponseToReview').and.callThrough();
     spyOn(utilityModule, 'sleep').and.callFake(() => { });
   });
@@ -109,6 +114,66 @@ describe('Pull Request Review Module', () => {
       };
     });
 
+    describe('When reviewer requests changes and LGTM label ' +
+     'was already added to the pull request.', ()=>{
+      const originalPayloadLabels = [
+        ...reviewPayloadData.payload.pull_request.labels
+      ];
+      beforeEach(async () => {
+        const label = {
+          id: 248679580,
+          node_id: 'MDU6TGFiZWwyNDg2Nzk1ODA=',
+          url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20LGTM',
+          name: 'PR: LGTM',
+          color: '009800',
+        };
+        // Set the payload action and label which will simulate removing
+        // the LGTM label.
+        payloadData.payload.label = label;
+        payloadData.payload.pull_request.requested_reviewers = [
+          { login: 'reviewer1' },
+          { login: 'reviewer2' },
+        ];
+        payloadData.payload.pull_request.assignees = [];
+        // Set project owner to be pr author.
+        payloadData.payload.pull_request.user.login = 'kevintab95';
+        reviewPayloadData.payload.pull_request.labels.push(label);
+        await robot.receive(reviewPayloadData);
+      });
+
+      it('should check type of review', () => {
+        expect(
+          pullRequestReviewModule.handlePullRequestReview
+        ).toHaveBeenCalled();
+      });
+
+      it('should wait for 3 minutes before performing any action', () => {
+        expect(utilityModule.sleep).toHaveBeenCalled();
+        expect(utilityModule.sleep).toHaveBeenCalledWith(
+          utilityModule.THREE_MINUTES);
+      });
+
+      it('Should comment on PR', () => {
+        expect(github.issues.createComment)
+          .toHaveBeenCalled();
+      });
+
+      it('Should Remove the LGTM Label', () => {
+        expect(github.issues.removeLabel).toHaveBeenCalled();
+      });
+
+      afterAll(() => {
+        payloadData.payload.pull_request.requested_reviewers = [];
+        reviewPayloadData.payload.pull_request.labels = originalPayloadLabels;
+      });
+    });
+
+    describe('When reviewer requests changes' +
+          'and there is no label', () => {
+      it('Should Remove the LGTM Label', () => {
+        expect(github.issues.removeLabel).not.toHaveBeenCalled();
+      });
+    });
     describe('when reviewer is assigned and pr author is not assigned', () => {
       beforeEach(async () => {
         await robot.receive(reviewPayloadData);
