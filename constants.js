@@ -45,6 +45,7 @@ const assigneeCheck = 'assignee-check';
 const mergeConflictCheck = 'merge-conflict-check';
 const allMergeConflictCheck = 'all-merge-conflict-check';
 const jobCheck = 'job-check';
+const cronJobCheck = 'cron-job-check';
 const modelCheck = 'model-check';
 const issuesLabelCheck = 'issues-labeled-check';
 const issuesAssignedCheck = 'issues-assigned-check';
@@ -78,6 +79,7 @@ const checksWhitelist = {
       branchCheck,
       wipCheck,
       jobCheck,
+      cronJobCheck,
       modelCheck,
       prTemplateCheck
     ],
@@ -89,6 +91,7 @@ const checksWhitelist = {
       branchCheck,
       wipCheck,
       jobCheck,
+      cronJobCheck,
       modelCheck,
       prTemplateCheck
     ],
@@ -96,6 +99,7 @@ const checksWhitelist = {
     [synchronizeEvent]: [
       mergeConflictCheck,
       jobCheck,
+      cronJobCheck,
       modelCheck,
       codeOwnerCheck,
       oldBuildLabelCheck
@@ -153,6 +157,7 @@ module.exports.assigneeCheck = assigneeCheck;
 module.exports.mergeConflictCheck = mergeConflictCheck;
 module.exports.allMergeConflictCheck = allMergeConflictCheck;
 module.exports.jobCheck = jobCheck;
+module.exports.cronJobCheck = cronJobCheck;
 module.exports.modelCheck = modelCheck;
 module.exports.issuesLabelCheck = issuesLabelCheck;
 module.exports.issuesAssignedCheck = issuesAssignedCheck;

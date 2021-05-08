@@ -21,6 +21,7 @@ const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
+const checkCronJobModule = require('../lib/checkNewCronJobs');
 const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
@@ -200,6 +201,7 @@ describe('check for new code owner', () => {
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(checkCronJobModule, 'checkForNewCronJob').and.callFake(() => { });
     spyOn(
       checkCriticalPullRequestModule,
       'checkIfPRAffectsDatastoreLayer'
