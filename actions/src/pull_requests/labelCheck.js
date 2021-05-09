@@ -26,6 +26,23 @@ const checkLabels = async () => {
   const label = context.payload.label;
   const octokit = new GitHub(token);
   const user = context.payload.sender.login;
+
+  if (label.name.startsWith(DONT_MERGE_LABEL_PREFIX)) {
+    await handleDontMergeLabel(octokit, label.name);
+  }
 };
 
-module.exports = {};
+/**
+ * Handles cases when a good first issue gets added by a non whitelisted user.
+ *
+ * @param {import('@actions/github').GitHub} octokit
+ */
+const handleDontMergeLabel = async (octokit, label) => {
+  core.setFailed(
+    'This PR should not be merged because it has a ' + label + ' label.'
+  );
+};
+
+module.exports = {
+  checkLabels
+};
