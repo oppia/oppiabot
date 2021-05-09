@@ -47,10 +47,6 @@ describe('CLA check github action Module', () => {
       return octokit;
     });
 
-    Object.setPrototypeOf(OAuth2Client, function () {
-      return {};
-    });
-
     spyOnProperty(github.context, 'repo').and.returnValue({
       owner: pullRequestPayload.payload.repository.owner.login,
       repo: pullRequestPayload.payload.repository.name,
