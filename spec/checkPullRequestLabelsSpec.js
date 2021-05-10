@@ -935,10 +935,17 @@ describe('Pull Request Label Action Check', () => {
         removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
         addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
       },
+      pulls: {
+        get: jasmine.createSpy('get').and.resolveTo(
+          {data: actionPayload.pull_request}
+        ),
+      }
     };
 
     spyOn(core, 'getInput').and.returnValue('sample-token');
     spyOn(core, 'setFailed').and.callFake(() => {});
+    spyOn(core, 'info').and.callFake(() => {});
+
     spyOnProperty(github.context, 'repo').and.returnValue({
       owner: actionPayload.repository.owner.login,
       repo: actionPayload.repository.name,
@@ -949,6 +956,7 @@ describe('Pull Request Label Action Check', () => {
       return octokit;
     });
     spyOn(pRLabelModule, 'checkLabels').and.callThrough();
+    spyOn(pRLabelModule, 'checkUnLabeled').and.callThrough();
   });
 
   describe("when a don't merge label gets added to a pull request",
@@ -969,6 +977,63 @@ describe('Pull Request Label Action Check', () => {
       });
     }
   );
+
+  describe("When a don't merge label gets removed", () => {
+    let initialLabel;
+    beforeEach(async () => {
+      initialLabel = {...actionPayload.label};
+      actionPayload.pull_request.labels = [
+        {name: 'PR CHANGELOG: code health -- @user'}
+      ];
+      await dispatcher.dispatch('pull_request', 'unlabeled');
+    });
+
+    afterAll(() => {
+      actionPayload.label = initialLabel;
+    });
+
+    it('should check the label', () => {
+      expect(pRLabelModule.checkUnLabeled).toHaveBeenCalled();
+    });
+    it('should not fail CI', () => {
+      expect(core.setFailed).not.toHaveBeenCalled();
+      expect(core.info).toHaveBeenCalled();
+      expect(core.info).toHaveBeenCalledWith(
+        "This PR does not contain a PR don't merge label"
+      );
+    });
+  });
+
+  describe(
+    "When a don't merge label gets removed but PR contains other don't " +
+    'merge labels',
+    () => {
+      let initialLabel;
+      beforeEach(async () => {
+        initialLabel = {...actionPayload.label};
+        actionPayload.pull_request.labels = [
+          {name: 'PR CHANGELOG: code health -- @user'},
+          {name: "PR: don't merge - Rejected"}
+        ];
+        await dispatcher.dispatch('pull_request', 'unlabeled');
+      });
+
+      afterAll(() => {
+        actionPayload.label = initialLabel;
+      });
+
+      it('should check the label', () => {
+        expect(pRLabelModule.checkUnLabeled).toHaveBeenCalled();
+      });
+      it('should fail CI', () => {
+        expect(core.setFailed).toHaveBeenCalled();
+        expect(core.setFailed).toHaveBeenCalledWith(
+          'This PR should not be merged because it has a ' +
+          "PR: don't merge - Rejected label."
+        );
+      });
+    });
+
   describe('When another label gets added to a pull request', () => {
     let initialLabel;
     beforeEach(async () => {
@@ -983,6 +1048,26 @@ describe('Pull Request Label Action Check', () => {
 
     it('should check the label', () => {
       expect(pRLabelModule.checkLabels).toHaveBeenCalled();
+    });
+    it('should not fail CI', () => {
+      expect(core.setFailed).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('When another label gets removed from a pull request', () => {
+    let initialLabel;
+    beforeEach(async () => {
+      initialLabel = {...actionPayload.label};
+      actionPayload.label.name = 'PR CHANGELOG: code health -- @user';
+      await dispatcher.dispatch('pull_request', 'unlabeled');
+    });
+
+    afterAll(() => {
+      actionPayload.label = initialLabel;
+    });
+
+    it('should check the label', () => {
+      expect(pRLabelModule.checkUnLabeled).toHaveBeenCalled();
     });
     it('should not fail CI', () => {
       expect(core.setFailed).not.toHaveBeenCalled();

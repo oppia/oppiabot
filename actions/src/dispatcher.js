@@ -43,6 +43,10 @@ module.exports = {
               break;
             case constants.prLabelCheck:
               await pRLabelsModule.checkLabels();
+              break;
+            case constants.dontMergeLabelCheck:
+              await pRLabelsModule.checkUnLabeled();
+              break;
           }
         }
       }

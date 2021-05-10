@@ -25,7 +25,6 @@ const checkLabels = async () => {
   const token = core.getInput('repo-token');
   const label = context.payload.label;
   const octokit = new GitHub(token);
-  const user = context.payload.sender.login;
 
   if (label.name.startsWith(DONT_MERGE_LABEL_PREFIX)) {
     await handleDontMergeLabel(octokit, label.name);
@@ -43,6 +42,43 @@ const handleDontMergeLabel = async (octokit, label) => {
   );
 };
 
+/**
+ * Handles cases when a good first issue gets added by a non whitelisted user.
+ *
+ * @param {import('@actions/github').GitHub} octokit
+ */
+const handleDontMergeLabelRemoved = async(octokit) => {
+  const {data: pullRequest} = await octokit.pulls.get({
+    pull_number: context.payload.pull_request.number,
+    owner: context.payload.repository.owner.login,
+    repo: context.payload.repository.name,
+  });
+
+  const labelNames = pullRequest.labels.map(label => label.name);
+
+  const dontMergeLabel = labelNames.find(
+    label => label.startsWith(DONT_MERGE_LABEL_PREFIX)
+  );
+
+  if (dontMergeLabel) {
+    await handleDontMergeLabel(octokit, dontMergeLabel);
+  } else {
+    core.info("This PR does not contain a PR don't merge label");
+  }
+};
+
+const checkUnLabeled = async () => {
+  core.info('Checking newly removed label...');
+  const token = core.getInput('repo-token');
+  const label = context.payload.label;
+  const octokit = new GitHub(token);
+
+  if (label.name.startsWith(DONT_MERGE_LABEL_PREFIX)) {
+    await handleDontMergeLabelRemoved(octokit, label.name);
+  }
+};
+
 module.exports = {
-  checkLabels
+  checkLabels,
+  checkUnLabeled,
 };

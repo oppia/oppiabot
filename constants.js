@@ -17,7 +17,7 @@ const openEvent = 'opened';
 const openEventGithubActions = 'pull_request_target_opened';
 const reopenEventGithubActions = 'pull_request_target_reopened';
 const reopenEvent = 'pull_request_reopened';
-const unlabelEvent = 'unlabeled';
+const unlabelEvent = 'pull_request_unlabeled';
 const PRLabelEvent = 'pull_request_labeled';
 const synchronizeEvent = 'synchronize';
 const closeEvent = 'closed';
@@ -56,6 +56,7 @@ const ciFailureCheck = 'ci-failure-check';
 const updateWithDevelopCheck = 'update-with-develop-check';
 const respondToReviewCheck = 'respond-to-review-check';
 const oldBuildLabelCheck = 'old-build-label-check';
+const dontMergeLabelCheck = 'dont-merge-label-check';
 
 const checksWhitelist = {
   // eslint-disable-next-line quote-props
@@ -108,7 +109,7 @@ const checksWhitelist = {
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
-    [unlabelEvent]: [datastoreLabelCheck],
+    [unlabelEvent]: [datastoreLabelCheck, dontMergeLabelCheck],
     [pushEvent]: [forcePushCheck],
     [periodicCheckEvent]: [periodicCheck],
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
@@ -171,6 +172,7 @@ module.exports.ciFailureCheck = ciFailureCheck;
 module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
 module.exports.respondToReviewCheck = respondToReviewCheck;
 module.exports.oldBuildLabelCheck = oldBuildLabelCheck;
+module.exports.dontMergeLabelCheck = dontMergeLabelCheck;
 
 module.exports.getBlacklistedAuthors = function() {
   return blacklistedAuthors;
