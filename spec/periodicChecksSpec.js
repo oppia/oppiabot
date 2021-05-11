@@ -159,7 +159,7 @@ describe('Periodic Checks Module', () => {
               return {
                 data: {
                   status: 200,
-                  permission: ['admin', 'write'],
+                  permission: 'write',
                 }
               };
             }
@@ -456,6 +456,16 @@ describe('Periodic Checks Module', () => {
         github.pulls.list = jasmine.createSpy('list').and.resolveTo({
           data: [approvedPR, pullRequests.assignedPullRequest],
         });
+        github.repos = {
+          getCollaboratorPermissionLevel: jasmine
+            .createSpy('getCollaboratorPermissionLevel')
+            .and.resolveTo({
+              data: {
+                status: 200,
+                permission: 'write',
+              }
+            }),
+        };
 
         await robot.receive(payloadData);
       });
@@ -471,7 +481,8 @@ describe('Periodic Checks Module', () => {
         .toHaveBeenCalled();
         expect(github.repos.getCollaboratorPermissionLevel)
         .toHaveBeenCalledWith({
-          org: 'oppia',
+          owner: 'oppia',
+          repo: 'oppia',
           username: 'author4',
         });
       });
@@ -533,7 +544,8 @@ describe('Periodic Checks Module', () => {
         .toHaveBeenCalled();
         expect(github.repos.getCollaboratorPermissionLevel)
         .toHaveBeenCalledWith({
-          org: 'oppia',
+          owner: 'oppia',
+          repo: 'oppia',
           username: 'author5',
         });
       });

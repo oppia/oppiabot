@@ -693,8 +693,8 @@ describe('Pull Request Review Module', () => {
               .createSpy('getCollaboratorPermissionLevel')
               .and.callFake(() => {
                 throw new Error(
-                  'User does not exist or is not a public member of ' +
-                  'the organization.'
+                  'User does not exist or is not a public member ' +
+                  'of the orgnization.'
                 );
               }),
           };
@@ -743,7 +743,7 @@ describe('Pull Request Review Module', () => {
           .toHaveBeenCalled();
           expect(github.repos.getCollaboratorPermissionLevel)
           .toHaveBeenCalledWith({
-            owner: reviewPayloadData.payload.repo.owner.login,
+            owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             username: reviewPayloadData.payload.pull_request.user.login,
           });
@@ -812,8 +812,8 @@ describe('Pull Request Review Module', () => {
             .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
                  data: {
-                status: 200,
-                permission: ['admin', 'write'],
+                  status: 200,
+                  permission: 'write',
                 }
               }),
           };
@@ -942,7 +942,7 @@ describe('Pull Request Review Module', () => {
               .and.resolveTo({
                 data: {
                  status: 200,
-                 permission: ['admin', 'write'],
+                 permission: 'write',
                 }
               }),
           };
@@ -1048,8 +1048,8 @@ describe('Pull Request Review Module', () => {
               .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
                 data: {
-                status: 200,
-                permission: ['admin', 'write'],
+                  status: 200,
+                  permission: 'write',
                 }
               }),
           };
