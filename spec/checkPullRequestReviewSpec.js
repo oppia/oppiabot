@@ -1524,7 +1524,7 @@ describe('Pull Request Review Module', () => {
     );
 
     describe(
-      'when author asks some question/comment and asks reviewer to ptal',
+      'when PTAL template found in the comment',
       () => {
         const initialCommentBody = commentPayloadData.payload.comment.body;
         beforeAll(() => {
@@ -1535,7 +1535,7 @@ describe('Pull Request Review Module', () => {
           await robot.receive(commentPayloadData);
         });
 
-        it('should not trigger on comment with PTAL template', () => {
+        it('should not assign anyone to the PR', () => {
           expect(github.issues.createComment).not.toHaveBeenCalled();
         });
 
