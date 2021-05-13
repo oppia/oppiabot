@@ -130,16 +130,6 @@ const checksWhitelist = {
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
     [issueCommentCreatedEvent]: [respondToReviewCheck],
   },
-  'test-github-actions': {
-    [openEventGithubActions]: [claCheckGithubAction],
-    [reopenEventGithubActions]: [claCheckGithubAction],
-    [synchronizeEvent]: [mergeConflictCheck],
-    [closeEvent]: [],
-    [editEvent]: [],
-    [issuesLabelEvent]: [],
-    [issuesAssignedEvent]: [],
-    [pushEvent]: []
-  },
 };
 
 const blacklistedAuthors = ['translatewiki'];
