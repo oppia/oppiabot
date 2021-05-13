@@ -1523,25 +1523,23 @@ describe('Pull Request Review Module', () => {
       }
     );
 
-    describe(
-      'when PTAL template found in the comment',
-      () => {
-        const initialCommentBody = commentPayloadData.payload.comment.body;
-        beforeAll(() => {
-          commentPayloadData.payload.comment.body =
-          '{{Question/comment}} @{{reviewer_username}} PTAL';
-        });
-        beforeEach(async () => {
-          await robot.receive(commentPayloadData);
-        });
-
-        it('should not assign anyone to the PR', () => {
-          expect(github.issues.createComment).not.toHaveBeenCalled();
-        });
-
-        afterAll(() => {
-          commentPayloadData.payload.comment.body = initialCommentBody;
-        });
+    describe('when PTAL template found in the comment', () => {
+      const initialCommentBody = commentPayloadData.payload.comment.body;
+      beforeAll(() => {
+        commentPayloadData.payload.comment.body = (
+          '{{Question/comment}} @{{reviewer_username}} PTAL');
       });
+      beforeEach(async () => {
+        await robot.receive(commentPayloadData);
+      });
+
+      it('should not assign anyone to the PR', () => {
+        expect(github.issues.createComment).not.toHaveBeenCalled();
+      });
+
+      afterAll(() => {
+        commentPayloadData.payload.comment.body = initialCommentBody;
+      });
+    });
   });
 });
