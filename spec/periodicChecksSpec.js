@@ -873,7 +873,7 @@ describe('Periodic Checks Module', () => {
         spyOn(periodicCheckModule, 'ensureNewIssuesHaveProjects').
           and.callThrough();
         await robot.receive(payloadData);
-      });
+      }, 40000);
 
       it('Should Call ensureNewIssuesHaveProjects function', () => {
         expect(periodicCheckModule.ensureNewIssuesHaveProjects).
@@ -905,6 +905,34 @@ describe('Periodic Checks Module', () => {
           archived_state: 'not_archived',
           column_id: 112,
         });
+      });
+
+
+      afterAll(() => {
+        payloadData.name = 'schedule';
+        payloadData.payload.action = 'repository';
+      });
+    });
+    describe('Opened Issue is Assigned to a project', () => {
+      beforeEach(async () => {
+        github.issues.listForRepo = jasmine
+          .createSpy('listForRepo')
+          .and.resolveTo({
+            data: [
+              issues.withProject,
+              issues.anotherWithProject,
+              issues.withoutProject,
+            ],
+          });
+        payloadData.name = 'issues';
+        payloadData.payload.action = 'opened';
+        spyOn(periodicCheckModule, 'ensureNewIssuesHaveProjects').
+          and.callThrough();
+        await robot.receive(payloadData);
+      }, 40000);
+
+      it('should not ping core maintainers', () => {
+        expect(github.issues.createComment).not.toHaveBeenCalled();
       });
 
       afterAll(() => {
