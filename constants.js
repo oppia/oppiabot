@@ -133,6 +133,12 @@ const checksWhitelist = {
   'test-github-actions': {
     [openEventGithubActions]: [claCheckGithubAction],
     [reopenEventGithubActions]: [claCheckGithubAction],
+    [synchronizeEvent]: [mergeConflictCheck],
+    [closeEvent]: [],
+    [editEvent]: [],
+    [issuesLabelEvent]: [],
+    [issuesAssignedEvent]: [],
+    [pushEvent]: []
   },
 };
 

@@ -120,6 +120,7 @@ const checkSheet = async (auth) => {
 };
 
 const claCheckGithubAction = async () => {
+  core.info('cla check running');
   // Authorize a client with the loaded credentials.
   const auth = await authorize();
 
