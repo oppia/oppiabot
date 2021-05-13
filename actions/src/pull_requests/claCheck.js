@@ -43,14 +43,24 @@ const authorize = async function() {
 };
 
 const generateOutput = async (hasClaSigned) => {
-  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-  const LINK_RESULT = 'here'.link(
-    'https://github.com/oppia/oppia/wiki/' +
-    'Contributing-code-to-Oppia#setting-things-up'
-  );
+  const GITHUB_TOKEN = core.getInput('repo-token');
   const octokit = new GitHub(GITHUB_TOKEN);
   const PR_NUMBER = context.payload.pull_request.number;
   const PR_AUTHOR = context.payload.pull_request.user.login;
+  const REPO_NAME = context.payload.repository.name;
+
+  let LINK_RESULT = '';
+
+  if (REPO_NAME === 'oppia-android' ){
+    LINK_RESULT = 'here'.link(
+      'https://github.com/oppia/oppia-android/wiki#onboarding-instructions'
+    );
+  } else {
+    LINK_RESULT = 'here'.link(
+      'https://github.com/oppia/oppia/wiki/' +
+      'Contributing-code-to-Oppia#setting-things-up'
+    );
+  }
 
   let comment = '';
   if (!hasClaSigned) {

@@ -62,6 +62,8 @@ const checksWhitelist = {
   'oppia-android': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
+    [openEventGithubActions]: [claCheckGithubAction],
+    [reopenEventGithubActions]: [claCheckGithubAction],
     [PRLabelEvent]: [],
     [synchronizeEvent]: [],
     [closeEvent]: [],
