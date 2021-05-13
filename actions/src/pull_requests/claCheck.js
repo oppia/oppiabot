@@ -98,7 +98,7 @@ const checkSheet = async (auth) => {
   await sheets.spreadsheets.values.get(
     {
       spreadsheetId: SPREADSHEET_ID,
-      range: 'Usernames!A:A',
+      range: 'Usernames',
     },
     async (err, res) => {
       if (err) {
@@ -120,7 +120,6 @@ const checkSheet = async (auth) => {
 };
 
 const claCheckGithubAction = async () => {
-  core.info('cla check running');
   // Authorize a client with the loaded credentials.
   const auth = await authorize();
 
