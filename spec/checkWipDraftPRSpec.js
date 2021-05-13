@@ -22,6 +22,7 @@ const pullRequestEditedPayload = require('../fixtures/pullRequest.edited.json');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
+const checkCronJobModule = require('../lib/checkNewCronJobs');
 const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
@@ -53,6 +54,7 @@ describe('Oppiabot\'s', () => {
       checkPullRequestLabelsModule, 'checkChangelogLabel'
     ).and.callFake(() => { });
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(checkCronJobModule, 'checkForNewCronJob').and.callFake(() => { });
     spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'
     ).and.callFake(() => { });
     spyOn(checkPullRequestTemplateModule, 'checkTemplate'
