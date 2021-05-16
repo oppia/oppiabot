@@ -21,7 +21,7 @@ const { context } = require('@actions/github');
 const issueLabelsModule = require('./issues/checkIssueLabels');
 const claCheckGithubActionModule = require('./pull_requests/claCheck');
 const constants = require('../../constants');
-const pRLabelsModule = require('./pull_requests/labelCheck');
+const PRLabelsModule = require('./pull_requests/labelCheck');
 
 module.exports = {
   async dispatch(event, action) {
@@ -42,10 +42,10 @@ module.exports = {
               await claCheckGithubActionModule.claCheckGithubAction();
               break;
             case constants.prLabelCheck:
-              await pRLabelsModule.checkLabels();
+              await PRLabelsModule.checkLabels();
               break;
             case constants.dontMergeLabelCheck:
-              await pRLabelsModule.checkUnLabeled();
+              await PRLabelsModule.checkUnLabeled();
               break;
           }
         }

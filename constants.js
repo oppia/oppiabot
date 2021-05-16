@@ -17,7 +17,7 @@ const openEvent = 'opened';
 const openEventGithubActions = 'pull_request_target_opened';
 const reopenEventGithubActions = 'pull_request_target_reopened';
 const reopenEvent = 'pull_request_reopened';
-const unlabelEvent = 'pull_request_unlabeled';
+const PRUnlabelEvent = 'pull_request_unlabeled';
 const PRLabelEvent = 'pull_request_labeled';
 const synchronizeEvent = 'synchronize';
 const closeEvent = 'closed';
@@ -109,7 +109,7 @@ const checksWhitelist = {
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
-    [unlabelEvent]: [datastoreLabelCheck, dontMergeLabelCheck],
+    [PRUnlabelEvent]: [datastoreLabelCheck, dontMergeLabelCheck],
     [pushEvent]: [forcePushCheck],
     [periodicCheckEvent]: [periodicCheck],
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
@@ -135,7 +135,7 @@ const blacklistedAuthors = ['translatewiki'];
 
 module.exports.openEvent = openEvent;
 module.exports.reopenEvent = reopenEvent;
-module.exports.unlabelEvent = unlabelEvent;
+module.exports.PRUnlabelEvent = PRUnlabelEvent;
 module.exports.PRLabelEvent = PRLabelEvent;
 module.exports.synchronizeEvent = synchronizeEvent;
 module.exports.closeEvent = closeEvent;
