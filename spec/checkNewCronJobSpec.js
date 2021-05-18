@@ -273,6 +273,16 @@ describe('Cron Job Spec', () => {
         assignees: ['vojtechjelinek']
       });
     });
+
+    it('should add datastore label', () => {
+      expect(github.issues.addLabels).toHaveBeenCalled();
+      expect(github.issues.addLabels).toHaveBeenCalledWith({
+        issue_number: payloadData.payload.pull_request.number,
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        labels: ['PR: Affects datastore layer']
+      });
+    });
   });
 
   describe('When a new cron job is added in an existing cron job file', () => {
@@ -330,6 +340,16 @@ describe('Cron Job Spec', () => {
         assignees: ['vojtechjelinek']
       });
     });
+
+    it('should add datastore label', () => {
+      expect(github.issues.addLabels).toHaveBeenCalled();
+      expect(github.issues.addLabels).toHaveBeenCalledWith({
+        issue_number: payloadData.payload.pull_request.number,
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        labels: ['PR: Affects datastore layer']
+      });
+    });
   });
 
   describe('When no job file is modified in a pull request', () => {
@@ -356,6 +376,10 @@ describe('Cron Job Spec', () => {
 
     it('should not ping server job admin', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('should not add datastore label', () => {
+      expect(github.issues.addLabels).not.toHaveBeenCalled();
     });
   });
 
@@ -404,6 +428,16 @@ describe('Cron Job Spec', () => {
         owner: payloadData.payload.repository.owner.login,
       });
     });
+
+    it('should add datastore label', () => {
+      expect(github.issues.addLabels).toHaveBeenCalled();
+      expect(github.issues.addLabels).toHaveBeenCalledWith({
+        issue_number: payloadData.payload.pull_request.number,
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        labels: ['PR: Affects datastore layer']
+      });
+    });
   });
 
   describe('When only tests are added for a  cron job', () => {
@@ -450,6 +484,46 @@ describe('Cron Job Spec', () => {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
       });
+    });
+
+    it('should add datastore label', () => {
+      expect(github.issues.addLabels).toHaveBeenCalled();
+      expect(github.issues.addLabels).toHaveBeenCalledWith({
+        issue_number: payloadData.payload.pull_request.number,
+        repo: payloadData.payload.repository.name,
+        owner: payloadData.payload.repository.owner.login,
+        labels: ['PR: Affects datastore layer']
+      });
+    });
+  });
+
+  describe('When pull request has datastore label', () => {
+    beforeEach(async () => {
+      payloadData.payload.pull_request.labels = [{
+        name: 'PR: Affects datastore layer'
+      }];
+      github.pulls = {
+        listFiles: jasmine.createSpy('listFiles').and.resolveTo({
+          data: [
+            nonJobFile, firstNewJobFileObj
+          ],
+        }),
+      };
+
+      payloadData.payload.pull_request.changed_files = 2;
+      await robot.receive(payloadData);
+    });
+
+    it('should check for cron jobs', () => {
+      expect(checkCronJobModule.checkForNewCronJob).toHaveBeenCalled();
+    });
+
+    it('should not get modified files', () => {
+      expect(github.pulls.listFiles).not.toHaveBeenCalled();
+    });
+
+    it('should not ping server job admin', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
     });
   });
 });
