@@ -35,9 +35,11 @@ module.exports = {
         for (var i = 0; i < checkList.length; i++) {
           switch (checkList[i]) {
             case constants.issuesLabelCheck:
+              core.info('issue label check triggered');
               await issueLabelsModule.checkLabels();
               break;
             case constants.claCheckGithubAction:
+              core.info('cla check triggered');
               await claCheckGithubActionModule.claCheckGithubAction();
               break;
           }
