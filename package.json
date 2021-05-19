@@ -19,7 +19,7 @@
     "@actions/github": "^2.2.0",
     "axios": "^0.19.2",
     "dotenv": "^6.0.0",
-    "google-auth-library": "^6.0.0",
+    "google-auth-library": "^7.0.4",
     "googleapis": "^51.0.0",
     "newrelic": "^6.6.0",
     "probot": "^9.11.3",
@@ -33,9 +33,9 @@
     ]
   },
   "devDependencies": {
-    "@zeit/ncc": "^0.22.2",
+    "@zeit/ncc": "^0.22.3",
     "eslint": "^7.26.0",
-    "husky": "^4.2.5",
+    "husky": "^6.0.0",
     "jasmine": "^3.7.0",
     "lint-staged": "^11.0.0",
     "nodemon": "^2.0.7",
