@@ -18,7 +18,7 @@
     "@actions/core": "^1.2.7",
     "@actions/github": "^2.2.0",
     "axios": "^0.19.2",
-    "dotenv": "^6.0.0",
+    "dotenv": "^9.0.2",
     "google-auth-library": "^7.0.4",
     "googleapis": "^51.0.0",
     "newrelic": "^6.6.0",
