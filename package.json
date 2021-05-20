@@ -17,7 +17,7 @@
   "dependencies": {
     "@actions/core": "^1.2.7",
     "@actions/github": "^2.2.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "dotenv": "^9.0.2",
     "google-auth-library": "^7.0.4",
     "googleapis": "^51.0.0",
