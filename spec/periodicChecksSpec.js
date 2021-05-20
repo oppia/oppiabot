@@ -24,6 +24,7 @@ const payloadData = require('../fixtures/periodicCheckPayload.json');
 const periodicCheckModule = require('../lib/periodicChecks');
 const mergeConflictModule = require('../lib/checkMergeConflicts');
 const staleBuildModule = require('../lib/staleBuildChecks');
+const issueAssignedPayLoad = require('../fixtures/issues.assigned.json');
 
 describe('Periodic Checks Module', () => {
   /**
@@ -868,11 +869,10 @@ describe('Periodic Checks Module', () => {
               issues.withoutProject,
             ],
           });
-        payloadData.name = 'issues';
-        payloadData.payload.action = 'opened';
+        issueAssignedPayLoad.payload.action = 'opened';
         spyOn(periodicCheckModule, 'ensureNewIssuesHaveProjects').
           and.callThrough();
-        await robot.receive(payloadData);
+        await robot.receive(issueAssignedPayLoad);
       }, 40000);
 
       it('Should Call ensureNewIssuesHaveProjects function', () => {
@@ -909,8 +909,7 @@ describe('Periodic Checks Module', () => {
 
 
       afterAll(() => {
-        payloadData.name = 'schedule';
-        payloadData.payload.action = 'repository';
+        issueAssignedPayLoad.payload.action = 'assigned';
       });
     });
     describe('Opened Issue is Assigned to a project', () => {
@@ -924,11 +923,10 @@ describe('Periodic Checks Module', () => {
               issues.withoutProject,
             ],
           });
-        payloadData.name = 'issues';
-        payloadData.payload.action = 'opened';
+        issueAssignedPayLoad.payload.action = 'opened';
         spyOn(periodicCheckModule, 'ensureNewIssuesHaveProjects').
           and.callThrough();
-        await robot.receive(payloadData);
+        await robot.receive(issueAssignedPayLoad);
       }, 40000);
 
       it('should not ping core maintainers', () => {
@@ -936,8 +934,7 @@ describe('Periodic Checks Module', () => {
       });
 
       afterAll(() => {
-        payloadData.name = 'schedule';
-        payloadData.payload.action = 'repository';
+        payloadData.payload.action = 'assigned';
       });
     });
   });
