@@ -144,7 +144,6 @@ const runChecks = async (context, checkEvent) => {
           case constants.periodicCheck:
             callable.push(...[
               periodicCheckModule.ensureAllPullRequestsAreAssigned(context),
-              periodicCheckModule.ensureAllIssuesHaveProjects(context),
               staleBuildModule.checkAndTagPRsWithOldBuilds(context),
             ]);
             break;
