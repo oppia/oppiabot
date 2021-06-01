@@ -615,8 +615,8 @@ describe('Periodic Checks Module', () => {
       });
     });
   });
-
-  describe('Should ensure all issues have been assigned to a project', () => {
+  /* istanbul ignore next */
+  xdescribe('Should ensure all issues have been assigned to a project', () => {
     const issues = {
       withoutProject: {
         number: 1,
@@ -716,145 +716,145 @@ describe('Periodic Checks Module', () => {
         }),
       };
     });
+    /* istanbul ignore next */
+    xdescribe('When all issues have been added to a project', () => {
+      beforeEach(async () => {
+        github.issues.listForRepo = jasmine
+          .createSpy('listForRepo')
+          .and.resolveTo({
+            data: [issues.withProject, issues.anotherWithProject],
+          });
+        await robot.receive(payloadData);
+      });
 
-    // describe('When all issues have been added to a project', () => {
-    //   beforeEach(async () => {
-    //     github.issues.listForRepo = jasmine
-    //       .createSpy('listForRepo')
-    //       .and.resolveTo({
-    //         data: [issues.withProject, issues.anotherWithProject],
-    //       });
-    //     await robot.receive(payloadData);
-    //   });
+      it('should call ensureAllIssuesHaveProjects function', () => {
+        expect(
+          periodicCheckModule.ensureAllIssuesHaveProjects
+        ).toHaveBeenCalled();
+      });
 
-    //   it('should call ensureAllIssuesHaveProjects function', () => {
-    //     expect(
-    //       periodicCheckModule.ensureAllIssuesHaveProjects
-    //     ).toHaveBeenCalled();
-    //   });
+      it('should get all open issues', () => {
+        expect(github.issues.listForRepo).toHaveBeenCalled();
+        expect(github.issues.listForRepo).toHaveBeenCalledWith({
+          owner: 'oppia',
+          repo: 'oppia',
+          per_page: 100,
+          state: 'open',
+          page: 1,
+        });
+      });
 
-    //   it('should get all open issues', () => {
-    //     expect(github.issues.listForRepo).toHaveBeenCalled();
-    //     expect(github.issues.listForRepo).toHaveBeenCalledWith({
-    //       owner: 'oppia',
-    //       repo: 'oppia',
-    //       per_page: 100,
-    //       state: 'open',
-    //       page: 1,
-    //     });
-    //   });
+      it('should get all project cards', () => {
+        expect(github.projects.listForRepo).toHaveBeenCalled();
+        expect(github.projects.listForRepo).toHaveBeenCalledWith({
+          repo: 'oppia',
+          owner: 'oppia',
+        });
 
-    //   it('should get all project cards', () => {
-    //     expect(github.projects.listForRepo).toHaveBeenCalled();
-    //     expect(github.projects.listForRepo).toHaveBeenCalledWith({
-    //       repo: 'oppia',
-    //       owner: 'oppia',
-    //     });
+        expect(github.projects.listColumns).toHaveBeenCalled();
+        expect(github.projects.listColumns).toHaveBeenCalledTimes(2);
+        expect(github.projects.listColumns).toHaveBeenCalledWith({
+          project_id: 101,
+        });
+        expect(github.projects.listColumns).toHaveBeenCalledWith({
+          project_id: 102,
+        });
 
-    //     expect(github.projects.listColumns).toHaveBeenCalled();
-    //     expect(github.projects.listColumns).toHaveBeenCalledTimes(2);
-    //     expect(github.projects.listColumns).toHaveBeenCalledWith({
-    //       project_id: 101,
-    //     });
-    //     expect(github.projects.listColumns).toHaveBeenCalledWith({
-    //       project_id: 102,
-    //     });
+        expect(github.projects.listCards).toHaveBeenCalled();
+        expect(github.projects.listCards).toHaveBeenCalledTimes(3);
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 111,
+        });
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 112,
+        });
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 113,
+        });
+      });
 
-    //     expect(github.projects.listCards).toHaveBeenCalled();
-    //     expect(github.projects.listCards).toHaveBeenCalledTimes(3);
-    //     expect(github.projects.listCards).toHaveBeenCalledWith({
-    //       archived_state: 'not_archived',
-    //       column_id: 111,
-    //     });
-    //     expect(github.projects.listCards).toHaveBeenCalledWith({
-    //       archived_state: 'not_archived',
-    //       column_id: 112,
-    //     });
-    //     expect(github.projects.listCards).toHaveBeenCalledWith({
-    //       archived_state: 'not_archived',
-    //       column_id: 113,
-    //     });
-    //   });
+      it('should not ping core maintainers', () => {
+        expect(github.issues.createComment).not.toHaveBeenCalled();
+      });
+    });
 
-    //   it('should not ping core maintainers', () => {
-    //     expect(github.issues.createComment).not.toHaveBeenCalled();
-    //   });
-    // });
+    describe('When some issues have not been added to a project', () => {
+      beforeEach(async () => {
+        github.issues.listForRepo = jasmine
+          .createSpy('listForRepo')
+          .and.resolveTo({
+            data: [
+              issues.withProject,
+              issues.anotherWithProject,
+              issues.withoutProject,
+            ],
+          });
+        await robot.receive(payloadData);
+      });
 
-    // describe('When some issues have not been added to a project', () => {
-    //   beforeEach(async () => {
-    //     github.issues.listForRepo = jasmine
-    //       .createSpy('listForRepo')
-    //       .and.resolveTo({
-    //         data: [
-    //           issues.withProject,
-    //           issues.anotherWithProject,
-    //           issues.withoutProject,
-    //         ],
-    //       });
-    //     await robot.receive(payloadData);
-    //   });
+      it('should call ensureAllIssuesHaveProjects function', () => {
+        expect(
+          periodicCheckModule.ensureAllIssuesHaveProjects
+        ).toHaveBeenCalled();
+      });
 
-    //   it('should call ensureAllIssuesHaveProjects function', () => {
-    //     expect(
-    //       periodicCheckModule.ensureAllIssuesHaveProjects
-    //     ).toHaveBeenCalled();
-    //   });
+      it('should get all open issues', () => {
+        expect(github.issues.listForRepo).toHaveBeenCalled();
+        expect(github.issues.listForRepo).toHaveBeenCalledWith({
+          owner: 'oppia',
+          repo: 'oppia',
+          per_page: 100,
+          state: 'open',
+          page: 1,
+        });
+      });
 
-    //   it('should get all open issues', () => {
-    //     expect(github.issues.listForRepo).toHaveBeenCalled();
-    //     expect(github.issues.listForRepo).toHaveBeenCalledWith({
-    //       owner: 'oppia',
-    //       repo: 'oppia',
-    //       per_page: 100,
-    //       state: 'open',
-    //       page: 1,
-    //     });
-    //   });
+      it('should get all project cards', () => {
+        expect(github.projects.listForRepo).toHaveBeenCalled();
+        expect(github.projects.listForRepo).toHaveBeenCalledWith({
+          repo: 'oppia',
+          owner: 'oppia',
+        });
 
-    //   it('should get all project cards', () => {
-    //     expect(github.projects.listForRepo).toHaveBeenCalled();
-    //     expect(github.projects.listForRepo).toHaveBeenCalledWith({
-    //       repo: 'oppia',
-    //       owner: 'oppia',
-    //     });
+        expect(github.projects.listColumns).toHaveBeenCalled();
+        expect(github.projects.listColumns).toHaveBeenCalledTimes(2);
+        expect(github.projects.listColumns).toHaveBeenCalledWith({
+          project_id: 101,
+        });
+        expect(github.projects.listColumns).toHaveBeenCalledWith({
+          project_id: 102,
+        });
 
-    //     expect(github.projects.listColumns).toHaveBeenCalled();
-    //     expect(github.projects.listColumns).toHaveBeenCalledTimes(2);
-    //     expect(github.projects.listColumns).toHaveBeenCalledWith({
-    //       project_id: 101,
-    //     });
-    //     expect(github.projects.listColumns).toHaveBeenCalledWith({
-    //       project_id: 102,
-    //     });
+        expect(github.projects.listCards).toHaveBeenCalled();
+        expect(github.projects.listCards).toHaveBeenCalledTimes(3);
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 111,
+        });
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 112,
+        });
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 113,
+        });
+      });
 
-    //     expect(github.projects.listCards).toHaveBeenCalled();
-    //     expect(github.projects.listCards).toHaveBeenCalledTimes(3);
-    //     expect(github.projects.listCards).toHaveBeenCalledWith({
-    //       archived_state: 'not_archived',
-    //       column_id: 111,
-    //     });
-    //     expect(github.projects.listCards).toHaveBeenCalledWith({
-    //       archived_state: 'not_archived',
-    //       column_id: 112,
-    //     });
-    //     expect(github.projects.listCards).toHaveBeenCalledWith({
-    //       archived_state: 'not_archived',
-    //       column_id: 113,
-    //     });
-    //   });
-
-    //   it('should ping core maintainers', () => {
-    //     expect(github.issues.createComment).toHaveBeenCalled();
-    //     expect(github.issues.createComment).toHaveBeenCalledWith({
-    //       owner: 'oppia',
-    //       repo: 'oppia',
-    //       issue_number: 1,
-    //       body:
-    //         'Hi @oppia/core-maintainers, this issue is not assigned ' +
-    //         'to any project. Can you please update the same? Thanks!',
-    //     });
-    //   });
-    // });
+      it('should ping core maintainers', () => {
+        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          owner: 'oppia',
+          repo: 'oppia',
+          issue_number: 1,
+          body:
+            'Hi @oppia/core-maintainers, this issue is not assigned ' +
+            'to any project. Can you please update the same? Thanks!',
+        });
+      });
+    });
   });
 });
