@@ -22,7 +22,6 @@ const core = require('@actions/core');
 const dispatcher = require('../actions/src/dispatcher');
 const github = require('@actions/github');
 const { google } = require('googleapis');
-const { OAuth2Client } = require('google-auth-library');
 const pullRequestPayload = require('../fixtures/pullRequestPayload.json');
 const sheetsToken = JSON.stringify(require('../fixtures/token.json'));
 const sheetsCredentials =
@@ -37,15 +36,16 @@ describe('CLA check github action Module', () => {
     github.context.eventName = 'pull_request_target';
     github.context.payload = pullRequestPayload.payload;
 
-    octokit = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.resolveTo({})
-      },
-    };
+    // octokit = {
+    //   issues: {
+    //     createComment: jasmine.createSpy('createComment').and.resolveTo({})
+    //   },
+    // };
 
-    Object.setPrototypeOf(github.GitHub, function () {
-      return octokit;
-    });
+    // spyOn(github, 'getOctokit').and.returnValue(octokit);
+    // Object.setPrototypeOf(github.getOctokit, function () {
+    //   return octokit;
+    // });
 
     spyOnProperty(github.context, 'repo').and.returnValue({
       owner: pullRequestPayload.payload.repository.owner.login,
@@ -88,6 +88,12 @@ describe('CLA check github action Module', () => {
 
   describe('user has signed cla sheet', () => {
     beforeEach(function () {
+      octokit = {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.resolveTo({})
+        },
+      };
+      spyOn(github, 'getOctokit').and.returnValue(octokit);
       spyOn(core, 'info');
       spyOn(google, 'sheets').and.returnValue({
         spreadsheets: {
@@ -116,7 +122,13 @@ describe('CLA check github action Module', () => {
 
   describe('user has not signed cla sheet', () => {
     beforeEach(async () => {
-      spyOn(core, 'setFailed');
+      octokit = {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.resolveTo({})
+        },
+      };
+      spyOn(github, 'getOctokit').and.returnValue(octokit);
+      spyOn(core, 'setFailed').and.callThrough();
       spyOn(google, 'sheets').and.returnValue({
         spreadsheets: {
           values: {
@@ -167,7 +179,7 @@ describe('CLA check github action Module', () => {
 
   describe('testing http req fails', () => {
     beforeEach(async () => {
-      spyOn(core, 'setFailed');
+      spyOn(core, 'setFailed').and.callThrough();
     });
 
     it('should fail if no data is present in sheet', async () => {

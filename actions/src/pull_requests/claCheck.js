@@ -17,8 +17,8 @@
  */
 
 const core = require('@actions/core');
-const { context, GitHub } = require('@actions/github');
 const { google } = require('googleapis');
+const github = require('@actions/github');
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -48,9 +48,9 @@ const generateOutput = async (hasClaSigned) => {
     'https://github.com/oppia/oppia/wiki/' +
     'Contributing-code-to-Oppia#setting-things-up'
   );
-  const octokit = new GitHub(GITHUB_TOKEN);
-  const PR_NUMBER = context.payload.pull_request.number;
-  const PR_AUTHOR = context.payload.pull_request.user.login;
+  const octokit = github.getOctokit(GITHUB_TOKEN);
+  const PR_NUMBER = github.context.payload.pull_request.number;
+  const PR_AUTHOR = github.context.payload.pull_request.user.login;
 
   let comment = '';
   if (!hasClaSigned) {
@@ -62,12 +62,12 @@ const generateOutput = async (hasClaSigned) => {
         'this before we can accept your PR. Thanks!');
     core.info('Commenting in PR...');
 
-    await octokit.issues.createComment(
+    await octokit.rest.issues.createComment(
       {
         body: comment,
         issue_number: PR_NUMBER,
-        owner: context.repo.owner,
-        repo: context.repo.repo,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
       }
     );
     core.setFailed(PR_AUTHOR + ' has not signed the CLA');
@@ -82,7 +82,7 @@ const generateOutput = async (hasClaSigned) => {
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
 const checkSheet = async (auth) => {
-  const PR_AUTHOR = context.payload.pull_request.user.login;
+  const PR_AUTHOR = github.context.payload.pull_request.user.login;
   const sheets = google.sheets({ version: 'v4', auth });
   const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
   await sheets.spreadsheets.values.get(

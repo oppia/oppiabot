@@ -48,10 +48,11 @@ describe('Check Issue Labels Module', () => {
       repo: payload.repository.name,
     });
 
+    spyOn(github, 'getOctokit').and.returnValue(octokit);
     // Mock GitHub API.
-    Object.setPrototypeOf(github.GitHub, function () {
-      return octokit;
-    });
+    // Object.setPrototypeOf(github.getOctokit, function () {
+    //   return octokit;
+    // });
     spyOn(checkIssueLabelModule, 'checkLabels').and.callThrough();
   });
 

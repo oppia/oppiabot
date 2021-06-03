@@ -15,8 +15,8 @@
     "update-actions-build": "node actions/build.js"
   },
   "dependencies": {
-    "@actions/core": "^1.2.4",
-    "@actions/github": "^2.2.0",
+    "@actions/core": "^1.3.0",
+    "@actions/github": "^5.0.0",
     "axios": "^0.19.2",
     "dotenv": "^6.0.0",
     "google-auth-library": "^6.0.0",
