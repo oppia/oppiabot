@@ -257,7 +257,8 @@ describe('Api For Sheets Module', () => {
       await apiForSheetsModule.generateOutput(
         [...claData, ['testuser7777']],
         pullRequestPayload.payload.pull_request.number,
-        pullRequestPayload.payload.pull_request
+        pullRequestPayload.payload.pull_request,
+        pullRequestPayload.payload.repository.name
       );
 
       var linkText = 'here';
@@ -291,13 +292,19 @@ describe('Api For Sheets Module', () => {
         done();
       });
 
+      afterEach(function (done) {
+        pullRequestPayload.payload.repository.name = 'oppia';
+        done();
+      });
+
       it('should close the PR if atleast one user has not signed cla',
         async () => {
         // Add username to CLA sheet.
           await apiForSheetsModule.generateOutput(
             [...claData, ['testuser7777']],
             pullRequestPayload.payload.pull_request.number,
-            pullRequestPayload.payload.pull_request
+            pullRequestPayload.payload.pull_request,
+            pullRequestPayload.payload.repository.name
           );
 
           var oppiaAndroidLinkText = 'here';
