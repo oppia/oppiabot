@@ -17,8 +17,8 @@ const openEvent = 'opened';
 const openEventGithubActions = 'pull_request_target_opened';
 const reopenEventGithubActions = 'pull_request_target_reopened';
 const reopenEvent = 'pull_request_reopened';
-const unlabelEvent = 'unlabeled';
-const PRLabelEvent = 'labeled';
+const PRUnlabelEvent = 'pull_request_unlabeled';
+const PRLabelEvent = 'pull_request_labeled';
 const synchronizeEvent = 'synchronize';
 const closeEvent = 'closed';
 const editEvent = 'edited';
@@ -45,6 +45,7 @@ const assigneeCheck = 'assignee-check';
 const mergeConflictCheck = 'merge-conflict-check';
 const allMergeConflictCheck = 'all-merge-conflict-check';
 const jobCheck = 'job-check';
+const cronJobCheck = 'cron-job-check';
 const modelCheck = 'model-check';
 const issuesLabelCheck = 'issues-labeled-check';
 const issuesAssignedCheck = 'issues-assigned-check';
@@ -55,12 +56,15 @@ const ciFailureCheck = 'ci-failure-check';
 const updateWithDevelopCheck = 'update-with-develop-check';
 const respondToReviewCheck = 'respond-to-review-check';
 const oldBuildLabelCheck = 'old-build-label-check';
+const dontMergeLabelCheck = 'dont-merge-label-check';
 
 const checksWhitelist = {
   // eslint-disable-next-line quote-props
   'oppia-android': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
+    [openEventGithubActions]: [claCheckGithubAction],
+    [reopenEventGithubActions]: [claCheckGithubAction],
     [PRLabelEvent]: [],
     [synchronizeEvent]: [],
     [closeEvent]: [],
@@ -78,6 +82,7 @@ const checksWhitelist = {
       branchCheck,
       wipCheck,
       jobCheck,
+      cronJobCheck,
       modelCheck,
       prTemplateCheck
     ],
@@ -89,6 +94,7 @@ const checksWhitelist = {
       branchCheck,
       wipCheck,
       jobCheck,
+      cronJobCheck,
       modelCheck,
       prTemplateCheck
     ],
@@ -96,6 +102,7 @@ const checksWhitelist = {
     [synchronizeEvent]: [
       mergeConflictCheck,
       jobCheck,
+      cronJobCheck,
       modelCheck,
       codeOwnerCheck,
       oldBuildLabelCheck
@@ -104,7 +111,7 @@ const checksWhitelist = {
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
-    [unlabelEvent]: [datastoreLabelCheck],
+    [PRUnlabelEvent]: [datastoreLabelCheck, dontMergeLabelCheck],
     [pushEvent]: [forcePushCheck],
     [periodicCheckEvent]: [periodicCheck],
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
@@ -130,7 +137,7 @@ const blacklistedAuthors = ['translatewiki'];
 
 module.exports.openEvent = openEvent;
 module.exports.reopenEvent = reopenEvent;
-module.exports.unlabelEvent = unlabelEvent;
+module.exports.PRUnlabelEvent = PRUnlabelEvent;
 module.exports.PRLabelEvent = PRLabelEvent;
 module.exports.synchronizeEvent = synchronizeEvent;
 module.exports.closeEvent = closeEvent;
@@ -153,6 +160,7 @@ module.exports.assigneeCheck = assigneeCheck;
 module.exports.mergeConflictCheck = mergeConflictCheck;
 module.exports.allMergeConflictCheck = allMergeConflictCheck;
 module.exports.jobCheck = jobCheck;
+module.exports.cronJobCheck = cronJobCheck;
 module.exports.modelCheck = modelCheck;
 module.exports.issuesLabelCheck = issuesLabelCheck;
 module.exports.issuesAssignedCheck = issuesAssignedCheck;
@@ -166,6 +174,7 @@ module.exports.ciFailureCheck = ciFailureCheck;
 module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
 module.exports.respondToReviewCheck = respondToReviewCheck;
 module.exports.oldBuildLabelCheck = oldBuildLabelCheck;
+module.exports.dontMergeLabelCheck = dontMergeLabelCheck;
 
 module.exports.getBlacklistedAuthors = function() {
   return blacklistedAuthors;
