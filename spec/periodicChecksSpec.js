@@ -924,6 +924,7 @@ describe('Periodic Checks Module', () => {
             ],
           });
         issueAssignedPayLoad.payload.action = 'opened';
+        issueAssignedPayLoad.payload.issue = issues.withProject;
         spyOn(periodicCheckModule, 'ensureNewIssuesHaveProjects').
           and.callThrough();
         await robot.receive(issueAssignedPayLoad);
