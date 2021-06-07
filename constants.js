@@ -112,7 +112,7 @@ const checksWhitelist = {
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
-    [PRUnlabelEvent]: [datastoreLabelCheck, dontMergeLabelCheck, 
+    [PRUnlabelEvent]: [datastoreLabelCheck, dontMergeLabelCheck,
       staleBuildLabelCheck],
     [pushEvent]: [forcePushCheck],
     [periodicCheckEvent]: [periodicCheck],
