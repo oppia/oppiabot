@@ -246,7 +246,7 @@ module.exports = (oppiabot) => {
 
   oppiabot.on('pull_request.unlabeled', async (context) => {
     if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
-      await runChecks(context, constants.unlabelEvent);
+      await runChecks(context, constants.PRUnlabelEvent);
     }
   });
 
