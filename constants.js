@@ -73,50 +73,6 @@ const checksWhitelist = {
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
     [issueCommentCreatedEvent]: [respondToReviewCheck],
   },
-  'oppia-bot-test-repo-': {
-    [openEvent]: [
-      claCheck,
-      changelogCheck,
-      codeOwnerCheck,
-      branchCheck,
-      wipCheck,
-      jobCheck,
-      cronJobCheck,
-      modelCheck,
-      prTemplateCheck
-    ],
-    [openEventGithubActions]: [claCheckGithubAction],
-    [reopenEventGithubActions]: [claCheckGithubAction],
-    [reopenEvent]: [
-      changelogCheck,
-      claCheckGithubAction,
-      branchCheck,
-      wipCheck,
-      jobCheck,
-      cronJobCheck,
-      modelCheck,
-      prTemplateCheck
-    ],
-    [PRLabelEvent]: [assigneeCheck, prLabelCheck],
-    [synchronizeEvent]: [
-      mergeConflictCheck,
-      jobCheck,
-      cronJobCheck,
-      modelCheck,
-      codeOwnerCheck,
-      oldBuildLabelCheck
-    ],
-    [closeEvent]: [allMergeConflictCheck, updateWithDevelopCheck],
-    [editEvent]: [wipCheck],
-    [issuesLabelEvent]: [issuesLabelCheck],
-    [issuesAssignedEvent]: [issuesAssignedCheck],
-    [PRUnlabelEvent]: [datastoreLabelCheck, dontMergeLabelCheck],
-    [pushEvent]: [forcePushCheck],
-    [periodicCheckEvent]: [periodicCheck],
-    [pullRequestReviewEvent]: [pullRequestReviewCheck],
-    [checkCompletedEvent]: [ciFailureCheck],
-    [issueCommentCreatedEvent]: [respondToReviewCheck]
-  },
   // eslint-disable-next-line quote-props
   'oppia': {
     [openEvent]: [
