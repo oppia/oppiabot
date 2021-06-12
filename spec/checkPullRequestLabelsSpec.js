@@ -66,9 +66,11 @@ describe('Pull Request Label Check', () => {
             return { status: 204 };
           }),
         getCommit: jasmine.createSpy('getCommit').and.resolveTo({
-          commit: {
-            author: {
-              date: '2021-04-12T18:33:45Z'
+          data: {
+            commit: {
+              author: {
+                date: '2021-04-12T18:33:45Z'
+              }
             }
           }
         })
