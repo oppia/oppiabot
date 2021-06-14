@@ -22,8 +22,6 @@ const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
-const checkStaleBuildLabelRemovedModule =
-  require('../lib/checkPullRequestLabels');
 const scheduler = require('../lib/scheduler');
 const OLD_BUILD_LABEL = "PR: don't merge - STALE BUILD";
 
@@ -562,14 +560,48 @@ describe('Pull Request Label Check', () => {
       payloadData.payload.action = 'unlabeled';
       payloadData.payload.label = label;
       spyOn(
-        checkStaleBuildLabelRemovedModule, 'checkStaleBuildLabelRemoved',
+        checkPullRequestLabelModule, 'checkStaleBuildLabelRemoved',
       ).and.callThrough();
       await robot.receive(payloadData);
+      github = {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.returnValue({}),
+          addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
+          removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
+          addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
+        },
+        repos: {
+          checkCollaborator:
+          jasmine.createSpy('checkCollaborator').and.callFake(
+            (params) => {
+              if (params.username === 'newuser') {
+                throw new Error('User is not a collaborator.');
+              }
+              return { status: 204 };
+            }),
+          getCommit: jasmine.createSpy('getCommit').and.resolveTo({
+            data: {
+              commit: {
+                author: {
+                  date: (new Date).toISOString()
+                }
+              }
+            }
+          })
+        }
+      };
     });
 
     it('checks for stale build label', () => {
-      expect(checkStaleBuildLabelRemovedModule.checkStaleBuildLabelRemoved).
+      expect(checkPullRequestLabelModule.checkStaleBuildLabelRemoved).
         toHaveBeenCalled();
+    });
+
+    it('check if pr is stale', () => {
+      expect(github.repos.getCommit).toHaveBeenCalled();
+      expect(github.repos.getCommit).toHaveBeenCalledWith({
+        ref: payloadData.payload.pull_request.head.sha
+      });
     });
 
     it('should comment on PR', () => {
@@ -610,14 +642,48 @@ describe('Pull Request Label Check', () => {
       payloadData.payload.label = label;
       payloadData.payload.sender.login = 'seanlip';
       spyOn(
-        checkStaleBuildLabelRemovedModule, 'checkStaleBuildLabelRemoved'
+        checkPullRequestLabelModule, 'checkStaleBuildLabelRemoved'
       ).and.callThrough();
       await robot.receive(payloadData);
+      github = {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.returnValue({}),
+          addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
+          removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
+          addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
+        },
+        repos: {
+          checkCollaborator:
+          jasmine.createSpy('checkCollaborator').and.callFake(
+            (params) => {
+              if (params.username === 'newuser') {
+                throw new Error('User is not a collaborator.');
+              }
+              return { status: 204 };
+            }),
+          getCommit: jasmine.createSpy('getCommit').and.resolveTo({
+            data: {
+              commit: {
+                author: {
+                  date: (new Date).toISOString()
+                }
+              }
+            }
+          })
+        }
+      };
     });
 
     it('checks for stale build label', () => {
-      expect(checkStaleBuildLabelRemovedModule.checkStaleBuildLabelRemoved).
+      expect(checkPullRequestLabelModule.checkStaleBuildLabelRemoved).
         toHaveBeenCalled();
+    });
+
+    it('check if pr is stale', () => {
+      expect(github.repos.getCommit).toHaveBeenCalled();
+      expect(github.repos.getCommit).toHaveBeenCalledWith({
+        ref: payloadData.payload.pull_request.head.sha
+      });
     });
 
     it('does not add back the label', () => {
