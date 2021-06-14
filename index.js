@@ -36,7 +36,6 @@ const checkPullRequestReviewModule = require('./lib/checkPullRequestReview');
 const newCodeOwnerModule = require('./lib/checkForNewCodeowner');
 const ciCheckModule = require('./lib/ciChecks');
 const periodicCheckModule = require('./lib/periodicChecks');
-
 const constants = require('./constants');
 const checkIssueAssigneeModule = require('./lib/checkIssueAssignee');
 const staleBuildModule = require('./lib/staleBuildChecks');
@@ -146,10 +145,12 @@ const runChecks = async (context, checkEvent) => {
             );
             break;
           case constants.periodicCheck:
-            callable.push(...[
+            callable.push(
               periodicCheckModule.ensureAllPullRequestsAreAssigned(context),
               staleBuildModule.checkAndTagPRsWithOldBuilds(context),
-            ]);
+              checkPullRequestReviewModule.
+                checkForReviewersWithPendingReview(context)
+            );
             break;
           case constants.respondToReviewCheck:
             callable.push(

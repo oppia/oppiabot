@@ -24,6 +24,7 @@ const pullRequestReviewModule = require('../lib/checkPullRequestReview');
 const reviewPayloadData = require('../fixtures/pullRequestReview.json');
 const commentPayloadData = require('../fixtures/pullRequestComment.json');
 const utilityModule = require('../lib/utils');
+const pushPayload = require('../fixtures/push.json');
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
@@ -55,6 +56,7 @@ describe('Pull Request Review Module', () => {
           .createSpy('removeAssignees')
           .and.returnValue({}),
         addLabels: jasmine.createSpy('addLabels').and.returnValue({}),
+        update: jasmine.createSpy('update').and.returnValue({}),
         removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
       },
     };
@@ -71,6 +73,36 @@ describe('Pull Request Review Module', () => {
       and.callThrough();
     spyOn(pullRequestReviewModule, 'handleResponseToReview').and.callThrough();
     spyOn(utilityModule, 'sleep').and.callFake(() => { });
+  });
+
+  describe('Its been more than 24 Hrs since' +
+  'last review and there is no Code Review till now ', ()=>{
+    beforeEach(async () => {
+      await robot.receive(pushPayload);
+    });
+
+    it('should comment on pull request', ()=>{
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+
+    it('should not close the pull request', () => {
+      expect(github.issues.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Less than 24 Hrs', ()=>{
+    // In this beforeEach is not Required as we don't require any
+    // data before Performing these tests
+    beforeEach(async () => {
+      await robot.receive(pushPayload);
+    });
+    it('should not close the pull request', () => {
+      expect(github.issues.update).not.toHaveBeenCalled();
+    });
+
+    it('should not comment on pull request', ()=>{
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
   });
 
   describe('A reviewer requests changes to the PR', () => {
