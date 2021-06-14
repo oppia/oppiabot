@@ -29,6 +29,7 @@ const pullRequestReviewEvent = 'pr_review';
 const checkCompletedEvent = 'check_completed';
 const periodicCheckEvent = 'periodic-check-event';
 const issueCommentCreatedEvent = 'comment_created';
+const issueOpenedEvent = 'issue_opened';
 
 const periodicCheck = 'periodic-check';
 const claCheck = 'cla-check';
@@ -56,6 +57,7 @@ const ciFailureCheck = 'ci-failure-check';
 const updateWithDevelopCheck = 'update-with-develop-check';
 const respondToReviewCheck = 'respond-to-review-check';
 const oldBuildLabelCheck = 'old-build-label-check';
+const ensureNewIssuesHaveProjectsCheck = 'new-issues-have-project';
 const dontMergeLabelCheck = 'dont-merge-label-check';
 
 const checksWhitelist = {
@@ -116,7 +118,8 @@ const checksWhitelist = {
     [periodicCheckEvent]: [periodicCheck],
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
     [checkCompletedEvent]: [ciFailureCheck],
-    [issueCommentCreatedEvent]: [respondToReviewCheck]
+    [issueCommentCreatedEvent]: [respondToReviewCheck],
+    [issueOpenedEvent]: [ensureNewIssuesHaveProjectsCheck]
   },
   // eslint-disable-next-line quote-props
   'oppiabot': {
@@ -149,6 +152,7 @@ module.exports.pullRequestReviewEvent = pullRequestReviewEvent;
 module.exports.checkCompletedEvent = checkCompletedEvent;
 module.exports.periodicCheckEvent = periodicCheckEvent;
 module.exports.issueCommentCreatedEvent = issueCommentCreatedEvent;
+module.exports.issueOpenedEvent = issueOpenedEvent;
 
 module.exports.periodicCheck = periodicCheck;
 module.exports.claCheck = claCheck;
@@ -174,6 +178,8 @@ module.exports.ciFailureCheck = ciFailureCheck;
 module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
 module.exports.respondToReviewCheck = respondToReviewCheck;
 module.exports.oldBuildLabelCheck = oldBuildLabelCheck;
+module.exports.ensureNewIssuesHaveProjectsCheck = (
+  ensureNewIssuesHaveProjectsCheck);
 module.exports.dontMergeLabelCheck = dontMergeLabelCheck;
 
 module.exports.getBlacklistedAuthors = function() {

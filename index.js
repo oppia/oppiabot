@@ -159,6 +159,10 @@ const runChecks = async (context, checkEvent) => {
           case constants.oldBuildLabelCheck:
             callable.push(staleBuildModule.removeOldBuildLabel(context));
             break;
+          case constants.ensureNewIssuesHaveProjectsCheck:
+            callable.push(
+              periodicCheckModule.ensureNewIssuesHaveProjects(context));
+            break;
         }
       }
       // Wait for all checks to resolve or reject.
@@ -301,6 +305,13 @@ module.exports = (oppiabot) => {
       // eslint-disable-next-line no-console
       console.log('A CHECK SUITE HAS BEEN COMPLETED...');
       await runChecks(context, constants.checkCompletedEvent);
+    }
+  });
+
+  oppiabot.on('issues.opened', async (context) => {
+    if (checkWhitelistedAccounts(context)) {
+      console.log('An Issue is Opened');
+      await runChecks(context, constants.issueOpenedEvent);
     }
   });
 };

@@ -24,6 +24,7 @@ const payloadData = require('../fixtures/periodicCheckPayload.json');
 const periodicCheckModule = require('../lib/periodicChecks');
 const mergeConflictModule = require('../lib/checkMergeConflicts');
 const staleBuildModule = require('../lib/staleBuildChecks');
+const issueAssignedPayLoad = require('../fixtures/issues.assigned.json');
 
 describe('Periodic Checks Module', () => {
   /**
@@ -873,6 +874,87 @@ describe('Periodic Checks Module', () => {
             'Hi @oppia/core-maintainers, this issue is not assigned ' +
             'to any project. Can you please update the same? Thanks!',
         });
+      });
+    });
+
+    describe('Should Check If a Opened Issue is Assigned to a project', () => {
+      beforeEach(async () => {
+        github.issues.listForRepo = jasmine
+          .createSpy('listForRepo')
+          .and.resolveTo({
+            data: [
+              issues.withProject,
+              issues.anotherWithProject,
+              issues.withoutProject,
+            ],
+          });
+        issueAssignedPayLoad.payload.action = 'opened';
+        spyOn(periodicCheckModule, 'ensureNewIssuesHaveProjects').
+          and.callThrough();
+        await robot.receive(issueAssignedPayLoad);
+      }, 40000);
+
+      it('Should Call ensureNewIssuesHaveProjects function', () => {
+        expect(periodicCheckModule.ensureNewIssuesHaveProjects).
+          toHaveBeenCalled();
+      });
+      it('should get all project cards', () => {
+        expect(github.projects.listForRepo).toHaveBeenCalled();
+        expect(github.projects.listForRepo).toHaveBeenCalledWith({
+          repo: 'oppia',
+          owner: 'oppia',
+        });
+
+        expect(github.projects.listColumns).toHaveBeenCalled();
+        expect(github.projects.listColumns).toHaveBeenCalledTimes(2);
+        expect(github.projects.listColumns).toHaveBeenCalledWith({
+          project_id: 101,
+        });
+        expect(github.projects.listColumns).toHaveBeenCalledWith({
+          project_id: 102,
+        });
+
+        expect(github.projects.listCards).toHaveBeenCalled();
+        expect(github.projects.listCards).toHaveBeenCalledTimes(3);
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 111,
+        });
+        expect(github.projects.listCards).toHaveBeenCalledWith({
+          archived_state: 'not_archived',
+          column_id: 112,
+        });
+      });
+
+
+      afterAll(() => {
+        issueAssignedPayLoad.payload.action = 'assigned';
+      });
+    });
+    describe('Opened Issue is Assigned to a project', () => {
+      beforeEach(async () => {
+        github.issues.listForRepo = jasmine
+          .createSpy('listForRepo')
+          .and.resolveTo({
+            data: [
+              issues.withProject,
+              issues.anotherWithProject,
+              issues.withoutProject,
+            ],
+          });
+        issueAssignedPayLoad.payload.action = 'opened';
+        issueAssignedPayLoad.payload.issue = issues.withProject;
+        spyOn(periodicCheckModule, 'ensureNewIssuesHaveProjects').
+          and.callThrough();
+        await robot.receive(issueAssignedPayLoad);
+      }, 40000);
+
+      it('should not ping core maintainers', () => {
+        expect(github.issues.createComment).not.toHaveBeenCalled();
+      });
+
+      afterAll(() => {
+        payloadData.payload.action = 'assigned';
       });
     });
   });
