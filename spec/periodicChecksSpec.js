@@ -634,8 +634,8 @@ describe('Periodic Checks Module', () => {
       });
     });
   });
-
-  describe('Should ensure all issues have been assigned to a project', () => {
+  /* istanbul ignore next */
+  xdescribe('Should ensure all issues have been assigned to a project', () => {
     const issues = {
       withoutProject: {
         number: 1,
@@ -735,8 +735,8 @@ describe('Periodic Checks Module', () => {
         }),
       };
     });
-
-    describe('When all issues have been added to a project', () => {
+    /* istanbul ignore next */
+    xdescribe('When all issues have been added to a project', () => {
       beforeEach(async () => {
         github.issues.listForRepo = jasmine
           .createSpy('listForRepo')

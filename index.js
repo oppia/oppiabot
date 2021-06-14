@@ -24,6 +24,7 @@ const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
 const checkWipModule = require('./lib/checkWipDraftPR');
 const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
+const checkCronJobModule = require('./lib/checkNewCronJobs');
 const checkPullRequestTemplateModule = require(
   './lib/checkPullRequestTemplate'
 );
@@ -95,6 +96,9 @@ const runChecks = async (context, checkEvent) => {
           case constants.jobCheck:
             callable.push(checkPullRequestJobModule.checkForNewJob(context));
             break;
+          case constants.cronJobCheck:
+            callable.push(checkCronJobModule.checkForNewCronJob(context));
+            break;
           case constants.modelCheck:
             callable.push(
               checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer(
@@ -144,7 +148,6 @@ const runChecks = async (context, checkEvent) => {
           case constants.periodicCheck:
             callable.push(...[
               periodicCheckModule.ensureAllPullRequestsAreAssigned(context),
-              periodicCheckModule.ensureAllIssuesHaveProjects(context),
               staleBuildModule.checkAndTagPRsWithOldBuilds(context),
             ]);
             break;
@@ -242,7 +245,7 @@ module.exports = (oppiabot) => {
 
   oppiabot.on('pull_request.unlabeled', async (context) => {
     if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
-      await runChecks(context, constants.unlabelEvent);
+      await runChecks(context, constants.PRUnlabelEvent);
     }
   });
 

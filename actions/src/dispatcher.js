@@ -19,7 +19,9 @@
 const core = require('@actions/core');
 const { context } = require('@actions/github');
 const issueLabelsModule = require('./issues/checkIssueLabels');
+const claCheckGithubActionModule = require('./pull_requests/claCheck');
 const constants = require('../../constants');
+const PRLabelsModule = require('./pull_requests/labelCheck');
 
 module.exports = {
   async dispatch(event, action) {
@@ -34,7 +36,18 @@ module.exports = {
         for (var i = 0; i < checkList.length; i++) {
           switch (checkList[i]) {
             case constants.issuesLabelCheck:
+              core.info('issue label check triggered');
               await issueLabelsModule.checkLabels();
+              break;
+            case constants.claCheckGithubAction:
+              core.info('cla check triggered');
+              await claCheckGithubActionModule.claCheckGithubAction();
+              break;
+            case constants.prLabelCheck:
+              await PRLabelsModule.checkLabels();
+              break;
+            case constants.dontMergeLabelCheck:
+              await PRLabelsModule.checkUnLabeled();
               break;
           }
         }
