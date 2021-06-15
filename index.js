@@ -153,7 +153,6 @@ const runChecks = async (context, checkEvent) => {
           case constants.periodicCheck:
             callable.push(...[
               periodicCheckModule.ensureAllPullRequestsAreAssigned(context),
-              periodicCheckModule.ensureAllIssuesHaveProjects(context),
               staleBuildModule.checkAndTagPRsWithOldBuilds(context),
             ]);
             break;
@@ -251,7 +250,7 @@ module.exports = (oppiabot) => {
 
   oppiabot.on('pull_request.unlabeled', async (context) => {
     if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
-      await runChecks(context, constants.unlabelEvent);
+      await runChecks(context, constants.PRUnlabelEvent);
     }
   });
 
