@@ -583,7 +583,7 @@ describe('Pull Request Label Check', () => {
             data: {
               commit: {
                 author: {
-                  date: (new Date).toISOString()
+                  date: '2021-04-12T18:33:45Z'
                 }
               }
             }
