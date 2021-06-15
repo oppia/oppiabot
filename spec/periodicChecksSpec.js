@@ -478,13 +478,13 @@ describe('Periodic Checks Module', () => {
 
       it('should check if pr author has merging rights', () => {
         expect(github.repos.getCollaboratorPermissionLevel)
-        .toHaveBeenCalled();
+          .toHaveBeenCalled();
         expect(github.repos.getCollaboratorPermissionLevel)
-        .toHaveBeenCalledWith({
-          owner: 'oppia',
-          repo: 'oppia',
-          username: 'author4',
-        });
+          .toHaveBeenCalledWith({
+            owner: 'oppia',
+            repo: 'oppia',
+            username: 'author4',
+          });
       });
 
       it('should ping pr author', () => {
@@ -541,13 +541,13 @@ describe('Periodic Checks Module', () => {
 
       it('should check if pr author has merging rights', () => {
         expect(github.repos.getCollaboratorPermissionLevel)
-        .toHaveBeenCalled();
+          .toHaveBeenCalled();
         expect(github.repos.getCollaboratorPermissionLevel)
-        .toHaveBeenCalledWith({
-          owner: 'oppia',
-          repo: 'oppia',
-          username: 'author5',
-        });
+          .toHaveBeenCalledWith({
+            owner: 'oppia',
+            repo: 'oppia',
+            username: 'author5',
+          });
       });
 
       it('should ping project owner', () => {

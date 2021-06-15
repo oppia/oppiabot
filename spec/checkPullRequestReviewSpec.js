@@ -805,13 +805,13 @@ describe('Pull Request Review Module', () => {
 
         it('should check if author can merge', () => {
           expect(github.repos.getCollaboratorPermissionLevel)
-          .toHaveBeenCalled();
+            .toHaveBeenCalled();
           expect(github.repos.getCollaboratorPermissionLevel)
-          .toHaveBeenCalledWith({
-            owner: reviewPayloadData.payload.repository.owner.login,
-            repo: reviewPayloadData.payload.repository.name,
-            username: reviewPayloadData.payload.pull_request.user.login,
-          });
+            .toHaveBeenCalledWith({
+              owner: reviewPayloadData.payload.repository.owner.login,
+              repo: reviewPayloadData.payload.repository.name,
+              username: reviewPayloadData.payload.pull_request.user.login,
+            });
         });
 
         it('should assign one of the reviewers', () => {
@@ -874,9 +874,9 @@ describe('Pull Request Review Module', () => {
           };
           github.repos = {
             getCollaboratorPermissionLevel: jasmine
-            .createSpy('getCollaboratorPermissionLevel')
+              .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
-                 data: {
+                data: {
                   status: 200,
                   permission: 'write',
                 }
@@ -930,13 +930,13 @@ describe('Pull Request Review Module', () => {
 
         it('should check if author can merge', () => {
           expect(github.repos.getCollaboratorPermissionLevel)
-          .toHaveBeenCalled();
+            .toHaveBeenCalled();
           expect(github.repos.getCollaboratorPermissionLevel)
-          .toHaveBeenCalledWith({
-            owner: reviewPayloadData.payload.repository.owner.login,
-            repo: reviewPayloadData.payload.repository.name,
-            username: reviewPayloadData.payload.pull_request.user.login,
-          });
+            .toHaveBeenCalledWith({
+              owner: reviewPayloadData.payload.repository.owner.login,
+              repo: reviewPayloadData.payload.repository.name,
+              username: reviewPayloadData.payload.pull_request.user.login,
+            });
         });
 
         it('should assign pr author', () => {
@@ -1003,11 +1003,11 @@ describe('Pull Request Review Module', () => {
           };
           github.repos = {
             getCollaboratorPermissionLevel: jasmine
-            .createSpy('getCollaboratorPermissionLevel')
+              .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
                 data: {
-                 status: 200,
-                 permission: 'write',
+                  status: 200,
+                  permission: 'write',
                 }
               }),
           };
@@ -1053,13 +1053,13 @@ describe('Pull Request Review Module', () => {
 
         it('should check if author can merge', () => {
           expect(github.repos.getCollaboratorPermissionLevel)
-          .toHaveBeenCalled();
+            .toHaveBeenCalled();
           expect(github.repos.getCollaboratorPermissionLevel)
-          .toHaveBeenCalledWith({
-            owner: reviewPayloadData.payload.repository.owner.login,
-            repo: reviewPayloadData.payload.repository.name,
-            username: reviewPayloadData.payload.pull_request.user.login,
-          });
+            .toHaveBeenCalledWith({
+              owner: reviewPayloadData.payload.repository.owner.login,
+              repo: reviewPayloadData.payload.repository.name,
+              username: reviewPayloadData.payload.pull_request.user.login,
+            });
         });
 
         it('should assign pr author', () => {
@@ -1164,7 +1164,7 @@ describe('Pull Request Review Module', () => {
 
         it('should not check if author can merge', () => {
           expect(github.repos.getCollaboratorPermissionLevel)
-          .not.toHaveBeenCalled();
+            .not.toHaveBeenCalled();
         });
 
         it('should not assign pr author', () => {
