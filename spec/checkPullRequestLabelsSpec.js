@@ -577,19 +577,11 @@ describe('Pull Request Label Check', () => {
           addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
         },
         repos: {
-          checkCollaborator:
-          jasmine.createSpy('checkCollaborator').and.callFake(
-            (params) => {
-              if (params.username === 'newuser') {
-                throw new Error('User is not a collaborator.');
-              }
-              return { status: 204 };
-            }),
           getCommit: jasmine.createSpy('getCommit').and.resolveTo({
-            data: {
+            lastCommit: {
               commit: {
                 author: {
-                  date: '2021-04-12T18:33:45Z'
+                  date: (new Date).toISOString()
                 }
               }
             }
@@ -659,19 +651,11 @@ describe('Pull Request Label Check', () => {
           addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
         },
         repos: {
-          checkCollaborator:
-          jasmine.createSpy('checkCollaborator').and.callFake(
-            (params) => {
-              if (params.username === 'newuser') {
-                throw new Error('User is not a collaborator.');
-              }
-              return { status: 204 };
-            }),
           getCommit: jasmine.createSpy('getCommit').and.resolveTo({
-            data: {
+            lastCommit: {
               commit: {
                 author: {
-                  date: (new Date).toISOString()
+                  date: '2021-04-12T18:33:45Z'
                 }
               }
             }
