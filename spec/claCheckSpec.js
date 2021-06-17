@@ -28,11 +28,11 @@ const sheetsCredentials =
   JSON.stringify(require('../fixtures/credentials.json'));
 
 
-describe('CLA check github action Module', () => {
+describe('CLA check github action Module for Oppia', () => {
   beforeEach(async () => {
     process.env.SHEETS_CRED = sheetsCredentials;
     process.env.SHEETS_TOKEN = sheetsToken;
-    process.env.GITHUB_TOKEN = 'sample-token';
+    spyOn(core, 'getInput').and.returnValue('sample-token');
     github.context.eventName = 'pull_request_target';
     github.context.payload = pullRequestPayload.payload;
 
@@ -230,6 +230,76 @@ describe('CLA check github action Module', () => {
 
       expect(core.setFailed).toHaveBeenCalledWith(
         'Auth failure: SyntaxError: Unexpected token o in JSON at position 1');
+    });
+  });
+});
+
+describe('CLA check github action Module for oppia-android', () => {
+  beforeEach(async () => {
+    process.env.SHEETS_CRED = sheetsCredentials;
+    process.env.SHEETS_TOKEN = sheetsToken;
+    spyOn(core, 'getInput').and.returnValue('sample-token');
+    github.context.eventName = 'pull_request_target';
+    github.context.payload = pullRequestPayload.payload;
+    github.context.payload.repository.name = 'oppia-android';
+
+    octokit = {
+      issues: {
+        createComment: jasmine.createSpy('createComment').and.resolveTo({})
+      },
+    };
+
+    Object.setPrototypeOf(github.GitHub, function () {
+      return octokit;
+    });
+
+    spyOnProperty(github.context, 'repo').and.returnValue({
+      owner: pullRequestPayload.payload.repository.owner.login,
+      repo: pullRequestPayload.payload.repository.name,
+    });
+    spyOn(claCheckGithubActionModule, 'claCheckGithubAction').and.callThrough();
+    spyOn(core, 'setFailed');
+    spyOn(google, 'sheets').and.returnValue({
+      spreadsheets: {
+        values: {
+          get: jasmine.createSpy('get').and.callFake(async (obj, cb) => {
+            await cb(null, {
+              data: {
+                values: [['testuser']]
+              },
+            });
+          }),
+        },
+      },
+    });
+    await dispatcher.dispatch('pull_request_target', 'opened');
+  });
+
+  afterEach(() => {
+    github.context.payload.repository.name = 'oppia';
+  });
+
+  it('should comment in PR if user has not signed the CLA' +
+  ' for Oppia-Android', async () => {
+    const LINK_RESULT = 'here'.link(
+      'https://github.com/oppia/oppia-android/wiki#onboarding-instructions'
+    );
+    const PR_AUTHOR = pullRequestPayload.payload.pull_request.user.login;
+    const body = (
+      'Hi! @' +
+      PR_AUTHOR +
+      ' Welcome to Oppia! Could you please ' +
+      'follow the instructions ' + LINK_RESULT +
+      " and sign the CLA Sheet to get started? You'll need to do " +
+      'this before we can accept your PR. Thanks!');
+
+    expect(octokit.issues.createComment).toHaveBeenCalled();
+
+    expect(octokit.issues.createComment).toHaveBeenCalledWith({
+      body: body,
+      issue_number: pullRequestPayload.payload.pull_request.number,
+      owner: pullRequestPayload.payload.repository.owner.login,
+      repo: pullRequestPayload.payload.repository.name,
     });
   });
 });

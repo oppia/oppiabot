@@ -753,13 +753,13 @@ describe('Pull Request Review Module', () => {
                 },
               }),
           };
-          github.orgs = {
-            checkMembership: jasmine
-              .createSpy('checkMembership')
+          github.repos = {
+            getCollaboratorPermissionLevel: jasmine
+              .createSpy('getCollaboratorPermissionLevel')
               .and.callFake(() => {
                 throw new Error(
-                  'User does not exist or is not a public member of ' +
-                  'the organization.'
+                  'User does not exist or is not a public member ' +
+                  'of the orgnization.'
                 );
               }),
           };
@@ -804,9 +804,12 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should check if author can merge', () => {
-          expect(github.orgs.checkMembership).toHaveBeenCalled();
-          expect(github.orgs.checkMembership).toHaveBeenCalledWith({
-            org: reviewPayloadData.payload.organization.login,
+          expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalled();
+          expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
             username: reviewPayloadData.payload.pull_request.user.login,
           });
         });
@@ -869,10 +872,14 @@ describe('Pull Request Review Module', () => {
                 },
               }),
           };
-          github.orgs = {
-            checkMembership: jasmine.createSpy('checkMembership')
+          github.repos = {
+            getCollaboratorPermissionLevel: jasmine
+            .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
-                status: 204,
+                 data: {
+                  status: 200,
+                  permission: 'write',
+                }
               }),
           };
           await robot.receive(reviewPayloadData);
@@ -922,9 +929,12 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should check if author can merge', () => {
-          expect(github.orgs.checkMembership).toHaveBeenCalled();
-          expect(github.orgs.checkMembership).toHaveBeenCalledWith({
-            org: reviewPayloadData.payload.organization.login,
+          expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalled();
+          expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
             username: reviewPayloadData.payload.pull_request.user.login,
           });
         });
@@ -991,10 +1001,14 @@ describe('Pull Request Review Module', () => {
                 },
               }),
           };
-          github.orgs = {
-            checkMembership: jasmine.createSpy('checkMembership')
+          github.repos = {
+            getCollaboratorPermissionLevel: jasmine
+            .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
-                status: 204,
+                data: {
+                 status: 200,
+                 permission: 'write',
+                }
               }),
           };
           await robot.receive(reviewPayloadData);
@@ -1038,9 +1052,12 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should check if author can merge', () => {
-          expect(github.orgs.checkMembership).toHaveBeenCalled();
-          expect(github.orgs.checkMembership).toHaveBeenCalledWith({
-            org: reviewPayloadData.payload.organization.login,
+          expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalled();
+          expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalledWith({
+            owner: reviewPayloadData.payload.repository.owner.login,
+            repo: reviewPayloadData.payload.repository.name,
             username: reviewPayloadData.payload.pull_request.user.login,
           });
         });
@@ -1091,11 +1108,14 @@ describe('Pull Request Review Module', () => {
                 },
               }),
           };
-          github.orgs = {
-            checkMembership: jasmine
-              .createSpy('checkMembership')
+          github.repos = {
+            getCollaboratorPermissionLevel: jasmine
+              .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
-                status: 204,
+                data: {
+                  status: 200,
+                  permission: 'write',
+                }
               }),
           };
           await robot.receive(reviewPayloadData);
@@ -1143,7 +1163,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should not check if author can merge', () => {
-          expect(github.orgs.checkMembership).not.toHaveBeenCalled();
+          expect(github.repos.getCollaboratorPermissionLevel)
+          .not.toHaveBeenCalled();
         });
 
         it('should not assign pr author', () => {
@@ -1587,5 +1608,24 @@ describe('Pull Request Review Module', () => {
         });
       }
     );
+
+    describe('when PTAL template found in the comment', () => {
+      const initialCommentBody = commentPayloadData.payload.comment.body;
+      beforeAll(() => {
+        commentPayloadData.payload.comment.body = (
+          '{{Question/comment}} @{{reviewer_username}} PTAL');
+      });
+      beforeEach(async () => {
+        await robot.receive(commentPayloadData);
+      });
+
+      it('should not assign anyone to the PR', () => {
+        expect(github.issues.createComment).not.toHaveBeenCalled();
+      });
+
+      afterAll(() => {
+        commentPayloadData.payload.comment.body = initialCommentBody;
+      });
+    });
   });
 });

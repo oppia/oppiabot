@@ -58,7 +58,7 @@ const generateOutput = async (hasClaSigned) => {
   } else {
     LINK_RESULT = 'here'.link(
       'https://github.com/oppia/oppia/wiki/' +
-       'Contributing-code-to-Oppia#setting-things-up'
+      'Contributing-code-to-Oppia#setting-things-up'
     );
   }
 
