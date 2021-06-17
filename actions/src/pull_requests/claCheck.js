@@ -17,8 +17,8 @@
  */
 
 const core = require('@actions/core');
-const { google } = require('googleapis');
 const github = require('@actions/github');
+const { google } = require('googleapis');
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -43,14 +43,24 @@ const authorize = async function() {
 };
 
 const generateOutput = async (hasClaSigned) => {
-  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-  const LINK_RESULT = 'here'.link(
-    'https://github.com/oppia/oppia/wiki/' +
-    'Contributing-code-to-Oppia#setting-things-up'
-  );
-  const octokit = github.getOctokit(GITHUB_TOKEN);
-  const PR_NUMBER = github.context.payload.pull_request.number;
-  const PR_AUTHOR = github.context.payload.pull_request.user.login;
+  const GITHUB_TOKEN = core.getInput('repo-token');
+  const octokit = new GitHub(GITHUB_TOKEN);
+  const PR_NUMBER = context.payload.pull_request.number;
+  const PR_AUTHOR = context.payload.pull_request.user.login;
+  const REPO_NAME = context.payload.repository.name;
+
+  let LINK_RESULT = '';
+
+  if (REPO_NAME === 'oppia-android' ){
+    LINK_RESULT = 'here'.link(
+      'https://github.com/oppia/oppia-android/wiki#onboarding-instructions'
+    );
+  } else {
+    LINK_RESULT = 'here'.link(
+      'https://github.com/oppia/oppia/wiki/' +
+       'Contributing-code-to-Oppia#setting-things-up'
+    );
+  }
 
   let comment = '';
   if (!hasClaSigned) {
