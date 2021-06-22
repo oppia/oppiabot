@@ -68,16 +68,7 @@ describe('Pull Request Label Check', () => {
               throw new Error('User is not a collaborator.');
             }
             return { status: 204 };
-          }),
-        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
-          data: {
-            commit: {
-              author: {
-                date: '2021-04-12T18:33:45Z'
-              }
-            }
-          }
-        })
+          })
       }
     };
 
@@ -568,26 +559,16 @@ describe('Pull Request Label Check', () => {
       spyOn(
         checkPullRequestLabelModule, 'checkStaleBuildLabelRemoved',
       ).and.callThrough();
-      await robot.receive(payloadData);
-      github = {
-        issues: {
-          createComment: jasmine.createSpy('createComment').and.returnValue({}),
-          addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
-          removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
-          addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
-        },
-        repos: {
-          getCommit: jasmine.createSpy('getCommit').and.resolveTo({
-            lastCommit: {
-              commit: {
-                author: {
-                  date: (new Date).toISOString()
-                }
-              }
+      github.repos.getCommit = jasmine.createSpy('getCommit').and.resolveTo({
+        data: {
+          commit: {
+            author: {
+              date: '2021-04-12T18:33:45Z'
             }
-          })
+          }
         }
-      };
+      });
+      await robot.receive(payloadData);
     });
 
     it('checks for stale build label', () => {
@@ -598,6 +579,8 @@ describe('Pull Request Label Check', () => {
     it('check if pr is stale', () => {
       expect(github.repos.getCommit).toHaveBeenCalled();
       expect(github.repos.getCommit).toHaveBeenCalledWith({
+        owner: 'oppia',
+        repo: 'oppia',
         ref: payloadData.payload.pull_request.head.sha
       });
     });
@@ -642,26 +625,16 @@ describe('Pull Request Label Check', () => {
       spyOn(
         checkPullRequestLabelModule, 'checkStaleBuildLabelRemoved'
       ).and.callThrough();
-      await robot.receive(payloadData);
-      github = {
-        issues: {
-          createComment: jasmine.createSpy('createComment').and.returnValue({}),
-          addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
-          removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
-          addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
-        },
-        repos: {
-          getCommit: jasmine.createSpy('getCommit').and.resolveTo({
-            lastCommit: {
-              commit: {
-                author: {
-                  date: '2021-04-12T18:33:45Z'
-                }
-              }
+      github.repos.getCommit = jasmine.createSpy('getCommit').and.resolveTo({
+        data: {
+          commit: {
+            author: {
+              date: (new Date).toString()
             }
-          })
+          }
         }
-      };
+      });
+      await robot.receive(payloadData);
     });
 
     it('checks for stale build label', () => {
@@ -672,6 +645,8 @@ describe('Pull Request Label Check', () => {
     it('check if pr is stale', () => {
       expect(github.repos.getCommit).toHaveBeenCalled();
       expect(github.repos.getCommit).toHaveBeenCalledWith({
+        repo: 'oppia',
+        owner: 'oppia',
         ref: payloadData.payload.pull_request.head.sha
       });
     });
