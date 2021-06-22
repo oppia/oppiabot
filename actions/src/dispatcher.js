@@ -22,6 +22,7 @@ const issueLabelsModule = require('./issues/checkIssueLabels');
 const claCheckGithubActionModule = require('./pull_requests/claCheck');
 const constants = require('../../constants');
 const PRLabelsModule = require('./pull_requests/labelCheck');
+const wipDraftModule = require('./pull_requests/checkWipDraftPR');
 
 module.exports = {
   async dispatch(event, action) {
@@ -48,6 +49,9 @@ module.exports = {
               break;
             case constants.dontMergeLabelCheck:
               await PRLabelsModule.checkUnLabeled();
+              break;
+            case constants.wipCheck:
+              await wipDraftModule.checkWIP();
               break;
           }
         }

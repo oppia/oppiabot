@@ -22,7 +22,6 @@ const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
-const checkWipModule = require('./lib/checkWipDraftPR');
 const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
 const checkCronJobModule = require('./lib/checkNewCronJobs');
 const checkPullRequestTemplateModule = require(
@@ -72,9 +71,6 @@ const runChecks = async (context, checkEvent) => {
             break;
           case constants.branchCheck:
             callable.push(checkPullRequestBranchModule.checkBranch(context));
-            break;
-          case constants.wipCheck:
-            callable.push(checkWipModule.checkWIP(context));
             break;
           case constants.assigneeCheck:
             callable.push(checkPullRequestLabelsModule.checkAssignee(context));
@@ -266,18 +262,6 @@ module.exports = (oppiabot) => {
       // eslint-disable-next-line no-console
       console.log(' A PR HAS BEEN MERGED..');
       await runChecks(context, constants.closeEvent);
-    }
-  });
-
-  oppiabot.on('pull_request.edited', async (context) => {
-    if (
-      checkWhitelistedAccounts(context) &&
-      context.payload.pull_request.state === 'open' &&
-      checkAuthor(context)
-    ) {
-      // eslint-disable-next-line no-console
-      console.log('A PR HAS BEEN EDITED...');
-      await runChecks(context, constants.editEvent);
     }
   });
 
