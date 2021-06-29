@@ -57,6 +57,7 @@ const ciFailureCheck = 'ci-failure-check';
 const updateWithDevelopCheck = 'update-with-develop-check';
 const respondToReviewCheck = 'respond-to-review-check';
 const oldBuildLabelCheck = 'old-build-label-check';
+const staleBuildLabelCheck = 'stale-build-label-check';
 const dontMergeLabelCheck = 'dont-merge-label-check';
 
 const checksWhitelist = {
@@ -111,7 +112,8 @@ const checksWhitelist = {
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
-    [PRUnlabelEvent]: [datastoreLabelCheck, dontMergeLabelCheck],
+    [PRUnlabelEvent]: [datastoreLabelCheck, dontMergeLabelCheck,
+      staleBuildLabelCheck],
     [pushEvent]: [forcePushCheck],
     [periodicCheckEvent]: [periodicCheck],
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
@@ -174,6 +176,7 @@ module.exports.ciFailureCheck = ciFailureCheck;
 module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
 module.exports.respondToReviewCheck = respondToReviewCheck;
 module.exports.oldBuildLabelCheck = oldBuildLabelCheck;
+module.exports.staleBuildLabelCheck = staleBuildLabelCheck;
 module.exports.dontMergeLabelCheck = dontMergeLabelCheck;
 
 module.exports.getBlacklistedAuthors = function() {

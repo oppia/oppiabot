@@ -115,6 +115,11 @@ const runChecks = async (context, checkEvent) => {
               checkPullRequestLabelsModule.checkCriticalLabel(context)
             );
             break;
+          case constants.staleBuildLabelCheck:
+            callable.push(
+              checkPullRequestLabelsModule.checkStaleBuildLabelRemoved(context)
+            );
+            break;
           case constants.forcePushCheck:
             callable.push(checkBranchPushModule.handleForcePush(context));
             break;
