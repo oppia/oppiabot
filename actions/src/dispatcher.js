@@ -45,12 +45,15 @@ module.exports = {
               await claCheckGithubActionModule.claCheckGithubAction();
               break;
             case constants.prLabelCheck:
+              core.info('PR label check triggered');
               await PRLabelsModule.checkLabels();
               break;
             case constants.dontMergeLabelCheck:
+              core.info('Don\'t label check triggered');
               await PRLabelsModule.checkUnLabeled();
               break;
             case constants.wipCheck:
+              core.info('WIP check triggered');
               await wipDraftModule.checkWIP();
               break;
           }
