@@ -16,12 +16,13 @@ const openEvent = 'opened';
 // Github action sends a different type of event.
 const openEventGithubActions = 'pull_request_target_opened';
 const reopenEventGithubActions = 'pull_request_target_reopened';
+const editEventGithubActions = 'pull_request_target_edited';
 const reopenEvent = 'pull_request_reopened';
 const PRUnlabelEvent = 'pull_request_unlabeled';
 const PRLabelEvent = 'pull_request_labeled';
 const synchronizeEvent = 'synchronize';
 const closeEvent = 'closed';
-const editEvent = 'edited';
+const editEvent = 'pull_request_edited';
 const issuesLabelEvent = 'issues_labeled';
 const issuesAssignedEvent = 'issues_assigned';
 const pushEvent = 'push';
@@ -81,19 +82,18 @@ const checksWhitelist = {
       changelogCheck,
       codeOwnerCheck,
       branchCheck,
-      wipCheck,
       jobCheck,
       cronJobCheck,
       modelCheck,
       prTemplateCheck
     ],
-    [openEventGithubActions]: [claCheckGithubAction],
-    [reopenEventGithubActions]: [claCheckGithubAction],
+    [openEventGithubActions]: [claCheckGithubAction, wipCheck],
+    [reopenEventGithubActions]: [claCheckGithubAction, wipCheck],
+    [editEventGithubActions]: [wipCheck],
     [reopenEvent]: [
       changelogCheck,
       claCheckGithubAction,
       branchCheck,
-      wipCheck,
       jobCheck,
       cronJobCheck,
       modelCheck,

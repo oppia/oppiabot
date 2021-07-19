@@ -16,7 +16,6 @@ require('dotenv').config();
 const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
-const checkWipDraftPRModule = require('../lib/checkWipDraftPR');
 const scheduler = require('../lib/scheduler');
 const pullRequestPayload = require('../fixtures/pullRequestPayload.json');
 const apiForSheetsModule = require('../lib/apiForSheets');
@@ -54,8 +53,6 @@ describe('Pull Request Branch Check', () => {
       checkPullRequestLabelsModule,
       'checkChangelogLabel'
     ).and.callFake(() => { });
-    spyOn(checkWipDraftPRModule, 'checkWIP')
-      .and.callFake(() => { });
     spyOn(checkPullRequestJobModule, 'checkForNewJob')
       .and.callFake(() => { });
     spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')

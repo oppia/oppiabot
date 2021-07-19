@@ -20,7 +20,6 @@ const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
-const checkWIPModule = require('../lib/checkWipDraftPR');
 const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
@@ -462,7 +461,6 @@ describe('Pull Request Job Spec', () => {
     ).and.callFake(() => { });
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
     spyOn(checkCronJobModule, 'checkForNewCronJob').and.callFake(() => { });
-    spyOn(checkWIPModule, 'checkWIP').and.callFake(() => { });
     spyOn(
       checkPullRequestTemplateModule, 'checkTemplate'
     ).and.callFake(() => { });
