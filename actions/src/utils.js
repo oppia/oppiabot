@@ -1,7 +1,7 @@
 const { context } = require('@actions/github');
 
 /**
- * This function pings and assigns all pending reviewers to a pull request.
+ * This function creates a comment and assigns users.
  * @param {import('@octokit/rest').Octokit} octokit
  * @param {import('@octokit/rest').Octokit.PullsGetResponse} pullRequest
  * @param {string[]} assignees

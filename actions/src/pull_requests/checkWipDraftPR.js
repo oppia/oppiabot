@@ -77,9 +77,7 @@ module.exports.checkWIP = async () => {
         'Hi @' + prAuthor + ', when creating WIP/Draft PRs, ensure that ' +
         'your commit messages are prefixed with **[ci skip]** or ' +
         '**[skip ci]** to prevent CI checks from running. ' +
-        'You can learn more about it ' +
-        link +
-        '.';
+        'You can learn more about it ' + link + '.';
 
       await pingAndAssignUsers(octokit, pullRequest, [prAuthor], commentBody);
     }
