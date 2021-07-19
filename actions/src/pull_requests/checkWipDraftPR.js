@@ -74,9 +74,7 @@ module.exports.checkWIP = async () => {
       );
 
       const commentBody =
-        'Hi @' +
-        prAuthor +
-        ', when creating WIP/Draft PRs, ensure that ' +
+        'Hi @' + prAuthor + ', when creating WIP/Draft PRs, ensure that ' +
         'your commit messages are prefixed with **[ci skip]** or ' +
         '**[skip ci]** to prevent CI checks from running. ' +
         'You can learn more about it ' +
