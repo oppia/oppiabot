@@ -19,7 +19,7 @@
 
 const core = require('@actions/core');
 const { context, GitHub } = require('@actions/github');
-const { pingAndAssignUsers } = require('../utils');
+const { commentAndAssignUsers } = require('../utils');
 
 /**
  * @param {import('@octokit/rest').Octokit.PullsGetResponse} pullRequest
@@ -79,7 +79,9 @@ module.exports.checkWIP = async () => {
         '**[skip ci]** to prevent CI checks from running. ' +
         'You can learn more about it ' + link + '.';
 
-      await pingAndAssignUsers(octokit, pullRequest, [prAuthor], commentBody);
+      await commentAndAssignUsers(
+        octokit, pullRequest, [prAuthor], commentBody
+      );
     }
   }
 };

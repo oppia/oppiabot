@@ -7,7 +7,9 @@ const { context } = require('@actions/github');
  * @param {string[]} assignees
  * @param {string} comment
  */
-const pingAndAssignUsers = async (octokit, pullRequest, assignees, comment) => {
+const commentAndAssignUsers = async (
+    octokit, pullRequest, assignees, comment
+) => {
   await octokit.issues.createComment({
     issue_number: pullRequest.number,
     body: comment,
@@ -22,5 +24,5 @@ const pingAndAssignUsers = async (octokit, pullRequest, assignees, comment) => {
 };
 
 module.exports = {
-  pingAndAssignUsers,
+  commentAndAssignUsers,
 };
