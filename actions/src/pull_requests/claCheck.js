@@ -113,7 +113,7 @@ const checkSheet = async (auth) => {
       } else {
         core.info(`Checking if ${PR_AUTHOR} has signed the CLA`);
         const hasUserSignedCla = flatRows.some(
-          item => item.toLowerCase() === PR_AUTHOR.toLowerCase()
+          username => username.toLowerCase() === PR_AUTHOR.toLowerCase()
         );
 
         await generateOutput(hasUserSignedCla);

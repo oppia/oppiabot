@@ -115,6 +115,7 @@ describe('CLA check github action Module for Oppia', () => {
   });
 
   describe('user with multi cased username has signed cla sheet', () => {
+    const username = pullRequestPayload.payload.pull_request.user.login;
     beforeEach(function () {
       // Changing the username to be multi cased.
       pullRequestPayload.payload.pull_request.user.login = 'TestUser7777';
@@ -132,6 +133,10 @@ describe('CLA check github action Module for Oppia', () => {
           },
         },
       });
+    });
+
+    afterEach(() => {
+      pullRequestPayload.payload.pull_request.user.login = username;
     });
 
     it('should not fail', async () => {
