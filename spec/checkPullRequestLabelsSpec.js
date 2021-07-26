@@ -23,6 +23,7 @@ const checkCriticalPullRequestModule =
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
 const scheduler = require('../lib/scheduler');
+const OLD_BUILD_LABEL = "PR: don't merge - STALE BUILD";
 
 const github = require('@actions/github');
 const core = require('@actions/core');
@@ -532,6 +533,122 @@ describe('Pull Request Label Check', () => {
 
     it('checks for datastore label', () => {
       expect(checkPullRequestLabelModule.checkCriticalLabel).toHaveBeenCalled();
+    });
+
+    it('does not add back the label', () => {
+      expect(github.issues.addLabels).not.toHaveBeenCalled();
+    });
+
+    it('does not comment on the PR', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('when stale build label gets removed before updating branch', () => {
+    const label = {
+      id: 638839900,
+      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+      name: "PR: don't merge - STALE BUILD",
+      color: '00FF00',
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'unlabeled';
+      payloadData.payload.label = label;
+      spyOn(
+        checkPullRequestLabelModule, 'checkStaleBuildLabelRemoved',
+      ).and.callThrough();
+      github.repos.getCommit = jasmine.createSpy('getCommit').and.resolveTo({
+        data: {
+          commit: {
+            author: {
+              date: '2021-04-12T18:33:45Z'
+            }
+          }
+        }
+      });
+      await robot.receive(payloadData);
+    });
+
+    it('checks for stale build label', () => {
+      expect(checkPullRequestLabelModule.checkStaleBuildLabelRemoved).
+        toHaveBeenCalled();
+    });
+
+    it('check if pr is stale', () => {
+      expect(github.repos.getCommit).toHaveBeenCalled();
+      expect(github.repos.getCommit).toHaveBeenCalledWith({
+        owner: 'oppia',
+        repo: 'oppia',
+        ref: payloadData.payload.pull_request.head.sha
+      });
+    });
+
+    it('should comment on PR', () => {
+      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        number: payloadData.payload.pull_request.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name,
+        body:
+        'Hi @' + payloadData.payload.sender.login + ', the build of this' +
+        ' PR is stale please do not remove \'' + OLD_BUILD_LABEL + '\'' +
+        ' label. ',
+      });
+    });
+
+    it('should add the stale build label', () => {
+      expect(github.issues.addLabels).toHaveBeenCalled();
+      expect(github.issues.addLabels).toHaveBeenCalledWith({
+        labels: [OLD_BUILD_LABEL],
+        number: payloadData.payload.pull_request.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name
+      });
+    });
+  });
+
+  describe('when stale build label removed after updating branch', () => {
+    const label = {
+      id: 638839900,
+      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+      name: "PR: don't merge - STALE BUILD",
+      color: '00FF00',
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'unlabeled';
+      payloadData.payload.label = label;
+      payloadData.payload.sender.login = 'seanlip';
+      spyOn(
+        checkPullRequestLabelModule, 'checkStaleBuildLabelRemoved'
+      ).and.callThrough();
+      github.repos.getCommit = jasmine.createSpy('getCommit').and.resolveTo({
+        data: {
+          commit: {
+            author: {
+              date: (new Date).toString()
+            }
+          }
+        }
+      });
+      await robot.receive(payloadData);
+    });
+
+    it('checks for stale build label', () => {
+      expect(checkPullRequestLabelModule.checkStaleBuildLabelRemoved).
+        toHaveBeenCalled();
+    });
+
+    it('check if pr is stale', () => {
+      expect(github.repos.getCommit).toHaveBeenCalled();
+      expect(github.repos.getCommit).toHaveBeenCalledWith({
+        repo: 'oppia',
+        owner: 'oppia',
+        ref: payloadData.payload.pull_request.head.sha
+      });
     });
 
     it('does not add back the label', () => {

@@ -150,14 +150,17 @@ describe('Periodic Checks Module', () => {
           };
         }),
       },
-      orgs: {
-        checkMembership: jasmine
-          .createSpy('checkMembership')
+      repos: {
+        getCollaboratorPermissionLevel: jasmine
+          .createSpy('getCollaboratorPermissionLevel')
           .and.callFake((params) => {
             // pullRequests.approvedPR is the only user that has merging rights.
             if (params.username === pullRequests.approvedPR.user.login) {
               return {
-                status: 204,
+                data: {
+                  status: 200,
+                  permission: 'write',
+                }
               };
             }
 
@@ -453,6 +456,16 @@ describe('Periodic Checks Module', () => {
         github.pulls.list = jasmine.createSpy('list').and.resolveTo({
           data: [approvedPR, pullRequests.assignedPullRequest],
         });
+        github.repos = {
+          getCollaboratorPermissionLevel: jasmine
+            .createSpy('getCollaboratorPermissionLevel')
+            .and.resolveTo({
+              data: {
+                status: 200,
+                permission: 'write',
+              }
+            }),
+        };
 
         await robot.receive(payloadData);
       });
@@ -464,11 +477,14 @@ describe('Periodic Checks Module', () => {
       });
 
       it('should check if pr author has merging rights', () => {
-        expect(github.orgs.checkMembership).toHaveBeenCalled();
-        expect(github.orgs.checkMembership).toHaveBeenCalledWith({
-          org: 'oppia',
-          username: 'author4',
-        });
+        expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalled();
+        expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalledWith({
+            owner: 'oppia',
+            repo: 'oppia',
+            username: 'author4',
+          });
       });
 
       it('should ping pr author', () => {
@@ -524,11 +540,14 @@ describe('Periodic Checks Module', () => {
       });
 
       it('should check if pr author has merging rights', () => {
-        expect(github.orgs.checkMembership).toHaveBeenCalled();
-        expect(github.orgs.checkMembership).toHaveBeenCalledWith({
-          org: 'oppia',
-          username: 'author5',
-        });
+        expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalled();
+        expect(github.repos.getCollaboratorPermissionLevel)
+          .toHaveBeenCalledWith({
+            owner: 'oppia',
+            repo: 'oppia',
+            username: 'author5',
+          });
       });
 
       it('should ping project owner', () => {
