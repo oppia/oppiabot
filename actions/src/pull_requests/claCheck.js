@@ -112,7 +112,10 @@ const checkSheet = async (auth) => {
         core.setFailed('No data found.');
       } else {
         core.info(`Checking if ${PR_AUTHOR} has signed the CLA`);
-        const hasUserSignedCla = flatRows.includes(PR_AUTHOR);
+        const hasUserSignedCla = flatRows.some(
+          item => item.toLowerCase() === PR_AUTHOR.toLowerCase()
+        );
+
         await generateOutput(hasUserSignedCla);
       }
     }

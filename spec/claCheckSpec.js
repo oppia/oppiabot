@@ -114,6 +114,36 @@ describe('CLA check github action Module for Oppia', () => {
     });
   });
 
+  describe('user with multi cased username has signed cla sheet', () => {
+    beforeEach(function () {
+      // Changing the username to be multi cased.
+      pullRequestPayload.payload.pull_request.user.login = 'TestUser7777';
+      spyOn(core, 'info');
+      spyOn(google, 'sheets').and.returnValue({
+        spreadsheets: {
+          values: {
+            get: jasmine.createSpy('get').and.callFake(async (obj, cb) => {
+              await cb(null, {
+                data: {
+                  values: [['testuser7777']]
+                },
+              });
+            }),
+          },
+        },
+      });
+    });
+
+    it('should not fail', async () => {
+      await dispatcher.dispatch('pull_request_target', 'reopened');
+      expect(claCheckGithubActionModule.claCheckGithubAction)
+        .toHaveBeenCalled();
+      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+      expect(octokit.issues.createComment).not.toHaveBeenCalledWith({});
+      expect(core.info).toHaveBeenCalledWith('TestUser7777 has signed the CLA');
+    });
+  });
+
   describe('user has not signed cla sheet', () => {
     beforeEach(async () => {
       spyOn(core, 'setFailed');
