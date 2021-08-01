@@ -25,7 +25,6 @@ const checkCronJobModule = require('../lib/checkNewCronJobs');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
-const checkWIPModule = require('../lib/checkWipDraftPR');
 const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
@@ -200,7 +199,6 @@ describe('Critical Pull Request Spec', () => {
       'checkChangelogLabel'
     ).and.callFake(() => { });
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
-    spyOn(checkWIPModule, 'checkWIP').and.callFake(() => { });
     spyOn(
       checkPullRequestTemplateModule, 'checkTemplate'
     ).and.callFake(() => { });
