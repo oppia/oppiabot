@@ -31,8 +31,10 @@ module.exports = {
     const repoName = context.payload.repository.name.toLowerCase();
     const checksWhitelist = constants.getChecksWhitelist();
     if (Object.prototype.hasOwnProperty.call(checksWhitelist, repoName)) {
+      core.info('ran1');
       const checks = checksWhitelist[repoName];
       if ((Object.prototype.hasOwnProperty.call(checks, checkEvent))) {
+        core.info('ran1');
         const checkList = checks[checkEvent];
         for (var i = 0; i < checkList.length; i++) {
           switch (checkList[i]) {
