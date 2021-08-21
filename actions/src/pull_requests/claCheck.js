@@ -26,8 +26,10 @@ const { google } = require('googleapis');
  */
 const authorize = async function() {
   try {
-    const CREDENTIALS = JSON.parse(process.env.SHEETS_CRED);
-    const SHEETS_TOKEN = JSON.parse(process.env.SHEETS_TOKEN);
+    // const CREDENTIALS = JSON.parse(process.env.SHEETS_CRED);
+    // const SHEETS_TOKEN = JSON.parse(process.env.SHEETS_TOKEN);
+    const CREDENTIALS = JSON.parse(core.getInput('sheets-cred'));
+    const SHEETS_TOKEN = JSON.parse(core.getInput('sheets-token'));
     // eslint-disable-next-line camelcase
     const { client_secret, client_id, redirect_uris } = CREDENTIALS.installed;
     var oAuth2Client = new google.auth.OAuth2(
