@@ -26,8 +26,6 @@ const { google } = require('googleapis');
  */
 const authorize = async function() {
   try {
-    // const CREDENTIALS = JSON.parse(process.env.SHEETS_CRED);
-    // const SHEETS_TOKEN = JSON.parse(process.env.SHEETS_TOKEN);
     const CREDENTIALS = JSON.parse(core.getInput('sheets-cred'));
     const SHEETS_TOKEN = JSON.parse(core.getInput('sheets-token'));
     // eslint-disable-next-line camelcase
@@ -96,7 +94,7 @@ const generateOutput = async (hasClaSigned) => {
 const checkSheet = async (auth) => {
   const PR_AUTHOR = context.payload.pull_request.user.login;
   const sheets = google.sheets({ version: 'v4', auth });
-  const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
+  const SPREADSHEET_ID = core.getInput('spreadsheet-id');
   await sheets.spreadsheets.values.get(
     {
       spreadsheetId: SPREADSHEET_ID,
