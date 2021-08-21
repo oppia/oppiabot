@@ -94,7 +94,7 @@ const generateOutput = async (hasClaSigned) => {
 const checkSheet = async (auth) => {
   const PR_AUTHOR = context.payload.pull_request.user.login;
   const sheets = google.sheets({ version: 'v4', auth });
-  const SPREADSHEET_ID = core.getInput('spreadsheet-id');
+  const SPREADSHEET_ID = core.getInput('cla-sheet-id');
   await sheets.spreadsheets.values.get(
     {
       spreadsheetId: SPREADSHEET_ID,
