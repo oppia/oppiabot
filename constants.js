@@ -92,7 +92,6 @@ const checksWhitelist = {
     [editEventGithubActions]: [wipCheck],
     [reopenEvent]: [
       changelogCheck,
-      claCheckGithubAction,
       branchCheck,
       jobCheck,
       cronJobCheck,
@@ -124,6 +123,8 @@ const checksWhitelist = {
   'oppiabot': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
+    [openEventGithubActions]: [claCheckGithubAction],
+    [reopenEventGithubActions]: [claCheckGithubAction],
     [synchronizeEvent]: [mergeConflictCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: [],
