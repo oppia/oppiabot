@@ -1627,5 +1627,29 @@ describe('Pull Request Review Module', () => {
         commentPayloadData.payload.comment.body = initialCommentBody;
       });
     });
+
+    describe('when commenter self references in comment', () => {
+      const initialCommentBody = commentPayloadData.payload.comment.body;
+      beforeAll(() => {
+        commentPayloadData.payload.comment.body = (
+          '@testuser @reviewer1 PTAL');
+      });
+      beforeEach(async () => {
+        await robot.receive(commentPayloadData);
+      });
+
+      it('should not assign commenter to the PR', () => {
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          repo: commentPayloadData.payload.repository.name,
+          owner: commentPayloadData.payload.repository.owner.login,
+          issue_number: commentPayloadData.payload.issue.number,
+          assignees: ['reviewer1'],
+        });
+      });
+
+      afterAll(() => {
+        commentPayloadData.payload.comment.body = initialCommentBody;
+      });
+    });
   });
 });
