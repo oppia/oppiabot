@@ -92,7 +92,6 @@ const checksWhitelist = {
     [editEventGithubActions]: [wipCheck],
     [reopenEvent]: [
       changelogCheck,
-      claCheckGithubAction,
       branchCheck,
       jobCheck,
       cronJobCheck,

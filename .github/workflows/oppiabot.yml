@@ -15,7 +15,7 @@ jobs:
       - name: CLA Check
         uses: oppia/oppiabot@1.4.0
         with:
-          repo-token: ${{secrets.GITHUB_TOKEN}}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
         env:
           SHEETS_TOKEN: ${{ secrets.SHEETS_TOKEN }}
           SHEETS_CRED: ${{ secrets.SHEETS_CRED }}
