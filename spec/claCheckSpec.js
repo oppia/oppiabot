@@ -31,9 +31,15 @@ const sheetsCredentials =
 
 describe('CLA check github action Module for Oppia', () => {
   beforeEach(async () => {
-    process.env.SHEETS_CRED = sheetsCredentials;
-    process.env.SHEETS_TOKEN = sheetsToken;
-    spyOn(core, 'getInput').and.returnValue('sample-token');
+    spyOn(core, 'getInput').and.callFake((val) =>{
+      if (val === 'repo-token') {
+        return 'sample-token';
+      } else if (val === 'sheets-cred') {
+        return sheetsCredentials;
+      } else if (val === 'sheets-token') {
+        return sheetsToken;
+      }
+    });
     github.context.eventName = 'pull_request_target';
     github.context.payload = pullRequestPayload.payload;
 
@@ -245,23 +251,46 @@ describe('CLA check github action Module for Oppia', () => {
       expect(core.setFailed).toHaveBeenCalledWith(
         'The API returned an error: error');
     });
+  });
+});
 
-    it('should fail if Auth fails', async () => {
-      process.env.SHEETS_CRED = {};
-
-      await dispatcher.dispatch('pull_request_target', 'opened');
-
-      expect(core.setFailed).toHaveBeenCalledWith(
-        'Auth failure: SyntaxError: Unexpected token o in JSON at position 1');
+describe('CLA check github action Module Auth fail', () => {
+  beforeEach(async () => {
+    spyOn(core, 'getInput').and.callFake((val) =>{
+      if (val === 'repo-token') {
+        return 'sample-token';
+      } else if (val === 'sheets-cred') {
+        return {};
+      } else if (val === 'sheets-token') {
+        return sheetsToken;
+      }
     });
+    github.context.eventName = 'pull_request_target';
+    github.context.payload = pullRequestPayload.payload;
+    spyOn(claCheckGithubActionModule, 'claCheckGithubAction').and.callThrough();
+  });
+
+  it('should fail if Auth fails', async () => {
+    spyOn(core, 'setFailed');
+
+    await dispatcher.dispatch('pull_request_target', 'opened');
+
+    expect(core.setFailed).toHaveBeenCalledWith(
+      'Auth failure: SyntaxError: Unexpected token o in JSON at position 1');
   });
 });
 
 describe('CLA check github action Module for oppia-android', () => {
   beforeEach(async () => {
-    process.env.SHEETS_CRED = sheetsCredentials;
-    process.env.SHEETS_TOKEN = sheetsToken;
-    spyOn(core, 'getInput').and.returnValue('sample-token');
+    spyOn(core, 'getInput').and.callFake((val) =>{
+      if (val === 'repo-token') {
+        return 'sample-token';
+      } else if (val === 'sheets-cred') {
+        return sheetsCredentials;
+      } else if (val === 'sheets-token') {
+        return sheetsToken;
+      }
+    });
     github.context.eventName = 'pull_request_target';
     github.context.payload = pullRequestPayload.payload;
     github.context.payload.repository.name = 'oppia-android';
