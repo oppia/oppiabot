@@ -20,7 +20,6 @@ const constants = require('../constants');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
-const checkWipModule = require('../lib/checkWipDraftPR');
 const scheduler = require('../lib/scheduler');
 const pullRequestPayload = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json')));
@@ -57,7 +56,6 @@ describe('Api For Sheets Module', () => {
     spyOn(checkPullRequestLabelsModule, 'checkChangelogLabel').and.callFake(
       () => { });
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
-    spyOn(checkWipModule, 'checkWIP').and.callFake(() => { });
     spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')
       .and.callFake(() => { });
     spyOn(checkPullRequestTemplateModule, 'checkTemplate')
@@ -130,7 +128,6 @@ describe('Api For Sheets Module', () => {
       expect(
         checkPullRequestLabelsModule.checkChangelogLabel).toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).toHaveBeenCalled();
-      expect(checkWipModule.checkWIP).toHaveBeenCalled();
       expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
     });
 
@@ -250,39 +247,88 @@ describe('Api For Sheets Module', () => {
       expect(github.issues.update).not.toHaveBeenCalled();
     });
 
-    it('should close the PR if atleast one user has not signed cla',
-      async () => {
-        // Add username to CLA sheet.
-        await apiForSheetsModule.generateOutput(
-          [...claData, ['testuser7777']],
-          pullRequestPayload.payload.pull_request.number,
-          pullRequestPayload.payload.pull_request
-        );
+    it('should close the PR if atleast one user has not signed cla and' +
+    ' pull request is at oppia repository',
+    async () => {
+      // Add username to CLA sheet.
+      await apiForSheetsModule.generateOutput(
+        [...claData, ['testuser7777']],
+        pullRequestPayload.payload.pull_request.number,
+        pullRequestPayload.payload.pull_request,
+        pullRequestPayload.payload.repository.name
+      );
 
-        var linkText = 'here';
-        var linkResult = linkText.link(
-          'https://github.com/oppia/oppia/wiki/Contributing-code-to-' +
+      var linkText = 'here';
+      var linkResult = linkText.link(
+        'https://github.com/oppia/oppia/wiki/Contributing-code-to-' +
           'Oppia#setting-things-up'
-        );
-        expect(github.issues.createComment).toHaveBeenCalledWith({
-          owner: pullRequestPayload.payload.repository.owner.login,
-          repo: pullRequestPayload.payload.repository.name,
-          number: pullRequestPayload.payload.pull_request.number,
-          body:
-            'Hi! @testuser7778, Welcome to Oppia! Please could you ' +
-            'follow the instructions ' + linkResult +
-            ' to get started? You\'ll need to do ' +
-            'this before we can accept your PR. ' +
-            'I am closing this PR for now. Feel free to re-open it ' +
-            'once you are done with the above instructions. Thanks!',
-        });
-        expect(github.issues.update).toHaveBeenCalledWith({
-          issue_number: pullRequestPayload.payload.pull_request.number,
-          owner: pullRequestPayload.payload.repository.owner.login,
-          repo: pullRequestPayload.payload.repository.name,
-          state: 'closed',
-        });
+      );
+
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        owner: pullRequestPayload.payload.repository.owner.login,
+        repo: pullRequestPayload.payload.repository.name,
+        number: pullRequestPayload.payload.pull_request.number,
+        body: 'Hi! ' + '@testuser7778,' +
+        ' Welcome to Oppia! Please could you follow the instructions ' +
+        linkResult + ' to get started ? You\'ll need to do this' +
+        ' before we can accept your PR. I am closing this PR  for' +
+        ' now. Feel free to re-open it once you are done the' +
+        ' above instructions. Thanks!',
       });
+      expect(github.issues.update).toHaveBeenCalledWith({
+        issue_number: pullRequestPayload.payload.pull_request.number,
+        owner: pullRequestPayload.payload.repository.owner.login,
+        repo: pullRequestPayload.payload.repository.name,
+        state: 'closed',
+      });
+    });
+
+    describe('when pull request created at oppia-android repository', () => {
+      beforeEach(function (done) {
+        pullRequestPayload.payload.repository.name = 'oppia-android';
+        done();
+      });
+
+      afterEach(function (done) {
+        pullRequestPayload.payload.repository.name = 'oppia';
+        done();
+      });
+
+      it('should close the PR if atleast one user has not signed cla',
+        async () => {
+        // Add username to CLA sheet.
+          await apiForSheetsModule.generateOutput(
+            [...claData, ['testuser7777']],
+            pullRequestPayload.payload.pull_request.number,
+            pullRequestPayload.payload.pull_request,
+            pullRequestPayload.payload.repository.name
+          );
+
+          var oppiaAndroidLinkText = 'here';
+          var linkOppiaAndroid = oppiaAndroidLinkText.link(
+            'https://github.com/oppia/oppia-android/wiki#' +
+            'onboarding-instructions'
+          );
+
+          expect(github.issues.createComment).toHaveBeenCalledWith({
+            owner: pullRequestPayload.payload.repository.owner.login,
+            repo: pullRequestPayload.payload.repository.name,
+            number: pullRequestPayload.payload.pull_request.number,
+            body: 'Hi! ' + '@testuser7778,' +
+            ' Welcome to Oppia! Please could you follow the instructions ' +
+            linkOppiaAndroid + ' to get started with oppia-android? ' +
+            'You\'ll need to do this before we can accept your PR. I am ' +
+            'closing this PR for now. Feel free to re-open it once you ' +
+            'are done with the above instructions. Thanks!',
+          });
+          expect(github.issues.update).toHaveBeenCalledWith({
+            issue_number: pullRequestPayload.payload.pull_request.number,
+            owner: pullRequestPayload.payload.repository.owner.login,
+            repo: pullRequestPayload.payload.repository.name,
+            state: 'closed',
+          });
+        });
+    });
 
     it('should do nothing if no data is obtained from sheet', async () => {
       await apiForSheetsModule.generateOutput(
@@ -328,7 +374,6 @@ describe('Api For Sheets Module', () => {
         checkPullRequestLabelsModule.checkChangelogLabel
       ).not.toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
-      expect(checkWipModule.checkWIP).not.toHaveBeenCalled();
     });
 
     it('should be called for the given payload', () => {
@@ -399,7 +444,6 @@ describe('Api For Sheets Module', () => {
         checkPullRequestLabelsModule.checkChangelogLabel
       ).not.toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
-      expect(checkWipModule.checkWIP).not.toHaveBeenCalled();
       expect(apiForSheetsModule.checkClaStatus).not.toHaveBeenCalled();
       expect(checkPullRequestJobModule.checkForNewJob).not.toHaveBeenCalled();
     });
@@ -421,7 +465,6 @@ describe('Api For Sheets Module', () => {
         checkPullRequestLabelsModule.checkChangelogLabel
       ).not.toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
-      expect(checkWipModule.checkWIP).not.toHaveBeenCalled();
       expect(apiForSheetsModule.checkClaStatus).not.toHaveBeenCalled();
       expect(checkPullRequestJobModule.checkForNewJob).not.toHaveBeenCalled();
     });

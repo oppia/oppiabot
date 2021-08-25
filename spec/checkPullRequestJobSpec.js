@@ -20,13 +20,14 @@ const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
-const checkWIPModule = require('../lib/checkWipDraftPR');
 const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
+const checkCronJobModule = require('../lib/checkNewCronJobs');
+const { JOBS_AND_FETURES_TESTING_WIKI_LINK } = require('../lib/utils');
 
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
@@ -459,7 +460,7 @@ describe('Pull Request Job Spec', () => {
       checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'
     ).and.callFake(() => { });
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
-    spyOn(checkWIPModule, 'checkWIP').and.callFake(() => { });
+    spyOn(checkCronJobModule, 'checkForNewCronJob').and.callFake(() => { });
     spyOn(
       checkPullRequestTemplateModule, 'checkTemplate'
     ).and.callFake(() => { });
@@ -495,11 +496,8 @@ describe('Pull Request Job Spec', () => {
           'https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText = (
-        'this guide'.link(
-          'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
-          '#submitting-a-pr-with-a-new-job')
-      );
+      const wikiLinkText = 'this guide'.link(
+        JOBS_AND_FETURES_TESTING_WIKI_LINK);
       const jobRegistryLink = (
         'job registry'.link(
           'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py')
@@ -577,11 +575,8 @@ describe('Pull Request Job Spec', () => {
         'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText = (
-        'this guide'.link(
-          'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
-          '#submitting-a-pr-with-a-new-job')
-      );
+      const wikiLinkText = 'this guide'.link(
+        JOBS_AND_FETURES_TESTING_WIKI_LINK);
       const jobRegistryLink = (
         'job registry'.link(
           'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py')
@@ -662,11 +657,8 @@ describe('Pull Request Job Spec', () => {
         'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText = (
-        'this guide'.link(
-          'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
-            '#submitting-a-pr-with-a-new-job')
-      );
+      const wikiLinkText = 'this guide'.link(
+        JOBS_AND_FETURES_TESTING_WIKI_LINK);
       const jobNameLink = (
         'FirstTestOneOffJob'.link(firstNewJobFileObj.blob_url)
       );
@@ -737,11 +729,8 @@ describe('Pull Request Job Spec', () => {
         'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
       );
       const newLineFeed = '<br>';
-      const wikiLinkText = (
-        'this guide'.link(
-          'https://github.com/oppia/oppia/wiki/Running-jobs-in-production' +
-          '#submitting-a-pr-with-a-new-job')
-      );
+      const wikiLinkText = 'this guide'.link(
+        JOBS_AND_FETURES_TESTING_WIKI_LINK);
       const jobRegistryLink = (
         'job registry'.link(
           'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py')

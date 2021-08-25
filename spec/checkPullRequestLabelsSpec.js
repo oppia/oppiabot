@@ -23,8 +23,13 @@ const checkCriticalPullRequestModule =
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
 const scheduler = require('../lib/scheduler');
-const utilityModule = require('../lib/utils');
-const reviewPayloadData = require('../fixtures/pullRequestReview.json');
+const OLD_BUILD_LABEL = "PR: don't merge - STALE BUILD";
+
+const github = require('@actions/github');
+const core = require('@actions/core');
+const actionPayload = require('../fixtures/pullRequest.labelled.json');
+const dispatcher = require('../actions/src/dispatcher');
+const pRLabelModule = require('../actions/src/pull_requests/labelCheck');
 
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
@@ -540,6 +545,122 @@ describe('Pull Request Label Check', () => {
     });
   });
 
+  describe('when stale build label gets removed before updating branch', () => {
+    const label = {
+      id: 638839900,
+      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+      name: "PR: don't merge - STALE BUILD",
+      color: '00FF00',
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'unlabeled';
+      payloadData.payload.label = label;
+      spyOn(
+        checkPullRequestLabelModule, 'checkStaleBuildLabelRemoved',
+      ).and.callThrough();
+      github.repos.getCommit = jasmine.createSpy('getCommit').and.resolveTo({
+        data: {
+          commit: {
+            author: {
+              date: '2021-04-12T18:33:45Z'
+            }
+          }
+        }
+      });
+      await robot.receive(payloadData);
+    });
+
+    it('checks for stale build label', () => {
+      expect(checkPullRequestLabelModule.checkStaleBuildLabelRemoved).
+        toHaveBeenCalled();
+    });
+
+    it('check if pr is stale', () => {
+      expect(github.repos.getCommit).toHaveBeenCalled();
+      expect(github.repos.getCommit).toHaveBeenCalledWith({
+        owner: 'oppia',
+        repo: 'oppia',
+        ref: payloadData.payload.pull_request.head.sha
+      });
+    });
+
+    it('should comment on PR', () => {
+      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        number: payloadData.payload.pull_request.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name,
+        body:
+        'Hi @' + payloadData.payload.sender.login + ', the build of this' +
+        ' PR is stale please do not remove \'' + OLD_BUILD_LABEL + '\'' +
+        ' label. ',
+      });
+    });
+
+    it('should add the stale build label', () => {
+      expect(github.issues.addLabels).toHaveBeenCalled();
+      expect(github.issues.addLabels).toHaveBeenCalledWith({
+        labels: [OLD_BUILD_LABEL],
+        number: payloadData.payload.pull_request.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name
+      });
+    });
+  });
+
+  describe('when stale build label removed after updating branch', () => {
+    const label = {
+      id: 638839900,
+      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+      name: "PR: don't merge - STALE BUILD",
+      color: '00FF00',
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'unlabeled';
+      payloadData.payload.label = label;
+      payloadData.payload.sender.login = 'seanlip';
+      spyOn(
+        checkPullRequestLabelModule, 'checkStaleBuildLabelRemoved'
+      ).and.callThrough();
+      github.repos.getCommit = jasmine.createSpy('getCommit').and.resolveTo({
+        data: {
+          commit: {
+            author: {
+              date: (new Date).toString()
+            }
+          }
+        }
+      });
+      await robot.receive(payloadData);
+    });
+
+    it('checks for stale build label', () => {
+      expect(checkPullRequestLabelModule.checkStaleBuildLabelRemoved).
+        toHaveBeenCalled();
+    });
+
+    it('check if pr is stale', () => {
+      expect(github.repos.getCommit).toHaveBeenCalled();
+      expect(github.repos.getCommit).toHaveBeenCalledWith({
+        repo: 'oppia',
+        owner: 'oppia',
+        ref: payloadData.payload.pull_request.head.sha
+      });
+    });
+
+    it('does not add back the label', () => {
+      expect(github.issues.addLabels).not.toHaveBeenCalled();
+    });
+
+    it('does not comment on the PR', () => {
+      expect(github.issues.createComment).not.toHaveBeenCalled();
+    });
+  });
+
   describe('when another label gets removed', () => {
     const label = {
       id: 638839900,
@@ -604,7 +725,7 @@ describe('Pull Request Label Check', () => {
           'Hi, @' +
           payloadData.payload.pull_request.user.login +
           ', this pull request does not have a "CHANGELOG: ..." label ' +
-          'as mentioned in the PR pointers. Assigning @ ' +
+          'as mentioned in the PR pointers. Assigning @' +
           payloadData.payload.pull_request.user.login +
           ' to add the required label. ' +
           'PRs without this label will not be merged. If you are unsure ' +
@@ -676,7 +797,111 @@ describe('Pull Request Label Check', () => {
           issue_number: payloadData.payload.number,
           assignees: ['reviewer']
         });
-      }, 10000
+      }
+    );
+
+    it(
+      'adds a default label when pr author is not a collaborator and PR ' +
+      'is in draft mode',
+      async () => {
+        payloadData.payload.action = 'reopened';
+        payloadData.payload.pull_request.user.login = 'newuser';
+        payloadData.payload.pull_request.draft = true;
+        payloadData.payload.pull_request.requested_reviewers = [];
+
+        spyOn(
+          checkPullRequestLabelModule, 'checkChangelogLabel'
+        ).and.callThrough();
+
+        github.pulls = {
+          get: jasmine
+            .createSpy('get')
+            .and.resolveTo({data: payloadData.payload.pull_request}),
+        };
+
+        await robot.receive(payloadData);
+
+        expect(
+          checkPullRequestLabelModule.checkChangelogLabel
+        ).toHaveBeenCalled();
+        expect(github.issues.addLabels).toHaveBeenCalled();
+        const labelParams = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          labels: ['REVIEWERS: Please add changelog label'],
+        };
+        expect(github.issues.addLabels).toHaveBeenCalledWith(labelParams);
+
+        expect(github.issues.createComment).not.toHaveBeenCalled();
+        const commentParams = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          body:
+            'Hi @reviewer, could you please add the appropriate ' +
+            'changelog label to this pull request? Thanks!',
+        };
+        expect(github.issues.createComment)
+          .not
+          .toHaveBeenCalledWith(commentParams);
+
+        expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      }
+    );
+
+    it(
+      'adds a default label when pr author is not a collaborator and PR ' +
+      'has no reviewer',
+      async () => {
+        payloadData.payload.action = 'reopened';
+        payloadData.payload.pull_request.user.login = 'newuser';
+        payloadData.payload.pull_request.draft = false;
+        payloadData.payload.pull_request.requested_reviewers = [];
+
+        spyOn(
+          checkPullRequestLabelModule, 'checkChangelogLabel'
+        ).and.callThrough();
+
+        github.pulls = {
+          get: jasmine
+            .createSpy('get')
+            .and.resolveTo({data: payloadData.payload.pull_request}),
+        };
+
+        await robot.receive(payloadData);
+
+        expect(
+          checkPullRequestLabelModule.checkChangelogLabel
+        ).toHaveBeenCalled();
+        expect(github.issues.addLabels).toHaveBeenCalled();
+        const labelParams = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          labels: ['REVIEWERS: Please add changelog label'],
+        };
+        expect(github.issues.addLabels).toHaveBeenCalledWith(labelParams);
+
+        expect(github.issues.createComment).toHaveBeenCalled();
+        const commentParams = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          body:
+            'Hi @DubeySandeep, could you please add the appropriate ' +
+            'changelog label to this pull request? Thanks!',
+        };
+        expect(github.issues.createComment).toHaveBeenCalledWith(commentParams);
+
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          assignees: ['DubeySandeep']
+        });
+      }
     );
 
     it(
@@ -739,7 +964,7 @@ describe('Pull Request Label Check', () => {
           issue_number: payloadData.payload.number,
           assignees: ['reviewer1', 'reviewer2']
         });
-      }, 10000
+      }
     );
 
 
@@ -852,6 +1077,162 @@ describe('Pull Request Label Check', () => {
       };
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalled(params);
+    });
+  });
+});
+
+describe('Pull Request Label Action Check', () => {
+  /**
+   * @type {import('@actions/github').GitHub} octokit
+   */
+  let octokit;
+
+  beforeEach(async () => {
+    github.context.eventName = 'pull_request';
+    github.context.payload = actionPayload;
+
+    octokit = {
+      issues: {
+        createComment: jasmine.createSpy('createComment').and.resolveTo({}),
+        removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
+        addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
+      },
+      pulls: {
+        get: jasmine.createSpy('get').and.resolveTo(
+          {data: actionPayload.pull_request}
+        ),
+      }
+    };
+
+    spyOn(core, 'getInput').and.returnValue('sample-token');
+    spyOn(core, 'setFailed').and.callFake(() => {});
+    spyOn(core, 'info').and.callFake(() => {});
+
+    spyOnProperty(github.context, 'repo').and.returnValue({
+      owner: actionPayload.repository.owner.login,
+      repo: actionPayload.repository.name,
+    });
+
+    // Mock GitHub API.
+    Object.setPrototypeOf(github.GitHub, function () {
+      return octokit;
+    });
+    spyOn(pRLabelModule, 'checkLabels').and.callThrough();
+    spyOn(pRLabelModule, 'checkUnLabeled').and.callThrough();
+  });
+
+  describe("when a don't merge label gets added to a pull request",
+    () => {
+      beforeEach(async () => {
+        await dispatcher.dispatch('pull_request', 'labeled');
+      });
+
+      it('should check the label', () => {
+        expect(pRLabelModule.checkLabels).toHaveBeenCalled();
+      });
+      it('should fail CI', () => {
+        expect(core.setFailed).toHaveBeenCalled();
+        expect(core.setFailed).toHaveBeenCalledWith(
+          'This PR should not be merged because it has a ' +
+          actionPayload.label.name + ' label.'
+        );
+      });
+    }
+  );
+
+  describe("When a don't merge label gets removed", () => {
+    let initialLabel;
+    beforeEach(async () => {
+      initialLabel = {...actionPayload.label};
+      actionPayload.pull_request.labels = [
+        {name: 'PR CHANGELOG: code health -- @user'}
+      ];
+      await dispatcher.dispatch('pull_request', 'unlabeled');
+    });
+
+    afterAll(() => {
+      actionPayload.label = initialLabel;
+    });
+
+    it('should check the label', () => {
+      expect(pRLabelModule.checkUnLabeled).toHaveBeenCalled();
+    });
+    it('should not fail CI', () => {
+      expect(core.setFailed).not.toHaveBeenCalled();
+      expect(core.info).toHaveBeenCalled();
+      expect(core.info).toHaveBeenCalledWith(
+        "This PR does not contain a PR don't merge label"
+      );
+    });
+  });
+
+  describe(
+    "When a don't merge label gets removed but PR contains other don't " +
+    'merge labels',
+    () => {
+      let initialLabel;
+      beforeEach(async () => {
+        initialLabel = {...actionPayload.label};
+        actionPayload.pull_request.labels = [
+          {name: 'PR CHANGELOG: code health -- @user'},
+          {name: "PR: don't merge - Rejected"}
+        ];
+        await dispatcher.dispatch('pull_request', 'unlabeled');
+      });
+
+      afterAll(() => {
+        actionPayload.label = initialLabel;
+      });
+
+      it('should check the label', () => {
+        expect(pRLabelModule.checkUnLabeled).toHaveBeenCalled();
+      });
+      it('should fail CI', () => {
+        expect(core.setFailed).toHaveBeenCalled();
+        expect(core.setFailed).toHaveBeenCalledWith(
+          'This PR should not be merged because it has a ' +
+          "PR: don't merge - Rejected label."
+        );
+      });
+    });
+
+  describe('When another label gets added to a pull request', () => {
+    let initialLabel;
+    beforeEach(async () => {
+      initialLabel = {...actionPayload.label};
+      actionPayload.label.name = 'PR CHANGELOG: code health -- @user';
+      await dispatcher.dispatch('pull_request', 'labeled');
+    });
+
+    afterAll(() => {
+      actionPayload.label = initialLabel;
+    });
+
+    it('should check the label', () => {
+      expect(pRLabelModule.checkLabels).toHaveBeenCalled();
+    });
+    it('should not fail CI', () => {
+      expect(core.setFailed).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('When another label gets removed from a pull request', () => {
+    let initialLabel;
+    beforeEach(async () => {
+      initialLabel = {...actionPayload.label};
+      actionPayload.label.name = 'PR CHANGELOG: code health -- @user';
+      await dispatcher.dispatch('pull_request', 'unlabeled');
+    });
+
+    afterAll(() => {
+      actionPayload.label = initialLabel;
+    });
+
+    it('should check the label', () => {
+      expect(pRLabelModule.checkUnLabeled).toHaveBeenCalled();
+    });
+    it('should not fail CI', () => {
+      expect(core.setFailed).not.toHaveBeenCalled();
     });
   });
 });
