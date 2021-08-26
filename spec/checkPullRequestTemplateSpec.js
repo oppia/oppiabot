@@ -21,10 +21,10 @@ const oppiaBot = require('../index');
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
+const checkCronJobModule = require('../lib/checkNewCronJobs');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
-const checkWIPModule = require('../lib/checkWipDraftPR');
 const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
@@ -290,6 +290,7 @@ describe('Pull Request Template', () => {
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(checkCronJobModule, 'checkForNewCronJob').and.callFake(() => { });
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
       checkPullRequestLabelsModule,
@@ -300,7 +301,6 @@ describe('Pull Request Template', () => {
       'checkIfPRAffectsDatastoreLayer'
     ).and.callFake(() => { });
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
-    spyOn(checkWIPModule, 'checkWIP').and.callFake(() => { });
     spyOn(checkPullRequestTemplateModule, 'checkTemplate').and.callThrough();
     spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
   });

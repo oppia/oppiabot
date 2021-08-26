@@ -13,13 +13,17 @@
 // limitations under the License.
 
 const openEvent = 'opened';
-const reopenEvent = 'reopened';
-const unlabelEvent = 'unlabeled';
-const PRLabelEvent = 'labeled';
+// Github action sends a different type of event.
+const openEventGithubActions = 'pull_request_target_opened';
+const reopenEventGithubActions = 'pull_request_target_reopened';
+const editEventGithubActions = 'pull_request_target_edited';
+const reopenEvent = 'pull_request_reopened';
+const PRUnlabelEvent = 'pull_request_unlabeled';
+const PRLabelEvent = 'pull_request_labeled';
 const PRMilestoneEvent = 'milestoned';
 const synchronizeEvent = 'synchronize';
 const closeEvent = 'closed';
-const editEvent = 'edited';
+const editEvent = 'pull_request_edited';
 const issuesLabelEvent = 'issues_labeled';
 const issuesAssignedEvent = 'issues_assigned';
 const pushEvent = 'push';
@@ -30,6 +34,7 @@ const issueCommentCreatedEvent = 'comment_created';
 
 const periodicCheck = 'periodic-check';
 const claCheck = 'cla-check';
+const claCheckGithubAction = 'cla-check-github-action';
 const changelogCheck = 'changelog-check';
 const datastoreLabelCheck = 'datastore-label-check';
 const prLabelCheck = 'pr-label-check';
@@ -43,6 +48,7 @@ const assigneeCheck = 'assignee-check';
 const mergeConflictCheck = 'merge-conflict-check';
 const allMergeConflictCheck = 'all-merge-conflict-check';
 const jobCheck = 'job-check';
+const cronJobCheck = 'cron-job-check';
 const modelCheck = 'model-check';
 const issuesLabelCheck = 'issues-labeled-check';
 const issuesAssignedCheck = 'issues-assigned-check';
@@ -53,33 +59,44 @@ const ciFailureCheck = 'ci-failure-check';
 const updateWithDevelopCheck = 'update-with-develop-check';
 const respondToReviewCheck = 'respond-to-review-check';
 const oldBuildLabelCheck = 'old-build-label-check';
+const staleBuildLabelCheck = 'stale-build-label-check';
+const dontMergeLabelCheck = 'dont-merge-label-check';
 
 const checksWhitelist = {
+  // eslint-disable-next-line quote-props
   'oppia-android': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
+    [openEventGithubActions]: [claCheckGithubAction],
+    [reopenEventGithubActions]: [claCheckGithubAction],
     [PRLabelEvent]: [],
     [synchronizeEvent]: [],
     [closeEvent]: [],
     [editEvent]: [],
-    [issuesLabelEvent]: []
+    [issuesLabelEvent]: [],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
+    [issueCommentCreatedEvent]: [respondToReviewCheck],
   },
-  oppia: {
+  // eslint-disable-next-line quote-props
+  'oppia': {
     [openEvent]: [
       claCheck,
       changelogCheck,
       codeOwnerCheck,
       branchCheck,
-      wipCheck,
       jobCheck,
+      cronJobCheck,
       modelCheck,
       prTemplateCheck
     ],
+    [openEventGithubActions]: [claCheckGithubAction, wipCheck],
+    [reopenEventGithubActions]: [claCheckGithubAction, wipCheck],
+    [editEventGithubActions]: [wipCheck],
     [reopenEvent]: [
       changelogCheck,
       branchCheck,
-      wipCheck,
       jobCheck,
+      cronJobCheck,
       modelCheck,
       prTemplateCheck
     ],
@@ -88,6 +105,7 @@ const checksWhitelist = {
     [synchronizeEvent]: [
       mergeConflictCheck,
       jobCheck,
+      cronJobCheck,
       modelCheck,
       codeOwnerCheck,
       oldBuildLabelCheck
@@ -96,22 +114,28 @@ const checksWhitelist = {
     [editEvent]: [wipCheck],
     [issuesLabelEvent]: [issuesLabelCheck],
     [issuesAssignedEvent]: [issuesAssignedCheck],
-    [unlabelEvent]: [datastoreLabelCheck],
+    [PRUnlabelEvent]: [datastoreLabelCheck, dontMergeLabelCheck,
+      staleBuildLabelCheck],
     [pushEvent]: [forcePushCheck],
     [periodicCheckEvent]: [periodicCheck],
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
     [checkCompletedEvent]: [ciFailureCheck],
     [issueCommentCreatedEvent]: [respondToReviewCheck]
   },
-  oppiabot: {
+  // eslint-disable-next-line quote-props
+  'oppiabot': {
     [openEvent]: [claCheck],
     [reopenEvent]: [],
+    [openEventGithubActions]: [claCheckGithubAction],
+    [reopenEventGithubActions]: [claCheckGithubAction],
     [synchronizeEvent]: [mergeConflictCheck],
     [closeEvent]: [allMergeConflictCheck],
     [editEvent]: [],
     [issuesLabelEvent]: [],
     [issuesAssignedEvent]: [],
-    [pushEvent]: []
+    [pushEvent]: [],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
+    [issueCommentCreatedEvent]: [respondToReviewCheck],
   },
 };
 
@@ -119,7 +143,7 @@ const blacklistedAuthors = ['translatewiki'];
 
 module.exports.openEvent = openEvent;
 module.exports.reopenEvent = reopenEvent;
-module.exports.unlabelEvent = unlabelEvent;
+module.exports.PRUnlabelEvent = PRUnlabelEvent;
 module.exports.PRLabelEvent = PRLabelEvent;
 module.exports.PRMilestoneEvent = PRMilestoneEvent;
 module.exports.synchronizeEvent = synchronizeEvent;
@@ -135,6 +159,7 @@ module.exports.issueCommentCreatedEvent = issueCommentCreatedEvent;
 
 module.exports.periodicCheck = periodicCheck;
 module.exports.claCheck = claCheck;
+module.exports.claCheckGithubAction = claCheckGithubAction;
 module.exports.changelogCheck = changelogCheck;
 module.exports.branchCheck = branchCheck;
 module.exports.wipCheck = wipCheck;
@@ -142,6 +167,7 @@ module.exports.assigneeCheck = assigneeCheck;
 module.exports.mergeConflictCheck = mergeConflictCheck;
 module.exports.allMergeConflictCheck = allMergeConflictCheck;
 module.exports.jobCheck = jobCheck;
+module.exports.cronJobCheck = cronJobCheck;
 module.exports.modelCheck = modelCheck;
 module.exports.issuesLabelCheck = issuesLabelCheck;
 module.exports.issuesAssignedCheck = issuesAssignedCheck;
@@ -156,6 +182,8 @@ module.exports.ciFailureCheck = ciFailureCheck;
 module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
 module.exports.respondToReviewCheck = respondToReviewCheck;
 module.exports.oldBuildLabelCheck = oldBuildLabelCheck;
+module.exports.staleBuildLabelCheck = staleBuildLabelCheck;
+module.exports.dontMergeLabelCheck = dontMergeLabelCheck;
 
 module.exports.getBlacklistedAuthors = function() {
   return blacklistedAuthors;

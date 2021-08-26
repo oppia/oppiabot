@@ -22,8 +22,8 @@ const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
-const checkWipModule = require('./lib/checkWipDraftPR');
 const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
+const checkCronJobModule = require('./lib/checkNewCronJobs');
 const checkPullRequestTemplateModule = require(
   './lib/checkPullRequestTemplate'
 );
@@ -72,9 +72,6 @@ const runChecks = async (context, checkEvent) => {
           case constants.branchCheck:
             callable.push(checkPullRequestBranchModule.checkBranch(context));
             break;
-          case constants.wipCheck:
-            callable.push(checkWipModule.checkWIP(context));
-            break;
           case constants.assigneeCheck:
             callable.push(checkPullRequestLabelsModule.checkAssignee(context));
             break;
@@ -94,6 +91,9 @@ const runChecks = async (context, checkEvent) => {
             break;
           case constants.jobCheck:
             callable.push(checkPullRequestJobModule.checkForNewJob(context));
+            break;
+          case constants.cronJobCheck:
+            callable.push(checkCronJobModule.checkForNewCronJob(context));
             break;
           case constants.modelCheck:
             callable.push(
@@ -118,6 +118,11 @@ const runChecks = async (context, checkEvent) => {
           case constants.datastoreLabelCheck:
             callable.push(
               checkPullRequestLabelsModule.checkCriticalLabel(context)
+            );
+            break;
+          case constants.staleBuildLabelCheck:
+            callable.push(
+              checkPullRequestLabelsModule.checkStaleBuildLabelRemoved(context)
             );
             break;
           case constants.forcePushCheck:
@@ -149,7 +154,6 @@ const runChecks = async (context, checkEvent) => {
           case constants.periodicCheck:
             callable.push(...[
               periodicCheckModule.ensureAllPullRequestsAreAssigned(context),
-              periodicCheckModule.ensureAllIssuesHaveProjects(context),
               staleBuildModule.checkAndTagPRsWithOldBuilds(context),
             ]);
             break;
@@ -253,7 +257,7 @@ module.exports = (oppiabot) => {
 
   oppiabot.on('pull_request.unlabeled', async (context) => {
     if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
-      await runChecks(context, constants.unlabelEvent);
+      await runChecks(context, constants.PRUnlabelEvent);
     }
   });
 
@@ -274,18 +278,6 @@ module.exports = (oppiabot) => {
       // eslint-disable-next-line no-console
       console.log(' A PR HAS BEEN MERGED..');
       await runChecks(context, constants.closeEvent);
-    }
-  });
-
-  oppiabot.on('pull_request.edited', async (context) => {
-    if (
-      checkWhitelistedAccounts(context) &&
-      context.payload.pull_request.state === 'open' &&
-      checkAuthor(context)
-    ) {
-      // eslint-disable-next-line no-console
-      console.log('A PR HAS BEEN EDITED...');
-      await runChecks(context, constants.editEvent);
     }
   });
 

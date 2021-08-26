@@ -21,10 +21,10 @@ const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
+const checkCronJobModule = require('../lib/checkNewCronJobs');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
-const checkWIPModule = require('../lib/checkWipDraftPR');
 const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
@@ -192,13 +192,13 @@ describe('Critical Pull Request Spec', () => {
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(checkCronJobModule, 'checkForNewCronJob').and.callFake(() => { });
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
       checkPullRequestLabelsModule,
       'checkChangelogLabel'
     ).and.callFake(() => { });
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
-    spyOn(checkWIPModule, 'checkWIP').and.callFake(() => { });
     spyOn(
       checkPullRequestTemplateModule, 'checkTemplate'
     ).and.callFake(() => { });
