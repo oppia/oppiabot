@@ -696,7 +696,6 @@ describe('Pull Request Label Check', () => {
   });
 
   describe('when pull request gets opened or reopened', () => {
-    
     it('pings pr author when there is no changelog label', async () => {
       payloadData.payload.action = 'reopened';
 
@@ -755,7 +754,7 @@ describe('Pull Request Label Check', () => {
             login: 'reviewer',
           },
         ];
-        
+
         github.search = {
           issuesAndPullRequests: jasmine
             .createSpy('issuesAndPullRequests')
@@ -864,8 +863,8 @@ describe('Pull Request Label Check', () => {
             'changelog label to this pull request? Thanks!',
         };
         expect(github.issues.createComment)
-        .not
-        .toHaveBeenCalledWith(commentParams);
+          .not
+          .toHaveBeenCalledWith(commentParams);
 
         expect(github.issues.addAssignees).not.toHaveBeenCalled();
       }
@@ -1096,86 +1095,90 @@ describe('Pull Request Label Check', () => {
       ).and.callThrough();
       await robot.receive(payloadData);
     });
-    it('should unassign the author when author is assigned with no review comments', async () => {
-      payloadData.payload.pull_request.assignees = [{login: 'username'}];
-      payloadData.payload.pull_request.review_comments = 0;
-      github.search = {
-        issuesAndPullRequests: jasmine
-          .createSpy('issuesAndPullRequests')
-          .and.resolveTo({
-            data: {
-              items: [],
-            },
-          }),
-      };
-      spyOn(
-        checkPullRequestLabelModule, 'checkChangelogLabel'
-      ).and.callThrough();
-      await robot.receive(payloadData);
-      expect(
-        utilityModule.doesPullRequestHaveChangesRequested
-      ).toHaveBeenCalled();
-      expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
-      expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
-        owner: payloadData.payload.repository.owner.login,
-        repo: payloadData.payload.repository.name,
-        q:
+    it(
+      'should unassign the author when author is assigned with ' +
+      'no review comments', async () => {
+        payloadData.payload.pull_request.assignees = [{login: 'username'}];
+        payloadData.payload.pull_request.review_comments = 0;
+        github.search = {
+          issuesAndPullRequests: jasmine
+            .createSpy('issuesAndPullRequests')
+            .and.resolveTo({
+              data: {
+                items: [],
+              },
+            }),
+        };
+        spyOn(
+          checkPullRequestLabelModule, 'checkChangelogLabel'
+        ).and.callThrough();
+        await robot.receive(payloadData);
+        expect(
+          utilityModule.doesPullRequestHaveChangesRequested
+        ).toHaveBeenCalled();
+        expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
+        expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+          owner: payloadData.payload.repository.owner.login,
+          repo: payloadData.payload.repository.name,
+          q:
           'repo:oppia/oppia review:changes_requested ' +
           payloadData.payload.pull_request.number,
+        });
+        expect(
+          checkPullRequestLabelModule.checkChangelogLabel
+        ).toHaveBeenCalled();
+        expect(github.issues.removeAssignees).toHaveBeenCalled();
+        expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          assignees: ['username']
+        });
+        const params = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          body: 'Unassigning @username since the changelog label was added.'
+        };
+        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.issues.createComment).toHaveBeenCalledWith(params);
       });
-      expect(
-        checkPullRequestLabelModule.checkChangelogLabel
-      ).toHaveBeenCalled();
-      expect(github.issues.removeAssignees).toHaveBeenCalled();
-      expect(github.issues.removeAssignees).toHaveBeenCalledWith({
-        repo: payloadData.payload.repository.name,
-        owner: payloadData.payload.repository.owner.login,
-        issue_number: payloadData.payload.number,
-        assignees: ['username']
+    it(
+      'should not unassign the author when author is already unassigned ' +
+      'and pull request has no review comments', async () => {
+        payloadData.payload.pull_request.assignees = [];
+        payloadData.payload.pull_request.review_comments = 0;
+        github.search = {
+          issuesAndPullRequests: jasmine
+            .createSpy('issuesAndPullRequests')
+            .and.resolveTo({
+              data: {
+                items: [],
+              },
+            }),
+        };
+        await robot.receive(payloadData);
+        expect(github.issues.removeAssignees).not.toHaveBeenCalled();
+        expect(github.issues.createComment).not.toHaveBeenCalled();
       });
-      const params = {
-        repo: payloadData.payload.repository.name,
-        owner: payloadData.payload.repository.owner.login,
-        issue_number: payloadData.payload.number,
-        body: 'Unassigning @username since the changelog label was added.'
-      };
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith(params);
-    });
-    it('should not unassign the author when author is already unassigned and pull request has no changes requested', async () => {
-      payloadData.payload.pull_request.assignees = [];
-      payloadData.payload.pull_request.review_comments = 0;
-      github.search = {
-        issuesAndPullRequests: jasmine
-          .createSpy('issuesAndPullRequests')
-          .and.resolveTo({
-            data: {
-              items: [],
-            },
-          }),
-      };
-      await robot.receive(payloadData);
-      expect(github.issues.removeAssignees).not.toHaveBeenCalled();
-      expect(github.issues.createComment).not.toHaveBeenCalled();
-
-    });
-    it('should not unassign the author when pull request has changes requested', async () => {
-      payloadData.payload.pull_request.assignees = {login: 'username'}
-      payloadData.payload.pull_request.review_comments = 0;
-      github.search = {
-        issuesAndPullRequests: jasmine
-          .createSpy('issuesAndPullRequests')
-          .and.resolveTo({
-            data: {
-              items: [payloadData.payload.pull_request],
-            },
-          }),
-      };
-      await robot.receive(payloadData);
-      expect(github.issues.removeAssignees).not.toHaveBeenCalled();
-      expect(github.issues.createComment).not.toHaveBeenCalled();
-    });
-
+    it(
+      'should not unassign the author when pull request ' +
+      'has changes requested', async () => {
+        payloadData.payload.pull_request.assignees = {login: 'username'};
+        payloadData.payload.pull_request.review_comments = 0;
+        github.search = {
+          issuesAndPullRequests: jasmine
+            .createSpy('issuesAndPullRequests')
+            .and.resolveTo({
+              data: {
+                items: [payloadData.payload.pull_request],
+              },
+            }),
+        };
+        await robot.receive(payloadData);
+        expect(github.issues.removeAssignees).not.toHaveBeenCalled();
+        expect(github.issues.createComment).not.toHaveBeenCalled();
+      });
   });
 });
 
