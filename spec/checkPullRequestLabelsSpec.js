@@ -465,9 +465,9 @@ describe('Pull Request Label Check', () => {
     });
   });
 
-  fdescribe('when a pr is milestoned', () => {
+  describe('when a pr is milestoned', () => {
     const milestone = {
-      title: 'Blocking Bugs',
+      title: 'Regressions (August 2021)',
     };
 
     beforeEach(async () => {
@@ -486,9 +486,9 @@ describe('Pull Request Label Check', () => {
     it('should create comment on the PR', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledWith({
-        body: 'Hi @' + payloadData.payload.sender.login + ', the Blocking ' +
-          'Bugs milestone should only be used on issues, and I’m ' +
-          'removing the milestone. Thanks!',
+        body: 'Hi @' + payloadData.payload.sender.login + ', the ' 
+        + milestone.title + ' milestone should only be used on ' + 
+        'issues, and I’m ' + 'removing the milestone. Thanks!',
         number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name

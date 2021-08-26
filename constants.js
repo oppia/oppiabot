@@ -140,6 +140,9 @@ const checksWhitelist = {
 };
 
 const blacklistedAuthors = ['translatewiki'];
+const milestones = ['Regressions (August 2021)',
+  'Hotlist (August 2021)',
+  'Py3 Migration QA (June 2021)'];
 
 module.exports.openEvent = openEvent;
 module.exports.reopenEvent = reopenEvent;
@@ -192,3 +195,6 @@ module.exports.getBlacklistedAuthors = function() {
 module.exports.getChecksWhitelist = function() {
   return checksWhitelist;
 };
+
+module.exports.milestones = milestones;
+
