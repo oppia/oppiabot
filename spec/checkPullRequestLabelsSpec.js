@@ -465,7 +465,7 @@ describe('Pull Request Label Check', () => {
     });
   });
 
-  describe('when a pr is milestoned', () => {
+  fdescribe('when a pr is milestoned', () => {
     const milestone = {
       title: 'Regressions (August 2021)',
     };
