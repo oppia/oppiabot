@@ -189,7 +189,8 @@ describe('CLA check github action Module for Oppia', () => {
         ' Welcome to Oppia! Could you please ' +
         'follow the instructions ' + LINK_RESULT +
         " and sign the CLA Sheet to get started? You'll need to do " +
-        'this before we can accept your PR. Thanks!');
+        "this before we can accept your PR. Once you\'re done," +
+        ' please reopen the PR. Thanks!');
 
       expect(octokit.issues.update).toHaveBeenCalled();
 
@@ -356,7 +357,8 @@ describe('CLA check github action Module for oppia-android', () => {
       ' Welcome to Oppia! Could you please ' +
       'follow the instructions ' + LINK_RESULT +
       " and sign the CLA Sheet to get started? You'll need to do " +
-      'this before we can accept your PR. Thanks!');
+      "this before we can accept your PR. Once you\'re done," +
+      ' please reopen the PR. Thanks!');
 
     expect(octokit.issues.update).toHaveBeenCalled();
 
