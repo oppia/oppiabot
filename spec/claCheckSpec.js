@@ -45,7 +45,8 @@ describe('CLA check github action Module for Oppia', () => {
 
     octokit = {
       issues: {
-        createComment: jasmine.createSpy('createComment').and.resolveTo({})
+        createComment: jasmine.createSpy('createComment').and.resolveTo({}),
+        update: jasmine.createSpy('update').and.resolveTo({}),
       },
     };
 
@@ -114,6 +115,7 @@ describe('CLA check github action Module for Oppia', () => {
       await dispatcher.dispatch('pull_request_target', 'reopened');
       expect(claCheckGithubActionModule.claCheckGithubAction)
         .toHaveBeenCalled();
+      expect(octokit.issues.update).not.toHaveBeenCalled();
       expect(octokit.issues.createComment).not.toHaveBeenCalled();
       expect(octokit.issues.createComment).not.toHaveBeenCalledWith({});
       expect(core.info).toHaveBeenCalledWith('testuser7777 has signed the CLA');
@@ -149,6 +151,7 @@ describe('CLA check github action Module for Oppia', () => {
       await dispatcher.dispatch('pull_request_target', 'reopened');
       expect(claCheckGithubActionModule.claCheckGithubAction)
         .toHaveBeenCalled();
+      expect(octokit.issues.update).not.toHaveBeenCalled();
       expect(octokit.issues.createComment).not.toHaveBeenCalled();
       expect(octokit.issues.createComment).not.toHaveBeenCalledWith({});
       expect(core.info).toHaveBeenCalledWith('TestUser7777 has signed the CLA');
@@ -187,6 +190,15 @@ describe('CLA check github action Module for Oppia', () => {
         'follow the instructions ' + LINK_RESULT +
         " and sign the CLA Sheet to get started? You'll need to do " +
         'this before we can accept your PR. Thanks!');
+
+      expect(octokit.issues.update).toHaveBeenCalled();
+
+      expect(octokit.issues.update).toHaveBeenCalledWith({
+        state: 'closed',
+        issue_number: pullRequestPayload.payload.pull_request.number,
+        owner: pullRequestPayload.payload.repository.owner.login,
+        repo: pullRequestPayload.payload.repository.name,
+      });
 
       expect(octokit.issues.createComment).toHaveBeenCalled();
 
@@ -297,7 +309,8 @@ describe('CLA check github action Module for oppia-android', () => {
 
     octokit = {
       issues: {
-        createComment: jasmine.createSpy('createComment').and.resolveTo({})
+        createComment: jasmine.createSpy('createComment').and.resolveTo({}),
+        update: jasmine.createSpy('update').and.resolveTo({}),
       },
     };
 
@@ -344,6 +357,15 @@ describe('CLA check github action Module for oppia-android', () => {
       'follow the instructions ' + LINK_RESULT +
       " and sign the CLA Sheet to get started? You'll need to do " +
       'this before we can accept your PR. Thanks!');
+
+    expect(octokit.issues.update).toHaveBeenCalled();
+
+    expect(octokit.issues.update).toHaveBeenCalledWith({
+      state: 'closed',
+      issue_number: pullRequestPayload.payload.pull_request.number,
+      owner: pullRequestPayload.payload.repository.owner.login,
+      repo: pullRequestPayload.payload.repository.name,
+    });
 
     expect(octokit.issues.createComment).toHaveBeenCalled();
 

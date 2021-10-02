@@ -70,8 +70,14 @@ const generateOutput = async (hasClaSigned) => {
         'follow the instructions ' + LINK_RESULT +
         " and sign the CLA Sheet to get started? You'll need to do " +
         'this before we can accept your PR. Thanks!');
-    core.info('Commenting in PR...');
+    core.info('Closing and commenting in PR...');
 
+    await octokit.issues.update({
+      issue_number: PR_NUMBER,
+      state: 'closed',
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+    });
     await octokit.issues.createComment(
       {
         body: comment,
