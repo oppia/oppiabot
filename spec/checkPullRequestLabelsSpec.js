@@ -24,7 +24,7 @@ const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
 const scheduler = require('../lib/scheduler');
 const OLD_BUILD_LABEL = "PR: don't merge - STALE BUILD";
-
+const utilityModule = require('../lib/utils');
 const github = require('@actions/github');
 const core = require('@actions/core');
 const actionPayload = require('../fixtures/pullRequest.labelled.json');
@@ -53,6 +53,7 @@ describe('Pull Request Label Check', () => {
 
   beforeEach(() => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
+    spyOn(utilityModule, 'sleep').and.callFake(() => { });
 
     github = {
       issues: {
@@ -692,6 +693,14 @@ describe('Pull Request Label Check', () => {
   });
 
   describe('when pull request gets opened or reopened', () => {
+    beforeEach(() => {
+      github.pulls = {
+        get: jasmine.createSpy('get').and.resolveTo({
+          data: payloadData.payload.pull_request,
+        }),
+      };
+    });
+
     it('pings pr author when there is no changelog label', async () => {
       payloadData.payload.action = 'reopened';
 
@@ -700,6 +709,7 @@ describe('Pull Request Label Check', () => {
       ).and.callThrough();
       await robot.receive(payloadData);
 
+      expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
       expect(
         checkPullRequestLabelModule.checkChangelogLabel
       ).toHaveBeenCalled();
@@ -754,6 +764,7 @@ describe('Pull Request Label Check', () => {
 
         await robot.receive(payloadData);
 
+        expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
@@ -808,6 +819,7 @@ describe('Pull Request Label Check', () => {
 
         await robot.receive(payloadData);
 
+        expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
@@ -858,6 +870,7 @@ describe('Pull Request Label Check', () => {
 
         await robot.receive(payloadData);
 
+        expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
@@ -921,6 +934,7 @@ describe('Pull Request Label Check', () => {
 
         await robot.receive(payloadData);
 
+        expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
@@ -971,6 +985,7 @@ describe('Pull Request Label Check', () => {
       ).and.callThrough();
       await robot.receive(payloadData);
 
+      expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
       expect(
         checkPullRequestLabelModule.checkChangelogLabel
       ).toHaveBeenCalled();
@@ -994,6 +1009,7 @@ describe('Pull Request Label Check', () => {
       ).and.callThrough();
       await robot.receive(payloadData);
 
+      expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
       expect(
         checkPullRequestLabelModule.checkChangelogLabel
       ).toHaveBeenCalled();
@@ -1028,6 +1044,7 @@ describe('Pull Request Label Check', () => {
         ).and.callThrough();
         await robot.receive(payloadData);
 
+        expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
