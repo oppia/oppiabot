@@ -63,7 +63,7 @@ const dontMergeLabelCheck = 'dont-merge-label-check';
 const checksWhitelist = {
   // eslint-disable-next-line quote-props
   'oppia-android': {
-    [openEvent]: [claCheck],
+    [openEvent]: [],
     [reopenEvent]: [],
     [openEventGithubActions]: [claCheckGithubAction],
     [reopenEventGithubActions]: [claCheckGithubAction],
@@ -78,7 +78,6 @@ const checksWhitelist = {
   // eslint-disable-next-line quote-props
   'oppia': {
     [openEvent]: [
-      claCheck,
       changelogCheck,
       codeOwnerCheck,
       branchCheck,
@@ -121,7 +120,7 @@ const checksWhitelist = {
   },
   // eslint-disable-next-line quote-props
   'oppiabot': {
-    [openEvent]: [claCheck],
+    [openEvent]: [],
     [reopenEvent]: [],
     [openEventGithubActions]: [claCheckGithubAction],
     [reopenEventGithubActions]: [claCheckGithubAction],
@@ -134,10 +133,6 @@ const checksWhitelist = {
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
     [issueCommentCreatedEvent]: [respondToReviewCheck],
   },
-  'test-github-actions': {
-    [openEventGithubActions]: [claCheckGithubAction],
-    [reopenEventGithubActions]: [claCheckGithubAction]
-  }
 };
 
 const blacklistedAuthors = ['translatewiki'];
