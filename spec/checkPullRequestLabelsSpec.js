@@ -709,7 +709,7 @@ describe('Pull Request Label Check', () => {
       ).and.callThrough();
       await robot.receive(payloadData);
 
-      expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
+      expect(utilityModule.sleep).toHaveBeenCalledWith(10 * 1000);
       expect(
         checkPullRequestLabelModule.checkChangelogLabel
       ).toHaveBeenCalled();
@@ -764,7 +764,7 @@ describe('Pull Request Label Check', () => {
 
         await robot.receive(payloadData);
 
-        expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(10 * 1000);
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
@@ -819,7 +819,7 @@ describe('Pull Request Label Check', () => {
 
         await robot.receive(payloadData);
 
-        expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(10 * 1000);
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
@@ -870,7 +870,7 @@ describe('Pull Request Label Check', () => {
 
         await robot.receive(payloadData);
 
-        expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(10 * 1000);
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
@@ -934,7 +934,7 @@ describe('Pull Request Label Check', () => {
 
         await robot.receive(payloadData);
 
-        expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(10 * 1000);
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
@@ -985,7 +985,7 @@ describe('Pull Request Label Check', () => {
       ).and.callThrough();
       await robot.receive(payloadData);
 
-      expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
+      expect(utilityModule.sleep).toHaveBeenCalledWith(10 * 1000);
       expect(
         checkPullRequestLabelModule.checkChangelogLabel
       ).toHaveBeenCalled();
@@ -1009,7 +1009,7 @@ describe('Pull Request Label Check', () => {
       ).and.callThrough();
       await robot.receive(payloadData);
 
-      expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
+      expect(utilityModule.sleep).toHaveBeenCalledWith(10 * 1000);
       expect(
         checkPullRequestLabelModule.checkChangelogLabel
       ).toHaveBeenCalled();
@@ -1044,7 +1044,7 @@ describe('Pull Request Label Check', () => {
         ).and.callThrough();
         await robot.receive(payloadData);
 
-        expect(utilityModule.sleep).toHaveBeenCalledWith(30 * 1000);
+        expect(utilityModule.sleep).toHaveBeenCalledWith(10 * 1000);
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
