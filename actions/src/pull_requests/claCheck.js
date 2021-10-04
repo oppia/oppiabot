@@ -69,7 +69,7 @@ const generateOutput = async (hasClaSigned) => {
         ' Welcome to Oppia! Could you please ' +
         'follow the instructions ' + LINK_RESULT +
         " and sign the CLA Sheet to get started? You'll need to do " +
-        "this before we can accept your PR. Once you\'re done," +
+        "this before we can accept your PR. Once you're done," +
         ' please reopen the PR. Thanks!');
     core.info('Closing and commenting in PR...');
 
