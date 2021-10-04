@@ -192,8 +192,6 @@ describe('CLA check github action Module for Oppia', () => {
         "this before we can accept your PR. Once you're done," +
         ' please reopen the PR. Thanks!');
 
-      expect(octokit.issues.update).toHaveBeenCalled();
-
       expect(octokit.issues.update).toHaveBeenCalledWith({
         state: 'closed',
         issue_number: pullRequestPayload.payload.pull_request.number,
@@ -359,8 +357,6 @@ describe('CLA check github action Module for oppia-android', () => {
       " and sign the CLA Sheet to get started? You'll need to do " +
       "this before we can accept your PR. Once you're done," +
       ' please reopen the PR. Thanks!');
-
-    expect(octokit.issues.update).toHaveBeenCalled();
 
     expect(octokit.issues.update).toHaveBeenCalledWith({
       state: 'closed',
