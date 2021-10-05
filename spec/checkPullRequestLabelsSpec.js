@@ -23,8 +23,6 @@ const checkCriticalPullRequestModule =
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
 const scheduler = require('../lib/scheduler');
-const utilityModule = require('../lib/utils');
-const reviewPayloadData = require('../fixtures/pullRequestReview.json');
 const OLD_BUILD_LABEL = "PR: don't merge - STALE BUILD";
 
 const github = require('@actions/github');
@@ -55,7 +53,6 @@ describe('Pull Request Label Check', () => {
 
   beforeEach(() => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
-    spyOn(utilityModule, 'sleep').and.callFake(() => { });
 
     github = {
       issues: {
@@ -63,7 +60,7 @@ describe('Pull Request Label Check', () => {
         addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
         removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
         addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
-        removeAssignees: jasmine.createSpy('removeAssignees').and.resolveTo({}),
+        update: jasmine.createSpy('update').and.resolveTo({}),
       },
       repos: {
         checkCollaborator: jasmine.createSpy('checkCollaborator').and.callFake(
@@ -468,6 +465,42 @@ describe('Pull Request Label Check', () => {
     });
   });
 
+  describe('when a pr is milestoned', () => {
+    const milestone = {
+      title: 'Regressions (August 2021)',
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'milestoned';
+      payloadData.payload.pull_request.milestone = milestone;
+      spyOn(
+        checkPullRequestLabelModule, 'checkForMilestone'
+      ).and.callThrough();
+      await robot.receive(payloadData);
+    });
+
+    it('should check the milestone', () => {
+      expect(checkPullRequestLabelModule.checkForMilestone).toHaveBeenCalled();
+    });
+
+    it('should create comment on the PR', () => {
+      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        body: 'Hi @' + payloadData.payload.sender.login + ', the ' +
+        milestone.title + ' milestone should only be used for ' +
+        'issues. I’m ' + 'removing the milestone from this PR. Thanks!',
+        number: payloadData.payload.pull_request.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name
+      });
+    });
+
+    it('should remove the milestone', () => {
+      expect(github.issues.update).toHaveBeenCalled();
+      expect(github.issues.update).toHaveBeenCalledWith({milestone: null});
+    });
+  });
+
   describe('when datastore label gets removed by non whitelisted user', () => {
     const label = {
       id: 638839900,
@@ -699,15 +732,6 @@ describe('Pull Request Label Check', () => {
     it('pings pr author when there is no changelog label', async () => {
       payloadData.payload.action = 'reopened';
 
-      github.search = {
-        issuesAndPullRequests: jasmine
-          .createSpy('issuesAndPullRequests')
-          .and.resolveTo({
-            data: {
-              items: [payloadData.payload.pull_request],
-            },
-          }),
-      };
       spyOn(
         checkPullRequestLabelModule, 'checkChangelogLabel'
       ).and.callThrough();
@@ -755,15 +779,6 @@ describe('Pull Request Label Check', () => {
           },
         ];
 
-        github.search = {
-          issuesAndPullRequests: jasmine
-            .createSpy('issuesAndPullRequests')
-            .and.resolveTo({
-              data: {
-                items: [payloadData.payload.pull_request],
-              },
-            }),
-        };
         spyOn(
           checkPullRequestLabelModule, 'checkChangelogLabel'
         ).and.callThrough();
@@ -817,18 +832,7 @@ describe('Pull Request Label Check', () => {
         payloadData.payload.pull_request.user.login = 'newuser';
         payloadData.payload.pull_request.draft = true;
         payloadData.payload.pull_request.requested_reviewers = [];
-        payloadData.payload.pull_request.review_comments = 0;
 
-        github.search = {
-          issuesAndPullRequests: jasmine
-            .createSpy('issuesAndPullRequests')
-            .and.resolveTo({
-              data: {
-                items: [],
-              },
-            }),
-        };
-        await robot.receive(payloadData);
         spyOn(
           checkPullRequestLabelModule, 'checkChangelogLabel'
         ).and.callThrough();
@@ -878,15 +882,7 @@ describe('Pull Request Label Check', () => {
         payloadData.payload.pull_request.user.login = 'newuser';
         payloadData.payload.pull_request.draft = false;
         payloadData.payload.pull_request.requested_reviewers = [];
-        github.search = {
-          issuesAndPullRequests: jasmine
-            .createSpy('issuesAndPullRequests')
-            .and.resolveTo({
-              data: {
-                items: [],
-              },
-            }),
-        };
+
         spyOn(
           checkPullRequestLabelModule, 'checkChangelogLabel'
         ).and.callThrough();
@@ -949,15 +945,7 @@ describe('Pull Request Label Check', () => {
             login: 'reviewer3',
           },
         ];
-        github.search = {
-          issuesAndPullRequests: jasmine
-            .createSpy('issuesAndPullRequests')
-            .and.resolveTo({
-              data: {
-                items: [payloadData.payload.pull_request],
-              },
-            }),
-        };
+
         spyOn(
           checkPullRequestLabelModule, 'checkChangelogLabel'
         ).and.callThrough();
@@ -1012,16 +1000,9 @@ describe('Pull Request Label Check', () => {
         name: 'PR CHANGELOG: Server Errors -- @kevintab95',
         color: '00FF00',
       };
+      payloadData.payload.action = 'reopened';
+      // Add changelog label.
       payloadData.payload.pull_request.labels.push(label);
-      github.search = {
-        issuesAndPullRequests: jasmine
-          .createSpy('issuesAndPullRequests')
-          .and.resolveTo({
-            data: {
-              items: [payloadData.payload.pull_request],
-            },
-          }),
-      };
       spyOn(
         checkPullRequestLabelModule, 'checkChangelogLabel'
       ).and.callThrough();
@@ -1045,15 +1026,6 @@ describe('Pull Request Label Check', () => {
 
       payloadData.payload.action = 'reopened';
       payloadData.payload.pull_request.labels = [label];
-      github.search = {
-        issuesAndPullRequests: jasmine
-          .createSpy('issuesAndPullRequests')
-          .and.resolveTo({
-            data: {
-              items: [payloadData.payload.pull_request],
-            },
-          }),
-      };
       spyOn(
         checkPullRequestLabelModule, 'checkChangelogLabel'
       ).and.callThrough();
@@ -1074,109 +1046,28 @@ describe('Pull Request Label Check', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledWith(params);
     });
-  });
 
-  describe('when valid changelog added ', () => {
-    beforeEach(async () => {
-      const label = {
-        id: 638839900,
-        node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-        url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
-        color: '00FF00',
-      };
-      payloadData.payload.action = 'reopened';
-      // Add changelog label.
-      payloadData.payload.pull_request.labels = [label];
-      payloadData.payload.pull_request.user.login = 'username';
-      payloadData.payload.pull_request.review_comments = 0;
-      spyOn(
-        utilityModule, 'doesPullRequestHaveChangesRequested'
-      ).and.callThrough();
-      await robot.receive(payloadData);
-    });
-    it(
-      'should unassign the author when author is assigned with ' +
-      'no review comments', async () => {
-        payloadData.payload.pull_request.assignees = [{login: 'username'}];
-        payloadData.payload.pull_request.review_comments = 0;
-        github.search = {
-          issuesAndPullRequests: jasmine
-            .createSpy('issuesAndPullRequests')
-            .and.resolveTo({
-              data: {
-                items: [],
-              },
-            }),
+    it('does not ping dev workflow team for valid changelog label',
+      async () => {
+        const label = {
+          id: 638839900,
+          node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+          url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+          name: 'PR CHANGELOG: Server Errors -- @kevintab95',
+          color: '00FF00',
         };
+
+        payloadData.payload.action = 'reopened';
+
+        payloadData.payload.pull_request.labels = [label];
         spyOn(
           checkPullRequestLabelModule, 'checkChangelogLabel'
         ).and.callThrough();
         await robot.receive(payloadData);
-        expect(
-          utilityModule.doesPullRequestHaveChangesRequested
-        ).toHaveBeenCalled();
-        expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
-        expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
-          owner: payloadData.payload.repository.owner.login,
-          repo: payloadData.payload.repository.name,
-          q:
-          'repo:oppia/oppia review:changes_requested ' +
-          payloadData.payload.pull_request.number,
-        });
+
         expect(
           checkPullRequestLabelModule.checkChangelogLabel
         ).toHaveBeenCalled();
-        expect(github.issues.removeAssignees).toHaveBeenCalled();
-        expect(github.issues.removeAssignees).toHaveBeenCalledWith({
-          repo: payloadData.payload.repository.name,
-          owner: payloadData.payload.repository.owner.login,
-          issue_number: payloadData.payload.number,
-          assignees: ['username']
-        });
-        const params = {
-          repo: payloadData.payload.repository.name,
-          owner: payloadData.payload.repository.owner.login,
-          issue_number: payloadData.payload.number,
-          body: 'Unassigning @username since the changelog label was added.'
-        };
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith(params);
-      });
-    it(
-      'should not unassign the author when author is already unassigned ' +
-      'and pull request has no review comments', async () => {
-        payloadData.payload.pull_request.assignees = [];
-        payloadData.payload.pull_request.review_comments = 0;
-        github.search = {
-          issuesAndPullRequests: jasmine
-            .createSpy('issuesAndPullRequests')
-            .and.resolveTo({
-              data: {
-                items: [],
-              },
-            }),
-        };
-        await robot.receive(payloadData);
-        expect(github.issues.removeAssignees).not.toHaveBeenCalled();
-        expect(github.issues.createComment).not.toHaveBeenCalled();
-      });
-    it(
-      'should not unassign the author when pull request ' +
-      'has changes requested', async () => {
-        payloadData.payload.pull_request.assignees = {login: 'username'};
-        payloadData.payload.pull_request.review_comments = 0;
-        github.search = {
-          issuesAndPullRequests: jasmine
-            .createSpy('issuesAndPullRequests')
-            .and.resolveTo({
-              data: {
-                items: [payloadData.payload.pull_request],
-              },
-            }),
-        };
-        await robot.receive(payloadData);
-        expect(github.issues.removeAssignees).not.toHaveBeenCalled();
         expect(github.issues.createComment).not.toHaveBeenCalled();
       });
   });
