@@ -63,13 +63,13 @@ const dontMergeLabelCheck = 'dont-merge-label-check';
 const checksWhitelist = {
   // eslint-disable-next-line quote-props
   'oppia-android': {
-    [openEvent]: [claCheck],
+    [openEvent]: [claCheck, codeOwnerCheck],
     [reopenEvent]: [],
     [openEventGithubActions]: [claCheckGithubAction],
     [reopenEventGithubActions]: [claCheckGithubAction],
     [PRLabelEvent]: [],
     [synchronizeEvent]: [],
-    [closeEvent]: [],
+    [closeEvent]: [updateWithDevelopCheck],
     [editEvent]: [],
     [issuesLabelEvent]: [],
     [pullRequestReviewEvent]: [pullRequestReviewCheck],

@@ -210,7 +210,7 @@ describe('check for new code owner', () => {
       .and.callFake(() => { });
     spyOn(staleBuildModule, 'removeOldBuildLabel').and.callFake(() => {});
     spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callThrough();
-    spyOn(utils, 'getMainCodeOwnerfile').and.resolveTo(mainCodeOwnerFile);
+    spyOn(utils, 'getMainCodeOwnerFile').and.resolveTo(mainCodeOwnerFile);
   });
 
   describe('When a new code owner gets added', () => {
@@ -245,7 +245,7 @@ describe('check for new code owner', () => {
       });
 
       it('should get codeowner file from develop', () => {
-        expect(utils.getMainCodeOwnerfile).toHaveBeenCalled();
+        expect(utils.getMainCodeOwnerFile).toHaveBeenCalled();
       });
 
       it('should ping project owner', () => {
@@ -284,7 +284,7 @@ describe('check for new code owner', () => {
       });
 
       it('should get codeowner file from develop', () => {
-        expect(utils.getMainCodeOwnerfile).toHaveBeenCalled();
+        expect(utils.getMainCodeOwnerFile).toHaveBeenCalled();
       });
 
       it('should ping reviewer', () => {
@@ -334,7 +334,7 @@ describe('check for new code owner', () => {
     });
 
     it('should get codeowner file from develop', () => {
-      expect(utils.getMainCodeOwnerfile).toHaveBeenCalled();
+      expect(utils.getMainCodeOwnerFile).toHaveBeenCalled();
     });
 
     it('should ping project owner', () => {
@@ -386,7 +386,7 @@ describe('check for new code owner', () => {
     });
 
     it('should get codeowner file from develop', () => {
-      expect(utils.getMainCodeOwnerfile).toHaveBeenCalled();
+      expect(utils.getMainCodeOwnerFile).toHaveBeenCalled();
     });
 
     it('should not ping project owner', () => {
@@ -426,7 +426,7 @@ describe('check for new code owner', () => {
     });
 
     it('should not get codeowner file from develop', () => {
-      expect(utils.getMainCodeOwnerfile).not.toHaveBeenCalled();
+      expect(utils.getMainCodeOwnerFile).not.toHaveBeenCalled();
     });
 
     it('should not ping project owner', () => {

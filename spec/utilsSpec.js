@@ -21,6 +21,9 @@ const pullRequest = require('../fixtures/pullRequestPayload.json').payload
   .pull_request;
 const CODE_OWNERS_FILE_URL =
   'https://raw.githubusercontent.com/oppia/oppia/develop/.github/CODEOWNERS';
+const OPPIA_ANDROID_CODE_OWNERS_FILE_URL =
+  'https://raw.githubusercontent.com/oppia/' +
+  'oppia-android/develop/.github/CODEOWNERS';
 
 describe('Utility module tests', () => {
   const firstModelFileObj = {
@@ -269,10 +272,20 @@ describe('Utility module tests', () => {
     spyOn(Axios, 'get').and.resolveTo({
       data: 'Contents of code owner file.',
     });
-    const response = await utilityModule.getMainCodeOwnerfile();
+    const response = await utilityModule.getMainCodeOwnerFile('oppia');
     expect(Axios.get).toHaveBeenCalled();
     expect(Axios.get).toHaveBeenCalledWith(CODE_OWNERS_FILE_URL);
     expect(response).toBe('Contents of code owner file.');
+  });
+
+  it('should get oppia-android code owner file from develop ', async () => {
+    spyOn(Axios, 'get').and.resolveTo({
+      data: 'Contents of oppia android code owner file.',
+    });
+    const response = await utilityModule.getMainCodeOwnerFile('oppia-android');
+    expect(Axios.get).toHaveBeenCalled();
+    expect(Axios.get).toHaveBeenCalledWith(OPPIA_ANDROID_CODE_OWNERS_FILE_URL);
+    expect(response).toBe('Contents of oppia android code owner file.');
   });
 
   it('should check if a label is a changelog label', () => {
