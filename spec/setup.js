@@ -20,7 +20,7 @@
 const fs = require('fs');
 const path = require('path');
 const { EOL } = require('os');
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 
 const WHITELISTED_ACCOUNTS = 'WHITELISTED_ACCOUNTS';
 const CLIENT_SECRET = 'CLIENT_SECRET';
@@ -131,42 +131,24 @@ const setEnvVariables = () => {
   });
 };
 
-const runTest = () => {
-  const jasminePath = path.join(
-    __dirname, '..', 'node_modules', '.bin', 'jasmine');
-  const nycPath = path.join(
-    __dirname, '..', 'node_modules', '.bin', 'nyc');
-
-  return new Promise((resolve, reject) => {
-    exec(
-      nycPath + ' ' + jasminePath,
-      (error, stdout, stderr) => {
-        console.log(stdout);
-        if (error) {
-          console.log(error);
-          reject();
-        }
-        if (stderr) {
-          console.log(stderr);
-          reject();
-        }
-        resolve();
-      });
-  });
-};
 
 const revertEnv = () => {
-  console.log('Reverting .env');
   fs.writeFileSync(envPath, envData);
 };
 
-setEnvVariables();
-runTest().then(
-  () => {
+const runTest = () => {
+  setEnvVariables();
+  const testRunner = spawn('npx', ['nyc', 'jasmine'], {
+    shell: true,
+    stdio: 'inherit',
+  });
+
+  testRunner.on('close', (code) => {
     revertEnv();
-    console.log('Tests successful');
-  })['catch'](() => {
-  revertEnv();
-  console.log('Tests failed.');
-  process.exit(1);
-});
+
+    process.exit(code);
+  });
+};
+
+
+runTest();
