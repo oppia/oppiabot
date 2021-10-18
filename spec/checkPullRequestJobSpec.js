@@ -51,23 +51,23 @@ describe('Pull Request Job Spec', () => {
 
   const firstNewJobFileObj = {
     sha: 'd144f32b9812373d5f1bc9f94d9af795f09023ff',
-    filename: 'core/domain/exp_jobs_one_off.py',
+    filename: 'core/jobs/exp_jobs_one_off.py',
     status: 'added',
     additions: 1,
     deletions: 0,
     changes: 1,
     blob_url:
       'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130' +
-      'e110d7e9833c/core/domain/exp_jobs_one_off.py',
+      'e110d7e9833c/core/jobs/exp_jobs_one_off.py',
     raw_url:
       'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130' +
-      'e110d7e9833c/core/domain/exp_jobs_one_off.py',
+      'e110d7e9833c/core/jobs/exp_jobs_one_off.py',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/domain/' +
+      'https://api.github.com/repos/oppia/oppia/contents/core/jobs/' +
       'exp_jobs_one_off.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
-    patch: '@@ -0,0 +1 @@\n+class FirstTestOneOffJob(jobs.' +
-      'BaseMapReduceOneOffJobManager):\n+    """One-off job for ' +
-      'creating and populating UserContributionsModels for\n+    ' +
+    patch: '@@ -0,0 +1 @@\n+class FirstTestJob(jobs.JobTestBase):\n' +
+      '+    """One-off job for creating and populating ' +
+      'UserContributionsModels for\n+    ' +
       'all registered users that have contributed.\n+    """\n+    ' +
       '@classmethod\n+    def entity_classes_to_map_over(cls)' +
       ':\n+        """Return a list of datastore class references ' +
@@ -99,24 +99,24 @@ describe('Pull Request Job Spec', () => {
 
   const secondNewJobFileObj = {
     sha: 'd144f32b9812373d5f1bc9f94d9af795f09023ff',
-    filename: 'core/domain/exp_jobs_oppiabot_off.py',
+    filename: 'core/jobs/exp_jobs_oppiabot_off.py',
     status: 'added',
     additions: 1,
     deletions: 0,
     changes: 1,
     blob_url:
       'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130' +
-      'e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
+      'e110d7e9833c/core/jobs/exp_jobs_oppiabot_off.py',
     raw_url:
       'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130' +
-      'e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
+      'e110d7e9833c/core/jobs/exp_jobs_oppiabot_off.py',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/domain/' +
+      'https://api.github.com/repos/oppia/oppia/contents/core/jobs/' +
       'exp_jobs_oppiabot_off.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
-    patch: '@@ -0,0 +1 @@\n+class SecondTestOneOffJob(jobs.' +
-      'BaseMapReduceOneOffJobManager):\n+    """One-off job ' +
-      'for creating and populating UserContributionsModels for' +
-      '\n+    all registered users that have contributed.\n+    ' +
+    patch: '@@ -0,0 +1 @@\n+class SecondTestJob(jobs.JobTestBase):\n' +
+      '+    """One-off job for creating and populating ' +
+      'UserContributionsModels for\n' +
+      '+    all registered users that have contributed.\n+    ' +
       '"""\n+    @classmethod\n+    def entity_classes_to_map_over' +
       '(cls):\n+        """Return a list of datastore class references ' +
       'to map over."""\n+        return [exp_models.' +
@@ -147,26 +147,26 @@ describe('Pull Request Job Spec', () => {
 
   const modifiedExistingJobFileObj = {
     sha: 'f06a0d3ea104733080c4dad4a4e5aa7fb76d8f5d',
-    filename: 'core/domain/user_jobs_one_off.py',
+    filename: 'core/jobs/user_jobs_one_off.py',
     status: 'modified',
     additions: 43,
     deletions: 0,
     changes: 43,
     blob_url:
       'https://github.com/oppia/oppia/blob/5b0e633fa1b9a00771a3b88302fa' +
-      '3ff048d7240c/core/domain/user_jobs_one_off.py',
+      '3ff048d7240c/core/jobs/user_jobs_one_off.py',
     raw_url:
       'https://github.com/oppia/oppia/raw/5b0e633fa1b9a00771a3b88302fa' +
-      '3ff048d7240c/core/domain/user_jobs_one_off.py',
+      '3ff048d7240c/core/jobs/user_jobs_one_off.py',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/domain/' +
+      'https://api.github.com/repos/oppia/oppia/contents/core/jobs/' +
       'user_jobs_one_off.py?ref=5b0e633fa1b9a00771a3b88302fa3ff048d7240c',
     patch:
       '@@ -80,6 +80,49 @@ def reduce(key, version_and_exp_ids)' +
       ':\n                     edited_exploration_ids))\n \n ' +
-      '\n+class OppiabotContributionsOneOffJob(jobs.' +
-      'BaseMapReduceOneOffJobManager):\n+    """One-off job ' +
-      'for creating and populating UserContributionsModels for' +
+      '\n+class OppiabotContributionsJob(jobs.JobTestBase):\n' +
+      '+    """One-off job for creating and populating ' +
+      'UserContributionsModels for' +
       '\n+    all registered users that have contributed.\n+    ' +
       '"""\n+    @classmethod\n+    def entity_classes_to_map_over' +
       '(cls):\n+        """Return a list of datastore class ' +
@@ -199,49 +199,50 @@ describe('Pull Request Job Spec', () => {
   };
   const modifiedExistingJobFileObjWithJobClassInPatch = {
     sha: 'd144f32b9812373d5f1bc9f94d9af795f09023ff',
-    filename: 'core/domain/exp_jobs_oppiabot_off.py',
+    filename: 'core/jobs/exp_jobs_oppiabot_off.py',
     status: 'modified',
     additions: 1,
     deletions: 0,
     changes: 1,
     blob_url:
       'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130' +
-      'e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
+      'e110d7e9833c/core/jobs/exp_jobs_oppiabot_off.py',
     raw_url:
       'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130' +
-      'e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
+      'e110d7e9833c/core/jobs/exp_jobs_oppiabot_off.py',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/domain/' +
+      'https://api.github.com/repos/oppia/oppia/contents/core/jobs/' +
       'exp_jobs_oppiabot_off.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
-    patch: '@@ -0,0 +1 @@class SecondTestOneOffJob(jobs.' +
-      'BaseMapReduceOneOffJobManager)  def reduce(key, ' +
-      'version_and_exp_ids):\n                     ' +
-      'edited_exploration_ids))\n ',
+    patch: '@@ -0,0 +1 @@class SecondTestJob(jobs.JobTestBase)  ' +
+      'def reduce(key, version_and_exp_ids):\n' +
+      '                     edited_exploration_ids))\n ',
   };
 
   const jobFileObjWithJobClassInPatchAndNewJob = {
     sha: 'd144f32b9812373d5f1bc9f94d9af795f09023ff',
-    filename: 'core/domain/exp_jobs_oppiabot_off.py',
+    filename: 'core/jobs/exp_jobs_oppiabot_off.py',
     status: 'modified',
     additions: 1,
     deletions: 0,
     changes: 1,
     blob_url:
       'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130' +
-      'e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
+      'e110d7e9833c/core/jobs/exp_jobs_oppiabot_off.py',
     raw_url:
       'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a89413' +
-      '0e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
+      '0e110d7e9833c/core/jobs/exp_jobs_oppiabot_off.py',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/domain/' +
+      'https://api.github.com/repos/oppia/oppia/contents/core/jobs/' +
       'exp_jobs_oppiabot_off.py?ref=' +
       '67fb4a973b318882af3b5a894130e110d7e9833c',
-    patch: '@@ -0,0 +1 @@class SecondTestOneOffJob(jobs.' +
-      'BaseMapReduceOneOffJobManager)  def reduce(key, ' +
-      'version_and_exp_ids):\n                     ' +
-      'edited_exploration_ids))\n \n+class AnotherTestOneOffJob' +
-      '(jobs.BaseMapReduceOneOffJobManager):\n+    """\n+    ' +
-      '@classmethod\n+    def entity_classes_to_map_over ',
+    patch: '@@ -0,0 +1 @@class SecondTestJob(jobs.JobTestBase)  ' +
+      'def reduce(key, version_and_exp_ids):\n' +
+      '                     edited_exploration_ids))\n' +
+      ' \n' +
+      '+class AnotherTestJob(jobs.JobTestBase):\n' +
+      '+    """\n' +
+      '+    @classmethod\n' +
+      '+    def entity_classes_to_map_over ',
   };
 
   const jobFromTestDir = {
@@ -261,10 +262,10 @@ describe('Pull Request Job Spec', () => {
       'https://api.github.com/repos/oppia/oppia/contents/core/tests/' +
       'linter_tests/exp_jobs_oppiabot_off.py?ref=' +
       '67fb4a973b318882af3b5a894130e110d7e9833c',
-    patch: '@@ -0,0 +1 @@\n+class LintTestOneOffJob(jobs.' +
-      'BaseMapReduceOneOffJobManager):\n+    """One-off job ' +
-      'for creating and populating UserContributionsModels for' +
-      '\n+    all registered users that have contributed.\n+    ' +
+    patch: '@@ -0,0 +1 @@\n+class LintTestJob(jobs.JobTestBase):\n' +
+      '+    """One-off job for creating and populating' +
+      ' UserContributionsModels for\n' +
+      '+    all registered users that have contributed.\n+    ' +
       '"""\n+    @classmethod\n+    def entity_classes_to_map_over' +
       '(cls):\n+        """Return a list of datastore class ' +
       'references to map over."""\n+        return [exp_models.' +
@@ -295,26 +296,26 @@ describe('Pull Request Job Spec', () => {
 
   const fileWithMultipleJobs = {
     sha: 'd144f32b9812373d5f1bc9f94d9af795f09023ff',
-    filename: 'core/domain/exp_jobs_oppiabot_off.py',
+    filename: 'core/jobs/exp_jobs_oppiabot_off.py',
     status: 'added',
     additions: 1,
     deletions: 0,
     changes: 1,
     blob_url:
       'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130' +
-      'e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
+      'e110d7e9833c/core/jobs/exp_jobs_oppiabot_off.py',
     raw_url:
       'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130' +
-      'e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
+      'e110d7e9833c/core/jobs/exp_jobs_oppiabot_off.py',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/domain/' +
+      'https://api.github.com/repos/oppia/oppia/contents/core/jobs/' +
       'exp_jobs_oppiabot_off.py?ref=' +
       '67fb4a973b318882af3b5a894130e110d7e9833c',
-    patch: '@@ -0,0 +1 @@\n+class TestOneOffJob(jobs.BaseMapReduceOne' +
-      'OffJobManager):\n+    """One-off job for creating and ' +
+    patch: '@@ -0,0 +1 @@\n+class TestJob(jobs.JobTestBase):\n' +
+      '+    """One-off job for creating and ' +
       'populating UserContributionsModels for \n+class ' +
-      'AnotherTestOneOffJob(jobs.BaseMapReduceOneOffJobManager)' +
-      ':\n+    """\n+    @classmethod\n+    def ' +
+      'AnotherTestJob(jobs.JobTestBase):\n' +
+      '+    """\n+    @classmethod\n+    def ' +
       'entity_classes_to_map_over(cls):\n+        """Return a list' +
       ' of datastore class references to map over."""\n+        ' +
       'return [exp_models.ExplorationSnapshotMetadataModel]\n+\n+    ' +
@@ -346,25 +347,25 @@ describe('Pull Request Job Spec', () => {
 
   const jobTestFile = {
     sha: 'd144f32b9812373d5f1bc9f94d9af795f09023ff',
-    filename: 'core/domain/exp_jobs_oppiabot_off_test.py',
+    filename: 'core/jobs/exp_jobs_oppiabot_off_test.py',
     status: 'added',
     additions: 1,
     deletions: 0,
     changes: 1,
     blob_url:
       'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130' +
-      'e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
+      'e110d7e9833c/core/jobs/exp_jobs_oppiabot_off.py',
     raw_url:
       'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130' +
-      'e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
+      'e110d7e9833c/core/jobs/exp_jobs_oppiabot_off.py',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/domain/' +
+      'https://api.github.com/repos/oppia/oppia/contents/core/jobs/' +
       'exp_jobs_oppiabot_off.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
-    patch: '@@ -0,0 +1 @@\n+class TestOneOffJobTests' +
-      '(jobs.BaseMapReduceOneOffJobManager):\n+    """One-off job for ' +
-      'creating and populating UserContributionsModels for ' +
-      '\n+class AnotherTestOneOffJobTests(' +
-      'jobs.BaseMapReduceOneOffJobManager):\n+    """\n+    ' +
+    patch: '@@ -0,0 +1 @@\n+class TestJobTests(jobs.JobTestBase):\n' +
+      '+    """One-off job for creating and populating ' +
+      'UserContributionsModels for \n' +
+      '+class AnotherTestJobTests(jobs.JobTestBase):\n' +
+      '+    """\n+    ' +
       '@classmethod\n+    def entity_classes_to_map_over(cls):' +
       '\n+        """Return a list of datastore class references to ' +
       'map over."""\n+        return [exp_models.' +
@@ -390,26 +391,6 @@ describe('Pull Request Job Spec', () => {
       'user_services.create_user_contributions(\n+                ' +
       'key, list(created_exploration_ids), list(\n+                    ' +
       'edited_exploration_ids))\n',
-  };
-
-  const registryFileObjWithNewjob = {
-    sha: 'd144f32b9812373d5f1bc9f94d9af795f09023ff',
-    filename: 'core/jobs_registry.py',
-    status: 'modified',
-    additions: 1,
-    deletions: 0,
-    changes: 1,
-    blob_url:
-      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130' +
-      'e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
-    raw_url:
-      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130' +
-      'e110d7e9833c/core/domain/exp_jobs_oppiabot_off.py',
-    contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/domain/' +
-      'exp_jobs_oppiabot_off.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
-    patch: '@@ -0,0 +1 @@\n+# exp_jobs_oppiabot_off.SecondTestOneOffJob ' +
-      'exp_jobs_one_off.FirstTestOneOffJob',
   };
 
   const nonJobFile = {
@@ -471,9 +452,7 @@ describe('Pull Request Job Spec', () => {
     beforeEach(async () => {
       github.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
-          data: [
-            nonJobFile, firstNewJobFileObj
-          ],
+          data: [nonJobFile, firstNewJobFileObj],
         }),
       };
       payloadData.payload.pull_request.changed_files = 2;
@@ -489,7 +468,6 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should ping server jobs admin', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
       const author = payloadData.payload.pull_request.user.login;
       const formText = (
         'server jobs form'.link(
@@ -498,22 +476,17 @@ describe('Pull Request Job Spec', () => {
       const newLineFeed = '<br>';
       const wikiLinkText = 'this guide'.link(
         JOBS_AND_FETURES_TESTING_WIKI_LINK);
-      const jobRegistryLink = (
-        'job registry'.link(
-          'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py')
-      );
       const jobNameLink = (
-        'FirstTestOneOffJob'.link(firstNewJobFileObj.blob_url)
+        'FirstTestJob'.link(firstNewJobFileObj.blob_url)
       );
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @vojtechjelinek, PTAL at this PR, ' +
-          'it adds a new one off job. The name of the job is ' +
-          jobNameLink + '.' + newLineFeed + 'Also @' + author +
-          ', please add the new job ' + 'to the ' + jobRegistryLink +
-          ' and please make sure to fill in the ' + formText +
+          'it adds a new job. The name of the job is ' + jobNameLink + '.' +
+          newLineFeed +
+          'Also @' + author + ', please make sure to fill in the ' + formText +
           ' for the new job to be tested on the backup server. ' +
           'This PR can be merged only after the test run is successful. ' +
           'Please refer to ' + wikiLinkText + ' for details.' +
@@ -582,19 +555,18 @@ describe('Pull Request Job Spec', () => {
           'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py')
       );
       const firstJobNameLink = (
-        'FirstTestOneOffJob'.link(firstNewJobFileObj.blob_url)
+        'FirstTestJob'.link(firstNewJobFileObj.blob_url)
       );
       const secondJobNameLink = (
-        'SecondTestOneOffJob'.link(secondNewJobFileObj.blob_url)
+        'SecondTestJob'.link(secondNewJobFileObj.blob_url)
       );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @vojtechjelinek, PTAL at this PR, ' +
-          'it adds new one off jobs. The jobs are ' + firstJobNameLink +
+          'it adds new jobs. The jobs are ' + firstJobNameLink +
           ', ' + secondJobNameLink + '.' + newLineFeed + 'Also @' +
-          author + ', please add the new jobs ' + 'to the ' +
-          jobRegistryLink + ' and please make sure to fill in the ' +
+          author + ', please make sure to fill in the ' +
           formText + ' for the new jobs to be tested on the backup server. ' +
           'This PR can be merged only after the test run is successful. ' +
           'Please refer to ' + wikiLinkText + ' for details.' +
@@ -633,12 +605,11 @@ describe('Pull Request Job Spec', () => {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
             nonJobFile,
-            firstNewJobFileObj,
-            registryFileObjWithNewjob
+            firstNewJobFileObj
           ],
         }),
       };
-      payloadData.payload.pull_request.changed_files = 3;
+      payloadData.payload.pull_request.changed_files = 2;
       await robot.receive(payloadData);
     });
 
@@ -660,14 +631,14 @@ describe('Pull Request Job Spec', () => {
       const wikiLinkText = 'this guide'.link(
         JOBS_AND_FETURES_TESTING_WIKI_LINK);
       const jobNameLink = (
-        'FirstTestOneOffJob'.link(firstNewJobFileObj.blob_url)
+        'FirstTestJob'.link(firstNewJobFileObj.blob_url)
       );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
             'Hi @vojtechjelinek, PTAL at this PR, ' +
-            'it adds a new one off job. The name of the job is ' +
-            jobNameLink + '.' + newLineFeed + 'Also @' + author +
+            'it adds a new job. The name of the job is ' + jobNameLink + '.' +
+            newLineFeed + 'Also @' + author +
             ', please make sure to fill in the ' + formText +
             ' for the new job to be tested on the backup server. ' +
             'This PR can be merged only after the test run is successful. ' +
@@ -736,17 +707,16 @@ describe('Pull Request Job Spec', () => {
           'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py')
       );
       const jobNameLink = (
-        'OppiabotContributionsOneOffJob'
+        'OppiabotContributionsJob'
           .link(modifiedExistingJobFileObj.blob_url)
       );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @vojtechjelinek, PTAL at this PR, ' +
-          'it adds a new one off job. The name of the job is ' + jobNameLink +
-          '.' + newLineFeed + 'Also @' + author + ', please add the new job ' +
-          'to the ' + jobRegistryLink + ' and please make sure to fill ' +
-          'in the ' + formText + ' for the new job to be tested on the ' +
+          'it adds a new job. The name of the job is ' + jobNameLink +
+          '.' + newLineFeed + 'Also @' + author + ', please make sure to ' +
+          'fill in the ' + formText + ' for the new job to be tested on the ' +
           'backup server. ' + 'This PR can be merged only after the test ' +
           'run is successful. ' + 'Please refer to ' + wikiLinkText +
           ' for details.' + newLineFeed + 'Thanks!',
@@ -931,22 +901,22 @@ describe('Pull Request Job Spec', () => {
         firstNewJobFileObj
       );
       expect(jobs.length).toBe(1);
-      expect(jobs[0]).toBe('FirstTestOneOffJob');
+      expect(jobs[0]).toBe('FirstTestJob');
 
       jobs = checkPullRequestJobModule.getNewJobsFromFile(secondNewJobFileObj);
       expect(jobs.length).toBe(1);
-      expect(jobs[0]).toBe('SecondTestOneOffJob');
+      expect(jobs[0]).toBe('SecondTestJob');
 
       jobs = checkPullRequestJobModule.getNewJobsFromFile(
         modifiedExistingJobFileObj
       );
       expect(jobs.length).toBe(1);
-      expect(jobs[0]).toBe('OppiabotContributionsOneOffJob');
+      expect(jobs[0]).toBe('OppiabotContributionsJob');
 
       jobs = checkPullRequestJobModule.getNewJobsFromFile(fileWithMultipleJobs);
       expect(jobs.length).toBe(2);
-      expect(jobs[0]).toBe('TestOneOffJob');
-      expect(jobs[1]).toBe('AnotherTestOneOffJob');
+      expect(jobs[0]).toBe('TestJob');
+      expect(jobs[1]).toBe('AnotherTestJob');
 
       jobs = checkPullRequestJobModule.getNewJobsFromFile(jobTestFile);
       expect(jobs.length).toBe(0);
@@ -958,7 +928,7 @@ describe('Pull Request Job Spec', () => {
       jobs = checkPullRequestJobModule.getNewJobsFromFile(
         jobFileObjWithJobClassInPatchAndNewJob);
       expect(jobs.length).toBe(1);
-      expect(jobs[0]).toBe('AnotherTestOneOffJob');
+      expect(jobs[0]).toBe('AnotherTestJob');
     });
   });
 });
