@@ -12,21 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const { pingAndAssignUsers } = require('./utils');
 
 /**
  *
  * @fileoverview File to handle checks when a PR fails CI checks.
  */
 
+ const core = require('@actions/core');
+ const { context, GitHub } = require('@actions/github');
+ const { commentAndAssignUsers } = require('../utils');
+
 /**
  * This function checks for CI test failure and pings PR author.
- * @param {import('probot').Context} context
+ * @param {import('@octokit/rest').Octokit} octokit
+ * @returns{Promise<Boolean>}
  */
-const handleFailure = async (context) => {
-  /**
-   * @type {import('probot').Octokit.ChecksGetSuiteResponse} checkSuite
-   */
+const handleFailure = async () => {
+  
+  const token = core.getInput('repo-token');
+  const octokit = new GitHub(token);
   const checkSuite = context.payload.check_suite;
   if (checkSuite.conclusion === 'failure') {
     // Some checks fail in develop due to a PR being merged.
@@ -38,21 +42,18 @@ const handleFailure = async (context) => {
       // pull request data, hence we need to fetch the pull request
       // so we can get the author.
       const pullRequestData = checkSuite.pull_requests[0];
-      const pullRequestResponse = await context.github.pulls.get(
-        context.repo({
+      const pullRequestResponse = await octokit.pulls.get(
+        {
           pull_number: pullRequestData.number,
-        })
+          ...context.repo
+        }
       );
       const pullRequest = pullRequestResponse.data;
       const prAuthor = pullRequest.user.login;
 
       const commentBody =
-        'Hi @' +
-        prAuthor +
-        ', there are some failing CI checks in your latest push ' +
-        ' If you think this is due to a flake, please file an issue ' +
-        'before restarting the tests. Thanks!';
-      await pingAndAssignUsers(context, pullRequest, [prAuthor], commentBody);
+        'Hi @' + prAuthor + ', there are some failing CI checks in your latest push ' + ' If you think this is due to a flake, please file an issue ' + 'before restarting the tests. Thanks!';
+      await commentAndAssignUsers(octokit, pullRequest, [prAuthor], commentBody);
     }
   }
 };

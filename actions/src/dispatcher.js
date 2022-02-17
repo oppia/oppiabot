@@ -23,6 +23,7 @@ const claCheckGithubActionModule = require('./pull_requests/claCheck');
 const constants = require('../../constants');
 const PRLabelsModule = require('./pull_requests/labelCheck');
 const wipDraftModule = require('./pull_requests/checkWipDraftPR');
+const ciCheckModule = require('./pull_requests/ciChecks');
 
 module.exports = {
   async dispatch(event, action) {
@@ -57,6 +58,10 @@ module.exports = {
             case constants.wipCheck:
               core.info('WIP check triggered');
               await wipDraftModule.checkWIP();
+              break;
+            case constants.ciFailureCheck:
+              core.info('CI check triggered');
+              await ciCheckModule.handleFailure();
               break;
           }
         }
