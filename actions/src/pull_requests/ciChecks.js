@@ -29,8 +29,7 @@
  */
 const handleFailure = async () => {
   
-  const token = core.getInput('repo-token');
-  const octokit = new GitHub(token);
+  const octokit = new GitHub(core.getInput('repo-token'));
   const checkSuite = context.payload.check_suite;
   if (checkSuite.conclusion === 'failure') {
     // Some checks fail in develop due to a PR being merged.
@@ -52,7 +51,11 @@ const handleFailure = async () => {
       const prAuthor = pullRequest.user.login;
 
       const commentBody =
-        'Hi @' + prAuthor + ', there are some failing CI checks in your latest push ' + ' If you think this is due to a flake, please file an issue ' + 'before restarting the tests. Thanks!';
+        'Hi @' + 
+        prAuthor + 
+        ', there are some failing CI checks in your latest push ' + 
+        ' If you think this is due to a flake, please file an issue ' + 
+        'before restarting the tests. Thanks!';
       await commentAndAssignUsers(octokit, pullRequest, [prAuthor], commentBody);
     }
   }
