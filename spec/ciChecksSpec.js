@@ -25,7 +25,6 @@ const ciCheckModule = require('../actions/src/pull_requests/ciChecks');
 const dispatcher = require('../actions/src/dispatcher');
 
 describe('CI Checks', () => {
-
   /**
    * @type {import('@actions/github').GitHub} octokit
    */
@@ -40,15 +39,14 @@ describe('CI Checks', () => {
   };
 
   beforeEach(async () => {
-
     github.context.eventName = payloadData.name;
-    github.context.payload =payloadData.payload;
-    github.context.pull_request =pullRequest;
+    github.context.payload = payloadData.payload;
+    github.context.pull_request = pullRequest;
 
     octokit = {
       issues: {
-        createComment: jasmine.createSpy('createComment').and.callFake(() => {}),
-        addAssignees: jasmine.createSpy('addAssignees').and.callFake(() => {}),
+        createComment: jasmine.createSpy('createComment').and.callFake(()=>{}),
+        addAssignees: jasmine.createSpy('addAssignees').and.callFake(()=>{}),
       },
       pulls: {
         get: jasmine.createSpy('get').and.resolveTo({
