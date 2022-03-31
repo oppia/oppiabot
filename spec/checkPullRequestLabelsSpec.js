@@ -665,11 +665,9 @@ describe('Pull Request Label Check', () => {
     const label = {
       id: 638839900,
       node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-      url:
-        'https://api.github.com/repos/oppia/oppia/' +
-        'labels/PR%3A%20Needs%20to%20be%20hotfixed',
+      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
       name: 'PR: Needs to be hotfixed',
-      color: '006B75',
+      color: '00FF00',
     };
 
     beforeEach(async () => {
