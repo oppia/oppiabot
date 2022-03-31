@@ -16,15 +16,16 @@ require('dotenv').config();
 const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
-const checkWipDraftPRModule = require('../lib/checkWipDraftPR');
 const scheduler = require('../lib/scheduler');
 const pullRequestPayload = require('../fixtures/pullRequestPayload.json');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
-const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
-const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
+const checkCriticalPullRequestModule =
+  require('../lib/checkCriticalPullRequest');
+const checkPullRequestTemplateModule =
+  require('../lib/checkPullRequestTemplate');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 
 describe('Pull Request Branch Check', () => {
@@ -44,19 +45,21 @@ describe('Pull Request Branch Check', () => {
   let app;
 
   beforeEach(() => {
-    spyOn(scheduler, 'createScheduler').and.callFake(() => {});
+    spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     // Spy on other modules that will be triggered by the payload.
-    spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => {});
+    spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
       checkPullRequestLabelsModule,
       'checkChangelogLabel'
-    ).and.callFake(() => {});
-    spyOn(checkWipDraftPRModule, 'checkWIP').and.callFake(() => {});
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
-    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callFake(() => {});
-    spyOn(checkPullRequestTemplateModule,'checkTemplate').and.callFake(() => {});
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
+    ).and.callFake(() => { });
+    spyOn(checkPullRequestJobModule, 'checkForNewJob')
+      .and.callFake(() => { });
+    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')
+      .and.callFake(() => { });
+    spyOn(checkPullRequestTemplateModule, 'checkTemplate')
+      .and.callFake(() => { });
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
 
     github = {
       issues: {
@@ -90,16 +93,18 @@ describe('Pull Request Branch Check', () => {
       it('should create appropriate comment', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
         const author = pullRequestPayload.payload.pull_request.user.login;
-        const wiki = 'wiki'.link(
-          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-            'instructions-for-making-a-code-change'
+        const wiki = (
+          'wiki'.link(
+            'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+          'instructions-for-making-a-code-change')
         );
         const commentBody =
           'Hi @' +
           author +
-          ', PRs made from develop branch or from a ' +
-          'branch whose name is prefixed with develop, release or test are ' +
-          'not allowed. So this PR is being closed. Please make your changes ' +
+          ', PRs made from develop branch are not allowed. Also PRs made from' +
+          ' develop branch or from a branch whose name is prefixed with ' +
+          'develop, release or test are not allowed. ' +
+          'So this PR is being closed. Please make your changes ' +
           'in another branch and send in the PR. To learn more about ' +
           'contributing to Oppia, take a look at our ' +
           wiki +
@@ -123,6 +128,55 @@ describe('Pull Request Branch Check', () => {
       });
     });
 
+    describe('develop prefixed branch check', () => {
+      beforeEach(async () => {
+        pullRequestPayload.payload.pull_request.head.ref = 'develop-2';
+        await app.receive(pullRequestPayload);
+      });
+
+      it('should call appropriate module', async () => {
+        expect(checkPullRequestBranchModule.checkBranch).toHaveBeenCalled();
+      });
+
+      it('should create appropriate comment', () => {
+        expect(github.issues.createComment).toHaveBeenCalled();
+        const author = pullRequestPayload.payload.pull_request.user.login;
+        const wiki = (
+          'wiki'.link(
+            'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+          'instructions-for-making-a-code-change')
+        );
+        const commentBody =
+          'Hi @' +
+          author +
+          ', PRs made from a branch whose name is prefixed with develop ' +
+          'are not allowed. Also PRs made from develop branch or from a ' +
+          'branch whose name is prefixed with develop, release or test ' +
+          'are not allowed. So this PR is being closed. Please make your ' +
+          'changes in another branch and send in the PR. To learn more ' +
+          'about contributing to Oppia, take a look at our ' +
+          wiki +
+          ' (Rule 1 specifically). Thanks!';
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          issue_number: pullRequestPayload.payload.pull_request.number,
+          owner: pullRequestPayload.payload.repository.owner.login,
+          repo: pullRequestPayload.payload.repository.name,
+          body: commentBody,
+        });
+      });
+
+      it('should close pull request', () => {
+        expect(github.issues.update).toHaveBeenCalled();
+        expect(github.issues.update).toHaveBeenCalledWith({
+          issue_number: pullRequestPayload.payload.pull_request.number,
+          owner: pullRequestPayload.payload.repository.owner.login,
+          repo: pullRequestPayload.payload.repository.name,
+          state: 'closed',
+        });
+      });
+    });
+
+
     describe('release branch check', () => {
       beforeEach(async () => {
         pullRequestPayload.payload.pull_request.head.ref = 'release-2';
@@ -136,18 +190,20 @@ describe('Pull Request Branch Check', () => {
       it('should create appropriate comment', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
         const author = pullRequestPayload.payload.pull_request.user.login;
-        const wiki = 'wiki'.link(
-          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-            'instructions-for-making-a-code-change'
+        const wiki = (
+          'wiki'.link(
+            'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+          'instructions-for-making-a-code-change')
         );
         const commentBody =
           'Hi @' +
           author +
-          ', PRs made from develop branch or from a ' +
-          'branch whose name is prefixed with develop, release or test are ' +
-          'not allowed. So this PR is being closed. Please make your changes ' +
-          'in another branch and send in the PR. To learn more about ' +
-          'contributing to Oppia, take a look at our ' +
+          ', PRs made from a branch whose name is prefixed with release ' +
+          'are not allowed. Also PRs made from develop branch or from a ' +
+          'branch whose name is prefixed with develop, release or test ' +
+          'are not allowed. So this PR is being closed. Please make your ' +
+          'changes in another branch and send in the PR. To learn more ' +
+          'about contributing to Oppia, take a look at our ' +
           wiki +
           ' (Rule 1 specifically). Thanks!';
         expect(github.issues.createComment).toHaveBeenCalledWith({
@@ -182,18 +238,20 @@ describe('Pull Request Branch Check', () => {
       it('should create appropriate comment', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
         const author = pullRequestPayload.payload.pull_request.user.login;
-        const wiki = 'wiki'.link(
-          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-            'instructions-for-making-a-code-change'
+        const wiki = (
+          'wiki'.link(
+            'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+          'instructions-for-making-a-code-change')
         );
         const commentBody =
           'Hi @' +
           author +
-          ', PRs made from develop branch or from a ' +
-          'branch whose name is prefixed with develop, release or test are ' +
-          'not allowed. So this PR is being closed. Please make your changes ' +
-          'in another branch and send in the PR. To learn more about ' +
-          'contributing to Oppia, take a look at our ' +
+          ', PRs made from a branch whose name is prefixed with test ' +
+          'are not allowed. Also PRs made from develop branch or from a ' +
+          'branch whose name is prefixed with develop, release or test ' +
+          'are not allowed. So this PR is being closed. Please make your ' +
+          'changes in another branch and send in the PR. To learn more ' +
+          'about contributing to Oppia, take a look at our ' +
           wiki +
           ' (Rule 1 specifically). Thanks!';
         expect(github.issues.createComment).toHaveBeenCalledWith({

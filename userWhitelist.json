@@ -5,26 +5,33 @@
     "vojtechjelinek",
     "ankita240796",
     "DubeySandeep",
-    "BenHenning"
+    "BenHenning",
+    "kevintab95",
+    "seanlip",
+    "U8NWXD"
   ],
   "goodFirstIssue": [
     "U8NWXD",
     "kevintab95",
     "seanlip",
     "ankita240796",
-    "Showtim3",
+    "DubeySandeep",
     "bansalnitish",
     "vojtechjelinek",
     "marianazangrossi",
     "brianrodri",
     "nithusha21",
-    "aks681"
+    "aks681",
+    "srijanreddy98"
   ],
+  "codeOwnerFileReviewer":"DubeySandeep",
   "teamLeads": {
-    "onboardingTeam": "Showtim3",
+    "onboardingTeam": "DubeySandeep",
     "releaseTeam": "vojtechjelinek",
-    "welfareTeam": "Showtim3"
+    "welfareTeam": "DubeySandeep"
   },
   "oppiaMaintainers": "oppia/core-maintainers",
-  "SERVER_JOBS_ADMIN": "seanlip"
+  "oppiaReleaseCoordinators": "oppia/release-coordinators",
+  "oppiaDevWorkflowTeam": "oppia/dev-workflow-team",
+  "serverJobAdmins": ["vojtechjelinek"]
 }

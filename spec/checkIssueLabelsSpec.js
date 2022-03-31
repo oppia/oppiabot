@@ -151,9 +151,11 @@ describe('Check Issue Labels Module', () => {
       expect(octokit.issues.createComment).toHaveBeenCalled();
 
       const user = payload.sender.login;
-      const link = 'here'.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-        'labeling-issues-and-pull-requests');
+      const link = (
+        'here'.link(
+          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+        'labeling-issues-and-pull-requests')
+      );
       const body = (
         'Hi @' + user + ', changelog labels should not be used on issues.' +
         ' I’m removing the label. You can learn more about labels ' + link +
@@ -193,9 +195,11 @@ describe('Check Issue Labels Module', () => {
       expect(octokit.issues.createComment).toHaveBeenCalled();
 
       const user = payload.sender.login;
-      const link = 'here'.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-        'labeling-issues-and-pull-requests');
+      const link = (
+        'here'.link(
+          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+        'labeling-issues-and-pull-requests')
+      );
       const body = (
         'Hi @' + user + ', the ' + testLabel + ' label should only be used ' +
         'in pull requests. I’m removing the label. You can learn more ' +
@@ -238,12 +242,12 @@ describe('Check Issue Labels Module', () => {
     it('should not remove the label', () => {
       expect(octokit.issues.removeLabel).not.toHaveBeenCalled();
     });
-  })
+  });
 
 
   describe('check non whitelisted repo', () => {
     beforeEach(async () => {
-      payload.repository.name = 'non-whitelisted-repo'
+      payload.repository.name = 'non-whitelisted-repo';
       await dispatcher.dispatch('issues', 'labeled');
     });
 
@@ -262,5 +266,5 @@ describe('Check Issue Labels Module', () => {
     it('should not assign team lead', () => {
       expect(octokit.issues.addAssignees).not.toHaveBeenCalled();
     });
-  })
+  });
 });

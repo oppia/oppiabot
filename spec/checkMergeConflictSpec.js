@@ -1,3 +1,17 @@
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 require('dotenv').config();
 const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
@@ -5,6 +19,7 @@ const oppiaBot = require('../index');
 const checkMergeConflictModule = require('../lib/checkMergeConflicts');
 const scheduler = require('../lib/scheduler');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
+const checkCronJobModule = require('../lib/checkNewCronJobs');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const checkCriticalPullRequestModule = require(
   '../lib/checkCriticalPullRequest'
@@ -37,10 +52,10 @@ describe('Merge Conflict Check', () => {
       "PR:%20don't%20merge%20-%20HAS%20MERGE%20CONFLICTS",
     name: "PR: don't merge - HAS MERGE CONFLICTS",
     color: 'd93f0b',
-    default: false,
+    'default': false,
   };
   beforeEach(() => {
-    spyOn(scheduler, 'createScheduler').and.callFake(() => {});
+    spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
       issues: {
@@ -59,12 +74,13 @@ describe('Merge Conflict Check', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
+    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(checkCronJobModule, 'checkForNewCronJob').and.callFake(() => { });
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
     spyOn(
       checkCriticalPullRequestModule,
       'checkIfPRAffectsDatastoreLayer'
-    ).and.callFake(() => {});
+    ).and.callFake(() => { });
 
     spyOn(
       checkMergeConflictModule,
@@ -116,9 +132,10 @@ describe('Merge Conflict Check', () => {
     it('pings pr author regarding merge conflict', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
 
-      const link = 'link'.link(
-        'https://help.github.com/articles/resolving-a-merge' +
-          '-conflict-using-the-command-line/'
+      const link = (
+        'link'.link(
+          'https://help.github.com/articles/resolving-a-merge' +
+        '-conflict-using-the-command-line/')
       );
       const params = {
         repo: payloadData.payload.repository.name,
@@ -156,7 +173,7 @@ describe('Merge Conflict Check', () => {
         issue_number: payloadData.payload.pull_request.number,
         assignees: [payloadData.payload.pull_request.user.login],
       };
-    })
+    });
   });
 
   describe('pull request merge does not result in merge conflict', () => {
@@ -206,164 +223,164 @@ describe('Merge Conflict Check', () => {
   describe(
     'pull request with resolved merge conflicts has merge conflict label',
     () => {
-    beforeEach(async () => {
-      // Set event to pull_request.synchronize.
-      payloadData.payload.action = 'synchronize';
+      beforeEach(async () => {
+        // Set event to pull_request.synchronize.
+        payloadData.payload.action = 'synchronize';
 
-      // Create new pull request from payload data.
-      const pullRequestToBeChecked = { ...payloadData.payload.pull_request };
-      pullRequestToBeChecked.merged = false;
-      pullRequestToBeChecked.mergeable = true;
+        // Create new pull request from payload data.
+        const pullRequestToBeChecked = { ...payloadData.payload.pull_request };
+        pullRequestToBeChecked.merged = false;
+        pullRequestToBeChecked.mergeable = true;
 
-      // Add merge conflict label to new pull request.
-      pullRequestToBeChecked.labels.push(mergeConflictLabel);
+        // Add merge conflict label to new pull request.
+        pullRequestToBeChecked.labels.push(mergeConflictLabel);
 
-      github.pulls = {
-        get: jasmine.createSpy('get').and.resolveTo({
-          data: pullRequestToBeChecked,
-        }),
-        list: jasmine.createSpy('list').and.resolveTo({
-          data: [pullRequestToBeChecked],
-        }),
-      };
+        github.pulls = {
+          get: jasmine.createSpy('get').and.resolveTo({
+            data: pullRequestToBeChecked,
+          }),
+          list: jasmine.createSpy('list').and.resolveTo({
+            data: [pullRequestToBeChecked],
+          }),
+        };
 
-      await robot.receive(payloadData);
+        await robot.receive(payloadData);
+      });
+
+      it('should check for merge conflict', () => {
+        expect(
+          checkMergeConflictModule.checkMergeConflictsInPullRequest
+        ).toHaveBeenCalled();
+      });
+
+      it('should not ping pr author', () => {
+        expect(github.issues.createComment).not.toHaveBeenCalled();
+      });
+
+      it('should not add merge conflict label', () => {
+        expect(github.issues.addLabels).not.toHaveBeenCalled();
+      });
+
+      it('removes merge conflict label', () => {
+        expect(github.issues.removeLabel).toHaveBeenCalled();
+        const params = {
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.pull_request.number,
+          name: mergeConflictLabel.name,
+        };
+        expect(github.issues.removeLabel).toHaveBeenCalledWith(params);
+      });
     });
-
-    it('should check for merge conflict', () => {
-      expect(
-        checkMergeConflictModule.checkMergeConflictsInPullRequest
-      ).toHaveBeenCalled();
-    });
-
-    it('should not ping pr author', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
-    });
-
-    it('should not add merge conflict label', () => {
-      expect(github.issues.addLabels).not.toHaveBeenCalled();
-    });
-
-    it('removes merge conflict label', () => {
-      expect(github.issues.removeLabel).toHaveBeenCalled();
-      const params = {
-        repo: payloadData.payload.repository.name,
-        owner: payloadData.payload.repository.owner.login,
-        issue_number: payloadData.payload.pull_request.number,
-        name: mergeConflictLabel.name,
-      };
-      expect(github.issues.removeLabel).toHaveBeenCalledWith(params);
-    });
-  });
 
   describe(
     'pull request with unresolved merge conflicts has merge conflict label ' +
     'and unassigned author', () => {
-    beforeEach(async () => {
-      // Set event to pull_request.synchronize.
-      payloadData.payload.action = 'synchronize';
+      beforeEach(async () => {
+        // Set event to pull_request.synchronize.
+        payloadData.payload.action = 'synchronize';
 
-      // Create new pull request from payload data.
-      const pullRequestToBeChecked = { ...payloadData.payload.pull_request };
-      pullRequestToBeChecked.merged = false;
-      pullRequestToBeChecked.mergeable = false;
+        // Create new pull request from payload data.
+        const pullRequestToBeChecked = { ...payloadData.payload.pull_request };
+        pullRequestToBeChecked.merged = false;
+        pullRequestToBeChecked.mergeable = false;
 
-      // Add merge conflict label to new pull request.
-      pullRequestToBeChecked.labels.push(mergeConflictLabel);
+        // Add merge conflict label to new pull request.
+        pullRequestToBeChecked.labels.push(mergeConflictLabel);
 
-      github.pulls = {
-        get: jasmine.createSpy('get').and.resolveTo({
-          data: pullRequestToBeChecked,
-        }),
-        list: jasmine.createSpy('list').and.resolveTo({
-          data: [pullRequestToBeChecked],
-        }),
-      };
+        github.pulls = {
+          get: jasmine.createSpy('get').and.resolveTo({
+            data: pullRequestToBeChecked,
+          }),
+          list: jasmine.createSpy('list').and.resolveTo({
+            data: [pullRequestToBeChecked],
+          }),
+        };
 
-      await robot.receive(payloadData);
-    });
+        await robot.receive(payloadData);
+      });
 
-    it('should check for merge conflict', () => {
-      expect(
-        checkMergeConflictModule.checkMergeConflictsInPullRequest
-      ).toHaveBeenCalled();
-    });
+      it('should check for merge conflict', () => {
+        expect(
+          checkMergeConflictModule.checkMergeConflictsInPullRequest
+        ).toHaveBeenCalled();
+      });
 
-    it('should not ping pr author', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
-    });
+      it('should not ping pr author', () => {
+        expect(github.issues.createComment).not.toHaveBeenCalled();
+      });
 
-    it('should assign pr author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
-        repo: payloadData.payload.repository.name,
-        owner: payloadData.payload.repository.owner.login,
-        issue_number: payloadData.payload.pull_request.number,
-        assignees: [payloadData.payload.pull_request.user.login]
+      it('should assign pr author', () => {
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.pull_request.number,
+          assignees: [payloadData.payload.pull_request.user.login]
+        });
+      });
+
+      it('should not add merge conflict label', () => {
+        expect(github.issues.addLabels).not.toHaveBeenCalled();
+      });
+
+      it('should not remove merge conflict label', () => {
+        expect(github.issues.removeLabel).not.toHaveBeenCalled();
       });
     });
-
-    it('should not add merge conflict label', () => {
-      expect(github.issues.addLabels).not.toHaveBeenCalled();
-    });
-
-    it('should not remove merge conflict label', () => {
-      expect(github.issues.removeLabel).not.toHaveBeenCalled();
-    });
-  });
 
   describe(
     'pull request with unresolved merge conflicts has merge conflict label ' +
     'and assigned author', () => {
-    beforeEach(async () => {
-      // Set event to pull_request.synchronize.
-      payloadData.payload.action = 'synchronize';
+      beforeEach(async () => {
+        // Set event to pull_request.synchronize.
+        payloadData.payload.action = 'synchronize';
 
-      // Create new pull request from payload data.
-      const pullRequestToBeChecked = { ...payloadData.payload.pull_request };
-      pullRequestToBeChecked.merged = false;
-      pullRequestToBeChecked.mergeable = false;
+        // Create new pull request from payload data.
+        const pullRequestToBeChecked = { ...payloadData.payload.pull_request };
+        pullRequestToBeChecked.merged = false;
+        pullRequestToBeChecked.mergeable = false;
 
-      // Add merge conflict label to new pull request.
-      pullRequestToBeChecked.labels.push(mergeConflictLabel);
+        // Add merge conflict label to new pull request.
+        pullRequestToBeChecked.labels.push(mergeConflictLabel);
 
-      // Add author to list of assignees.
-      pullRequestToBeChecked.assignees.push(pullRequestToBeChecked.user);
+        // Add author to list of assignees.
+        pullRequestToBeChecked.assignees.push(pullRequestToBeChecked.user);
 
-      github.pulls = {
-        get: jasmine.createSpy('get').and.resolveTo({
-          data: pullRequestToBeChecked,
-        }),
-        list: jasmine.createSpy('list').and.resolveTo({
-          data: [pullRequestToBeChecked],
-        }),
-      };
+        github.pulls = {
+          get: jasmine.createSpy('get').and.resolveTo({
+            data: pullRequestToBeChecked,
+          }),
+          list: jasmine.createSpy('list').and.resolveTo({
+            data: [pullRequestToBeChecked],
+          }),
+        };
 
-      await robot.receive(payloadData);
+        await robot.receive(payloadData);
+      });
+
+      it('should check for merge conflict', () => {
+        expect(
+          checkMergeConflictModule.checkMergeConflictsInPullRequest
+        ).toHaveBeenCalled();
+      });
+
+      it('should not ping pr author', () => {
+        expect(github.issues.createComment).not.toHaveBeenCalled();
+      });
+
+      it('should not add merge conflict label', () => {
+        expect(github.issues.addLabels).not.toHaveBeenCalled();
+      });
+
+      it('should not assign pr author', () => {
+        expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      });
+
+      it('should not remove merge conflict label', () => {
+        expect(github.issues.removeLabel).not.toHaveBeenCalled();
+      });
     });
-
-    it('should check for merge conflict', () => {
-      expect(
-        checkMergeConflictModule.checkMergeConflictsInPullRequest
-      ).toHaveBeenCalled();
-    });
-
-    it('should not ping pr author', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
-    });
-
-    it('should not add merge conflict label', () => {
-      expect(github.issues.addLabels).not.toHaveBeenCalled();
-    });
-
-    it('should not assign pr author', () => {
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
-    });
-
-    it('should not remove merge conflict label', () => {
-      expect(github.issues.removeLabel).not.toHaveBeenCalled();
-    });
-  });
 
   describe('pull request merged with the update other PRs label', () => {
     const firstPullRequest = {
@@ -399,11 +416,11 @@ describe('Merge Conflict Check', () => {
 
       spyOn(
         checkMergeConflictModule, 'checkMergeConflictsInAllPullRequests'
-      ).and.callFake(() => {});
+      ).and.callFake(() => { });
 
       // Add label to pull request.
       payloadData.payload.pull_request.labels.push({
-        name: "PR: require post-merge sync to HEAD"
+        name: 'PR: require post-merge sync to HEAD'
       });
       await robot.receive(payloadData);
     });
@@ -416,18 +433,20 @@ describe('Merge Conflict Check', () => {
 
     it('should fetch all pull request', () => {
       expect(github.pulls.list).toHaveBeenCalled();
-    })
+    });
 
     it('should comment on all open pull requests', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledTimes(2);
-      const linkToChange = 'new change'.link(
-        payloadData.payload.pull_request.html_url
+      const linkToChange = (
+        'new change'.link(
+          payloadData.payload.pull_request.html_url)
       );
-      const linkToWiki = 'link'.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-        'instructions-for-making-a-code-change'
-      )
+      const linkToWiki = (
+        'link'.link(
+          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
+        'instructions-for-making-a-code-change')
+      );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -478,7 +497,7 @@ describe('Merge Conflict Check', () => {
         issue_number: secondPullRequest.number,
         assignees: [secondPullRequest.user.login]
       });
-    })
+    });
 
     afterEach(() => {
       payloadData.payload.pull_request.labels.pop();
@@ -519,7 +538,7 @@ describe('Merge Conflict Check', () => {
 
       spyOn(
         checkMergeConflictModule, 'checkMergeConflictsInAllPullRequests'
-      ).and.callFake(() => {});
+      ).and.callFake(() => { });
 
       await robot.receive(payloadData);
     });
@@ -540,6 +559,6 @@ describe('Merge Conflict Check', () => {
 
     it('should not assign PR author', () => {
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
-    })
+    });
   });
 });

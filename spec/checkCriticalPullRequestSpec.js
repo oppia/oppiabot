@@ -21,19 +21,17 @@ const { createProbot } = require('probot');
 // The plugin refers to the actual app in index.js.
 const oppiaBot = require('../index');
 const checkPullRequestJobModule = require('../lib/checkPullRequestJob');
+const checkCronJobModule = require('../lib/checkNewCronJobs');
 const apiForSheetsModule = require('../lib/apiForSheets');
 const checkPullRequestLabelsModule = require('../lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('../lib/checkPullRequestBranch');
-const checkWIPModule = require('../lib/checkWipDraftPR');
-const checkCriticalPullRequestModule = require('../lib/checkCriticalPullRequest');
-const checkPullRequestTemplateModule = require('../lib/checkPullRequestTemplate');
+const checkCriticalPullRequestModule =
+  require('../lib/checkCriticalPullRequest');
+const checkPullRequestTemplateModule =
+  require('../lib/checkPullRequestTemplate');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
-const {
-  teamLeads,
-  oppiaMaintainers,
-  SERVER_JOBS_ADMIN,
-} = require('../userWhitelist.json');
+
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
@@ -160,21 +158,22 @@ describe('Critical Pull Request Spec', () => {
     deletions: 0,
     changes: 1,
     blob_url:
-      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e110d7e' +
-      '9833c/core/domain/exp_fetchers.py',
+      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130e' +
+      '110d7e9833c/core/domain/exp_fetchers.py',
     raw_url:
-      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e110d7e9' +
-      '833c/core/domain/exp_fetchers.py',
+      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e' +
+      '110d7e9833c/core/domain/exp_fetchers.py',
     contents_url:
-      'https://api.github.com/repos/oppia/oppia/contents/core/domain/exp_fetche' +
-      'rs.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
+      'https://api.github.com/repos/oppia/oppia/contents/core/domain/' +
+      'exp_fetchers.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
     patch:
-      '@@ -0,0 +1 @@\n+# def _migrate_states_schema(versioned_exploration_states' +
+      '@@ -0,0 +1 @@\n+# def _migrate_states_schema' +
+      '(versioned_exploration_states' +
       ', exploration_id):',
   };
 
   beforeEach(() => {
-    spyOn(scheduler, 'createScheduler').and.callFake(() => {});
+    spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
       issues: {
@@ -192,18 +191,22 @@ describe('Critical Pull Request Spec', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => {});
-    spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => {});
+    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(checkCronJobModule, 'checkForNewCronJob').and.callFake(() => { });
+    spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
       checkPullRequestLabelsModule,
       'checkChangelogLabel'
-    ).and.callFake(() => {});
-    spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => {});
-    spyOn(checkWIPModule, 'checkWIP').and.callFake(() => {});
-    spyOn(checkPullRequestTemplateModule,'checkTemplate').and.callFake(() => {});
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => {});
+    ).and.callFake(() => { });
+    spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
+    spyOn(
+      checkPullRequestTemplateModule, 'checkTemplate'
+    ).and.callFake(() => { });
+    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
 
-    spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer').and.callThrough();
+    spyOn(
+      checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'
+    ).and.callThrough();
   });
 
   describe('When a new model is created in a pull request', () => {
@@ -218,7 +221,9 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer).toHaveBeenCalled();
+      expect(
+        checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -227,15 +232,15 @@ describe('Critical Pull Request Spec', () => {
 
     it('should ping release coordinator', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
-      const firstModel = 'OppiabotTestActivitiesModel'.link(
-        newModelFileObj.blob_url
+      const firstModel = (
+        'OppiabotTestActivitiesModel'.link(newModelFileObj.blob_url)
       );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @' + SERVER_JOBS_ADMIN + ' and @' + teamLeads.releaseTeam +
+          'Hi @vojtechjelinek' +
           ', PTAL at this PR, it adds a model that needs to be validated. ' +
           'The name of the model is ' + firstModel + '.<br>Thanks!',
       });
@@ -247,7 +252,7 @@ describe('Critical Pull Request Spec', () => {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
-        assignees: [teamLeads.releaseTeam, SERVER_JOBS_ADMIN],
+        assignees: ['vojtechjelinek'],
       });
     });
 
@@ -274,7 +279,9 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer).toHaveBeenCalled();
+      expect(
+        checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -283,18 +290,19 @@ describe('Critical Pull Request Spec', () => {
 
     it('should ping release coordinator', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
-      const firstModel = 'OppiabotTestActivitiesModel'.link(
-        newModelFileObj.blob_url
+      const firstModel = (
+        'OppiabotTestActivitiesModel'.link(newModelFileObj.blob_url)
       );
-      const secondModels = 'OppiabotSnapshotContentModel, OppiabotSnapshotTestingModel'.link(
-        modifiedModelFileObj.blob_url
+      const secondModels = (
+        'OppiabotSnapshotContentModel, OppiabotSnapshotTestingModel'
+          .link(modifiedModelFileObj.blob_url)
       );
       expect(github.issues.createComment).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @' + SERVER_JOBS_ADMIN + ' and @' + teamLeads.releaseTeam +
+          'Hi @vojtechjelinek' +
           ', PTAL at this PR, it adds new models that need to be validated. ' +
           'The models are ' + firstModel + ', ' + secondModels + '.<br>Thanks!'
       });
@@ -306,7 +314,7 @@ describe('Critical Pull Request Spec', () => {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
-        assignees: [teamLeads.releaseTeam, SERVER_JOBS_ADMIN],
+        assignees: ['vojtechjelinek'],
       });
     });
 
@@ -334,7 +342,9 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer).toHaveBeenCalled();
+      expect(
+        checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -363,7 +373,9 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer).toHaveBeenCalled();
+      expect(
+        checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -392,7 +404,9 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer).toHaveBeenCalled();
+      expect(
+        checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -425,7 +439,9 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should check for models', () => {
-      expect(checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer).toHaveBeenCalled();
+      expect(
+        checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer
+      ).toHaveBeenCalled();
     });
 
     it('should not get modified files', () => {

@@ -43,7 +43,7 @@ describe('Check Issue Assignee Module', () => {
   let app;
 
   beforeEach(async () => {
-    spyOn(scheduler, 'createScheduler').and.callFake(() => {});
+    spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
       issues: {
@@ -97,8 +97,10 @@ describe('Check Issue Assignee Module', () => {
     });
 
     it('should comment on issue', () => {
-      const linkToCla = 'here'.link(
-        'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up'
+      const linkToCla = (
+        'here'.link(
+          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
+        '#setting-things-up')
       );
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledWith({
@@ -106,11 +108,11 @@ describe('Check Issue Assignee Module', () => {
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name,
         body:
-          'Hi @' +
-          payloadData.payload.assignee.login +
+          'Hi @' + payloadData.payload.assignee.login +
           ', you need to sign the ' +
-          'CLA before you can get assigned to issues. Follow the instructions ' +
-          linkToCla + ' to get started. I am unassigning you for now, feel ' +
+          'CLA before you can get assigned to issues. ' +
+          'Follow the instructions ' + linkToCla + ' to get started. ' +
+          'I am unassigning you for now, feel ' +
           'free to assign yourself once you have signed the CLA. Thanks!'
       });
     });

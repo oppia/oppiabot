@@ -15,7 +15,7 @@
 /**
  * @fileoverview Tests for the helper module.
  */
-const { default: Axios } = require('axios');
+const { 'default': Axios } = require('axios');
 const utilityModule = require('../lib/utils');
 const pullRequest = require('../fixtures/pullRequestPayload.json').payload
   .pull_request;
@@ -171,9 +171,11 @@ describe('Utility module tests', () => {
     firstItemLink = 'OppiabotTestActivitiesModel'.link(
       firstModelFileObj.blob_url
     );
-    let secondItemLink = 'OppiabotSnapshotContentModel, OppiabotSnapshotTestingModel'.link(
-      secondModelFileObj.blob_url
-    );
+    let secondItemLink =
+    'OppiabotSnapshotContentModel, OppiabotSnapshotTestingModel'
+      .link(
+        secondModelFileObj.blob_url
+      );
     expect(result).toBe(
       ' The models are ' + itemLink + ', ' + secondItemLink + '.'
     );
@@ -476,10 +478,58 @@ describe('Utility module tests', () => {
 
     context.github.orgs.checkMembership = jasmine
       .createSpy('checkMembership')
-      .and.resolveTo({
-        status: 404,
+      .and.callFake(() => {
+        throw new Error(
+          'User does not exist or is not a public member of ' +
+            'the organization.'
+        );
       });
     response = await utilityModule.isUserAMemberOfTheOrganisation(
+      context,
+      'testuser'
+    );
+    expect(response).toBe(false);
+  });
+
+  it('should check if a user is a collaborator', async () => {
+    const context = {
+      repo() {
+        return {
+          owner: 'oppia',
+          repo: 'oppia'
+        };
+      },
+      github: {
+        repos: {
+          checkCollaborator: jasmine
+            .createSpy('checkCollaborator')
+            .and.resolveTo({
+              status: 204,
+            }),
+        },
+      },
+    };
+
+    let response = await utilityModule.isUserCollaborator(
+      context,
+      'testuser'
+    );
+    expect(response).toBe(true);
+    expect(context.github.repos.checkCollaborator).toHaveBeenCalled();
+    expect(context.github.repos.checkCollaborator).toHaveBeenCalledWith({
+      owner: 'oppia',
+      repo: 'oppia',
+      username: 'testuser',
+    });
+
+    context.github.repos.checkCollaborator = jasmine
+      .createSpy('checkCollaborator')
+      .and.callFake(() => {
+        throw new Error(
+          'User is not a collaborator.'
+        );
+      });
+    response = await utilityModule.isUserCollaborator(
       context,
       'testuser'
     );
@@ -519,7 +569,8 @@ describe('Utility module tests', () => {
     expect(usernames[0]).toBe('aks681');
     expect(usernames[1]).toBe('seanlip');
 
-    text = `@DubeySandeep, done I've created the issue(#10419 ) and addressed your comments.
+    text = `@DubeySandeep, done I've created the issue(#10419 )
+      and addressed your comments.
       @seanlip @aks681 PTAL`;
     usernames = utilityModule.getUsernamesFromText(text);
     expect(usernames.length).toBe(3);
@@ -538,7 +589,8 @@ describe('Utility module tests', () => {
     expect(usernames[0]).toBe('aks681');
     expect(usernames[1]).toBe('seanlip');
 
-    text = `@DubeySandeep, done I've created the issue(#10419 ) and addressed your comments.
+    text = `@DubeySandeep, done I've created the issue(#10419 )
+      and addressed your comments.
       @seanlip @aks681 please take a look`;
     usernames = utilityModule.getUsernamesFromText(text);
     expect(usernames.length).toBe(3);

@@ -22,10 +22,14 @@ const apiForSheetsModule = require('./lib/apiForSheets');
 const checkMergeConflictsModule = require('./lib/checkMergeConflicts');
 const checkPullRequestLabelsModule = require('./lib/checkPullRequestLabels');
 const checkPullRequestBranchModule = require('./lib/checkPullRequestBranch');
-const checkWipModule = require('./lib/checkWipDraftPR');
 const checkPullRequestJobModule = require('./lib/checkPullRequestJob');
-const checkPullRequestTemplateModule = require('./lib/checkPullRequestTemplate');
-const checkCriticalPullRequestModule = require('./lib/checkCriticalPullRequest');
+const checkCronJobModule = require('./lib/checkNewCronJobs');
+const checkPullRequestTemplateModule = require(
+  './lib/checkPullRequestTemplate'
+);
+const checkCriticalPullRequestModule = require(
+  './lib/checkCriticalPullRequest'
+);
 const checkBranchPushModule = require('./lib/checkBranchPush');
 const checkPullRequestReviewModule = require('./lib/checkPullRequestReview');
 const newCodeOwnerModule = require('./lib/checkForNewCodeowner');
@@ -34,6 +38,7 @@ const periodicCheckModule = require('./lib/periodicChecks');
 
 const constants = require('./constants');
 const checkIssueAssigneeModule = require('./lib/checkIssueAssignee');
+const staleBuildModule = require('./lib/staleBuildChecks');
 
 const whitelistedAccounts = (process.env.WHITELISTED_ACCOUNTS || '')
   .toLowerCase()
@@ -49,96 +54,128 @@ const whitelistedAccounts = (process.env.WHITELISTED_ACCOUNTS || '')
 const runChecks = async (context, checkEvent) => {
   const repoName = context.repo().repo.toLowerCase();
   const checksWhitelist = constants.getChecksWhitelist();
-  if (checksWhitelist.hasOwnProperty(repoName)) {
+  if (Object.prototype.hasOwnProperty.call(checksWhitelist, repoName)) {
     const checks = checksWhitelist[repoName];
-    if (checks.hasOwnProperty(checkEvent)) {
+    if (Object.prototype.hasOwnProperty.call(checks, checkEvent)) {
       const checkList = checks[checkEvent];
+      const callable = [];
       for (var i = 0; i < checkList.length; i++) {
         switch (checkList[i]) {
           case constants.claCheck:
-            await apiForSheetsModule.checkClaStatus(context);
+            callable.push(apiForSheetsModule.checkClaStatus(context));
             break;
           case constants.changelogCheck:
-            await checkPullRequestLabelsModule.checkChangelogLabel(context);
+            callable.push(
+              checkPullRequestLabelsModule.checkChangelogLabel(context)
+            );
             break;
           case constants.branchCheck:
-            await checkPullRequestBranchModule.checkBranch(context);
-            break;
-          case constants.wipCheck:
-            await checkWipModule.checkWIP(context);
+            callable.push(checkPullRequestBranchModule.checkBranch(context));
             break;
           case constants.assigneeCheck:
-            await checkPullRequestLabelsModule.checkAssignee(context);
+            callable.push(checkPullRequestLabelsModule.checkAssignee(context));
             break;
           case constants.mergeConflictCheck:
-            await checkMergeConflictsModule.checkMergeConflictsInPullRequest(
-              context,
-              context.payload.pull_request
+            callable.push(
+              checkMergeConflictsModule.checkMergeConflictsInPullRequest(
+                context, context.payload.pull_request
+              )
             );
             break;
           case constants.allMergeConflictCheck:
-            await checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(
-              context
+            callable.push(
+              checkMergeConflictsModule.checkMergeConflictsInAllPullRequests(
+                context
+              )
             );
             break;
           case constants.jobCheck:
-            await checkPullRequestJobModule.checkForNewJob(context);
+            callable.push(checkPullRequestJobModule.checkForNewJob(context));
+            break;
+          case constants.cronJobCheck:
+            callable.push(checkCronJobModule.checkForNewCronJob(context));
             break;
           case constants.modelCheck:
-            await checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer(
-              context
+            callable.push(
+              checkCriticalPullRequestModule.checkIfPRAffectsDatastoreLayer(
+                context
+              )
             );
             break;
           case constants.issuesAssignedCheck:
-            await checkIssueAssigneeModule.checkAssignees(context);
+            callable.push(checkIssueAssigneeModule.checkAssignees(context));
             break;
           case constants.prLabelCheck:
-            await checkPullRequestLabelsModule.checkForIssueLabel(context);
+            callable.push(
+              checkPullRequestLabelsModule.checkForIssueLabel(context)
+            );
             break;
           case constants.datastoreLabelCheck:
-            await checkPullRequestLabelsModule.checkCriticalLabel(context);
+            callable.push(
+              checkPullRequestLabelsModule.checkCriticalLabel(context)
+            );
+            break;
+          case constants.staleBuildLabelCheck:
+            callable.push(
+              checkPullRequestLabelsModule.checkStaleBuildLabelRemoved(context)
+            );
             break;
           case constants.forcePushCheck:
-            await checkBranchPushModule.handleForcePush(context);
+            callable.push(checkBranchPushModule.handleForcePush(context));
             break;
           case constants.prTemplateCheck:
-            await checkPullRequestTemplateModule.checkTemplate(context);
+            callable.push(
+              checkPullRequestTemplateModule.checkTemplate(context)
+            );
             break;
           case constants.pullRequestReviewCheck:
-            await checkPullRequestReviewModule.handlePullRequestReview(context);
+            callable.push(
+              checkPullRequestReviewModule.handlePullRequestReview(context)
+            );
             break;
           case constants.codeOwnerCheck:
-            await newCodeOwnerModule.checkForNewCodeowner(context);
+            callable.push(newCodeOwnerModule.checkForNewCodeowner(context));
             break;
           case constants.ciFailureCheck:
-            await ciCheckModule.handleFailure(context);
+            callable.push(ciCheckModule.handleFailure(context));
             break;
           case constants.updateWithDevelopCheck:
-            await checkMergeConflictsModule.pingAllPullRequestsToMergeFromDevelop(
-              context
+            callable.push(
+              checkMergeConflictsModule.pingAllPullRequestsToMergeFromDevelop(
+                context
+              )
             );
             break;
           case constants.periodicCheck:
-            await periodicCheckModule.ensureAllPullRequestsAreAssigned(context);
-            await periodicCheckModule.ensureAllIssuesHaveProjects(context);
+            callable.push(...[
+              periodicCheckModule.ensureAllPullRequestsAreAssigned(context),
+              staleBuildModule.checkAndTagPRsWithOldBuilds(context),
+            ]);
             break;
           case constants.respondToReviewCheck:
-            await checkPullRequestReviewModule.handleResponseToReview(context);
+            callable.push(
+              checkPullRequestReviewModule.handleResponseToReview(context)
+            );
+            break;
+          case constants.oldBuildLabelCheck:
+            callable.push(staleBuildModule.removeOldBuildLabel(context));
             break;
         }
       }
+      // Wait for all checks to resolve or reject.
+      await Promise.allSettled(callable);
     }
   }
-}
+};
 
 /**
  * This function checks if repo owner is whitelisted for Oppiabot checks.
  *
  * @param {import('probot').Context} context
  */
-function checkWhitelistedAccounts(context) {
+const checkWhitelistedAccounts = (context) => {
   return whitelistedAccounts.includes(context.repo().owner.toLowerCase());
-}
+};
 
 /**
  * This function checks if pull request author is blacklisted for
@@ -146,14 +183,14 @@ function checkWhitelistedAccounts(context) {
  *
  * @param {import('probot').Context} context
  */
-function checkAuthor(context) {
+const checkAuthor = (context) => {
   const pullRequest = context.payload.pull_request;
   const author = pullRequest.user.login;
   return !constants.getBlacklistedAuthors().includes(author);
-}
+};
 
 /**
- * This is the main entrypoint to the Probot app
+ * This is the main entry point to the Probot app
  * @param {import('probot').Application} oppiabot
  */
 module.exports = (oppiabot) => {
@@ -181,7 +218,7 @@ module.exports = (oppiabot) => {
       console.log('COMMENT CREATED ON ISSUE OR PULL REQUEST...');
       await runChecks(context, constants.issueCommentCreatedEvent);
     }
-  })
+  });
 
   oppiabot.on('pull_request.opened', async (context) => {
     // The oppiabot runs only for repositories belonging to certain
@@ -209,7 +246,7 @@ module.exports = (oppiabot) => {
 
   oppiabot.on('pull_request.unlabeled', async (context) => {
     if (checkWhitelistedAccounts(context) && checkAuthor(context)) {
-      await runChecks(context, constants.unlabelEvent);
+      await runChecks(context, constants.PRUnlabelEvent);
     }
   });
 
@@ -233,18 +270,6 @@ module.exports = (oppiabot) => {
     }
   });
 
-  oppiabot.on('pull_request.edited', async (context) => {
-    if (
-      checkWhitelistedAccounts(context) &&
-      context.payload.pull_request.state === 'open' &&
-      checkAuthor(context)
-    ) {
-      // eslint-disable-next-line no-console
-      console.log('A PR HAS BEEN EDITED...');
-      await runChecks(context, constants.editEvent);
-    }
-  });
-
   oppiabot.on('push', async (context) => {
     if (checkWhitelistedAccounts(context)) {
       // eslint-disable-next-line no-console
@@ -254,7 +279,7 @@ module.exports = (oppiabot) => {
   });
 
   oppiabot.on('pull_request_review.submitted', async (context) => {
-    if(checkWhitelistedAccounts(context)) {
+    if (checkWhitelistedAccounts(context)) {
       console.log('A Pull Request got reviewed');
       await runChecks(context, constants.pullRequestReviewEvent);
     }

@@ -19,7 +19,10 @@
 const core = require('@actions/core');
 const { context } = require('@actions/github');
 const issueLabelsModule = require('./issues/checkIssueLabels');
+const claCheckGithubActionModule = require('./pull_requests/claCheck');
 const constants = require('../../constants');
+const PRLabelsModule = require('./pull_requests/labelCheck');
+const wipDraftModule = require('./pull_requests/checkWipDraftPR');
 
 module.exports = {
   async dispatch(event, action) {
@@ -27,14 +30,33 @@ module.exports = {
     const checkEvent = `${event}_${action}`;
     const repoName = context.payload.repository.name.toLowerCase();
     const checksWhitelist = constants.getChecksWhitelist();
-    if (checksWhitelist.hasOwnProperty(repoName)) {
+    if (Object.prototype.hasOwnProperty.call(checksWhitelist, repoName)) {
+      core.info('Repo is whitelisted');
       const checks = checksWhitelist[repoName];
-      if (checks.hasOwnProperty(checkEvent)) {
+      if ((Object.prototype.hasOwnProperty.call(checks, checkEvent))) {
+        core.info('Valid checkevent');
         const checkList = checks[checkEvent];
         for (var i = 0; i < checkList.length; i++) {
           switch (checkList[i]) {
             case constants.issuesLabelCheck:
+              core.info('issue label check triggered');
               await issueLabelsModule.checkLabels();
+              break;
+            case constants.claCheckGithubAction:
+              core.info('cla check triggered');
+              await claCheckGithubActionModule.claCheckGithubAction();
+              break;
+            case constants.prLabelCheck:
+              core.info('PR label check triggered');
+              await PRLabelsModule.checkLabels();
+              break;
+            case constants.dontMergeLabelCheck:
+              core.info('Don\'t label check triggered');
+              await PRLabelsModule.checkUnLabeled();
+              break;
+            case constants.wipCheck:
+              core.info('WIP check triggered');
+              await wipDraftModule.checkWIP();
               break;
           }
         }
