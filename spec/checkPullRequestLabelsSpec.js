@@ -673,7 +673,7 @@ describe('Pull Request Label Check', () => {
     };
 
     beforeEach(async () => {
-      payloadData.payload.action = 'unlabeled';
+      payloadData.payload.action = 'labeled';
       payloadData.payload.label = label;
       spyOn(checkPullRequestLabelModule, 'checkHotfixLabel').and.callThrough();
       await robot.receive(payloadData);
