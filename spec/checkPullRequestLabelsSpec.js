@@ -512,6 +512,40 @@ describe('Pull Request Label Check', () => {
 
   });
 
+  describe('when hotfix label gets added', () => {
+    const label = {
+      id: 638839900,
+      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+      url:
+        'https://api.github.com/repos/oppia/oppia/' +
+        'labels/PR%3A%20Needs%20to%20be%20hotfixed',
+      name: 'PR: Needs to be hotfixed',
+      color: '006B75',
+    };
+
+    beforeEach(async () => {
+      payloadData.payload.action = 'unlabeled';
+      payloadData.payload.label = label;
+      spyOn(checkPullRequestLabelModule, 'checkHotfixLabel').and.callThrough();
+      await robot.receive(payloadData);
+    });
+
+    it('should check for hotfix label', () => {
+      expect(checkPullRequestLabelModule.checkHotfixLabel).toHaveBeenCalled();
+    });
+
+    it('should comment on PR', () => {
+      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.issues.createComment).toHaveBeenCalledWith({
+        body: 'Hi, @oppia/release-coordinators flagging this pull request for ' +
+          'for your attention since this is labelled as a hotfix PR. Thanks!',
+        number: payloadData.payload.pull_request.number,
+        owner: payloadData.payload.repository.owner.login,
+        repo: payloadData.payload.repository.name
+      })
+    })
+  });
+
   describe('when another label gets removed', () => {
     const label = {
       id: 638839900,
