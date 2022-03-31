@@ -686,7 +686,8 @@ describe('Pull Request Label Check', () => {
     it('should comment on PR', () => {
       expect(github.issues.createComment).toHaveBeenCalled();
       expect(github.issues.createComment).toHaveBeenCalledWith({
-        body: 'Hi, @oppia/release-coordinators flagging this pull request for ' +
+        body:
+          'Hi, @oppia/release-coordinators flagging this pull request for ' +
           'for your attention since this is labelled as a hotfix PR. Thanks!',
         number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
