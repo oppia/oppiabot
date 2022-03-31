@@ -37,6 +37,7 @@ const claCheckGithubAction = 'cla-check-github-action';
 const changelogCheck = 'changelog-check';
 const datastoreLabelCheck = 'datastore-label-check';
 const prLabelCheck = 'pr-label-check';
+const hotfixLabelCheck = 'hotfix-label-check';
 const prTemplateCheck = 'pr-template-check';
 // This check is required in re-open events as well to
 // prevent user from reopening the PR.
@@ -98,7 +99,7 @@ const checksWhitelist = {
       modelCheck,
       prTemplateCheck
     ],
-    [PRLabelEvent]: [assigneeCheck, prLabelCheck],
+    [PRLabelEvent]: [assigneeCheck, prLabelCheck, hotfixLabelCheck],
     [synchronizeEvent]: [
       mergeConflictCheck,
       jobCheck,
@@ -169,6 +170,7 @@ module.exports.issuesLabelCheck = issuesLabelCheck;
 module.exports.issuesAssignedCheck = issuesAssignedCheck;
 module.exports.datastoreLabelCheck = datastoreLabelCheck;
 module.exports.prLabelCheck = prLabelCheck;
+module.exports.hotfixLabelCheck = hotfixLabelCheck;
 module.exports.prTemplateCheck = prTemplateCheck;
 module.exports.forcePushCheck = forcePushCheck;
 module.exports.pullRequestReviewCheck = pullRequestReviewCheck;
