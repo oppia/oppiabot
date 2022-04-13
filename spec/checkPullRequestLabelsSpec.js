@@ -688,7 +688,7 @@ describe('Pull Request Label Check', () => {
           'Hi, @oppia/release-coordinators flagging this pull request for ' +
           'for your attention since this is labelled as a hotfix PR. ' +
           'Please ensure that you add the "PR: for current release" ' +
-          'label if the next release is in progress. Thanks!'
+          'label if the next release is in progress. Thanks!',
         number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name
