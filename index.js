@@ -110,6 +110,11 @@ const runChecks = async (context, checkEvent) => {
               checkPullRequestLabelsModule.checkForIssueLabel(context)
             );
             break;
+          case constants.hotfixLabelCheck:
+            callable.push(
+              checkPullRequestLabelsModule.checkHotfixLabel(context)
+            );
+            break;
           case constants.datastoreLabelCheck:
             callable.push(
               checkPullRequestLabelsModule.checkCriticalLabel(context)
