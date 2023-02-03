@@ -536,20 +536,6 @@ describe('Utility module tests', () => {
     expect(response).toBe(false);
   });
 
-  it('should get changelog label from a pull request', () => {
-    const label = {
-      name: 'PR CHANGELOG: Angular Migration',
-    };
-    pullRequest.labels.push(label);
-
-    let response = utilityModule.getChangelogLabelFromPullRequest(pullRequest);
-    expect(response).toBe('PR CHANGELOG: Angular Migration');
-
-    pullRequest.labels = [];
-    response = utilityModule.getChangelogLabelFromPullRequest(pullRequest);
-    expect(response).toBe(undefined);
-  });
-
   it('should get progect owner from a changelog label', () => {
     let response = utilityModule.getProjectOwnerFromLabel(
       'PR CHANGELOG: Miscellaneous -- @ankita240796'

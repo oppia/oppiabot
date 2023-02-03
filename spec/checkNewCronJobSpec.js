@@ -203,9 +203,6 @@ describe('Cron Job Spec', () => {
       checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
-      checkPullRequestLabelsModule, 'checkChangelogLabel'
-    ).and.callFake(() => { });
-    spyOn(
       checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'
     ).and.callFake(() => { });
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
