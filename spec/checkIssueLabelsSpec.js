@@ -137,49 +137,6 @@ describe('Check Issue Labels Module', () => {
     });
   });
 
-  describe('check for changelog labels', () => {
-    beforeEach(async () => {
-      payload.label.name = 'PR CHANGELOG: Server Errors -- @kevintab95';
-      await dispatcher.dispatch('issues', 'labeled');
-    });
-
-    it('should be called for the payload', () => {
-      expect(checkIssueLabelModule.checkLabels).toHaveBeenCalled();
-    });
-
-    it('should create appropriate comment', () => {
-      expect(octokit.issues.createComment).toHaveBeenCalled();
-
-      const user = payload.sender.login;
-      const link = (
-        'here'.link(
-          'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
-        'labeling-issues-and-pull-requests')
-      );
-      const body = (
-        'Hi @' + user + ', changelog labels should not be used on issues.' +
-        ' I’m removing the label. You can learn more about labels ' + link +
-        '. Thanks!');
-
-      expect(octokit.issues.createComment).toHaveBeenCalledWith({
-        issue_number: payload.issue.number,
-        body: body,
-        owner: payload.repository.owner.login,
-        repo: payload.repository.name,
-      });
-    });
-
-    it('should remove the label', () => {
-      expect(octokit.issues.removeLabel).toHaveBeenCalled();
-      expect(octokit.issues.removeLabel).toHaveBeenCalledWith({
-        issue_number: payload.issue.number,
-        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
-        owner: payload.repository.owner.login,
-        repo: payload.repository.name,
-      });
-    });
-  });
-
   describe('check for PR labels', () => {
     const testLabel = 'dependencies';
     beforeEach(async () => {
