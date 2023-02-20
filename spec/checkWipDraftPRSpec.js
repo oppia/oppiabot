@@ -172,8 +172,8 @@ describe("Oppiabot's", () => {
           },
         }),
       };
-      // Trigger pull_request.opened event.
-      pullRequestEditedPayload.action = 'opened';
+      // Trigger pull_request.reopened event.
+      pullRequestEditedPayload.action = 'reopened';
       await dispatcher.dispatch('pull_request_target', 'opened');
 
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
