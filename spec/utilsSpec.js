@@ -121,6 +121,26 @@ describe('Utility module tests', () => {
       'r."""\n+        return [exp_models.ExplorationSnapshotMetadataModel]\n+',
   };
 
+
+  const emptyPatchFileObj = {
+    sha: 'd144f32b9812373d5f1bc9f94d9af795f09023ff',
+    filename: 'core/storage/skill/gae_models.py',
+    status: 'added',
+    additions: 1,
+    deletions: 0,
+    changes: 1,
+    blob_url:
+      'https://github.com/oppia/oppia/blob/67fb4a973b318882af3b5a894130' +
+      'e110d7e9833c/core/storage/skill/gae_models.py',
+    raw_url:
+      'https://github.com/oppia/oppia/raw/67fb4a973b318882af3b5a894130e' +
+      '110d7e9833c/core/storage/skill/gae_models.py',
+    contents_url:
+      'https://api.github.com/repos/oppia/oppia/contents/core/storage/s' +
+      'kill/gae_models.py?ref=67fb4a973b318882af3b5a894130e110d7e9833c',
+    patch: '',
+  };
+
   const jobRegex = new RegExp(
     [
       '(?<addition>\\+)(?<classDefinition>class\\s)',
@@ -208,33 +228,34 @@ describe('Utility module tests', () => {
 
   it('should return appropriate items by regex', () => {
     let result = utilityModule.getNewItemsFromFileByRegex(
-      modelRegex,
-      firstModelFileObj
+      modelRegex, firstModelFileObj
     );
     expect(result.length).toBe(1);
     expect(result[0]).toBe('OppiabotTestActivitiesModel');
 
     result = utilityModule.getNewItemsFromFileByRegex(
-      modelRegex,
-      secondModelFileObj
+      modelRegex, secondModelFileObj
     );
     expect(result.length).toBe(2);
     expect(result[0]).toBe('OppiabotSnapshotContentModel');
     expect(result[1]).toBe('OppiabotSnapshotTestingModel');
 
     result = utilityModule.getNewItemsFromFileByRegex(
-      jobRegex,
-      firstJobFileObj
+      jobRegex, firstJobFileObj
     );
     expect(result.length).toBe(1);
     expect(result[0]).toBe('FirstTestOneOffJob');
 
     result = utilityModule.getNewItemsFromFileByRegex(
-      jobRegex,
-      secondJobFileObj
+      jobRegex, secondJobFileObj
     );
     expect(result.length).toBe(1);
     expect(result[0]).toBe('SecondTestOneOffJob');
+
+    result = utilityModule.getNewItemsFromFileByRegex(
+      jobRegex, emptyPatchFileObj
+    );
+    expect(result.length).toBe(0);
   });
 
   it('should get all changed files', async () => {
