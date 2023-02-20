@@ -720,7 +720,7 @@ describe('Pull Request Review Module', () => {
 
     describe(
       'when all reviewers have approved and none are assigned and pr author ' +
-      'cannot merge.', () => {
+      'cannot merge ', () => {
         // Note that when the last reviewer approves, the list of
         // requested reviewers will be empty.
         const initialReviewers = [
@@ -729,16 +729,12 @@ describe('Pull Request Review Module', () => {
         const initialLabels = [
           ...reviewPayloadData.payload.pull_request.labels
         ];
-        const changelogLabel = {
-          name: 'PR CHANGELOG: Server Errors -- @kevintab95'
-        };
         const initialAssignees = [
           ...reviewPayloadData.payload.pull_request.assignees
         ];
         beforeAll(() => {
           reviewPayloadData.payload.pull_request.requested_reviewers = [];
           reviewPayloadData.payload.pull_request.assignees = [];
-          reviewPayloadData.payload.pull_request.labels = [changelogLabel];
         });
         beforeEach(async () => {
           spyOn(
@@ -814,13 +810,13 @@ describe('Pull Request Review Module', () => {
             });
         });
 
-        it('should assign one of the reviewers', () => {
+        it('should assign the author', () => {
           expect(github.issues.addAssignees).toHaveBeenCalled();
           expect(github.issues.addAssignees).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
-            assignees: ['kevintab95'],
+            assignees: ['testuser'],
           });
         });
 
@@ -831,11 +827,10 @@ describe('Pull Request Review Module', () => {
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
             body:
-              'Hi @kevintab95, this PR is ready to be merged. ' +
-              'Author of this PR does not have permissions ' +
-              'to merge this PR. Before you ' +
-              'merge it, please make sure that there are no pending comments ' +
-              'that require action from the author\'s end. Thanks!',
+              'Hi @testuser, this PR is ready to be merged. ' +
+              'Please address any remaining comments prior to merging, and ' +
+              'feel free to ask someone to merge your PR once the CI checks ' +
+              'pass and you\'re happy with it. Thanks!'
           });
         });
 
