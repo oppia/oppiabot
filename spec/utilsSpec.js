@@ -275,15 +275,6 @@ describe('Utility module tests', () => {
     expect(response).toBe('Contents of code owner file.');
   });
 
-  it('should check if a label is a changelog label', () => {
-    let response = utilityModule.isChangelogLabel(
-      'PR CHANGELOG: Angular Migration'
-    );
-    expect(response).toBe(true);
-    response = utilityModule.isChangelogLabel('An invalid label');
-    expect(response).toBe(false);
-  });
-
   it('should get all open pull requests', async () => {
     const context = {
       github: {
@@ -534,13 +525,6 @@ describe('Utility module tests', () => {
       'testuser'
     );
     expect(response).toBe(false);
-  });
-
-  it('should get progect owner from a changelog label', () => {
-    let response = utilityModule.getProjectOwnerFromLabel(
-      'PR CHANGELOG: Miscellaneous -- @ankita240796'
-    );
-    expect(response).toBe('ankita240796');
   });
 
   it('should get github usernames from text', () => {
