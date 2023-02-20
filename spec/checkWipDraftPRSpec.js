@@ -174,7 +174,7 @@ describe("Oppiabot's", () => {
       };
       // Trigger pull_request.reopened event.
       pullRequestEditedPayload.action = 'reopened';
-      await dispatcher.dispatch('pull_request_target', 'opened');
+      await dispatcher.dispatch('pull_request_target', 'reopened');
 
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
       expect(octokit.git.getCommit).toHaveBeenCalled();
