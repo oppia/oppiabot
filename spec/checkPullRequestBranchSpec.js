@@ -79,6 +79,7 @@ describe('Pull Request Branch Check', () => {
     describe('develop branch check', () => {
       beforeEach(async () => {
         pullRequestPayload.payload.pull_request.head.ref = 'develop';
+        pullRequestPayload.payload.action = 'reopened';
         await app.receive(pullRequestPayload);
       });
 
