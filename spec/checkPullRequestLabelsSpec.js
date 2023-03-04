@@ -90,35 +90,138 @@ describe('Pull Request Label Check', () => {
     ).and.callFake(() => { });
   });
 
-  describe('when a pr label gets added', () => {
-    const label = {
-      id: 638839900,
-      node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-      url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-      name: 'dependencies',
-      color: '00FF00',
-    };
+  describe('when pull request is created', () => {
+    describe('when all codeowners should be assigned', () => {
+      beforeEach(async () => {
+        payloadData.payload.action = 'opened';
+        payloadData.payload.pull_request.requested_reviewers = [
+          { login: 'reviewer1' },
+          { login: 'reviewer2' },
+        ];
+        payloadData.payload.pull_request.assignees = [];
+        // Set project owner to be pr author.
+        payloadData.payload.pull_request.user.login = 'kevintab95';
+        spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
+        await robot.receive(payloadData);
+      });
 
-    beforeEach(async () => {
-      payloadData.payload.action = 'labeled';
-      payloadData.payload.label = label;
-      spyOn(
-        checkPullRequestLabelModule, 'checkForIssueLabel'
-      ).and.callThrough();
+      it('should not assign project owner', () => {
+        const arg = github.issues.addAssignees.calls.argsFor(0)[0];
+        expect(arg.assignees.includes('kevintab95')).toBe(false);
+      });
+
+      it('should assign all reviewers', () => {
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          assignees: ['reviewer1', 'reviewer2'],
+        });
+      });
+
+      afterAll(() => {
+        payloadData.payload.pull_request.requested_reviewers = [];
+      });
+    });
+
+    describe('when pr author is the only codeowner', () => {
+      beforeEach(async () => {
+        payloadData.payload.action = 'opened';
+        payloadData.payload.pull_request.requested_reviewers = [];
+        payloadData.payload.pull_request.assignees = [];
+        // Set project owner to be pr author.
+        payloadData.payload.pull_request.user.login = 'kevintab95';
+        spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
+        await robot.receive(payloadData);
+      });
+
+      it('should check changelog label', () => {
+        expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
+      });
+
+      it('should assign pr author', () => {
+        expect(github.issues.addAssignees).toHaveBeenCalled();
+        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          repo: payloadData.payload.repository.name,
+          owner: payloadData.payload.repository.owner.login,
+          issue_number: payloadData.payload.number,
+          assignees: ['kevintab95'],
+        });
+      });
+
+      it('should ping pr author', () => {
+        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.issues.createComment).toHaveBeenCalledWith({
+          owner: payloadData.payload.repository.owner.login,
+          repo: payloadData.payload.repository.name,
+          issue_number: payloadData.payload.pull_request.number,
+          body:
+            'Hi @' +
+            payloadData.payload.pull_request.user.login +
+            ' please assign the required reviewer(s) for this PR. Thanks!',
+        });
+      });
+    });
+
+    describe('when a pr label gets added', () => {
+      const label = {
+        id: 638839900,
+        node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
+        url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
+        name: 'dependencies',
+        color: '00FF00',
+      };
+
+      beforeEach(async () => {
+        payloadData.payload.action = 'labeled';
+        payloadData.payload.label = label;
+        spyOn(
+          checkPullRequestLabelModule, 'checkForIssueLabel'
+        ).and.callThrough();
+        await robot.receive(payloadData);
+      });
+
+      it('checks the label', () => {
+        expect(checkPullRequestLabelModule.checkForIssueLabel).toHaveBeenCalled();
+      });
+
+      it('does not comment on the PR', () => {
+        expect(github.issues.createComment).not.toHaveBeenCalled();
+      });
+
+      it('does not remove the label', () => {
+        expect(github.issues.removeLabel).not.toHaveBeenCalled();
+      });
+    });
+
+    it('should not assign anyone if a user is already assigned', async () => {
+      payloadData.payload.action = 'opened';
+      payloadData.payload.pull_request.requested_reviewers = [
+        { login: 'testuser1' },
+      ];
+      payloadData.payload.pull_request.assignees = [{ login: 'testuser1' }];
+      spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
       await robot.receive(payloadData);
-    });
 
-    it('checks the label', () => {
-      expect(checkPullRequestLabelModule.checkForIssueLabel).toHaveBeenCalled();
-    });
-
-    it('does not comment on the PR', () => {
+      expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
+      expect(github.issues.addAssignees).not.toHaveBeenCalled();
       expect(github.issues.createComment).not.toHaveBeenCalled();
     });
 
-    it('does not remove the label', () => {
-      expect(github.issues.removeLabel).not.toHaveBeenCalled();
+    it('should not assign when there are review comments', async () => {
+      payloadData.payload.action = 'opened';
+      payloadData.payload.pull_request.assignees = [];
+      // Simulate when the payload alread has review comments.
+      payloadData.payload.pull_request.review_comments = 2;
+      spyOn(checkPullRequestLabelModule, 'checkAssignee').and.callThrough();
+      await robot.receive(payloadData);
+
+      expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
+      expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      expect(github.issues.createComment).not.toHaveBeenCalled();
     });
+
   });
 
   describe('when a issue label gets added', () => {
@@ -421,16 +524,6 @@ describe('Pull Request Label Check', () => {
 
     it('does not comment on the PR', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('when pull request gets opened or reopened', () => {
-    beforeEach(() => {
-      github.pulls = {
-        get: jasmine.createSpy('get').and.resolveTo({
-          data: payloadData.payload.pull_request,
-        }),
-      };
     });
   });
 });
