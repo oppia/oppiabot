@@ -183,7 +183,9 @@ describe('Pull Request Label Check', () => {
       });
 
       it('checks the label', () => {
-        expect(checkPullRequestLabelModule.checkForIssueLabel).toHaveBeenCalled();
+        expect(
+          checkPullRequestLabelModule.checkForIssueLabel
+        ).toHaveBeenCalled();
       });
 
       it('does not comment on the PR', () => {
