@@ -78,6 +78,7 @@ const checksWhitelist = {
   // eslint-disable-next-line quote-props
   'oppia': {
     [openEvent]: [
+      assigneeCheck,
       claCheck,
       codeOwnerCheck,
       branchCheck,

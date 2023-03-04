@@ -67,6 +67,9 @@ const runChecks = async (context, checkEvent) => {
           case constants.branchCheck:
             callable.push(checkPullRequestBranchModule.checkBranch(context));
             break;
+          case constants.assigneeCheck:
+            callable.push(checkPullRequestLabelsModule.checkAssignee(context));
+            break;
           case constants.mergeConflictCheck:
             callable.push(
               checkMergeConflictsModule.checkMergeConflictsInPullRequest(
