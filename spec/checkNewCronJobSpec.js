@@ -247,13 +247,12 @@ describe('Cron Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-        'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, it adds a new cron job.' +
-        newLineFeed + 'Also @' + author + ' please add the new test' +
-        ' and URL redirects for the new CRON jobs It seems you have added or' +
-        ' edited a CRON job, if so please request a testing of this ' +
-        'CRON job with this ' + formText + ' Please refer to ' +
-        wikiLinkText + ' for details.' +
-        newLineFeed + 'Thanks!',
+        'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
+        'it adds a new cron job.' + newLineFeed + 'Also @' + author + 
+        ' please add the new test and URL redirects for the new CRON jobs. ' +
+        ' It seems you have added or edited a CRON job, if so please request ' +
+        'a testing of this CRON job with this ' + formText + ' Please refer ' +
+        'to ' + wikiLinkText + ' for details.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
       });
@@ -265,7 +264,7 @@ describe('Cron Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        assignees: ['vojtechjelinek']
+        assignees: ['vojtechjelinek', 'DubeySandeep', 'kevintab95']
       });
     });
 
@@ -315,12 +314,11 @@ describe('Cron Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-        'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, it adds a new cron job.' +
-        newLineFeed + 'Also @' + author + ' It seems you have added or' +
-        ' edited a CRON job, if so please request a testing of this ' +
-        'CRON job with this ' + formText + ' Please refer to ' +
-        wikiLinkText + ' for details.' +
-        newLineFeed + 'Thanks!',
+        'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, it ' +
+        'adds a new cron job.' + newLineFeed + 'Also @' + author + ' It seems' +
+        'you have added or edited a CRON job, if so please request a testing ' +
+        'of this CRON job with this ' + formText + ' Please refer to ' +
+        wikiLinkText + ' for details.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
       });
@@ -332,7 +330,7 @@ describe('Cron Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        assignees: ['vojtechjelinek']
+        assignees: ['vojtechjelinek', 'DubeySandeep', 'kevintab95']
       });
     });
 
@@ -413,12 +411,11 @@ describe('Cron Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-        'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, it adds a new cron job.' +
-        newLineFeed + 'Also @' + author + ' It seems you have added or' +
-        ' edited a CRON job, if so please request a testing of this ' +
-        'CRON job with this ' + formText + ' Please refer to ' +
-        wikiLinkText + ' for details.' +
-        newLineFeed + 'Thanks!',
+        'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, it ' +
+        'adds a new cron job.' + newLineFeed + 'Also @' + author + ' It seems' +
+        'you have added or edited a CRON job, if so please request a testing ' +
+        'of this CRON job with this ' + formText + ' Please refer to ' +
+        wikiLinkText + ' for details.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
       });
@@ -470,12 +467,11 @@ describe('Cron Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-        'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, it adds a new cron job.' +
-        newLineFeed + 'Also @' + author + ' It seems you have added or' +
-        ' edited a CRON job, if so please request a testing of this ' +
-        'CRON job with this ' + formText + ' Please refer to ' +
-        wikiLinkText + ' for details.' +
-        newLineFeed + 'Thanks!',
+        'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, it ' +
+        'adds a new cron job.' + newLineFeed + 'Also @' + author + ' It seems' +
+        ' you have added or edited a CRON job, if so please request a testing' +
+        'of this CRON job with this ' + formText + ' Please refer to ' +
+        wikiLinkText + ' for details.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
       });
