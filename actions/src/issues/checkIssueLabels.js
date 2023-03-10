@@ -94,20 +94,11 @@ const handlePRLabel = async (octokit, label, user) => {
   const link = linkText.link(
     'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
     'labeling-issues-and-pull-requests');
-  let commentBody = '';
-  if (label.startsWith('PR CHANGELOG')) {
-    // Handle case for a changelog label.
-    commentBody = (
-      'Hi @' + user + ', changelog labels should not be used on issues.' +
-      ' I’m removing the label. You can learn more about labels ' + link +
-      '. Thanks!');
-  } else {
-    commentBody = (
-      'Hi @' + user + ', the ' + label + ' label should only be used in ' +
-      'pull requests. I’m removing the label. You can learn more about ' +
-      'labels ' + link + '. Thanks!');
-  }
-
+  const commentBody = (
+    'Hi @' + user + ', the ' + label + ' label should only be used in ' +
+    'pull requests. I’m removing the label. You can learn more about ' +
+    'labels ' + link + '. Thanks!'
+  );
   await octokit.issues.createComment(
     {
       body: commentBody,

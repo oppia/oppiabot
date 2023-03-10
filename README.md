@@ -6,20 +6,12 @@
 
 Oppiabot is a GitHub app built with [probot](https://github.com/probot/probot). It acts as a helper for the Oppia code repository to maintain the development workflow. It is hosted on [Heroku](https://www.heroku.com/).
 
-The bot currently performs the following functions:
-
-1. Checks whether a contributor creating a pull request has signed the CLA. It adds a label `Needs CLA` accordingly.
-
-2. Checks merge conflict in a pull request and notifies the author of the pull request if there is a merge conflict.
-
-3. Closes stale pull requests.
-
 
 ## Getting started
 
 Please refer to the following instructions to setup Oppiabot for the first time on your machine:
 
-1. Create a new, empty folder called `opensource/` within your home folder. Navigate to it (`cd opensource`), then [fork and clone](https://help.github.com/articles/fork-a-repo/) the Oppiabot repo. This will create a new folder named `opensource/oppiabot`. Navigate to `opensource/oppiabot/`.
+1. Create a new folder called `opensource/` within your home folder (or use one that you already have). Navigate to it (`cd opensource`), then [fork and clone](https://help.github.com/articles/fork-a-repo/) the Oppiabot repo. This will create a new folder named `opensource/oppiabot`. Navigate to `opensource/oppiabot/`.
 
 2. Install [Node.Js](https://nodejs.org/) and [NPM](https://www.npmjs.com/) on your machine using the following commands:
 
@@ -32,13 +24,7 @@ Please refer to the following instructions to setup Oppiabot for the first time 
     #### Using Ubuntu
     ```bash
     curl -sL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-    sudo apt-get install -y nodejs
-    ```
-    
-    #### Using Debian, as root
-    ```bash
-    curl -sL https://deb.nodesource.com/setup_lts.x | bash -
-    apt-get install -y nodejs
+    sudo apt install -y nodejs
     ```
        
     #### Using MacOS
@@ -47,7 +33,7 @@ Please refer to the following instructions to setup Oppiabot for the first time 
     ```
 
     #### Using Windows
-    Install using following [link](https://nodejs.org/en/download/). (Its always preferred to use LTS Version).
+    Use [WSL with Ubuntu](https://learn.microsoft.com/en-us/windows/wsl/install) and then follow the Ubuntu instructions.
     
 3. Setup probot and other dependencies by running the following command:
   ```bash
@@ -56,10 +42,6 @@ Please refer to the following instructions to setup Oppiabot for the first time 
 
 4. The Oppiabot uses environment variables. These are configured in the server settings. To deploy the bot locally, create a `.env` file and copy the contents of `.env.example` to it. You will need to adjust these variables accordingly following the instructions in the subsequent steps. Run following command to copy `.env.example` to `.env`
 
-If you're using Windows cmd, go to Oppiabot folder and type:
-``` bash
-copy .env.example .env 
-``` 
 If you have Linux terminal type:
   ```bash
     cp .env.example .env
@@ -68,13 +50,16 @@ If you have Linux terminal type:
 5. Go to [smee.io](https://smee.io/) and click **Start a new channel**. Set `WEBHOOK_PROXY_URL` in `.env` to the URL that you are redirected to.
 
 6. [Create a new GitHub App](https://github.com/settings/apps/new) with:
+    * **GitHub App name**: Use something like "My Oppiabot testing App"
+    * **Homepage URL**: Use any random URL
     * **Webhook URL**: Use your `WEBHOOK_PROXY_URL` from the previous step.
     * **Webhook Secret**: `development`
-    * **Permissions & events** The following permissions and events must be subscribed.If, for example, you only enable issue events, you will not be able to listen on pull request webhooks with the bot.
+    * **Permissions & events** The following permissions and events must be subscribed. If, for example, you only enable issue events, you will not be able to listen on pull request webhooks with the bot.
 
 <p align="center">
-  <img src="images/docs/repository-permissions.png">
-  <img src="images/docs/other-permissions.png">
+  <img src="images/docs/repository_permissions.png">
+  <img src="images/docs/organization_permissions.png">
+  <img src="images/docs/account_permissions.png">
   <img src="images/docs/events.png">
 </p>
 
@@ -82,19 +67,19 @@ If you have Linux terminal type:
 
 Make sure you remove
  > PRIVATE_KEY=example_private_key
+
 from .env file, Otherwise app will not work locally.
 
-8. Edit `.env` and set `APP_ID` to the ID of the app you just created. The App ID can be found in your app settings page here.
+8. Edit `.env` and set `APP_ID` to the ID of the app you just created and also `WEBHOOK_SECRET` to `development`. The App ID can be found in your app settings page here.
 
 <p align="center">
-    <img src="images/sample-app-id.png">
+    <img src="images/docs/sample_app_id.png">
 </p>
 
 
 ## Installing the bot on a repository
 
-You'll need to identify a target repository and install the bot by clicking the **Install** button on the settings page of your app, e.g `https://github.com/apps/your-app-name`. In the `.env` file put your github account name in 
-`WHITELISTED_ACCOUNTS` and also add your repository (name in small caps) in the `constants.js` file locally.
+You'll need to identify a target repository and install the bot by clicking the **Install** button on the settings page of your app, e.g `https://github.com/settings/apps/my-oppiabot-testing-app/installations`. In the `.env` file put your github account name in `WHITELISTED_ACCOUNTS` and also add your repository (name in small caps) in the `constants.js` file locally.
 
 
 ## Running the bot locally
@@ -104,12 +89,12 @@ The `dev` script will start the bot using [nodemon](https://github.com/remy/node
 
 ### Other available scripts
 
-`$ npm start` to start the bot without watching files.
+`npm start` to start the bot without watching files.
 
 
 ## Debugging
-Always run `$ npm install` and restart the server if `package.json` has changed.
-To turn on verbose logging, start server by running: `$ LOG_LEVEL=trace npm start`.
+Always run `npm install` and restart the server if `package.json` has changed.
+To turn on verbose logging, start server by running: `LOG_LEVEL=trace npm start`.
 Run `npm test` to run all the tests locally.
 
 

@@ -34,7 +34,6 @@ const issueCommentCreatedEvent = 'comment_created';
 const periodicCheck = 'periodic-check';
 const claCheck = 'cla-check';
 const claCheckGithubAction = 'cla-check-github-action';
-const changelogCheck = 'changelog-check';
 const datastoreLabelCheck = 'datastore-label-check';
 const prLabelCheck = 'pr-label-check';
 const hotfixLabelCheck = 'hotfix-label-check';
@@ -79,8 +78,8 @@ const checksWhitelist = {
   // eslint-disable-next-line quote-props
   'oppia': {
     [openEvent]: [
+      assigneeCheck,
       claCheck,
-      changelogCheck,
       codeOwnerCheck,
       branchCheck,
       jobCheck,
@@ -92,14 +91,13 @@ const checksWhitelist = {
     [reopenEventGithubActions]: [claCheckGithubAction, wipCheck],
     [editEventGithubActions]: [wipCheck],
     [reopenEvent]: [
-      changelogCheck,
       branchCheck,
       jobCheck,
       cronJobCheck,
       modelCheck,
       prTemplateCheck
     ],
-    [PRLabelEvent]: [assigneeCheck, prLabelCheck, hotfixLabelCheck],
+    [PRLabelEvent]: [prLabelCheck, hotfixLabelCheck],
     [synchronizeEvent]: [
       mergeConflictCheck,
       jobCheck,
@@ -157,7 +155,6 @@ module.exports.issueCommentCreatedEvent = issueCommentCreatedEvent;
 module.exports.periodicCheck = periodicCheck;
 module.exports.claCheck = claCheck;
 module.exports.claCheckGithubAction = claCheckGithubAction;
-module.exports.changelogCheck = changelogCheck;
 module.exports.branchCheck = branchCheck;
 module.exports.wipCheck = wipCheck;
 module.exports.assigneeCheck = assigneeCheck;

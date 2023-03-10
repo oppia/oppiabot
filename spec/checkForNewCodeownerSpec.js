@@ -33,7 +33,7 @@ let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
 
-describe('check for new code owner', () => {
+describe('Check for new code owner', () => {
   /**
    * @type {import('probot').Probot} robot
    */
@@ -223,49 +223,6 @@ describe('check for new code owner', () => {
       payloadData.payload.pull_request.changed_files = 2;
     });
 
-    describe('and there is a changelog label', () => {
-      beforeEach(async () => {
-        const label = {
-          id: 638839900,
-          node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-          url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-          name: 'PR CHANGELOG: Server Errors -- @kevintab95',
-          color: '00FF00',
-        };
-        payloadData.payload.pull_request.labels.push(label);
-        await robot.receive(payloadData);
-      });
-
-      it('should check for new code owner', () => {
-        expect(newCodeOwnerModule.checkForNewCodeowner).toHaveBeenCalled();
-      });
-
-      it('should get all modified files', () => {
-        expect(github.pulls.listFiles).toHaveBeenCalled();
-      });
-
-      it('should get codeowner file from develop', () => {
-        expect(utils.getMainCodeOwnerfile).toHaveBeenCalled();
-      });
-
-      it('should ping project owner', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
-          repo: payloadData.payload.repository.name,
-          owner: payloadData.payload.repository.owner.login,
-          issue_number: payloadData.payload.pull_request.number,
-          body:
-            'Hi @DubeySandeep, this PR adds a new code owner, @testuser to ' +
-            '/core/templates/pages/signup-page/. Please make sure the changes' +
-            ' are verified by the previous codeowner(s) of the file. Thanks!'
-        });
-      });
-
-      afterEach(() => {
-        payloadData.payload.pull_request.labels.pop();
-      });
-    });
-
     describe('and there is no changelog label', () => {
       beforeEach(async () => {
         const reviewer = {
@@ -288,7 +245,6 @@ describe('check for new code owner', () => {
       });
 
       it('should ping reviewer', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
         expect(github.issues.createComment).toHaveBeenCalledWith({
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
@@ -314,15 +270,6 @@ describe('check for new code owner', () => {
         }),
       };
       payloadData.payload.pull_request.changed_files = 2;
-
-      const label = {
-        id: 638839900,
-        node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-        url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
-        color: '00FF00',
-      };
-      payloadData.payload.pull_request.labels.push(label);
       await robot.receive(payloadData);
     });
     it('should check for new code owner', () => {
@@ -366,15 +313,6 @@ describe('check for new code owner', () => {
         }),
       };
       payloadData.payload.pull_request.changed_files = 2;
-
-      const label = {
-        id: 638839900,
-        node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-        url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
-        color: '00FF00',
-      };
-      payloadData.payload.pull_request.labels.push(label);
       await robot.receive(payloadData);
     });
     it('should check for new code owner', () => {
@@ -406,15 +344,6 @@ describe('check for new code owner', () => {
         }),
       };
       payloadData.payload.pull_request.changed_files = 1;
-
-      const label = {
-        id: 638839900,
-        node_id: 'MDU6TGFiZWw2Mzg4Mzk5MDA=',
-        url: 'https://api.github.com/repos/oppia/oppia/labels/PR:%20released',
-        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
-        color: '00FF00',
-      };
-      payloadData.payload.pull_request.labels.push(label);
       await robot.receive(payloadData);
     });
     it('should check for new code owner', () => {
@@ -491,4 +420,3 @@ describe('check for new code owner', () => {
     ]);
   });
 });
-

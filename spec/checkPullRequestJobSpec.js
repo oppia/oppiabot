@@ -435,9 +435,6 @@ describe('Pull Request Job Spec', () => {
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callThrough();
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
-      checkPullRequestLabelsModule, 'checkChangelogLabel'
-    ).and.callFake(() => { });
-    spyOn(
       checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'
     ).and.callFake(() => { });
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });

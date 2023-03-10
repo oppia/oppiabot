@@ -194,10 +194,6 @@ describe('Critical Pull Request Spec', () => {
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
     spyOn(checkCronJobModule, 'checkForNewCronJob').and.callFake(() => { });
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
-    spyOn(
-      checkPullRequestLabelsModule,
-      'checkChangelogLabel'
-    ).and.callFake(() => { });
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
     spyOn(
       checkPullRequestTemplateModule, 'checkTemplate'

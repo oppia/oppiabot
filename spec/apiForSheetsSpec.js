@@ -53,8 +53,6 @@ describe('Api For Sheets Module', () => {
   beforeEach(function (done) {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
     spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
-    spyOn(checkPullRequestLabelsModule, 'checkChangelogLabel').and.callFake(
-      () => { });
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
     spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')
       .and.callFake(() => { });
@@ -125,8 +123,6 @@ describe('Api For Sheets Module', () => {
     });
 
     it('should call other checks', () => {
-      expect(
-        checkPullRequestLabelsModule.checkChangelogLabel).toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).toHaveBeenCalled();
       expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
     });
@@ -212,9 +208,6 @@ describe('Api For Sheets Module', () => {
   describe('output generation', () => {
     const claData = [['abp'], ['kevinlee']];
     beforeEach(function (done) {
-      pullRequestPayload.payload.pull_request.labels.push({
-        name: 'PR CHANGELOG: Server Errors -- @kevintab95',
-      });
       spyOn(apiForSheetsModule, 'checkClaStatus').and.callThrough();
       spyOn(apiForSheetsModule, 'authorize').and.callFake(() => ({}));
       spyOn(apiForSheetsModule, 'checkClaSheet').and.callFake(() => { });
@@ -370,9 +363,6 @@ describe('Api For Sheets Module', () => {
     });
 
     it('should not call non whitelisted checks', () => {
-      expect(
-        checkPullRequestLabelsModule.checkChangelogLabel
-      ).not.toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
     });
 
@@ -440,9 +430,6 @@ describe('Api For Sheets Module', () => {
     });
 
     it('should not call any checks', () => {
-      expect(
-        checkPullRequestLabelsModule.checkChangelogLabel
-      ).not.toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
       expect(apiForSheetsModule.checkClaStatus).not.toHaveBeenCalled();
       expect(checkPullRequestJobModule.checkForNewJob).not.toHaveBeenCalled();
@@ -461,9 +448,6 @@ describe('Api For Sheets Module', () => {
     });
 
     it('should not call any checks', () => {
-      expect(
-        checkPullRequestLabelsModule.checkChangelogLabel
-      ).not.toHaveBeenCalled();
       expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
       expect(apiForSheetsModule.checkClaStatus).not.toHaveBeenCalled();
       expect(checkPullRequestJobModule.checkForNewJob).not.toHaveBeenCalled();
