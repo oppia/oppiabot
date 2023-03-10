@@ -480,7 +480,7 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @vojtechjelinek, PTAL at this PR, ' +
+          'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
           'it adds a new job. The name of the job is ' + jobNameLink + '.' +
           newLineFeed +
           'Also @' + author + ', please make sure to fill in the ' + formText +
@@ -499,7 +499,7 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        assignees: ['vojtechjelinek']
+        assignees: ['vojtechjelinek', 'DubeySandeep', 'kevintab95']
       });
     });
 
@@ -579,7 +579,7 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        assignees: ['vojtechjelinek']
+        assignees: ['vojtechjelinek', 'DubeySandeep', 'kevintab95']
       });
     });
 
@@ -633,7 +633,7 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-            'Hi @vojtechjelinek, PTAL at this PR, ' +
+            'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
             'it adds a new job. The name of the job is ' + jobNameLink + '.' +
             newLineFeed + 'Also @' + author +
             ', please make sure to fill in the ' + formText +
@@ -652,7 +652,7 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        assignees: ['vojtechjelinek']
+        assignees: ['vojtechjelinek', 'DubeySandeep', 'kevintab95']
       });
     });
 
@@ -710,7 +710,7 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @vojtechjelinek, PTAL at this PR, ' +
+          'Hi @vojtechjelinek, @DubeySandeep, @kevintab95,PTAL at this PR, ' +
           'it adds a new job. The name of the job is ' + jobNameLink +
           '.' + newLineFeed + 'Also @' + author + ', please make sure to ' +
           'fill in the ' + formText + ' for the new job to be tested on the ' +
@@ -728,7 +728,7 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        assignees: ['vojtechjelinek']
+        assignees: ['vojtechjelinek', 'DubeySandeep', 'kevintab95']
       });
     });
 
