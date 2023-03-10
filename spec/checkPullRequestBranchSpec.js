@@ -49,10 +49,6 @@ describe('Pull Request Branch Check', () => {
 
     // Spy on other modules that will be triggered by the payload.
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
-    spyOn(
-      checkPullRequestLabelsModule,
-      'checkChangelogLabel'
-    ).and.callFake(() => { });
     spyOn(checkPullRequestJobModule, 'checkForNewJob')
       .and.callFake(() => { });
     spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')
@@ -83,6 +79,7 @@ describe('Pull Request Branch Check', () => {
     describe('develop branch check', () => {
       beforeEach(async () => {
         pullRequestPayload.payload.pull_request.head.ref = 'develop';
+        pullRequestPayload.payload.action = 'reopened';
         await app.receive(pullRequestPayload);
       });
 

@@ -172,9 +172,9 @@ describe("Oppiabot's", () => {
           },
         }),
       };
-      // Trigger pull_request.opened event.
-      pullRequestEditedPayload.action = 'opened';
-      await dispatcher.dispatch('pull_request_target', 'opened');
+      // Trigger pull_request.reopened event.
+      pullRequestEditedPayload.action = 'reopened';
+      await dispatcher.dispatch('pull_request_target', 'reopened');
 
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
       expect(octokit.git.getCommit).toHaveBeenCalled();
@@ -217,7 +217,7 @@ describe("Oppiabot's", () => {
       // Receive a draft payload and remove WIP from title.
       pullRequestEditedPayload.pull_request.draft = true;
       pullRequestEditedPayload.pull_request.title = 'Testing Draft';
-      await dispatcher.dispatch('pull_request_target', 'opened');
+      await dispatcher.dispatch('pull_request_target', 'reopened');
     });
 
     it('calls checkWIP function', () => {

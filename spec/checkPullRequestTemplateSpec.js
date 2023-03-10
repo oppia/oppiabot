@@ -293,10 +293,6 @@ describe('Pull Request Template', () => {
     spyOn(checkCronJobModule, 'checkForNewCronJob').and.callFake(() => { });
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
-      checkPullRequestLabelsModule,
-      'checkChangelogLabel'
-    ).and.callFake(() => { });
-    spyOn(
       checkCriticalPullRequestModule,
       'checkIfPRAffectsDatastoreLayer'
     ).and.callFake(() => { });

@@ -2,6 +2,7 @@ node_modules
 npm-debug.log
 *.pem
 .env
+.idea
 newrelic_agent.log
 .nyc_output
 coverage

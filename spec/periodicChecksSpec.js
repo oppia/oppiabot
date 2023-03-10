@@ -101,11 +101,6 @@ describe('Periodic Checks Module', () => {
       },
       mergeable: true,
       requested_reviewers: [],
-      labels: [
-        {
-          name: 'PR CHANGELOG: Miscellaneous -- @ankita240796',
-        },
-      ],
     },
 
     unResolvablePR: {
@@ -511,80 +506,6 @@ describe('Periodic Checks Module', () => {
         });
       });
     });
-
-  describe(
-    'when pull request has been approved and has a changelog label but ' +
-    'author does not have merging rights',
-    () => {
-      beforeEach(async () => {
-        spyOn(
-          periodicCheckModule, 'ensureAllPullRequestsAreAssigned'
-        ).and.callThrough();
-        spyOn(
-          periodicCheckModule, 'ensureAllIssuesHaveProjects'
-        ).and.callFake(() => { });
-        spyOn(
-          staleBuildModule, 'checkAndTagPRsWithOldBuilds'
-        ).and.callFake(() => { });
-        const approvedPR = pullRequests.approvedPRWithLabel;
-        github.pulls.list = jasmine.createSpy('list').and.resolveTo({
-          data: [approvedPR, pullRequests.assignedPullRequest],
-        });
-        await robot.receive(payloadData);
-      });
-
-      it('should call periodic check module', () => {
-        expect(
-          periodicCheckModule.ensureAllPullRequestsAreAssigned
-        ).toHaveBeenCalled();
-      });
-
-      it('should check if pr author has merging rights', () => {
-        expect(github.repos.getCollaboratorPermissionLevel)
-          .toHaveBeenCalled();
-        expect(github.repos.getCollaboratorPermissionLevel)
-          .toHaveBeenCalledWith({
-            owner: 'oppia',
-            repo: 'oppia',
-            username: 'author5',
-          });
-      });
-
-      it('should ping project owner', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
-          issue_number: 5,
-          owner: 'oppia',
-          repo: 'oppia',
-          body:
-            'Hi @ankita240796, this PR is ready to be merged. ' +
-            'Author of this PR does not have permissions ' +
-            'to merge this PR. Before you ' +
-            'merge it, please make sure that there are no pending comments ' +
-            'that require action from the author\'s end. Thanks!',
-        });
-      });
-
-      it('should assign project owner', () => {
-        expect(github.issues.addAssignees).toHaveBeenCalled();
-        expect(github.issues.addAssignees).toHaveBeenCalledWith({
-          issue_number: 5,
-          owner: 'oppia',
-          repo: 'oppia',
-          assignees: ['ankita240796'],
-        });
-      });
-
-      it('should not assign author', () => {
-        expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
-          issue_number: 5,
-          owner: 'oppia',
-          repo: 'oppia',
-          assignees: ['author5'],
-        });
-      });
-    }
-  );
 
   describe('when pull request does not match any of the above cases', () => {
     beforeEach(async () => {
