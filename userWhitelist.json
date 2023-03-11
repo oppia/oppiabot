@@ -1,14 +1,17 @@
 {
   "releaseCoordinators": [
-    "nithusha21",
     "aks681",
     "vojtechjelinek",
-    "ankita240796",
     "DubeySandeep",
     "BenHenning",
     "kevintab95",
     "seanlip",
-    "U8NWXD"
+    "U8NWXD",
+    "gp201",
+    "Priyansh61",
+    "SanjaySajuJacob",
+    "sagangwee",
+    "chris7716"
   ],
   "goodFirstIssue": [
     "U8NWXD",
@@ -33,5 +36,5 @@
   "oppiaMaintainers": "oppia/core-maintainers",
   "oppiaReleaseCoordinators": "oppia/release-coordinators",
   "oppiaDevWorkflowTeam": "oppia/dev-workflow-team",
-  "serverJobAdmins": ["vojtechjelinek"]
+  "serverJobAdmins": ["vojtechjelinek", "DubeySandeep", "kevintab95"]
 }
