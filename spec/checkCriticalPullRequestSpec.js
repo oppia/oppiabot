@@ -298,7 +298,7 @@ describe('Critical Pull Request Spec', () => {
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @vojtechjelinek and @DubeySandeep and @kevintab95,' +
+          'Hi @vojtechjelinek and @DubeySandeep and @kevintab95, ' +
           'PTAL at this PR, it adds new models that need to be validated. ' +
           'The models are ' + firstModel + ', ' + secondModels + '.<br>Thanks!'
       });

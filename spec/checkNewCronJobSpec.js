@@ -249,8 +249,8 @@ describe('Cron Job Spec', () => {
         body:
         'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
         'it adds a new cron job.' + newLineFeed + 'Also @' + author + 
-        ' please add the new test and URL redirects for the new CRON jobs. ' +
-        ' It seems you have added or edited a CRON job, if so please request ' +
+        ' please add the new test and URL redirects for the new CRON jobs ' +
+        'It seems you have added or edited a CRON job, if so please request ' +
         'a testing of this CRON job with this ' + formText + ' Please refer ' +
         'to ' + wikiLinkText + ' for details.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
@@ -316,8 +316,8 @@ describe('Cron Job Spec', () => {
         body:
         'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, it ' +
         'adds a new cron job.' + newLineFeed + 'Also @' + author + ' It seems' +
-        'you have added or edited a CRON job, if so please request a testing ' +
-        'of this CRON job with this ' + formText + ' Please refer to ' +
+        ' you have added or edited a CRON job, if so please request a testing' +
+        ' of this CRON job with this ' + formText + ' Please refer to ' +
         wikiLinkText + ' for details.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -413,8 +413,8 @@ describe('Cron Job Spec', () => {
         body:
         'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, it ' +
         'adds a new cron job.' + newLineFeed + 'Also @' + author + ' It seems' +
-        'you have added or edited a CRON job, if so please request a testing ' +
-        'of this CRON job with this ' + formText + ' Please refer to ' +
+        ' you have added or edited a CRON job, if so please request a testing' +
+        ' of this CRON job with this ' + formText + ' Please refer to ' +
         wikiLinkText + ' for details.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -432,7 +432,7 @@ describe('Cron Job Spec', () => {
     });
   });
 
-  describe('When only tests are added for a  cron job', () => {
+  describe('When only tests are added for a cron job', () => {
     beforeEach(async () => {
       github.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
@@ -470,7 +470,7 @@ describe('Cron Job Spec', () => {
         'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, it ' +
         'adds a new cron job.' + newLineFeed + 'Also @' + author + ' It seems' +
         ' you have added or edited a CRON job, if so please request a testing' +
-        'of this CRON job with this ' + formText + ' Please refer to ' +
+        ' of this CRON job with this ' + formText + ' Please refer to ' +
         wikiLinkText + ' for details.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
