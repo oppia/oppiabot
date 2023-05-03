@@ -6,7 +6,6 @@
 
 Oppiabot is a GitHub app built with [probot](https://github.com/probot/probot). It acts as a helper for the Oppia code repository to maintain the development workflow. It is hosted on [Heroku](https://www.heroku.com/).
 
-
 ## Getting started
 
 Please refer to the following instructions to setup Oppiabot for the first time on your machine:
@@ -76,11 +75,9 @@ from .env file, Otherwise app will not work locally.
     <img src="images/docs/sample_app_id.png">
 </p>
 
-
 ## Installing the bot on a repository
 
 You'll need to identify a target repository and install the bot by clicking the **Install** button on the settings page of your app, e.g `https://github.com/settings/apps/my-oppiabot-testing-app/installations`. In the `.env` file put your github account name in `WHITELISTED_ACCOUNTS` and also add your repository (name in small caps) in the `constants.js` file locally.
-
 
 ## Running the bot locally
 
@@ -91,12 +88,10 @@ The `dev` script will start the bot using [nodemon](https://github.com/remy/node
 
 `npm start` to start the bot without watching files.
 
-
 ## Debugging
 Always run `npm install` and restart the server if `package.json` has changed.
 To turn on verbose logging, start server by running: `LOG_LEVEL=trace npm start`.
 Run `npm test` to run all the tests locally.
-
 
 ## Support
 
