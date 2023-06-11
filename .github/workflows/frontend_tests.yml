@@ -22,3 +22,6 @@ jobs:
         run: npm install
       - name: Run frontend tests
         run: npm run test
+      - id: set-version
+        name: Print npm version
+        run: npm pkg get version
