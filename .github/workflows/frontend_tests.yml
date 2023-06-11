@@ -14,6 +14,8 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
     steps:
+      - name: Print npm version
+        run: npm pkg get version
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
@@ -22,6 +24,3 @@ jobs:
         run: npm install
       - name: Run frontend tests
         run: npm run test
-      - id: set-version
-        name: Print npm version
-        run: npm pkg get version
