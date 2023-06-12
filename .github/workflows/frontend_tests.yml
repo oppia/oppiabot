@@ -18,8 +18,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12'
-        - name: Check node version
-        - run: node -v
+      - name: Check node version
+      - run: node -v
       - name: Install dependencies
         run: npm install
       - name: Run frontend tests
