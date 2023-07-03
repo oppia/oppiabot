@@ -50,12 +50,15 @@ const checkLabels = async () => {
 const handleGoodFirstIssueLabel = async (octokit, user) => {
   const issueNumber = context.payload.issue.number;
   // Comment on the issue and ping the onboarding team lead.
+  var commentBody = 'Hi @' + user + ', thanks for proposing this as a good first ' +
+    'issue. I am removing the label for now and looping in '
+  for (const teamMember of userWhitelist.goodFirstIssue) {
+    commentBody += '@' + teamMember + ' ';
+  }
+  commentBody += 'to approve the label. It will be added back if approved. Thanks!';
   await octokit.issues.createComment(
     {
-      body: 'Hi @' + user + ', thanks for proposing this as a good first ' +
-        'issue. I am removing the label for now and looping in ' +
-        '@' + whitelist.teamLeads.onboardingTeam + ' to approve the label. ' +
-        'It will be added back if approved. Thanks!',
+      body: commentBody,
       issue_number: issueNumber,
       owner: context.repo.owner,
       repo: context.repo.repo,
