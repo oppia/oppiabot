@@ -133,6 +133,10 @@ const checksWhitelist = {
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
     [issueCommentCreatedEvent]: [respondToReviewCheck],
   },
+  'testoppiabot': {
+    [openEvent]: [assigneeCheck, prTemplateCheck, codeOwnerCheck],
+    [reopenEvent]: [prTemplateCheck],
+  }
 };
 
 const blacklistedAuthors = ['translatewiki'];
