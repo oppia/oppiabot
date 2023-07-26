@@ -23,7 +23,6 @@ const scheduler = require('../lib/scheduler');
 const payloadData = require('../fixtures/periodicCheckPayload.json');
 const periodicCheckModule = require('../lib/periodicChecks');
 const mergeConflictModule = require('../lib/checkMergeConflicts');
-const staleBuildModule = require('../lib/staleBuildChecks');
 
 describe('Periodic Checks Module', () => {
   /**
@@ -236,9 +235,6 @@ describe('Periodic Checks Module', () => {
       spyOn(
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => { });
-      spyOn(
-        staleBuildModule, 'checkAndTagPRsWithOldBuilds'
-      ).and.callFake(() => { });
       const mergeConflictPR = pullRequests.mergeConflictPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [mergeConflictPR, pullRequests.assignedPullRequest],
@@ -307,9 +303,6 @@ describe('Periodic Checks Module', () => {
       spyOn(
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => { });
-      spyOn(
-        staleBuildModule, 'checkAndTagPRsWithOldBuilds'
-      ).and.callFake(() => { });
       const pendingReviewPR = pullRequests.pendingReviewPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [pendingReviewPR, pullRequests.assignedPullRequest],
@@ -361,9 +354,6 @@ describe('Periodic Checks Module', () => {
       ).and.callThrough();
       spyOn(
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
-      ).and.callFake(() => { });
-      spyOn(
-        staleBuildModule, 'checkAndTagPRsWithOldBuilds'
       ).and.callFake(() => { });
       const changesRequestedPR = pullRequests.hasChangesRequestedPR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
@@ -444,9 +434,6 @@ describe('Periodic Checks Module', () => {
         spyOn(
           periodicCheckModule, 'ensureAllIssuesHaveProjects'
         ).and.callFake(() => { });
-        spyOn(
-          staleBuildModule, 'checkAndTagPRsWithOldBuilds'
-        ).and.callFake(() => { });
         const approvedPR = pullRequests.approvedPR;
         github.pulls.list = jasmine.createSpy('list').and.resolveTo({
           data: [approvedPR, pullRequests.assignedPullRequest],
@@ -514,9 +501,6 @@ describe('Periodic Checks Module', () => {
       ).and.callThrough();
       spyOn(
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
-      ).and.callFake(() => { });
-      spyOn(
-        staleBuildModule, 'checkAndTagPRsWithOldBuilds'
       ).and.callFake(() => { });
       const approvedPR = pullRequests.unResolvablePR;
       github.pulls.list = jasmine.createSpy('list').and.resolveTo({
@@ -618,9 +602,6 @@ describe('Periodic Checks Module', () => {
       },
     ];
     beforeEach(() => {
-      spyOn(
-        staleBuildModule, 'checkAndTagPRsWithOldBuilds'
-      ).and.callFake(() => {});
       spyOn(
         periodicCheckModule,
         'ensureAllPullRequestsAreAssigned'

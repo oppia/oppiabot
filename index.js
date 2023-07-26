@@ -38,7 +38,6 @@ const periodicCheckModule = require('./lib/periodicChecks');
 
 const constants = require('./constants');
 const checkIssueAssigneeModule = require('./lib/checkIssueAssignee');
-const staleBuildModule = require('./lib/staleBuildChecks');
 
 const whitelistedAccounts = (process.env.WHITELISTED_ACCOUNTS || '')
   .toLowerCase()
@@ -149,16 +148,12 @@ const runChecks = async (context, checkEvent) => {
           case constants.periodicCheck:
             callable.push(...[
               periodicCheckModule.ensureAllPullRequestsAreAssigned(context),
-              staleBuildModule.checkAndTagPRsWithOldBuilds(context),
             ]);
             break;
           case constants.respondToReviewCheck:
             callable.push(
               checkPullRequestReviewModule.handleResponseToReview(context)
             );
-            break;
-          case constants.oldBuildLabelCheck:
-            callable.push(staleBuildModule.removeOldBuildLabel(context));
             break;
         }
       }
