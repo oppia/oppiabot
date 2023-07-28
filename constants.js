@@ -56,7 +56,6 @@ const codeOwnerCheck = 'code-owner-check';
 const ciFailureCheck = 'ci-failure-check';
 const updateWithDevelopCheck = 'update-with-develop-check';
 const respondToReviewCheck = 'respond-to-review-check';
-const oldBuildLabelCheck = 'old-build-label-check';
 const staleBuildLabelCheck = 'stale-build-label-check';
 const dontMergeLabelCheck = 'dont-merge-label-check';
 
@@ -104,7 +103,6 @@ const checksWhitelist = {
       cronJobCheck,
       modelCheck,
       codeOwnerCheck,
-      oldBuildLabelCheck
     ],
     [closeEvent]: [allMergeConflictCheck, updateWithDevelopCheck],
     [editEvent]: [wipCheck],
@@ -175,7 +173,6 @@ module.exports.codeOwnerCheck = codeOwnerCheck;
 module.exports.ciFailureCheck = ciFailureCheck;
 module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
 module.exports.respondToReviewCheck = respondToReviewCheck;
-module.exports.oldBuildLabelCheck = oldBuildLabelCheck;
 module.exports.staleBuildLabelCheck = staleBuildLabelCheck;
 module.exports.dontMergeLabelCheck = dontMergeLabelCheck;
 
