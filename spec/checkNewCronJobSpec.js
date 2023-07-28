@@ -199,7 +199,8 @@ describe('Cron Job Spec', () => {
     spyOn(app, 'auth').and.resolveTo(github);
     spyOn(checkCronJobModule, 'checkForNewCronJob').and.callThrough();
     spyOn(
-      checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+      checkPullRequestJobModule, 'checkForModificationsToFiles'
+    ).and.callFake(() => { });
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
       checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'
