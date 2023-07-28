@@ -1,6 +1,0 @@
-1. Download ZIP archive using https://is.muni.cz/go/1rlpne
-2. Make sure that you're on main branch (git status)
-3. Pull latest changes from remote (git pull)
-4. Create new branch and change to (git checkout -b review)
-5. Unzip the archive into review folder
-6. Create new commit (git commit -m ) 
