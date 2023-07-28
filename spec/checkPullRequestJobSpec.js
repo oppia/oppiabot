@@ -484,10 +484,10 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
-          'it adds a new job. The name of the job is ' + jobNameLink + '.' +
+          'it modifies files in jobs or platform folders.' +
           newLineFeed +
           'Also @' + author + ', please make sure to fill in the ' + formText +
-          ' for the new job to be tested on the backup server. ' +
+          ' for the new job or feature to be tested on the backup server. ' +
           'This PR can be merged only after the test run is successful. ' +
           'Please refer to ' + wikiLinkText + ' for details.' +
           newLineFeed + 'Thanks!',
@@ -641,10 +641,10 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
             'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this ' +
-            'PR, it adds a new job. The name of the job is ' + jobNameLink + 
+            'PR, it modifies files in jobs or platform folders.' +
             '.' + newLineFeed + 'Also @' + author +
             ', please make sure to fill in the ' + formText +
-            ' for the new job to be tested on the backup server. ' +
+            ' for the new job or feature to be tested on the backup server. ' +
             'This PR can be merged only after the test run is successful. ' +
             'Please refer to ' + wikiLinkText + ' for details.' +
             newLineFeed + 'Thanks!',
@@ -720,11 +720,11 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
-          'it adds a new job. The name of the job is ' + jobNameLink +
-          '.' + newLineFeed + 'Also @' + author + ', please make sure to ' +
-          'fill in the ' + formText + ' for the new job to be tested on the ' +
-          'backup server. ' + 'This PR can be merged only after the test ' +
-          'run is successful. ' + 'Please refer to ' + wikiLinkText +
+          'it modifies files in jobs or platform folders.' + newLineFeed + 
+          'Also @' + author + ', please make sure to ' +
+          'fill in the ' + formText + ' for the new job or feature to be ' +
+          'tested on the backup server. This PR can be merged only after the test ' +
+          'run is successful. Please refer to ' + wikiLinkText +
           ' for details.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -749,46 +749,6 @@ describe('Pull Request Job Spec', () => {
         owner: payloadData.payload.repository.owner.login,
         labels: ['PR: Affects datastore layer']
       });
-    });
-  });
-
-  describe('When an existing job file is modified with no new job', () => {
-    beforeEach(async () => {
-      github.pulls = {
-        listFiles: jasmine.createSpy('listFiles').and.resolveTo({
-          data: [
-            {
-              ...firstNewJobFileObj,
-              status: 'modified',
-              patch: '\n+# No job files present in the changes',
-            },
-          ],
-        }),
-      };
-
-      payloadData.payload.pull_request.changed_files = 1;
-      await robot.receive(payloadData);
-    });
-
-    it('should check for jobs', () => {
-      expect(
-        checkPullRequestJobModule.checkForModificationsToFiles
-      ).toHaveBeenCalled();
-    });
-
-    it('should get modified files', () => {
-      expect(github.pulls.listFiles).toHaveBeenCalled();
-    });
-
-
-    it('should not ping server jobs admin', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
-    });
-    it('should not add datastore label', () => {
-      expect(github.issues.addLabels).not.toHaveBeenCalled();
-    });
-    it('should not assign server jobs admin', () => {
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
 
