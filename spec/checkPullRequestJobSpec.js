@@ -638,10 +638,10 @@ describe('Pull Request Job Spec', () => {
         body:
             'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this ' +
             'PR, it modifies files in jobs or platform folders.' + newLineFeed + 
-            'Also @' + author + ', please make sure to fill in the ' + formText +
-            ' for the new job or feature to be tested on the backup server. ' +
-            'This PR can be merged only after the test run is successful. ' +
-            'Please refer to ' + wikiLinkText + ' for details.' +
+            'Also @' + author + ', please make sure to fill in the ' + 
+            formText + ' for the new job or feature to be tested on the ' +
+            'backup server. This PR can be merged only after the test run ' + 
+            'is successful. Please refer to ' + wikiLinkText + ' for details.' +
             newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -716,9 +716,9 @@ describe('Pull Request Job Spec', () => {
         body:
           'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
           'it modifies files in jobs or platform folders.' + newLineFeed + 
-          'Also @' + author + ', please make sure to ' +
-          'fill in the ' + formText + ' for the new job or feature to be ' +
-          'tested on the backup server. This PR can be merged only after the test ' +
+          'Also @' + author + ', please make sure to ' + 'fill in the ' + 
+          formText + ' for the new job or feature to be tested on the ' + 
+          'backup server. This PR can be merged only after the test ' +
           'run is successful. Please refer to ' + wikiLinkText +
           ' for details.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
