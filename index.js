@@ -84,7 +84,8 @@ const runChecks = async (context, checkEvent) => {
             );
             break;
           case constants.jobCheck:
-            callable.push(checkPullRequestJobModule.checkForNewJob(context));
+            callable.push(
+              checkPullRequestJobModule.checkForModificationsToFiles(context));
             break;
           case constants.cronJobCheck:
             callable.push(checkCronJobModule.checkForNewCronJob(context));

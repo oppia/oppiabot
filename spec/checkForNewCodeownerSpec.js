@@ -199,7 +199,9 @@ describe('Check for new code owner', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(
+      checkPullRequestJobModule, 'checkForModificationsToFiles'
+    ).and.callFake(() => { });
     spyOn(checkCronJobModule, 'checkForNewCronJob').and.callFake(() => { });
     spyOn(
       checkCriticalPullRequestModule,

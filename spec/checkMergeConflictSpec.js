@@ -74,7 +74,9 @@ describe('Merge Conflict Check', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(
+      checkPullRequestJobModule, 'checkForModificationsToFiles'
+    ).and.callFake(() => { });
     spyOn(checkCronJobModule, 'checkForNewCronJob').and.callFake(() => { });
     spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
     spyOn(

@@ -52,7 +52,9 @@ describe('Api For Sheets Module', () => {
 
   beforeEach(function (done) {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callFake(() => { });
+    spyOn(
+      checkPullRequestJobModule, 'checkForModificationsToFiles'
+    ).and.callFake(() => { });
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callFake(() => { });
     spyOn(checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer')
       .and.callFake(() => { });
@@ -124,7 +126,9 @@ describe('Api For Sheets Module', () => {
 
     it('should call other checks', () => {
       expect(checkPullRequestBranchModule.checkBranch).toHaveBeenCalled();
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should be called for the given payload', () => {
@@ -432,7 +436,9 @@ describe('Api For Sheets Module', () => {
     it('should not call any checks', () => {
       expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
       expect(apiForSheetsModule.checkClaStatus).not.toHaveBeenCalled();
-      expect(checkPullRequestJobModule.checkForNewJob).not.toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).not.toHaveBeenCalled();
     });
   });
 
@@ -450,7 +456,9 @@ describe('Api For Sheets Module', () => {
     it('should not call any checks', () => {
       expect(checkPullRequestBranchModule.checkBranch).not.toHaveBeenCalled();
       expect(apiForSheetsModule.checkClaStatus).not.toHaveBeenCalled();
-      expect(checkPullRequestJobModule.checkForNewJob).not.toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).not.toHaveBeenCalled();
     });
   });
 });
