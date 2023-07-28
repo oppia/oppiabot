@@ -26,7 +26,7 @@ const checkPullRequestTemplateModule =
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
 const checkCronJobModule = require('../lib/checkNewCronJobs');
-const { JOBS_AND_FETURES_TESTING_WIKI_LINK } = require('../lib/utils');
+const { JOBS_AND_FEATURES_TESTING_WIKI_LINK } = require('../lib/utils');
 
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
@@ -475,7 +475,7 @@ describe('Pull Request Job Spec', () => {
       );
       const newLineFeed = '<br>';
       const wikiLinkText = 'this guide'.link(
-        JOBS_AND_FETURES_TESTING_WIKI_LINK);
+        JOBS_AND_FEATURES_TESTING_WIKI_LINK);
       const jobNameLink = (
         'FirstTestJob'.link(firstNewJobFileObj.blob_url)
       );
@@ -551,7 +551,7 @@ describe('Pull Request Job Spec', () => {
       );
       const newLineFeed = '<br>';
       const wikiLinkText = 'this guide'.link(
-        JOBS_AND_FETURES_TESTING_WIKI_LINK);
+        JOBS_AND_FEATURES_TESTING_WIKI_LINK);
       const jobRegistryLink = (
         'job registry'.link(
           'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py')
@@ -633,7 +633,7 @@ describe('Pull Request Job Spec', () => {
       );
       const newLineFeed = '<br>';
       const wikiLinkText = 'this guide'.link(
-        JOBS_AND_FETURES_TESTING_WIKI_LINK);
+        JOBS_AND_FEATURES_TESTING_WIKI_LINK);
       const jobNameLink = (
         'FirstTestJob'.link(firstNewJobFileObj.blob_url)
       );
@@ -707,7 +707,7 @@ describe('Pull Request Job Spec', () => {
       );
       const newLineFeed = '<br>';
       const wikiLinkText = 'this guide'.link(
-        JOBS_AND_FETURES_TESTING_WIKI_LINK);
+        JOBS_AND_FEATURES_TESTING_WIKI_LINK);
       const jobRegistryLink = (
         'job registry'.link(
           'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py')

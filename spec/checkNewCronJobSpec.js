@@ -28,7 +28,7 @@ const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
 const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
-const { JOBS_AND_FETURES_TESTING_WIKI_LINK } = require('../lib/utils');
+const { JOBS_AND_FEATURES_TESTING_WIKI_LINK } = require('../lib/utils');
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
 );
@@ -242,7 +242,7 @@ describe('Cron Job Spec', () => {
       );
       const newLineFeed = '<br>';
       const wikiLinkText = 'this guide'.link(
-        JOBS_AND_FETURES_TESTING_WIKI_LINK);
+        JOBS_AND_FEATURES_TESTING_WIKI_LINK);
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
@@ -309,7 +309,7 @@ describe('Cron Job Spec', () => {
       );
       const newLineFeed = '<br>';
       const wikiLinkText = 'this guide'.link(
-        JOBS_AND_FETURES_TESTING_WIKI_LINK);
+        JOBS_AND_FEATURES_TESTING_WIKI_LINK);
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
@@ -406,7 +406,7 @@ describe('Cron Job Spec', () => {
       );
       const newLineFeed = '<br>';
       const wikiLinkText = 'this guide'.link(
-        JOBS_AND_FETURES_TESTING_WIKI_LINK);
+        JOBS_AND_FEATURES_TESTING_WIKI_LINK);
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
@@ -462,7 +462,7 @@ describe('Cron Job Spec', () => {
       );
       const newLineFeed = '<br>';
       const wikiLinkText = 'this guide'.link(
-        JOBS_AND_FETURES_TESTING_WIKI_LINK);
+        JOBS_AND_FEATURES_TESTING_WIKI_LINK);
 
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
