@@ -29,7 +29,6 @@ const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
-const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
 
 let payloadData = JSON.parse(
@@ -200,7 +199,6 @@ describe('Critical Pull Request Spec', () => {
     spyOn(
       checkPullRequestTemplateModule, 'checkTemplate'
     ).and.callFake(() => { });
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
 
     spyOn(
       checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'

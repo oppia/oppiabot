@@ -26,7 +26,6 @@ const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
-const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 
 describe('Pull Request Branch Check', () => {
   /**
@@ -56,7 +55,6 @@ describe('Pull Request Branch Check', () => {
       .and.callFake(() => { });
     spyOn(checkPullRequestTemplateModule, 'checkTemplate')
       .and.callFake(() => { });
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
 
     github = {
       issues: {

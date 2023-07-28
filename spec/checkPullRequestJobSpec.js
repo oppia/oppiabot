@@ -23,7 +23,6 @@ const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
-const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
 const checkCronJobModule = require('../lib/checkNewCronJobs');
 const { JOBS_AND_FEATURES_TESTING_WIKI_LINK } = require('../lib/utils');
@@ -443,7 +442,6 @@ describe('Pull Request Job Spec', () => {
     spyOn(
       checkPullRequestTemplateModule, 'checkTemplate'
     ).and.callFake(() => { });
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
   });
 
   describe('When a new job file is created in a pull request', () => {

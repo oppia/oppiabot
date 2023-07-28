@@ -30,7 +30,6 @@ const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
-const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const { google } = require('googleapis');
 const { OAuth2Client } = require('google-auth-library');
 
@@ -60,7 +59,6 @@ describe('Api For Sheets Module', () => {
       .and.callFake(() => { });
     spyOn(checkPullRequestTemplateModule, 'checkTemplate')
       .and.callFake(() => { });
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
 
     github = {
       issues: {

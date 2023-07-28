@@ -26,7 +26,6 @@ const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
-const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
 const { JOBS_AND_FEATURES_TESTING_WIKI_LINK } = require('../lib/utils');
 let payloadData = JSON.parse(
@@ -209,7 +208,6 @@ describe('Cron Job Spec', () => {
     spyOn(
       checkPullRequestTemplateModule, 'checkTemplate'
     ).and.callFake(() => { });
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
   });
 
   describe('When a new cron job is added in a pull request', () => {
