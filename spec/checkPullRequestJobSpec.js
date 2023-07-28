@@ -431,7 +431,9 @@ describe('Pull Request Job Spec', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callThrough();
+    spyOn(
+      checkPullRequestJobModule, 'checkForModificationsToFiles'
+    ).and.callThrough();
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
       checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'
@@ -456,7 +458,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+      checkPullRequestJobModule.checkForModificationsToFiles
+    ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -530,7 +534,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -610,7 +616,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -681,7 +689,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -761,7 +771,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -795,7 +807,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should not get modified files', () => {
@@ -822,7 +836,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -849,7 +865,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -879,7 +897,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should not get modified files', () => {
@@ -888,43 +908,6 @@ describe('Pull Request Job Spec', () => {
 
     it('should not ping server job admin', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Returns appropriate job name', () => {
-    it('should return the correct job created in the file', () => {
-      let jobs = checkPullRequestJobModule.getNewJobsFromFile(
-        firstNewJobFileObj
-      );
-      expect(jobs.length).toBe(1);
-      expect(jobs[0]).toBe('FirstTestJob');
-
-      jobs = checkPullRequestJobModule.getNewJobsFromFile(secondNewJobFileObj);
-      expect(jobs.length).toBe(1);
-      expect(jobs[0]).toBe('SecondTestJob');
-
-      jobs = checkPullRequestJobModule.getNewJobsFromFile(
-        modifiedExistingJobFileObj
-      );
-      expect(jobs.length).toBe(1);
-      expect(jobs[0]).toBe('OppiabotContributionsJob');
-
-      jobs = checkPullRequestJobModule.getNewJobsFromFile(fileWithMultipleJobs);
-      expect(jobs.length).toBe(2);
-      expect(jobs[0]).toBe('TestJob');
-      expect(jobs[1]).toBe('AnotherTestJob');
-
-      jobs = checkPullRequestJobModule.getNewJobsFromFile(jobTestFile);
-      expect(jobs.length).toBe(0);
-
-      jobs = checkPullRequestJobModule.getNewJobsFromFile(
-        modifiedExistingJobFileObjWithJobClassInPatch);
-      expect(jobs.length).toBe(0);
-
-      jobs = checkPullRequestJobModule.getNewJobsFromFile(
-        jobFileObjWithJobClassInPatchAndNewJob);
-      expect(jobs.length).toBe(1);
-      expect(jobs[0]).toBe('AnotherTestJob');
     });
   });
 });
