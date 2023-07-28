@@ -32,7 +32,6 @@ const checkCriticalPullRequestModule = require(
 );
 const checkBranchPushModule = require('./lib/checkBranchPush');
 const checkPullRequestReviewModule = require('./lib/checkPullRequestReview');
-const newCodeOwnerModule = require('./lib/checkForNewCodeowner');
 const ciCheckModule = require('./lib/ciChecks');
 const periodicCheckModule = require('./lib/periodicChecks');
 
@@ -132,9 +131,6 @@ const runChecks = async (context, checkEvent) => {
             callable.push(
               checkPullRequestReviewModule.handlePullRequestReview(context)
             );
-            break;
-          case constants.codeOwnerCheck:
-            callable.push(newCodeOwnerModule.checkForNewCodeowner(context));
             break;
           case constants.ciFailureCheck:
             callable.push(ciCheckModule.handleFailure(context));
