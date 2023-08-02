@@ -52,7 +52,6 @@ const issuesLabelCheck = 'issues-labeled-check';
 const issuesAssignedCheck = 'issues-assigned-check';
 const forcePushCheck = 'force-push-check';
 const pullRequestReviewCheck = 'pr-review-check';
-const codeOwnerCheck = 'code-owner-check';
 const ciFailureCheck = 'ci-failure-check';
 const updateWithDevelopCheck = 'update-with-develop-check';
 const respondToReviewCheck = 'respond-to-review-check';
@@ -79,7 +78,6 @@ const checksWhitelist = {
     [openEvent]: [
       assigneeCheck,
       claCheck,
-      codeOwnerCheck,
       branchCheck,
       jobCheck,
       cronJobCheck,
@@ -102,7 +100,6 @@ const checksWhitelist = {
       jobCheck,
       cronJobCheck,
       modelCheck,
-      codeOwnerCheck,
     ],
     [closeEvent]: [allMergeConflictCheck, updateWithDevelopCheck],
     [editEvent]: [wipCheck],
@@ -169,7 +166,6 @@ module.exports.hotfixLabelCheck = hotfixLabelCheck;
 module.exports.prTemplateCheck = prTemplateCheck;
 module.exports.forcePushCheck = forcePushCheck;
 module.exports.pullRequestReviewCheck = pullRequestReviewCheck;
-module.exports.codeOwnerCheck = codeOwnerCheck;
 module.exports.ciFailureCheck = ciFailureCheck;
 module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
 module.exports.respondToReviewCheck = respondToReviewCheck;

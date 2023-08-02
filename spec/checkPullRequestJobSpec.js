@@ -1,4 +1,3 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,10 +23,9 @@ const checkCriticalPullRequestModule =
   require('../lib/checkCriticalPullRequest');
 const checkPullRequestTemplateModule =
   require('../lib/checkPullRequestTemplate');
-const newCodeOwnerModule = require('../lib/checkForNewCodeowner');
 const scheduler = require('../lib/scheduler');
 const checkCronJobModule = require('../lib/checkNewCronJobs');
-const { JOBS_AND_FETURES_TESTING_WIKI_LINK } = require('../lib/utils');
+const { JOBS_AND_FEATURES_TESTING_WIKI_LINK } = require('../lib/utils');
 
 let payloadData = JSON.parse(
   JSON.stringify(require('../fixtures/pullRequestPayload.json'))
@@ -432,7 +430,9 @@ describe('Pull Request Job Spec', () => {
 
     app = robot.load(oppiaBot);
     spyOn(app, 'auth').and.resolveTo(github);
-    spyOn(checkPullRequestJobModule, 'checkForNewJob').and.callThrough();
+    spyOn(
+      checkPullRequestJobModule, 'checkForModificationsToFiles'
+    ).and.callThrough();
     spyOn(apiForSheetsModule, 'checkClaStatus').and.callFake(() => { });
     spyOn(
       checkCriticalPullRequestModule, 'checkIfPRAffectsDatastoreLayer'
@@ -442,7 +442,6 @@ describe('Pull Request Job Spec', () => {
     spyOn(
       checkPullRequestTemplateModule, 'checkTemplate'
     ).and.callFake(() => { });
-    spyOn(newCodeOwnerModule, 'checkForNewCodeowner').and.callFake(() => { });
   });
 
   describe('When a new job file is created in a pull request', () => {
@@ -457,7 +456,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+      checkPullRequestJobModule.checkForModificationsToFiles
+    ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -472,7 +473,7 @@ describe('Pull Request Job Spec', () => {
       );
       const newLineFeed = '<br>';
       const wikiLinkText = 'this guide'.link(
-        JOBS_AND_FETURES_TESTING_WIKI_LINK);
+        JOBS_AND_FEATURES_TESTING_WIKI_LINK);
       const jobNameLink = (
         'FirstTestJob'.link(firstNewJobFileObj.blob_url)
       );
@@ -481,10 +482,9 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
-          'it adds a new job. The name of the job is ' + jobNameLink + '.' +
-          newLineFeed +
+          'it modifies files in jobs or platform folders.' + newLineFeed +
           'Also @' + author + ', please make sure to fill in the ' + formText +
-          ' for the new job to be tested on the backup server. ' +
+          ' for the new job or feature to be tested on the backup server. ' +
           'This PR can be merged only after the test run is successful. ' +
           'Please refer to ' + wikiLinkText + ' for details.' +
           newLineFeed + 'Thanks!',
@@ -531,7 +531,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -546,7 +548,7 @@ describe('Pull Request Job Spec', () => {
       );
       const newLineFeed = '<br>';
       const wikiLinkText = 'this guide'.link(
-        JOBS_AND_FETURES_TESTING_WIKI_LINK);
+        JOBS_AND_FEATURES_TESTING_WIKI_LINK);
       const jobRegistryLink = (
         'job registry'.link(
           'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py')
@@ -561,10 +563,9 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
-          'it adds new jobs. The jobs are ' + firstJobNameLink +
-          ', ' + secondJobNameLink + '.' + newLineFeed + 'Also @' +
-          author + ', please make sure to fill in the ' +
-          formText + ' for the new jobs to be tested on the backup server. ' +
+          'it modifies files in jobs or platform folders.' + newLineFeed + 
+          'Also @' + author + ', please make sure to fill in the ' + formText + 
+          ' for the new job or feature to be tested on the backup server. ' +
           'This PR can be merged only after the test run is successful. ' +
           'Please refer to ' + wikiLinkText + ' for details.' +
           newLineFeed + 'Thanks!',
@@ -611,7 +612,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -626,7 +629,7 @@ describe('Pull Request Job Spec', () => {
       );
       const newLineFeed = '<br>';
       const wikiLinkText = 'this guide'.link(
-        JOBS_AND_FETURES_TESTING_WIKI_LINK);
+        JOBS_AND_FEATURES_TESTING_WIKI_LINK);
       const jobNameLink = (
         'FirstTestJob'.link(firstNewJobFileObj.blob_url)
       );
@@ -634,12 +637,11 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
             'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this ' +
-            'PR, it adds a new job. The name of the job is ' + jobNameLink + 
-            '.' + newLineFeed + 'Also @' + author +
-            ', please make sure to fill in the ' + formText +
-            ' for the new job to be tested on the backup server. ' +
-            'This PR can be merged only after the test run is successful. ' +
-            'Please refer to ' + wikiLinkText + ' for details.' +
+            'PR, it modifies files in jobs or platform folders.' + newLineFeed + 
+            'Also @' + author + ', please make sure to fill in the ' + 
+            formText + ' for the new job or feature to be tested on the ' +
+            'backup server. This PR can be merged only after the test run ' + 
+            'is successful. Please refer to ' + wikiLinkText + ' for details.' +
             newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -682,7 +684,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -698,7 +702,7 @@ describe('Pull Request Job Spec', () => {
       );
       const newLineFeed = '<br>';
       const wikiLinkText = 'this guide'.link(
-        JOBS_AND_FETURES_TESTING_WIKI_LINK);
+        JOBS_AND_FEATURES_TESTING_WIKI_LINK);
       const jobRegistryLink = (
         'job registry'.link(
           'https://github.com/oppia/oppia/blob/develop/core/jobs_registry.py')
@@ -711,11 +715,11 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
-          'it adds a new job. The name of the job is ' + jobNameLink +
-          '.' + newLineFeed + 'Also @' + author + ', please make sure to ' +
-          'fill in the ' + formText + ' for the new job to be tested on the ' +
-          'backup server. ' + 'This PR can be merged only after the test ' +
-          'run is successful. ' + 'Please refer to ' + wikiLinkText +
+          'it modifies files in jobs or platform folders.' + newLineFeed + 
+          'Also @' + author + ', please make sure to ' + 'fill in the ' + 
+          formText + ' for the new job or feature to be tested on the ' + 
+          'backup server. This PR can be merged only after the test ' +
+          'run is successful. Please refer to ' + wikiLinkText +
           ' for details.' + newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -743,44 +747,6 @@ describe('Pull Request Job Spec', () => {
     });
   });
 
-  describe('When an existing job file is modified with no new job', () => {
-    beforeEach(async () => {
-      github.pulls = {
-        listFiles: jasmine.createSpy('listFiles').and.resolveTo({
-          data: [
-            {
-              ...firstNewJobFileObj,
-              status: 'modified',
-              patch: '\n+# No job files present in the changes',
-            },
-          ],
-        }),
-      };
-
-      payloadData.payload.pull_request.changed_files = 1;
-      await robot.receive(payloadData);
-    });
-
-    it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
-    });
-
-    it('should get modified files', () => {
-      expect(github.pulls.listFiles).toHaveBeenCalled();
-    });
-
-
-    it('should not ping server jobs admin', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
-    });
-    it('should not add datastore label', () => {
-      expect(github.issues.addLabels).not.toHaveBeenCalled();
-    });
-    it('should not assign server jobs admin', () => {
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
-    });
-  });
-
   describe('When no job file is modified in a pull request', () => {
     beforeEach(async () => {
       github.pulls = {
@@ -796,7 +762,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should not get modified files', () => {
@@ -823,7 +791,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -850,7 +820,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -880,7 +852,9 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should check for jobs', () => {
-      expect(checkPullRequestJobModule.checkForNewJob).toHaveBeenCalled();
+      expect(
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should not get modified files', () => {
@@ -889,43 +863,6 @@ describe('Pull Request Job Spec', () => {
 
     it('should not ping server job admin', () => {
       expect(github.issues.createComment).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Returns appropriate job name', () => {
-    it('should return the correct job created in the file', () => {
-      let jobs = checkPullRequestJobModule.getNewJobsFromFile(
-        firstNewJobFileObj
-      );
-      expect(jobs.length).toBe(1);
-      expect(jobs[0]).toBe('FirstTestJob');
-
-      jobs = checkPullRequestJobModule.getNewJobsFromFile(secondNewJobFileObj);
-      expect(jobs.length).toBe(1);
-      expect(jobs[0]).toBe('SecondTestJob');
-
-      jobs = checkPullRequestJobModule.getNewJobsFromFile(
-        modifiedExistingJobFileObj
-      );
-      expect(jobs.length).toBe(1);
-      expect(jobs[0]).toBe('OppiabotContributionsJob');
-
-      jobs = checkPullRequestJobModule.getNewJobsFromFile(fileWithMultipleJobs);
-      expect(jobs.length).toBe(2);
-      expect(jobs[0]).toBe('TestJob');
-      expect(jobs[1]).toBe('AnotherTestJob');
-
-      jobs = checkPullRequestJobModule.getNewJobsFromFile(jobTestFile);
-      expect(jobs.length).toBe(0);
-
-      jobs = checkPullRequestJobModule.getNewJobsFromFile(
-        modifiedExistingJobFileObjWithJobClassInPatch);
-      expect(jobs.length).toBe(0);
-
-      jobs = checkPullRequestJobModule.getNewJobsFromFile(
-        jobFileObjWithJobClassInPatchAndNewJob);
-      expect(jobs.length).toBe(1);
-      expect(jobs[0]).toBe('AnotherTestJob');
     });
   });
 });
