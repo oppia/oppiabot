@@ -80,9 +80,11 @@ describe('Check Issue Labels Module', () => {
       expect(octokit.issues.createComment).toHaveBeenCalled();
       const user = payload.sender.login;
       const body = (
-        'Hi @ ' + user + ', only certain users are allowed to add good ' +
-        'issue labels. Looping in @oppia/oppia-good-first-issue-labelers ' +
-        'to add the label.');
+        'Hi @' + user + ', only certain users are allowed to add good ' +
+        'first issue labels. ' +
+        'Looping in @oppia/oppia-good-first-issue-labelers ' +
+        'to add the label.'
+      );
 
       expect(octokit.issues.createComment).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
