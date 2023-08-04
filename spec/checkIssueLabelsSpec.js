@@ -80,10 +80,9 @@ describe('Check Issue Labels Module', () => {
       expect(octokit.issues.createComment).toHaveBeenCalled();
       const user = payload.sender.login;
       const body = (
-        'Hi @' + user + ', thanks for proposing this as a good first issue. ' +
-        'I am removing the label for now and looping in ' +
-        '@' + whitelist.teamLeads.onboardingTeam + ' to approve the label. ' +
-        'It will be added back if approved. Thanks!');
+        'Hi @ ' + user + ', only certain users are allowed to add good ' +
+        'issue labels. Looping in @oppia/oppia-good-first-issue-labelers ' +
+        'to add the label.');
 
       expect(octokit.issues.createComment).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
