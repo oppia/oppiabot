@@ -50,7 +50,11 @@ const checkLabels = async () => {
 const handleGoodFirstIssueLabel = async (octokit, user) => {
   const issueNumber = context.payload.issue.number;
   // Comment on the issue and ping the onboarding team lead.
-  var commentBody = 'Hi @' + user + ', only certain users are allowed to add good first issue labels. Looping in @oppia/oppia-good-first-issue-labelers to add the label.';
+  var commentBody = (
+    'Hi @' + user + ', only certain users are allowed to add good ' +
+    'first issue labels. Looping in @oppia/oppia-good-first-issue-labelers ' + 
+    'to add the label.'
+  );
   await octokit.issues.createComment(
     {
       body: commentBody,
@@ -66,15 +70,6 @@ const handleGoodFirstIssueLabel = async (octokit, user) => {
     name: GOOD_FIRST_LABEL,
     owner: context.repo.owner,
     repo: context.repo.repo
-  });
-
-  // Assign issue to Team Lead.
-  core.info(`Assigning to ${whitelist.teamLeads.onboardingTeam}.`);
-  await octokit.issues.addAssignees({
-    issue_number: issueNumber,
-    owner: context.repo.owner,
-    repo: context.repo.repo,
-    assignees: [whitelist.teamLeads.onboardingTeam],
   });
 };
 

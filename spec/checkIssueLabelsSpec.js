@@ -101,16 +101,6 @@ describe('Check Issue Labels Module', () => {
         repo: payload.repository.name,
       });
     });
-
-    it('should assign team lead', () => {
-      expect(octokit.issues.addAssignees).toHaveBeenCalled();
-      expect(octokit.issues.addAssignees).toHaveBeenCalledWith({
-        issue_number: payload.issue.number,
-        assignees: [whitelist.teamLeads.onboardingTeam],
-        owner: payload.repository.owner.login,
-        repo: payload.repository.name,
-      });
-    });
   });
 
   describe('check for good first issue by whitelisted user', () => {
