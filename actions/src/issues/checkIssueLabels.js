@@ -53,7 +53,7 @@ const handleGoodFirstIssueLabel = async (octokit, user) => {
   var commentBody = (
     'Hi @' + user + ', only certain users are allowed to add good ' +
     'first issue labels. Looping in @oppia/oppia-good-first-issue-labelers ' + 
-    'to add the label.'
+    'to add the label. Thanks!'
   );
   await octokit.issues.createComment(
     {

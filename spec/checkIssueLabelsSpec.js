@@ -83,7 +83,7 @@ describe('Check Issue Labels Module', () => {
         'Hi @' + user + ', only certain users are allowed to add good ' +
         'first issue labels. ' +
         'Looping in @oppia/oppia-good-first-issue-labelers ' +
-        'to add the label.'
+        'to add the label. Thanks!'
       );
 
       expect(octokit.issues.createComment).toHaveBeenCalledWith({
