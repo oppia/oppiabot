@@ -225,7 +225,6 @@ describe('Pull Request Label Check', () => {
       expect(github.issues.addAssignees).not.toHaveBeenCalled();
       expect(github.issues.createComment).not.toHaveBeenCalled();
     });
-
   });
 
   describe('when a issue label gets added', () => {
@@ -239,7 +238,7 @@ describe('Pull Request Label Check', () => {
 
     beforeEach(async () => {
       payloadData.payload.action = 'labeled';
-      payloadData.payload.sender = {'login': 'user'}
+      payloadData.payload.sender = {login: 'user'};
       payloadData.payload.label = label;
       spyOn(
         checkPullRequestLabelModule, 'checkForIssueLabel'
@@ -496,8 +495,8 @@ describe('Pull Request Label Check', () => {
         number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name
-      })
-    })
+      });
+    });
   });
 
   describe('when another label gets removed', () => {
