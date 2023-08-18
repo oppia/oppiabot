@@ -457,8 +457,8 @@ describe('Pull Request Job Spec', () => {
 
     it('should check for jobs', () => {
       expect(
-      checkPullRequestJobModule.checkForModificationsToFiles
-    ).toHaveBeenCalled();
+        checkPullRequestJobModule.checkForModificationsToFiles
+      ).toHaveBeenCalled();
     });
 
     it('should get modified files', () => {
@@ -563,8 +563,8 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
-          'it modifies files in jobs or platform folders.' + newLineFeed + 
-          'Also @' + author + ', please make sure to fill in the ' + formText + 
+          'it modifies files in jobs or platform folders.' + newLineFeed +
+          'Also @' + author + ', please make sure to fill in the ' + formText +
           ' for the new job or feature to be tested on the backup server. ' +
           'This PR can be merged only after the test run is successful. ' +
           'Please refer to ' + wikiLinkText + ' for details.' +
@@ -637,10 +637,10 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
             'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this ' +
-            'PR, it modifies files in jobs or platform folders.' + newLineFeed + 
-            'Also @' + author + ', please make sure to fill in the ' + 
+            'PR, it modifies files in jobs or platform folders.' + newLineFeed +
+            'Also @' + author + ', please make sure to fill in the ' +
             formText + ' for the new job or feature to be tested on the ' +
-            'backup server. This PR can be merged only after the test run ' + 
+            'backup server. This PR can be merged only after the test run ' +
             'is successful. Please refer to ' + wikiLinkText + ' for details.' +
             newLineFeed + 'Thanks!',
         repo: payloadData.payload.repository.name,
@@ -715,9 +715,9 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
-          'it modifies files in jobs or platform folders.' + newLineFeed + 
-          'Also @' + author + ', please make sure to ' + 'fill in the ' + 
-          formText + ' for the new job or feature to be tested on the ' + 
+          'it modifies files in jobs or platform folders.' + newLineFeed +
+          'Also @' + author + ', please make sure to ' + 'fill in the ' +
+          formText + ' for the new job or feature to be tested on the ' +
           'backup server. This PR can be merged only after the test ' +
           'run is successful. Please refer to ' + wikiLinkText +
           ' for details.' + newLineFeed + 'Thanks!',
