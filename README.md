@@ -79,7 +79,53 @@ from .env file, Otherwise app will not work locally.
 
 ## Installing the bot on a repository
 
-You'll need to identify a target repository and install the bot by clicking the **Install** button on the settings page of your app, e.g `https://github.com/settings/apps/my-oppiabot-testing-app/installations`. In the `.env` file put your github account name in `WHITELISTED_ACCOUNTS` and also add your repository (name in small caps) in the `constants.js` file locally.
+Example Scenario
+
+Suppose you have a GitHub account with the username johndoe, and you want to install a bot on a repository named my-cool-project.
+
+Step-by-Step Guide
+1) Select and Install the Bot on Your Repository
+
+a) Visit the settings page for your bot at https://github.com/settings/apps/your-bot-name/installations (replace your-bot-name with your bot's actual name).
+b) Here, you’ll see an Install button next to each available repository.
+c) Click on Install for your target repository. For example, if my-cool-project is the repository where you want to install the bot, click Install next to it.
+
+2) Add Your Account to the .env File
+
+a) Open the .env file in your project’s local directory. This file stores environment variables needed by your bot.
+b) Add your GitHub account name (in this example, johndoe) to the WHITELISTED_ACCOUNTS entry. This allows the bot to recognize and interact with your account.
+For example :- WHITELISTED_ACCOUNTS=johndoe
+
+3) Specify Your Repository in constants.js
+
+a) Open constants.js, which stores the bot’s configuration for each repository. Locate the checksWhitelist object, where each repository has its own configuration.
+b) Add a new entry for your repository in lowercase (e.g., my-cool-project). Define the specific events and checks the bot should monitor for this repository.
+Here’s how you can add my-cool-project to checksWhitelist:
+
+const checksWhitelist = {
+  // existing configurations for other repositories
+  'oppia-android': { /* ... */ },
+  'oppia': { /* ... */ },
+  'oppiabot': { /* ... */ },
+
+  // Add your new repository entry here
+  'my-cool-project': {
+    [openEvent]: [claCheck, assigneeCheck, branchCheck],
+    [reopenEvent]: [branchCheck, mergeConflictCheck],
+    [PRLabelEvent]: [prLabelCheck],
+    [synchronizeEvent]: [mergeConflictCheck],
+    [closeEvent]: [allMergeConflictCheck],
+    [editEvent]: [wipCheck],
+    [issuesLabelEvent]: [issuesLabelCheck],
+    [issuesAssignedEvent]: [issuesAssignedCheck],
+    [pushEvent]: [forcePushCheck],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
+    [checkCompletedEvent]: [ciFailureCheck],
+    [issueCommentCreatedEvent]: [respondToReviewCheck]
+  }
+};
+
+This configuration will allow the bot to monitor specific events and perform actions for my-cool-project.
 
 
 ## Running the bot locally
