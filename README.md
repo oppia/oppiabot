@@ -79,7 +79,36 @@ from .env file, Otherwise app will not work locally.
 
 ## Installing the bot on a repository
 
-You'll need to identify a target repository and install the bot by clicking the **Install** button on the settings page of your app, e.g `https://github.com/settings/apps/my-oppiabot-testing-app/installations`. In the `.env` file put your github account name in `WHITELISTED_ACCOUNTS` and also add your repository (name in small caps) in the `constants.js` file locally.
+1. Identify a target repository and install the bot by clicking the Install button on the settings page of your app, e.g., **`https://github.com/settings/apps/my-oppiabot-testing-app/installations`** 
+2. Update the **`.env` file**:
+   - Add your GitHub account name to `WHITELISTED_ACCOUNTS`.  
+3. Add the repository name in the **`constant.js` file**:  
+   - Open the **`constant.js`** file in the bot's source code.  
+   - Navigate to the `checksWhitelist` object.  
+   - Add a new entry with your repository name (in lowercase) as the key. The value should define the checks and events specific to your repository.  
+
+   **Example:**
+   If your repository name is `my-repo`, the `checksWhitelist` object will look like this:  
+   ```javascript
+   const checksWhitelist = {
+     // Existing entries...
+     'my-repo': {
+       [openEvent]: [claCheck],
+       [reopenEvent]: [],
+       [openEventGithubActions]: [claCheckGithubAction],
+       [reopenEventGithubActions]: [claCheckGithubAction],
+       [synchronizeEvent]: [mergeConflictCheck],
+       [closeEvent]: [allMergeConflictCheck],
+       [editEvent]: [],
+       [issuesLabelEvent]: [],
+       [issuesAssignedEvent]: [],
+       [pushEvent]: [],
+       [pullRequestReviewEvent]: [pullRequestReviewCheck],
+       [issueCommentCreatedEvent]: [respondToReviewCheck],
+     },
+   };
+   
+4.Save the changes to **`constant.js`**.
 
 
 ## Running the bot locally
