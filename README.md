@@ -79,6 +79,7 @@ from .env file, Otherwise app will not work locally.
 
 ## Installing the bot on a repository
 
+
 1. Identify a target repository and install the bot by clicking the Install button on the settings page of your app, e.g., **`https://github.com/settings/apps/my-oppiabot-testing-app/installations`** 
 2. Update the **`.env` file**:
    - Add your GitHub account name to `WHITELISTED_ACCOUNTS`.  
@@ -107,8 +108,9 @@ from .env file, Otherwise app will not work locally.
        [issueCommentCreatedEvent]: [respondToReviewCheck],
      },
    };
+   ```
    
-4.Save the changes to **`constants.js`**.
+4. Save the changes to **`constants.js`**.
 
 
 ## Running the bot locally
