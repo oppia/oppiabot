@@ -14,3 +14,4 @@
 - [ ] I have successfully deployed my own instance of Oppiabot.
   - You can find instructions for doing this [here](https://github.com/oppia/oppiabot/wiki/Deploying-your-own-instance-of-the-oppiabot).
 - [ ] I have manually tested all the changes made in this PR following the [manual tests matrix](https://github.com/oppia/oppiabot/wiki/Manual-Tests-Matrix).
+- [ ] while making a pull request,if you have made some changes that requires server admin's check,instead of connecting directly with the server admin,add [SERVER ADMIN CHECK] in your PR description,this will automatically notify the server admins.
