@@ -236,7 +236,7 @@ describe('Critical Pull Request Spec', () => {
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @vojtechjelinek and @DubeySandeep and @kevintab95, ' +
+          'Hi @U8NWXD and @kevintab95, ' +
           'PTAL at this PR, it adds a model that needs to be validated. ' +
           'The name of the model is ' + firstModel + '.<br>Thanks!',
       });
@@ -248,7 +248,7 @@ describe('Critical Pull Request Spec', () => {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
-        assignees: ['vojtechjelinek', 'DubeySandeep', 'kevintab95'],
+        assignees: ['U8NWXD', 'kevintab95'],
       });
     });
 
@@ -298,7 +298,7 @@ describe('Critical Pull Request Spec', () => {
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @vojtechjelinek and @DubeySandeep and @kevintab95, ' +
+          'Hi @U8NWXD and @kevintab95, ' +
           'PTAL at this PR, it adds new models that need to be validated. ' +
           'The models are ' + firstModel + ', ' + secondModels + '.<br>Thanks!'
       });
@@ -310,7 +310,7 @@ describe('Critical Pull Request Spec', () => {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
-        assignees: ['vojtechjelinek', 'DubeySandeep', 'kevintab95'],
+        assignees: ['U8NWXD', 'kevintab95'],
       });
     });
 
