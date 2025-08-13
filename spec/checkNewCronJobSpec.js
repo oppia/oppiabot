@@ -246,7 +246,7 @@ describe('Cron Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-        'Hi, @U8NWXD, @kevintab95, PTAL at this PR, ' +
+        'Hi @U8NWXD, @kevintab95, PTAL at this PR, ' +
         'it adds a new cron job.' + newLineFeed + 'Also @' + author +
         ' please add the new test and URL redirects for the new CRON jobs ' +
         'It seems you have added or edited a CRON job, if so please request ' +
