@@ -14,18 +14,15 @@
     "chris7716"
   ],
   "goodFirstIssue": [
-    "U8NWXD",
     "kevintab95",
-    "seanlip",
-    "ankita240796",
-    "DubeySandeep",
-    "bansalnitish",
-    "vojtechjelinek",
-    "marianazangrossi",
-    "brianrodri",
-    "nithusha21",
-    "aks681",
-    "srijanreddy98"
+    "FaithAbiola",
+    "jayam04",
+    "ojasvi004",
+    "chris7716",
+    "masterboy376",
+    "HardikGoyal2003",
+    "mon4our",
+    "seanlip"
   ],
   "teamLeads": {
     "onboardingTeam": "DubeySandeep",
@@ -35,5 +32,5 @@
   "oppiaMaintainers": "oppia/core-maintainers",
   "oppiaReleaseCoordinators": "oppia/release-coordinators",
   "oppiaDevWorkflowTeam": "oppia/dev-workflow-team",
-  "serverJobAdmins": ["vojtechjelinek", "DubeySandeep", "kevintab95"]
+  "serverJobAdmins": ["U8NWXD", "kevintab95"]
 }
