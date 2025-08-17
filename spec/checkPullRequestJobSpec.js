@@ -481,7 +481,7 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
+          'Hi @U8NWXD, @kevintab95, PTAL at this PR, ' +
           'it modifies files in jobs or platform folders.' + newLineFeed +
           'Also @' + author + ', please make sure to fill in the ' + formText +
           ' for the new job or feature to be tested on the backup server. ' +
@@ -499,7 +499,7 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        assignees: ['vojtechjelinek', 'DubeySandeep', 'kevintab95']
+        assignees: ['U8NWXD', 'kevintab95']
       });
     });
 
@@ -562,7 +562,7 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
+          'Hi @U8NWXD, @kevintab95, PTAL at this PR, ' +
           'it modifies files in jobs or platform folders.' + newLineFeed +
           'Also @' + author + ', please make sure to fill in the ' + formText +
           ' for the new job or feature to be tested on the backup server. ' +
@@ -580,7 +580,7 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        assignees: ['vojtechjelinek', 'DubeySandeep', 'kevintab95']
+        assignees: ['U8NWXD', 'kevintab95']
       });
     });
 
@@ -636,7 +636,7 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-            'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this ' +
+            'Hi @U8NWXD, @kevintab95, PTAL at this ' +
             'PR, it modifies files in jobs or platform folders.' + newLineFeed +
             'Also @' + author + ', please make sure to fill in the ' +
             formText + ' for the new job or feature to be tested on the ' +
@@ -654,7 +654,7 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        assignees: ['vojtechjelinek', 'DubeySandeep', 'kevintab95']
+        assignees: ['U8NWXD', 'kevintab95']
       });
     });
 
@@ -714,7 +714,7 @@ describe('Pull Request Job Spec', () => {
       expect(github.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
-          'Hi @vojtechjelinek, @DubeySandeep, @kevintab95, PTAL at this PR, ' +
+          'Hi @U8NWXD, @kevintab95, PTAL at this PR, ' +
           'it modifies files in jobs or platform folders.' + newLineFeed +
           'Also @' + author + ', please make sure to ' + 'fill in the ' +
           formText + ' for the new job or feature to be tested on the ' +
@@ -732,7 +732,7 @@ describe('Pull Request Job Spec', () => {
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
-        assignees: ['vojtechjelinek', 'DubeySandeep', 'kevintab95']
+        assignees: ['U8NWXD', 'kevintab95']
       });
     });
 
