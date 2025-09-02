@@ -29,7 +29,7 @@
     "releaseTeam": "vojtechjelinek",
     "welfareTeam": "DubeySandeep"
   },
-  "oppiaMaintainers": "oppia/core-maintainers",
+  "oppiaMaintainers": "oppia/web-tech-leads",
   "oppiaReleaseCoordinators": "oppia/release-coordinators",
   "oppiaDevWorkflowTeam": "oppia/dev-workflow-team",
   "serverJobAdmins": ["U8NWXD", "kevintab95"]

@@ -523,7 +523,7 @@ describe('Periodic Checks Module', () => {
         owner: 'oppia',
         repo: 'oppia',
         body:
-          'Hi @DubeySandeep, @oppia/core-maintainers ' +
+          'Hi @DubeySandeep, @oppia/web-tech-leads ' +
           'I cannot decide what to do with this PR, ' +
           'please assign reviewers manually thanks!',
       });
@@ -765,14 +765,14 @@ describe('Periodic Checks Module', () => {
         });
       });
 
-      it('should ping core maintainers', () => {
+      it('should ping web tech leads', () => {
         expect(github.issues.createComment).toHaveBeenCalled();
         expect(github.issues.createComment).toHaveBeenCalledWith({
           owner: 'oppia',
           repo: 'oppia',
           issue_number: 1,
           body:
-            'Hi @oppia/core-maintainers, this issue is not assigned ' +
+            'Hi @oppia/web-tech-leads, this issue is not assigned ' +
             'to any project. Can you please update the same? Thanks!',
         });
       });
