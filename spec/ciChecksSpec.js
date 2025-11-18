@@ -108,8 +108,9 @@ describe('CI Checks', () => {
           'Hi @' +
           prAuthor +
           ', there are some failing CI checks in your latest push ' +
-          ' If you think this is due to a flake, please file an issue ' +
-          'before restarting the tests. Thanks!',
+          ' If you think this is due to a flake, please file an issue before ' +
+          'restarting the tests (see [instructions](https://github.com/oppia' +
+          '/oppia/wiki/If-CI-checks-fail-on-your-PR)). Thanks!',
       });
     });
 
