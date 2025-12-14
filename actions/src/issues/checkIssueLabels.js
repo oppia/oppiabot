@@ -17,7 +17,7 @@
  */
 
 const core = require('@actions/core');
-const { context, GitHub } = require('@actions/github');
+const { context, getOctokit } = require('@actions/github');
 const whitelist = require('../../../userWhitelist.json');
 const GOOD_FIRST_LABEL = 'good first issue';
 const prLabels = ['dependencies', 'stale'];
@@ -26,7 +26,7 @@ const checkLabels = async () => {
   core.info('Checking newly added label...');
   const token = core.getInput('repo-token');
   const label = context.payload.label;
-  const octokit = new GitHub(token);
+  const octokit = getOctokit(token);
   const user = context.payload.sender.login;
 
   if (

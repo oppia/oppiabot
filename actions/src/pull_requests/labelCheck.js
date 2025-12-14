@@ -17,14 +17,14 @@
  */
 
 const core = require('@actions/core');
-const { context, GitHub } = require('@actions/github');
+const { context, getOctokit } = require('@actions/github');
 const DONT_MERGE_LABEL_PREFIX = "PR: don't merge";
 
 const checkLabels = async () => {
   core.info('Checking newly added label...');
   const token = core.getInput('repo-token');
   const label = context.payload.label;
-  const octokit = new GitHub(token);
+  const octokit = getOctokit(token);
 
   if (label.name.startsWith(DONT_MERGE_LABEL_PREFIX)) {
     await handleDontMergeLabel(octokit, label.name);
@@ -71,7 +71,7 @@ const checkUnLabeled = async () => {
   core.info('Checking newly removed label...');
   const token = core.getInput('repo-token');
   const label = context.payload.label;
-  const octokit = new GitHub(token);
+  const octokit = getOctokit(token);
 
   if (label.name.startsWith(DONT_MERGE_LABEL_PREFIX)) {
     await handleDontMergeLabelRemoved(octokit, label.name);

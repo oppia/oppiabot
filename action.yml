@@ -17,5 +17,5 @@ inputs:
     required: true
 
 runs:
-  using: "node12"
+  using: "node20"
   main: "actions_build/index.js"

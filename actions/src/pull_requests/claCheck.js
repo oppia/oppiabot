@@ -17,7 +17,7 @@
  */
 
 const core = require('@actions/core');
-const { context, GitHub } = require('@actions/github');
+const { context, getOctokit } = require('@actions/github');
 const { google } = require('googleapis');
 
 /**
@@ -44,7 +44,7 @@ const authorize = async function() {
 
 const generateOutput = async (hasClaSigned) => {
   const GITHUB_TOKEN = core.getInput('repo-token');
-  const octokit = new GitHub(GITHUB_TOKEN);
+  const octokit = getOctokit(GITHUB_TOKEN);
   const PR_NUMBER = context.payload.pull_request.number;
   const PR_AUTHOR = context.payload.pull_request.user.login;
   const REPO_NAME = context.payload.repository.name;

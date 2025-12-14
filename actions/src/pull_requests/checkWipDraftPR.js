@@ -18,7 +18,7 @@
  */
 
 const core = require('@actions/core');
-const { context, GitHub } = require('@actions/github');
+const { context, getOctokit } = require('@actions/github');
 const { commentAndAssignUsers } = require('../utils');
 
 /**
@@ -60,7 +60,7 @@ const isSkipCICommit = async (octokit) => {
 
 module.exports.checkWIP = async () => {
   const token = core.getInput('repo-token');
-  const octokit = new GitHub(token);
+  const octokit = getOctokit(token);
   const pullRequest = context.payload.pull_request;
   const prAuthor = pullRequest.user.login;
 
