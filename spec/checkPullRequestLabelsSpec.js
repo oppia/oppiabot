@@ -557,16 +557,13 @@ describe('Pull Request Label Action Check', () => {
     spyOn(core, 'getInput').and.returnValue('sample-token');
     spyOn(core, 'setFailed').and.callFake(() => {});
     spyOn(core, 'info').and.callFake(() => {});
+    spyOn(github, 'getOctokit').and.returnValue(octokit);
 
     spyOnProperty(github.context, 'repo').and.returnValue({
       owner: actionPayload.repository.owner.login,
       repo: actionPayload.repository.name,
     });
 
-    // Mock GitHub API.
-    Object.setPrototypeOf(github.GitHub, function () {
-      return octokit;
-    });
     spyOn(pRLabelModule, 'checkLabels').and.callThrough();
     spyOn(pRLabelModule, 'checkUnLabeled').and.callThrough();
   });

@@ -36,31 +36,34 @@ describe("Oppiabot's", () => {
         createComment: jasmine.createSpy('createComment').and.resolveTo({}),
         addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
       },
+      git: {
+        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
+          data: {
+            message: 'default commit message',
+          },
+        }),
+      },
     };
 
     spyOn(core, 'getInput').and.returnValue('sample-token');
+    spyOn(core, 'info').and.callFake(() => {});
+    spyOn(github, 'getOctokit').and.returnValue(octokit);
 
     spyOnProperty(github.context, 'repo').and.returnValue({
       owner: pullRequestEditedPayload.repository.owner.login,
       repo: pullRequestEditedPayload.repository.name,
     });
 
-    // Mock GitHub API.
-    Object.setPrototypeOf(github.GitHub, function () {
-      return octokit;
-    });
     spyOn(checkWipDraftPRModule, 'checkWIP').and.callThrough();
   });
 
   describe('WIP PRs without skip prefix', () => {
     beforeEach(async () => {
-      octokit.git = {
-        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
-          data: {
-            message: 'commit without skip prefix',
-          },
-        }),
-      };
+      octokit.git.getCommit.and.resolveTo({
+        data: {
+          message: 'commit without skip prefix',
+        },
+      });
 
       await dispatcher.dispatch('pull_request', 'edited');
     });
@@ -125,13 +128,11 @@ describe("Oppiabot's", () => {
 
   describe('WIP PRs with skip prefix', () => {
     beforeEach(async () => {
-      octokit.git = {
-        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
-          data: {
-            message: '[ci skip] commit with skip prefix',
-          },
-        }),
-      };
+      octokit.git.getCommit.and.resolveTo({
+        data: {
+          message: '[ci skip] commit with skip prefix',
+        },
+      });
 
       await dispatcher.dispatch('pull_request_target', 'edited');
     });
@@ -165,13 +166,11 @@ describe("Oppiabot's", () => {
 
   describe('Checks when PR is opened or reopened', () => {
     it('should check when PR is opened', async () => {
-      octokit.git = {
-        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
-          data: {
-            message: 'changes',
-          },
-        }),
-      };
+      octokit.git.getCommit.and.resolveTo({
+        data: {
+          message: 'changes',
+        },
+      });
       // Trigger pull_request.reopened event.
       pullRequestEditedPayload.action = 'reopened';
       await dispatcher.dispatch('pull_request_target', 'reopened');
@@ -185,13 +184,11 @@ describe("Oppiabot's", () => {
     });
 
     it('should check when PR is reopened', async () => {
-      octokit.git = {
-        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
-          data: {
-            message: 'commit without skip prefix',
-          },
-        }),
-      };
+      octokit.git.getCommit.and.resolveTo({
+        data: {
+          message: 'commit without skip prefix',
+        },
+      });
       // Trigger pull_request.opened event.
       pullRequestEditedPayload.action = 'reopened';
       await dispatcher.dispatch('pull_request_target', 'reopened');
@@ -207,13 +204,11 @@ describe("Oppiabot's", () => {
 
   describe('Draft PRs', () => {
     beforeEach(async () => {
-      octokit.git = {
-        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
-          data: {
-            message: 'commit without skip prefix',
-          },
-        }),
-      };
+      octokit.git.getCommit.and.resolveTo({
+        data: {
+          message: 'commit without skip prefix',
+        },
+      });
       // Receive a draft payload and remove WIP from title.
       pullRequestEditedPayload.pull_request.draft = true;
       pullRequestEditedPayload.pull_request.title = 'Testing Draft';
@@ -279,13 +274,11 @@ describe("Oppiabot's", () => {
 
   describe('Draft PRs with skip prefix', () => {
     beforeEach(async () => {
-      octokit.git = {
-        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
-          data: {
-            message: '[skip ci] commit with skip prefix',
-          },
-        }),
-      };
+      octokit.git.getCommit.and.resolveTo({
+        data: {
+          message: '[skip ci] commit with skip prefix',
+        },
+      });
       // Receive a draft payload and remove WIP from title.
       pullRequestEditedPayload.pull_request.draft = true;
       pullRequestEditedPayload.pull_request.title = 'Testing Draft';
@@ -321,13 +314,11 @@ describe("Oppiabot's", () => {
 
   describe('Neither Draft nor WIP PRs', () => {
     beforeEach(async () => {
-      octokit.git = {
-        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
-          data: {
-            message: '[skip ci] commit with skip prefix',
-          },
-        }),
-      };
+      octokit.git.getCommit.and.resolveTo({
+        data: {
+          message: '[skip ci] commit with skip prefix',
+        },
+      });
       // Receive a neither draft nor WIP payload.
       pullRequestEditedPayload.pull_request.draft = false;
       pullRequestEditedPayload.pull_request.title = 'Testing';
