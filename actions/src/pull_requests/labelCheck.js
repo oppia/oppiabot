@@ -17,14 +17,14 @@
  */
 
 const core = require('@actions/core');
-const { context, GitHub } = require('@actions/github');
+const github = require('@actions/github');
 const DONT_MERGE_LABEL_PREFIX = "PR: don't merge";
 
 const checkLabels = async () => {
   core.info('Checking newly added label...');
   const token = core.getInput('repo-token');
-  const label = context.payload.label;
-  const octokit = new GitHub(token);
+  const label = github.context.payload.label;
+  const octokit = github.getOctokit(token);
 
   if (label.name.startsWith(DONT_MERGE_LABEL_PREFIX)) {
     await handleDontMergeLabel(octokit, label.name);
@@ -49,9 +49,9 @@ const handleDontMergeLabel = async (octokit, label) => {
  */
 const handleDontMergeLabelRemoved = async(octokit) => {
   const {data: pullRequest} = await octokit.pulls.get({
-    pull_number: context.payload.pull_request.number,
-    owner: context.payload.repository.owner.login,
-    repo: context.payload.repository.name,
+    pull_number: github.context.payload.pull_request.number,
+    owner: github.context.payload.repository.owner.login,
+    repo: github.context.payload.repository.name,
   });
 
   const labelNames = pullRequest.labels.map(label => label.name);
@@ -70,8 +70,8 @@ const handleDontMergeLabelRemoved = async(octokit) => {
 const checkUnLabeled = async () => {
   core.info('Checking newly removed label...');
   const token = core.getInput('repo-token');
-  const label = context.payload.label;
-  const octokit = new GitHub(token);
+  const label = github.context.payload.label;
+  const octokit = github.getOctokit(token);
 
   if (label.name.startsWith(DONT_MERGE_LABEL_PREFIX)) {
     await handleDontMergeLabelRemoved(octokit, label.name);

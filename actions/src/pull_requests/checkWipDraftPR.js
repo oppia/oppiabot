@@ -18,7 +18,7 @@
  */
 
 const core = require('@actions/core');
-const { context, GitHub } = require('@actions/github');
+const github = require('@actions/github');
 const { commentAndAssignUsers } = require('../utils');
 
 /**
@@ -44,11 +44,11 @@ const isWIPPr = ({ title, body }) => {
  * @returns {Promise<Boolean>}
  */
 const isSkipCICommit = async (octokit) => {
-  const pullRequest = context.payload.pull_request;
+  const pullRequest = github.context.payload.pull_request;
 
   const commitParams = {
     commit_sha: pullRequest.head.sha,
-    ...context.repo
+    ...github.context.repo
   };
   const commitResponse = await octokit.git.getCommit(commitParams);
 
@@ -60,8 +60,8 @@ const isSkipCICommit = async (octokit) => {
 
 module.exports.checkWIP = async () => {
   const token = core.getInput('repo-token');
-  const octokit = new GitHub(token);
-  const pullRequest = context.payload.pull_request;
+  const octokit = github.getOctokit(token);
+  const pullRequest = github.context.payload.pull_request;
   const prAuthor = pullRequest.user.login;
 
   if (isDraftPr(pullRequest) || isWIPPr(pullRequest)) {

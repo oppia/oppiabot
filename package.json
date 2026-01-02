@@ -15,8 +15,8 @@
     "update-actions-build": "node actions/build.js"
   },
   "dependencies": {
-    "@actions/core": "^1.10.0",
-    "@actions/github": "^2.2.0",
+    "@actions/core": "^2.0.1",
+    "@actions/github": "^6.0.1",
     "axios": "^1.4.0",
     "dotenv": "^16.1.4",
     "google-auth-library": "^8.8.0",
@@ -33,7 +33,7 @@
     ]
   },
   "devDependencies": {
-    "@zeit/ncc": "^0.22.3",
+    "@vercel/ncc": "^0.38.3",
     "eslint": "^8.41.0",
     "husky": "^8.0.3",
     "jasmine": "^5.0.1",

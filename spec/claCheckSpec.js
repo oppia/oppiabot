@@ -50,9 +50,8 @@ describe('CLA check github action Module for Oppia', () => {
       },
     };
 
-    Object.setPrototypeOf(github.GitHub, function () {
-      return octokit;
-    });
+    spyOn(core, 'info').and.callFake(() => {});
+    spyOn(github, 'getOctokit').and.returnValue(octokit);
 
     spyOnProperty(github.context, 'repo').and.returnValue({
       owner: pullRequestPayload.payload.repository.owner.login,
@@ -95,7 +94,6 @@ describe('CLA check github action Module for Oppia', () => {
 
   describe('user has signed cla sheet', () => {
     beforeEach(function () {
-      spyOn(core, 'info');
       spyOn(google, 'sheets').and.returnValue({
         spreadsheets: {
           values: {
@@ -127,7 +125,6 @@ describe('CLA check github action Module for Oppia', () => {
     beforeEach(function () {
       // Changing the username to be multi cased.
       pullRequestPayload.payload.pull_request.user.login = 'TestUser7777';
-      spyOn(core, 'info');
       spyOn(google, 'sheets').and.returnValue({
         spreadsheets: {
           values: {
@@ -287,7 +284,7 @@ describe('CLA check github action Module Auth fail', () => {
     await dispatcher.dispatch('pull_request_target', 'opened');
 
     expect(core.setFailed).toHaveBeenCalledWith(
-      'Auth failure: SyntaxError: Unexpected token o in JSON at position 1');
+      jasmine.stringMatching(/^Auth failure: SyntaxError:/));
   });
 });
 
@@ -313,9 +310,7 @@ describe('CLA check github action Module for oppia-android', () => {
       },
     };
 
-    Object.setPrototypeOf(github.GitHub, function () {
-      return octokit;
-    });
+    spyOn(github, 'getOctokit').and.returnValue(octokit);
 
     spyOnProperty(github.context, 'repo').and.returnValue({
       owner: pullRequestPayload.payload.repository.owner.login,

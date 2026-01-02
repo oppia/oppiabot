@@ -17,7 +17,7 @@
  */
 
 const core = require('@actions/core');
-const { context, GitHub } = require('@actions/github');
+const github = require('@actions/github');
 const whitelist = require('../../../userWhitelist.json');
 const GOOD_FIRST_LABEL = 'good first issue';
 const prLabels = ['dependencies', 'stale'];
@@ -25,9 +25,9 @@ const prLabels = ['dependencies', 'stale'];
 const checkLabels = async () => {
   core.info('Checking newly added label...');
   const token = core.getInput('repo-token');
-  const label = context.payload.label;
-  const octokit = new GitHub(token);
-  const user = context.payload.sender.login;
+  const label = github.context.payload.label;
+  const octokit = github.getOctokit(token);
+  const user = github.context.payload.sender.login;
 
   if (
     label.name === GOOD_FIRST_LABEL &&
@@ -48,19 +48,19 @@ const checkLabels = async () => {
  * @param {String} user - Username of the user that added the label.
  */
 const handleGoodFirstIssueLabel = async (octokit, user) => {
-  const issueNumber = context.payload.issue.number;
+  const issueNumber = github.context.payload.issue.number;
   // Comment on the issue and ping the onboarding team lead.
   var commentBody = (
     'Hi @' + user + ', only certain users are allowed to add good ' +
-    'first issue labels. Looping in @oppia/oppia-good-first-issue-labelers ' + 
+    'first issue labels. Looping in @oppia/oppia-good-first-issue-labelers ' +
     'to add the label. Thanks!'
   );
   await octokit.issues.createComment(
     {
       body: commentBody,
       issue_number: issueNumber,
-      owner: context.repo.owner,
-      repo: context.repo.repo,
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
     }
   );
   // Remove the label.
@@ -68,8 +68,8 @@ const handleGoodFirstIssueLabel = async (octokit, user) => {
   await octokit.issues.removeLabel({
     issue_number: issueNumber,
     name: GOOD_FIRST_LABEL,
-    owner: context.repo.owner,
-    repo: context.repo.repo
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo
   });
 };
 
@@ -81,7 +81,7 @@ const handleGoodFirstIssueLabel = async (octokit, user) => {
  * @param {String} user - Username of the user that added the label.
  */
 const handlePRLabel = async (octokit, label, user) => {
-  const issueNumber = context.payload.issue.number;
+  const issueNumber = github.context.payload.issue.number;
   const linkText = 'here';
   // Add link to wiki.
   const link = linkText.link(
@@ -96,8 +96,8 @@ const handlePRLabel = async (octokit, label, user) => {
     {
       body: commentBody,
       issue_number: issueNumber,
-      owner: context.repo.owner,
-      repo: context.repo.repo,
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
     }
   );
 
@@ -106,8 +106,8 @@ const handlePRLabel = async (octokit, label, user) => {
   await octokit.issues.removeLabel({
     issue_number: issueNumber,
     name: label,
-    owner: context.repo.owner,
-    repo: context.repo.repo
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo
   });
 };
 

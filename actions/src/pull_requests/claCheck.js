@@ -17,7 +17,7 @@
  */
 
 const core = require('@actions/core');
-const { context, GitHub } = require('@actions/github');
+const github = require('@actions/github');
 const { google } = require('googleapis');
 
 /**
@@ -44,10 +44,10 @@ const authorize = async function() {
 
 const generateOutput = async (hasClaSigned) => {
   const GITHUB_TOKEN = core.getInput('repo-token');
-  const octokit = new GitHub(GITHUB_TOKEN);
-  const PR_NUMBER = context.payload.pull_request.number;
-  const PR_AUTHOR = context.payload.pull_request.user.login;
-  const REPO_NAME = context.payload.repository.name;
+  const octokit = github.getOctokit(GITHUB_TOKEN);
+  const PR_NUMBER = github.context.payload.pull_request.number;
+  const PR_AUTHOR = github.context.payload.pull_request.user.login;
+  const REPO_NAME = github.context.payload.repository.name;
 
   let LINK_RESULT = '';
 
@@ -76,15 +76,15 @@ const generateOutput = async (hasClaSigned) => {
     await octokit.issues.update({
       issue_number: PR_NUMBER,
       state: 'closed',
-      owner: context.repo.owner,
-      repo: context.repo.repo,
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
     });
     await octokit.issues.createComment(
       {
         body: comment,
         issue_number: PR_NUMBER,
-        owner: context.repo.owner,
-        repo: context.repo.repo,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
       }
     );
     core.setFailed(PR_AUTHOR + ' has not signed the CLA');
@@ -99,7 +99,7 @@ const generateOutput = async (hasClaSigned) => {
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
 const checkSheet = async (auth) => {
-  const PR_AUTHOR = context.payload.pull_request.user.login;
+  const PR_AUTHOR = github.context.payload.pull_request.user.login;
   const sheets = google.sheets({ version: 'v4', auth });
   const SPREADSHEET_ID = core.getInput('cla-sheet-id');
   await sheets.spreadsheets.values.get(
