@@ -44,9 +44,11 @@ describe('CLA check github action Module for Oppia', () => {
     github.context.payload = pullRequestPayload.payload;
 
     octokit = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.resolveTo({}),
-        update: jasmine.createSpy('update').and.resolveTo({}),
+      rest: {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.resolveTo({}),
+          update: jasmine.createSpy('update').and.resolveTo({}),
+        },
       },
     };
 
@@ -113,9 +115,9 @@ describe('CLA check github action Module for Oppia', () => {
       await dispatcher.dispatch('pull_request_target', 'reopened');
       expect(claCheckGithubActionModule.claCheckGithubAction)
         .toHaveBeenCalled();
-      expect(octokit.issues.update).not.toHaveBeenCalled();
-      expect(octokit.issues.createComment).not.toHaveBeenCalled();
-      expect(octokit.issues.createComment).not.toHaveBeenCalledWith({});
+      expect(octokit.rest.issues.update).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).not.toHaveBeenCalledWith({});
       expect(core.info).toHaveBeenCalledWith('testuser7777 has signed the CLA');
     });
   });
@@ -148,9 +150,9 @@ describe('CLA check github action Module for Oppia', () => {
       await dispatcher.dispatch('pull_request_target', 'reopened');
       expect(claCheckGithubActionModule.claCheckGithubAction)
         .toHaveBeenCalled();
-      expect(octokit.issues.update).not.toHaveBeenCalled();
-      expect(octokit.issues.createComment).not.toHaveBeenCalled();
-      expect(octokit.issues.createComment).not.toHaveBeenCalledWith({});
+      expect(octokit.rest.issues.update).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).not.toHaveBeenCalledWith({});
       expect(core.info).toHaveBeenCalledWith('TestUser7777 has signed the CLA');
     });
   });
@@ -189,16 +191,16 @@ describe('CLA check github action Module for Oppia', () => {
         "this before we can accept your PR. Once you're done," +
         ' please reopen the PR. Thanks!');
 
-      expect(octokit.issues.update).toHaveBeenCalledWith({
+      expect(octokit.rest.issues.update).toHaveBeenCalledWith({
         state: 'closed',
         issue_number: pullRequestPayload.payload.pull_request.number,
         owner: pullRequestPayload.payload.repository.owner.login,
         repo: pullRequestPayload.payload.repository.name,
       });
 
-      expect(octokit.issues.createComment).toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).toHaveBeenCalled();
 
-      expect(octokit.issues.createComment).toHaveBeenCalledWith({
+      expect(octokit.rest.issues.createComment).toHaveBeenCalledWith({
         body: body,
         issue_number: pullRequestPayload.payload.pull_request.number,
         owner: pullRequestPayload.payload.repository.owner.login,
@@ -304,9 +306,11 @@ describe('CLA check github action Module for oppia-android', () => {
     github.context.payload.repository.name = 'oppia-android';
 
     octokit = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.resolveTo({}),
-        update: jasmine.createSpy('update').and.resolveTo({}),
+      rest: {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.resolveTo({}),
+          update: jasmine.createSpy('update').and.resolveTo({}),
+        },
       },
     };
 
@@ -353,16 +357,16 @@ describe('CLA check github action Module for oppia-android', () => {
       "this before we can accept your PR. Once you're done," +
       ' please reopen the PR. Thanks!');
 
-    expect(octokit.issues.update).toHaveBeenCalledWith({
+    expect(octokit.rest.issues.update).toHaveBeenCalledWith({
       state: 'closed',
       issue_number: pullRequestPayload.payload.pull_request.number,
       owner: pullRequestPayload.payload.repository.owner.login,
       repo: pullRequestPayload.payload.repository.name,
     });
 
-    expect(octokit.issues.createComment).toHaveBeenCalled();
+    expect(octokit.rest.issues.createComment).toHaveBeenCalled();
 
-    expect(octokit.issues.createComment).toHaveBeenCalledWith({
+    expect(octokit.rest.issues.createComment).toHaveBeenCalledWith({
       body: body,
       issue_number: pullRequestPayload.payload.pull_request.number,
       owner: pullRequestPayload.payload.repository.owner.login,

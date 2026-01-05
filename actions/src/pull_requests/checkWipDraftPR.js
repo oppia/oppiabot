@@ -50,7 +50,7 @@ const isSkipCICommit = async (octokit) => {
     commit_sha: pullRequest.head.sha,
     ...github.context.repo
   };
-  const commitResponse = await octokit.git.getCommit(commitParams);
+  const commitResponse = await octokit.rest.git.getCommit(commitParams);
 
   return (
     commitResponse.data.message.startsWith('[ci skip]') ||

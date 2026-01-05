@@ -32,16 +32,18 @@ describe("Oppiabot's", () => {
     github.context.pull_request = pullRequestEditedPayload.pull_request;
 
     octokit = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.resolveTo({}),
-        addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
-      },
-      git: {
-        getCommit: jasmine.createSpy('getCommit').and.resolveTo({
-          data: {
-            message: 'default commit message',
-          },
-        }),
+      rest: {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.resolveTo({}),
+          addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
+        },
+        git: {
+          getCommit: jasmine.createSpy('getCommit').and.resolveTo({
+            data: {
+              message: 'default commit message',
+            },
+          }),
+        },
       },
     };
 
@@ -59,7 +61,7 @@ describe("Oppiabot's", () => {
 
   describe('WIP PRs without skip prefix', () => {
     beforeEach(async () => {
-      octokit.git.getCommit.and.resolveTo({
+      octokit.rest.git.getCommit.and.resolveTo({
         data: {
           message: 'commit without skip prefix',
         },
@@ -77,9 +79,9 @@ describe("Oppiabot's", () => {
     });
 
     it('calls get commit', () => {
-      expect(octokit.git.getCommit).toHaveBeenCalled();
-      expect(octokit.git.getCommit).toHaveBeenCalledTimes(1);
-      expect(octokit.git.getCommit).toHaveBeenCalledWith({
+      expect(octokit.rest.git.getCommit).toHaveBeenCalled();
+      expect(octokit.rest.git.getCommit).toHaveBeenCalledTimes(1);
+      expect(octokit.rest.git.getCommit).toHaveBeenCalledWith({
         owner: pullRequestEditedPayload.repository.owner.login,
         repo: pullRequestEditedPayload.repository.name,
         commit_sha: pullRequestEditedPayload.pull_request.head.sha,
@@ -87,19 +89,19 @@ describe("Oppiabot's", () => {
     });
 
     it('assigns PR author', () => {
-      expect(octokit.issues.addAssignees).toHaveBeenCalled();
+      expect(octokit.rest.issues.addAssignees).toHaveBeenCalled();
       const params = {
         repo: pullRequestEditedPayload.repository.name,
         owner: pullRequestEditedPayload.repository.owner.login,
         issue_number: pullRequestEditedPayload.pull_request.number,
         assignees: ['testuser7777'],
       };
-      expect(octokit.issues.addAssignees).toHaveBeenCalledWith(params);
+      expect(octokit.rest.issues.addAssignees).toHaveBeenCalledWith(params);
     });
 
     it('creates comment for WIP PRs', () => {
-      expect(octokit.issues.createComment).toHaveBeenCalled();
-      expect(octokit.issues.createComment).toHaveBeenCalledTimes(1);
+      expect(octokit.rest.issues.createComment).toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).toHaveBeenCalledTimes(1);
 
       // Comment on Pull Request.
       const link = 'here'.link(
@@ -117,7 +119,7 @@ describe("Oppiabot's", () => {
         link +
         '.';
 
-      expect(octokit.issues.createComment).toHaveBeenCalledWith({
+      expect(octokit.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: pullRequestEditedPayload.pull_request.number,
         owner: pullRequestEditedPayload.repository.owner.login,
         repo: pullRequestEditedPayload.repository.name,
@@ -128,7 +130,7 @@ describe("Oppiabot's", () => {
 
   describe('WIP PRs with skip prefix', () => {
     beforeEach(async () => {
-      octokit.git.getCommit.and.resolveTo({
+      octokit.rest.git.getCommit.and.resolveTo({
         data: {
           message: '[ci skip] commit with skip prefix',
         },
@@ -146,9 +148,9 @@ describe("Oppiabot's", () => {
     });
 
     it('calls get commit', () => {
-      expect(octokit.git.getCommit).toHaveBeenCalled();
-      expect(octokit.git.getCommit).toHaveBeenCalledTimes(1);
-      expect(octokit.git.getCommit).toHaveBeenCalledWith({
+      expect(octokit.rest.git.getCommit).toHaveBeenCalled();
+      expect(octokit.rest.git.getCommit).toHaveBeenCalledTimes(1);
+      expect(octokit.rest.git.getCommit).toHaveBeenCalledWith({
         owner: pullRequestEditedPayload.repository.owner.login,
         repo: pullRequestEditedPayload.repository.name,
         commit_sha: pullRequestEditedPayload.pull_request.head.sha,
@@ -156,17 +158,17 @@ describe("Oppiabot's", () => {
     });
 
     it('does not assign PR author', () => {
-      expect(octokit.issues.addAssignees).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
 
     it('does not create comment for WIP PRs', () => {
-      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
     });
   });
 
   describe('Checks when PR is opened or reopened', () => {
     it('should check when PR is opened', async () => {
-      octokit.git.getCommit.and.resolveTo({
+      octokit.rest.git.getCommit.and.resolveTo({
         data: {
           message: 'changes',
         },
@@ -176,15 +178,15 @@ describe("Oppiabot's", () => {
       await dispatcher.dispatch('pull_request_target', 'reopened');
 
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
-      expect(octokit.git.getCommit).toHaveBeenCalled();
-      expect(octokit.issues.addAssignees).toHaveBeenCalled();
-      expect(octokit.issues.addAssignees).toHaveBeenCalledTimes(1);
-      expect(octokit.issues.createComment).toHaveBeenCalled();
-      expect(octokit.issues.createComment).toHaveBeenCalledTimes(1);
+      expect(octokit.rest.git.getCommit).toHaveBeenCalled();
+      expect(octokit.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(octokit.rest.issues.addAssignees).toHaveBeenCalledTimes(1);
+      expect(octokit.rest.issues.createComment).toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).toHaveBeenCalledTimes(1);
     });
 
     it('should check when PR is reopened', async () => {
-      octokit.git.getCommit.and.resolveTo({
+      octokit.rest.git.getCommit.and.resolveTo({
         data: {
           message: 'commit without skip prefix',
         },
@@ -194,17 +196,17 @@ describe("Oppiabot's", () => {
       await dispatcher.dispatch('pull_request_target', 'reopened');
 
       expect(checkWipDraftPRModule.checkWIP).toHaveBeenCalled();
-      expect(octokit.git.getCommit).toHaveBeenCalled();
-      expect(octokit.issues.addAssignees).toHaveBeenCalled();
-      expect(octokit.issues.addAssignees).toHaveBeenCalledTimes(1);
-      expect(octokit.issues.createComment).toHaveBeenCalled();
-      expect(octokit.issues.createComment).toHaveBeenCalledTimes(1);
+      expect(octokit.rest.git.getCommit).toHaveBeenCalled();
+      expect(octokit.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(octokit.rest.issues.addAssignees).toHaveBeenCalledTimes(1);
+      expect(octokit.rest.issues.createComment).toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('Draft PRs', () => {
     beforeEach(async () => {
-      octokit.git.getCommit.and.resolveTo({
+      octokit.rest.git.getCommit.and.resolveTo({
         data: {
           message: 'commit without skip prefix',
         },
@@ -220,9 +222,9 @@ describe("Oppiabot's", () => {
     });
 
     it('calls get commit', () => {
-      expect(octokit.git.getCommit).toHaveBeenCalled();
-      expect(octokit.git.getCommit).toHaveBeenCalledTimes(1);
-      expect(octokit.git.getCommit).toHaveBeenCalledWith({
+      expect(octokit.rest.git.getCommit).toHaveBeenCalled();
+      expect(octokit.rest.git.getCommit).toHaveBeenCalledTimes(1);
+      expect(octokit.rest.git.getCommit).toHaveBeenCalledWith({
         owner: pullRequestEditedPayload.repository.owner.login,
         repo: pullRequestEditedPayload.repository.name,
         commit_sha: pullRequestEditedPayload.pull_request.head.sha,
@@ -234,19 +236,19 @@ describe("Oppiabot's", () => {
     });
 
     it('assigns PR author', () => {
-      expect(octokit.issues.addAssignees).toHaveBeenCalled();
+      expect(octokit.rest.issues.addAssignees).toHaveBeenCalled();
       const params = {
         repo: pullRequestEditedPayload.repository.name,
         owner: pullRequestEditedPayload.repository.owner.login,
         issue_number: pullRequestEditedPayload.pull_request.number,
         assignees: ['testuser7777'],
       };
-      expect(octokit.issues.addAssignees).toHaveBeenCalledWith(params);
+      expect(octokit.rest.issues.addAssignees).toHaveBeenCalledWith(params);
     });
 
     it('creates comment for draft PRs', () => {
-      expect(octokit.issues.createComment).toHaveBeenCalled();
-      expect(octokit.issues.createComment).toHaveBeenCalledTimes(1);
+      expect(octokit.rest.issues.createComment).toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).toHaveBeenCalledTimes(1);
 
       const link = 'here'.link(
         'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
@@ -263,7 +265,7 @@ describe("Oppiabot's", () => {
         link +
         '.';
 
-      expect(octokit.issues.createComment).toHaveBeenCalledWith({
+      expect(octokit.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: pullRequestEditedPayload.pull_request.number,
         owner: pullRequestEditedPayload.repository.owner.login,
         repo: pullRequestEditedPayload.repository.name,
@@ -274,7 +276,7 @@ describe("Oppiabot's", () => {
 
   describe('Draft PRs with skip prefix', () => {
     beforeEach(async () => {
-      octokit.git.getCommit.and.resolveTo({
+      octokit.rest.git.getCommit.and.resolveTo({
         data: {
           message: '[skip ci] commit with skip prefix',
         },
@@ -294,9 +296,9 @@ describe("Oppiabot's", () => {
     });
 
     it('calls get commit', () => {
-      expect(octokit.git.getCommit).toHaveBeenCalled();
-      expect(octokit.git.getCommit).toHaveBeenCalledTimes(1);
-      expect(octokit.git.getCommit).toHaveBeenCalledWith({
+      expect(octokit.rest.git.getCommit).toHaveBeenCalled();
+      expect(octokit.rest.git.getCommit).toHaveBeenCalledTimes(1);
+      expect(octokit.rest.git.getCommit).toHaveBeenCalledWith({
         owner: pullRequestEditedPayload.repository.owner.login,
         repo: pullRequestEditedPayload.repository.name,
         commit_sha: pullRequestEditedPayload.pull_request.head.sha,
@@ -304,17 +306,17 @@ describe("Oppiabot's", () => {
     });
 
     it('does not assign PR author', () => {
-      expect(octokit.issues.addAssignees).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
 
     it('does not create comment for draft PRs', () => {
-      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
     });
   });
 
   describe('Neither Draft nor WIP PRs', () => {
     beforeEach(async () => {
-      octokit.git.getCommit.and.resolveTo({
+      octokit.rest.git.getCommit.and.resolveTo({
         data: {
           message: '[skip ci] commit with skip prefix',
         },
@@ -330,15 +332,15 @@ describe("Oppiabot's", () => {
     });
 
     it('does not call get commit', () => {
-      expect(octokit.git.getCommit).not.toHaveBeenCalled();
+      expect(octokit.rest.git.getCommit).not.toHaveBeenCalled();
     });
 
     it('does not assign PR author', () => {
-      expect(octokit.issues.addAssignees).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
 
     it('does not create a comment', () => {
-      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
     });
   });
 });

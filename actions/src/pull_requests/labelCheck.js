@@ -48,7 +48,7 @@ const handleDontMergeLabel = async (octokit, label) => {
  * @param {import('@actions/github').GitHub} octokit
  */
 const handleDontMergeLabelRemoved = async(octokit) => {
-  const {data: pullRequest} = await octokit.pulls.get({
+  const {data: pullRequest} = await octokit.rest.pulls.get({
     pull_number: github.context.payload.pull_request.number,
     owner: github.context.payload.repository.owner.login,
     repo: github.context.payload.repository.name,

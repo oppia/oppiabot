@@ -55,7 +55,7 @@ const handleGoodFirstIssueLabel = async (octokit, user) => {
     'first issue labels. Looping in @oppia/oppia-good-first-issue-labelers ' +
     'to add the label. Thanks!'
   );
-  await octokit.issues.createComment(
+  await octokit.rest.issues.createComment(
     {
       body: commentBody,
       issue_number: issueNumber,
@@ -65,7 +65,7 @@ const handleGoodFirstIssueLabel = async (octokit, user) => {
   );
   // Remove the label.
   core.info('Removing the label.');
-  await octokit.issues.removeLabel({
+  await octokit.rest.issues.removeLabel({
     issue_number: issueNumber,
     name: GOOD_FIRST_LABEL,
     owner: github.context.repo.owner,
@@ -92,7 +92,7 @@ const handlePRLabel = async (octokit, label, user) => {
     'pull requests. I’m removing the label. You can learn more about ' +
     'labels ' + link + '. Thanks!'
   );
-  await octokit.issues.createComment(
+  await octokit.rest.issues.createComment(
     {
       body: commentBody,
       issue_number: issueNumber,
@@ -103,7 +103,7 @@ const handlePRLabel = async (octokit, label, user) => {
 
   // Remove the label.
   core.info('Removing the label.');
-  await octokit.issues.removeLabel({
+  await octokit.rest.issues.removeLabel({
     issue_number: issueNumber,
     name: label,
     owner: github.context.repo.owner,
