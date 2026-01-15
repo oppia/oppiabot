@@ -35,7 +35,8 @@ const isDraftPr = (pullRequest) => {
  */
 const isWIPPr = ({ title, body }) => {
   return (
-    title.toLowerCase().includes('wip') || body.toLowerCase().includes('wip')
+    title.toLowerCase().includes('wip') ||
+    (body && body.toLowerCase().includes('wip'))
   );
 };
 
