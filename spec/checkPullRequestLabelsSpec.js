@@ -542,16 +542,18 @@ describe('Pull Request Label Action Check', () => {
     github.context.payload = actionPayload;
 
     octokit = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.resolveTo({}),
-        removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
-        addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
+      rest: {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.resolveTo({}),
+          removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
+          addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
+        },
+        pulls: {
+          get: jasmine.createSpy('get').and.resolveTo(
+            {data: actionPayload.pull_request}
+          ),
+        },
       },
-      pulls: {
-        get: jasmine.createSpy('get').and.resolveTo(
-          {data: actionPayload.pull_request}
-        ),
-      }
     };
 
     spyOn(core, 'getInput').and.returnValue('sample-token');

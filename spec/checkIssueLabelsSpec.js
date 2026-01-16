@@ -35,10 +35,12 @@ describe('Check Issue Labels Module', () => {
     github.context.issue = payload.issue;
 
     octokit = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.resolveTo({}),
-        removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
-        addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
+      rest: {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.resolveTo({}),
+          removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
+          addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
+        },
       },
     };
 
@@ -76,7 +78,7 @@ describe('Check Issue Labels Module', () => {
     });
 
     it('should create appropriate comment', () => {
-      expect(octokit.issues.createComment).toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).toHaveBeenCalled();
       const user = payload.sender.login;
       const body = (
         'Hi @' + user + ', only certain users are allowed to add good ' +
@@ -85,7 +87,7 @@ describe('Check Issue Labels Module', () => {
         'to add the label. Thanks!'
       );
 
-      expect(octokit.issues.createComment).toHaveBeenCalledWith({
+      expect(octokit.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
         body: body,
         owner: payload.repository.owner.login,
@@ -94,8 +96,8 @@ describe('Check Issue Labels Module', () => {
     });
 
     it('should remove the label', () => {
-      expect(octokit.issues.removeLabel).toHaveBeenCalled();
-      expect(octokit.issues.removeLabel).toHaveBeenCalledWith({
+      expect(octokit.rest.issues.removeLabel).toHaveBeenCalled();
+      expect(octokit.rest.issues.removeLabel).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
         name: 'good first issue',
         owner: payload.repository.owner.login,
@@ -115,15 +117,15 @@ describe('Check Issue Labels Module', () => {
     });
 
     it('should not comment on issue', () => {
-      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not remove the label', () => {
-      expect(octokit.issues.removeLabel).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.removeLabel).not.toHaveBeenCalled();
     });
 
     it('should not assign team lead', () => {
-      expect(octokit.issues.addAssignees).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
 
@@ -139,7 +141,7 @@ describe('Check Issue Labels Module', () => {
     });
 
     it('should create appropriate comment', () => {
-      expect(octokit.issues.createComment).toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).toHaveBeenCalled();
 
       const user = payload.sender.login;
       const link = (
@@ -152,7 +154,7 @@ describe('Check Issue Labels Module', () => {
         'in pull requests. I’m removing the label. You can learn more ' +
         'about labels ' + link + '. Thanks!');
 
-      expect(octokit.issues.createComment).toHaveBeenCalledWith({
+      expect(octokit.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
         body: body,
         owner: payload.repository.owner.login,
@@ -161,8 +163,8 @@ describe('Check Issue Labels Module', () => {
     });
 
     it('should remove the label', () => {
-      expect(octokit.issues.removeLabel).toHaveBeenCalled();
-      expect(octokit.issues.removeLabel).toHaveBeenCalledWith({
+      expect(octokit.rest.issues.removeLabel).toHaveBeenCalled();
+      expect(octokit.rest.issues.removeLabel).toHaveBeenCalledWith({
         issue_number: payload.issue.number,
         name: testLabel,
         owner: payload.repository.owner.login,
@@ -183,11 +185,11 @@ describe('Check Issue Labels Module', () => {
     });
 
     it('should not comment', () => {
-      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not remove the label', () => {
-      expect(octokit.issues.removeLabel).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.removeLabel).not.toHaveBeenCalled();
     });
   });
 
@@ -203,15 +205,15 @@ describe('Check Issue Labels Module', () => {
     });
 
     it('should not comment on issue', () => {
-      expect(octokit.issues.createComment).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not remove the label', () => {
-      expect(octokit.issues.removeLabel).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.removeLabel).not.toHaveBeenCalled();
     });
 
     it('should not assign team lead', () => {
-      expect(octokit.issues.addAssignees).not.toHaveBeenCalled();
+      expect(octokit.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
 });

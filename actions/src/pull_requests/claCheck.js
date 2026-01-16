@@ -73,13 +73,13 @@ const generateOutput = async (hasClaSigned) => {
         ' please reopen the PR. Thanks!');
     core.info('Closing and commenting in PR...');
 
-    await octokit.issues.update({
+    await octokit.rest.issues.update({
       issue_number: PR_NUMBER,
       state: 'closed',
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
     });
-    await octokit.issues.createComment(
+    await octokit.rest.issues.createComment(
       {
         body: comment,
         issue_number: PR_NUMBER,

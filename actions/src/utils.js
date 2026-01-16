@@ -10,13 +10,13 @@ const { context } = require('@actions/github');
 const commentAndAssignUsers = async (
     octokit, pullRequest, assignees, comment
 ) => {
-  await octokit.issues.createComment({
+  await octokit.rest.issues.createComment({
     issue_number: pullRequest.number,
     body: comment,
     ...context.repo,
   });
 
-  await octokit.issues.addAssignees({
+  await octokit.rest.issues.addAssignees({
     issue_number: pullRequest.number,
     assignees: assignees,
     ...context.repo,
