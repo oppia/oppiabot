@@ -57,6 +57,8 @@ const updateWithDevelopCheck = 'update-with-develop-check';
 const respondToReviewCheck = 'respond-to-review-check';
 const staleBuildLabelCheck = 'stale-build-label-check';
 const dontMergeLabelCheck = 'dont-merge-label-check';
+const prForcePushCheck = 'pr-force-push-check';
+const prForcePushReopenCheck = 'pr-force-push-reopen-check';
 
 const checksWhitelist = {
   // eslint-disable-next-line quote-props
@@ -92,7 +94,8 @@ const checksWhitelist = {
       jobCheck,
       cronJobCheck,
       modelCheck,
-      prTemplateCheck
+      prTemplateCheck,
+      prForcePushReopenCheck
     ],
     [PRLabelEvent]: [prLabelCheck, hotfixLabelCheck],
     [synchronizeEvent]: [
@@ -100,6 +103,7 @@ const checksWhitelist = {
       jobCheck,
       cronJobCheck,
       modelCheck,
+      prForcePushCheck,
     ],
     [closeEvent]: [allMergeConflictCheck, updateWithDevelopCheck],
     [editEvent]: [wipCheck],
@@ -171,6 +175,8 @@ module.exports.updateWithDevelopCheck = updateWithDevelopCheck;
 module.exports.respondToReviewCheck = respondToReviewCheck;
 module.exports.staleBuildLabelCheck = staleBuildLabelCheck;
 module.exports.dontMergeLabelCheck = dontMergeLabelCheck;
+module.exports.prForcePushCheck = prForcePushCheck;
+module.exports.prForcePushReopenCheck = prForcePushReopenCheck;
 
 module.exports.getBlacklistedAuthors = function() {
   return blacklistedAuthors;

@@ -34,6 +34,9 @@ const checkBranchPushModule = require('./lib/checkBranchPush');
 const checkPullRequestReviewModule = require('./lib/checkPullRequestReview');
 const ciCheckModule = require('./lib/ciChecks');
 const periodicCheckModule = require('./lib/periodicChecks');
+const checkPullRequestForcePushModule = require(
+  './lib/checkPullRequestForcePush'
+);
 
 const constants = require('./constants');
 const checkIssueAssigneeModule = require('./lib/checkIssueAssignee');
@@ -121,6 +124,16 @@ const runChecks = async (context, checkEvent) => {
             break;
           case constants.forcePushCheck:
             callable.push(checkBranchPushModule.handleForcePush(context));
+            break;
+          case constants.prForcePushCheck:
+            callable.push(
+              checkPullRequestForcePushModule.checkForForcePush(context)
+            );
+            break;
+          case constants.prForcePushReopenCheck:
+            callable.push(
+              checkPullRequestForcePushModule.checkForPreviousForcePush(context)
+            );
             break;
           case constants.prTemplateCheck:
             callable.push(
