@@ -127,100 +127,107 @@ describe('Periodic Checks Module', () => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
-      issues: {
-        createComment: jasmine
-          .createSpy('createComment')
-          .and.callFake(() => { }),
-        addAssignees: jasmine.createSpy('addAssignees').and.callFake(() => { }),
-        addLabels: jasmine.createSpy('addLabels').and.callFake(() => { }),
-      },
-      pulls: {
-        get: jasmine.createSpy('get').and.callFake((params) => {
-          const prData = Object.values(pullRequests).find(
-            (pr) => pr.number === params.pull_number
-          );
-          return {
-            data: prData,
-          };
-        }),
-      },
-      repos: {
-        getCollaboratorPermissionLevel: jasmine
-          .createSpy('getCollaboratorPermissionLevel')
-          .and.callFake((params) => {
-            // pullRequests.approvedPR is the only user that has merging rights.
-            if (params.username === pullRequests.approvedPR.user.login) {
-              return {
-                data: {
-                  status: 200,
-                  permission: 'write',
-                }
-              };
-            }
-
-            throw new Error(
-              'User does not exist or is not a public member of ' +
-              'the organization.'
+	      hook: {
+	        before: jasmine.createSpy('before').and.callFake(() => {}),
+	      },
+      rest: {
+        issues: {
+          createComment: jasmine
+            .createSpy('createComment')
+            .and.callFake(() => { }),
+          addAssignees: jasmine.createSpy('addAssignees').and.callFake(() => { }),
+          addLabels: jasmine.createSpy('addLabels').and.callFake(() => { }),
+        },
+        pulls: {
+          get: jasmine.createSpy('get').and.callFake((params) => {
+            const prData = Object.values(pullRequests).find(
+              (pr) => pr.number === params.pull_number
             );
-          }),
-      },
-      search: {
-        issuesAndPullRequests: jasmine
-          .createSpy('issuesAndPullRequests')
-          .and.callFake((params) => {
-            // This function checks if a PR has been approved by all reviewers
-            // or has changes requested, so we need to return 204 for the
-            // appropriate cases when called with the specific pull request
-            // numbers.
-            const approvedPRNumbers = [
-              pullRequests.approvedPR.number,
-              pullRequests.approvedPRWithLabel.number,
-            ];
-            const requestedChangesPRNumber =
-              pullRequests.hasChangesRequestedPR.number;
-            const isApproved = approvedPRNumbers.some((num) =>
-              params.q.includes(num)
-            );
-
-            if (isApproved && params.q.includes('review:approved')) {
-              return {
-                status: 200,
-                data: {
-                  items: [pullRequests.approvedPR]
-                }
-              };
-            }
-
-            if (
-              params.q.includes(requestedChangesPRNumber) &&
-              params.q.includes('review:changes_requested')
-            ) {
-              return {
-                status: 200,
-                data: {
-                  items: [pullRequests.hasChangesRequestedPR]
-                }
-              };
-            }
-
             return {
-              status: 200,
-              data: {
-                items: []
-              }
+              data: prData,
             };
           }),
+        },
+        repos: {
+          getCollaboratorPermissionLevel: jasmine
+            .createSpy('getCollaboratorPermissionLevel')
+            .and.callFake((params) => {
+              // pullRequests.approvedPR is the only user that has merging rights.
+              if (params.username === pullRequests.approvedPR.user.login) {
+                return {
+                  data: {
+                    status: 200,
+                    permission: 'write',
+                  }
+                };
+              }
+
+              throw new Error(
+                'User does not exist or is not a public member of ' +
+                'the organization.'
+              );
+            }),
+        },
+        search: {
+          issuesAndPullRequests: jasmine
+            .createSpy('issuesAndPullRequests')
+            .and.callFake((params) => {
+              // This function checks if a PR has been approved by all reviewers
+              // or has changes requested, so we need to return 204 for the
+              // appropriate cases when called with the specific pull request
+              // numbers.
+              const approvedPRNumbers = [
+                pullRequests.approvedPR.number,
+                pullRequests.approvedPRWithLabel.number,
+              ];
+              const requestedChangesPRNumber =
+                pullRequests.hasChangesRequestedPR.number;
+              const isApproved = approvedPRNumbers.some((num) =>
+                params.q.includes(num)
+              );
+
+              if (isApproved && params.q.includes('review:approved')) {
+                return {
+                  status: 200,
+                  data: {
+                    items: [pullRequests.approvedPR]
+                  }
+                };
+              }
+
+              if (
+                params.q.includes(requestedChangesPRNumber) &&
+                params.q.includes('review:changes_requested')
+              ) {
+                return {
+                  status: 200,
+                  data: {
+                    items: [pullRequests.hasChangesRequestedPR]
+                  }
+                };
+              }
+
+              return {
+                status: 200,
+                data: {
+                  items: []
+                }
+              };
+            }),
+        },
       },
     };
 
     robot = createProbot({
-      id: 1,
-      cert: 'test',
-      githubToken: 'test',
+      overrides: {
+        githubToken: 'test',
+        secret: 'test',
+        logLevel: 'fatal',
+      },
     });
 
-    app = robot.load(oppiaBot);
-    spyOn(app, 'auth').and.resolveTo(github);
+    robot.load(oppiaBot);
+	    spyOn(robot.state.octokit, 'auth').and.resolveTo(github);
     spyOn(
       mergeConflictModule,
       'checkMergeConflictsInPullRequest'
@@ -236,7 +243,7 @@ describe('Periodic Checks Module', () => {
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => { });
       const mergeConflictPR = pullRequests.mergeConflictPR;
-      github.pulls.list = jasmine.createSpy('list').and.resolveTo({
+      github.rest.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [mergeConflictPR, pullRequests.assignedPullRequest],
       });
       await robot.receive(payloadData);
@@ -254,8 +261,8 @@ describe('Periodic Checks Module', () => {
     });
 
     it('should add merge conflict label', () => {
-      expect(github.issues.addLabels).toHaveBeenCalled();
-      expect(github.issues.addLabels).toHaveBeenCalledWith({
+      expect(github.rest.issues.addLabels).toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).toHaveBeenCalledWith({
         issue_number: 1,
         labels: ["PR: don't merge - HAS MERGE CONFLICTS"],
         owner: 'oppia',
@@ -264,8 +271,8 @@ describe('Periodic Checks Module', () => {
     });
 
     it('should assign pr author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         issue_number: 1,
         assignees: ['author1'],
         owner: 'oppia',
@@ -280,8 +287,8 @@ describe('Periodic Checks Module', () => {
         '-conflict-using-the-command-line/')
       );
 
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: 1,
         body:
           'Hi @author1. Due to recent changes in the "develop" branch, ' +
@@ -304,7 +311,7 @@ describe('Periodic Checks Module', () => {
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => { });
       const pendingReviewPR = pullRequests.pendingReviewPR;
-      github.pulls.list = jasmine.createSpy('list').and.resolveTo({
+      github.rest.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [pendingReviewPR, pullRequests.assignedPullRequest],
       });
       await robot.receive(payloadData);
@@ -317,8 +324,8 @@ describe('Periodic Checks Module', () => {
     });
 
     it('should assign remaining reviewers', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         issue_number: 2,
         assignees: ['reviewer1', 'reviewer2'],
         owner: 'oppia',
@@ -327,8 +334,8 @@ describe('Periodic Checks Module', () => {
     });
 
     it('should ping remaining reviewers', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: 2,
         owner: 'oppia',
         repo: 'oppia',
@@ -338,7 +345,7 @@ describe('Periodic Checks Module', () => {
     });
 
     it('should not assign pr author', () => {
-      expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).not.toHaveBeenCalledWith({
         issue_number: 2,
         assignees: ['author2'],
         owner: 'oppia',
@@ -356,10 +363,10 @@ describe('Periodic Checks Module', () => {
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => { });
       const changesRequestedPR = pullRequests.hasChangesRequestedPR;
-      github.pulls.list = jasmine.createSpy('list').and.resolveTo({
+      github.rest.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [changesRequestedPR, pullRequests.assignedPullRequest],
       });
-      github.pulls.listReviews = jasmine
+      github.rest.pulls.listReviews = jasmine
         .createSpy('listReviews')
         .and.resolveTo({
           data: [
@@ -403,8 +410,8 @@ describe('Periodic Checks Module', () => {
     });
 
     it('should ping pr author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         issue_number: 3,
         assignees: ['author3'],
         owner: 'oppia',
@@ -413,8 +420,8 @@ describe('Periodic Checks Module', () => {
     });
 
     it('should assign pr author', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: 3,
         owner: 'oppia',
         repo: 'oppia',
@@ -435,10 +442,10 @@ describe('Periodic Checks Module', () => {
           periodicCheckModule, 'ensureAllIssuesHaveProjects'
         ).and.callFake(() => { });
         const approvedPR = pullRequests.approvedPR;
-        github.pulls.list = jasmine.createSpy('list').and.resolveTo({
+        github.rest.pulls.list = jasmine.createSpy('list').and.resolveTo({
           data: [approvedPR, pullRequests.assignedPullRequest],
         });
-        github.repos = {
+        github.rest.repos = {
           getCollaboratorPermissionLevel: jasmine
             .createSpy('getCollaboratorPermissionLevel')
             .and.resolveTo({
@@ -459,9 +466,9 @@ describe('Periodic Checks Module', () => {
       });
 
       it('should check if pr author has merging rights', () => {
-        expect(github.repos.getCollaboratorPermissionLevel)
+        expect(github.rest.repos.getCollaboratorPermissionLevel)
           .toHaveBeenCalled();
-        expect(github.repos.getCollaboratorPermissionLevel)
+        expect(github.rest.repos.getCollaboratorPermissionLevel)
           .toHaveBeenCalledWith({
             owner: 'oppia',
             repo: 'oppia',
@@ -470,8 +477,8 @@ describe('Periodic Checks Module', () => {
       });
 
       it('should ping pr author', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           issue_number: 4,
           owner: 'oppia',
           repo: 'oppia',
@@ -484,8 +491,8 @@ describe('Periodic Checks Module', () => {
       });
 
       it('should assign pr author', () => {
-        expect(github.issues.addAssignees).toHaveBeenCalled();
-        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+        expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
           issue_number: 4,
           owner: 'oppia',
           repo: 'oppia',
@@ -503,7 +510,7 @@ describe('Periodic Checks Module', () => {
         periodicCheckModule, 'ensureAllIssuesHaveProjects'
       ).and.callFake(() => { });
       const approvedPR = pullRequests.unResolvablePR;
-      github.pulls.list = jasmine.createSpy('list').and.resolveTo({
+      github.rest.pulls.list = jasmine.createSpy('list').and.resolveTo({
         data: [approvedPR, pullRequests.assignedPullRequest],
       });
 
@@ -517,8 +524,8 @@ describe('Periodic Checks Module', () => {
     });
 
     it('should ping onboarding team lead', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: 6,
         owner: 'oppia',
         repo: 'oppia',
@@ -530,8 +537,8 @@ describe('Periodic Checks Module', () => {
     });
 
     it('should assign onboarding team lead', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         issue_number: 6,
         owner: 'oppia',
         repo: 'oppia',
@@ -611,7 +618,7 @@ describe('Periodic Checks Module', () => {
         'ensureAllIssuesHaveProjects'
       ).and.callThrough();
 
-      github.projects = {
+      github.rest.projects = {
         listForRepo: jasmine.createSpy('listForRepo').and.resolveTo({
           data: projects,
         }),
@@ -640,7 +647,7 @@ describe('Periodic Checks Module', () => {
     /* istanbul ignore next */
     xdescribe('When all issues have been added to a project', () => {
       beforeEach(async () => {
-        github.issues.listForRepo = jasmine
+        github.rest.issues.listForRepo = jasmine
           .createSpy('listForRepo')
           .and.resolveTo({
             data: [issues.withProject, issues.anotherWithProject],
@@ -655,8 +662,8 @@ describe('Periodic Checks Module', () => {
       });
 
       it('should get all open issues', () => {
-        expect(github.issues.listForRepo).toHaveBeenCalled();
-        expect(github.issues.listForRepo).toHaveBeenCalledWith({
+        expect(github.rest.issues.listForRepo).toHaveBeenCalled();
+        expect(github.rest.issues.listForRepo).toHaveBeenCalledWith({
           owner: 'oppia',
           repo: 'oppia',
           per_page: 100,
@@ -666,45 +673,45 @@ describe('Periodic Checks Module', () => {
       });
 
       it('should get all project cards', () => {
-        expect(github.projects.listForRepo).toHaveBeenCalled();
-        expect(github.projects.listForRepo).toHaveBeenCalledWith({
+        expect(github.rest.projects.listForRepo).toHaveBeenCalled();
+        expect(github.rest.projects.listForRepo).toHaveBeenCalledWith({
           repo: 'oppia',
           owner: 'oppia',
         });
 
-        expect(github.projects.listColumns).toHaveBeenCalled();
-        expect(github.projects.listColumns).toHaveBeenCalledTimes(2);
-        expect(github.projects.listColumns).toHaveBeenCalledWith({
+        expect(github.rest.projects.listColumns).toHaveBeenCalled();
+        expect(github.rest.projects.listColumns).toHaveBeenCalledTimes(2);
+        expect(github.rest.projects.listColumns).toHaveBeenCalledWith({
           project_id: 101,
         });
-        expect(github.projects.listColumns).toHaveBeenCalledWith({
+        expect(github.rest.projects.listColumns).toHaveBeenCalledWith({
           project_id: 102,
         });
 
-        expect(github.projects.listCards).toHaveBeenCalled();
-        expect(github.projects.listCards).toHaveBeenCalledTimes(3);
-        expect(github.projects.listCards).toHaveBeenCalledWith({
+        expect(github.rest.projects.listCards).toHaveBeenCalled();
+        expect(github.rest.projects.listCards).toHaveBeenCalledTimes(3);
+        expect(github.rest.projects.listCards).toHaveBeenCalledWith({
           archived_state: 'not_archived',
           column_id: 111,
         });
-        expect(github.projects.listCards).toHaveBeenCalledWith({
+        expect(github.rest.projects.listCards).toHaveBeenCalledWith({
           archived_state: 'not_archived',
           column_id: 112,
         });
-        expect(github.projects.listCards).toHaveBeenCalledWith({
+        expect(github.rest.projects.listCards).toHaveBeenCalledWith({
           archived_state: 'not_archived',
           column_id: 113,
         });
       });
 
       it('should not ping core maintainers', () => {
-        expect(github.issues.createComment).not.toHaveBeenCalled();
+        expect(github.rest.issues.createComment).not.toHaveBeenCalled();
       });
     });
 
     describe('When some issues have not been added to a project', () => {
       beforeEach(async () => {
-        github.issues.listForRepo = jasmine
+        github.rest.issues.listForRepo = jasmine
           .createSpy('listForRepo')
           .and.resolveTo({
             data: [
@@ -723,8 +730,8 @@ describe('Periodic Checks Module', () => {
       });
 
       it('should get all open issues', () => {
-        expect(github.issues.listForRepo).toHaveBeenCalled();
-        expect(github.issues.listForRepo).toHaveBeenCalledWith({
+        expect(github.rest.issues.listForRepo).toHaveBeenCalled();
+        expect(github.rest.issues.listForRepo).toHaveBeenCalledWith({
           owner: 'oppia',
           repo: 'oppia',
           per_page: 100,
@@ -734,40 +741,40 @@ describe('Periodic Checks Module', () => {
       });
 
       it('should get all project cards', () => {
-        expect(github.projects.listForRepo).toHaveBeenCalled();
-        expect(github.projects.listForRepo).toHaveBeenCalledWith({
+        expect(github.rest.projects.listForRepo).toHaveBeenCalled();
+        expect(github.rest.projects.listForRepo).toHaveBeenCalledWith({
           repo: 'oppia',
           owner: 'oppia',
         });
 
-        expect(github.projects.listColumns).toHaveBeenCalled();
-        expect(github.projects.listColumns).toHaveBeenCalledTimes(2);
-        expect(github.projects.listColumns).toHaveBeenCalledWith({
+        expect(github.rest.projects.listColumns).toHaveBeenCalled();
+        expect(github.rest.projects.listColumns).toHaveBeenCalledTimes(2);
+        expect(github.rest.projects.listColumns).toHaveBeenCalledWith({
           project_id: 101,
         });
-        expect(github.projects.listColumns).toHaveBeenCalledWith({
+        expect(github.rest.projects.listColumns).toHaveBeenCalledWith({
           project_id: 102,
         });
 
-        expect(github.projects.listCards).toHaveBeenCalled();
-        expect(github.projects.listCards).toHaveBeenCalledTimes(3);
-        expect(github.projects.listCards).toHaveBeenCalledWith({
+        expect(github.rest.projects.listCards).toHaveBeenCalled();
+        expect(github.rest.projects.listCards).toHaveBeenCalledTimes(3);
+        expect(github.rest.projects.listCards).toHaveBeenCalledWith({
           archived_state: 'not_archived',
           column_id: 111,
         });
-        expect(github.projects.listCards).toHaveBeenCalledWith({
+        expect(github.rest.projects.listCards).toHaveBeenCalledWith({
           archived_state: 'not_archived',
           column_id: 112,
         });
-        expect(github.projects.listCards).toHaveBeenCalledWith({
+        expect(github.rest.projects.listCards).toHaveBeenCalledWith({
           archived_state: 'not_archived',
           column_id: 113,
         });
       });
 
       it('should ping web tech leads', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           owner: 'oppia',
           repo: 'oppia',
           issue_number: 1,

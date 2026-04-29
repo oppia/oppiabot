@@ -22,9 +22,8 @@
     "google-auth-library": "^8.8.0",
     "googleapis": "^118.0.0",
     "newrelic": "^10.0.0",
-    "probot": "^9.11.3",
+    "probot": "^13.4.7",
     "probot-config": "^1.1.0",
-    "probot-scheduler": "^2.0.0-beta.1",
     "probot-stale": "github:oppia/oppiabot-stale"
   },
   "probot": {

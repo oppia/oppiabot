@@ -54,27 +54,34 @@ describe('CI Checks', () => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => {});
 
     github = {
-      issues: {
-        createComment: jasmine
-          .createSpy('createComment')
-          .and.callFake(() => {}),
-        addAssignees: jasmine.createSpy('addAssignees').and.callFake(() => {}),
-      },
-      pulls: {
-        get: jasmine.createSpy('get').and.resolveTo({
-          data: pullRequest,
-        }),
+	      hook: {
+	        before: jasmine.createSpy('before').and.callFake(() => {}),
+	      },
+      rest: {
+        issues: {
+          createComment: jasmine
+            .createSpy('createComment')
+            .and.callFake(() => {}),
+          addAssignees: jasmine.createSpy('addAssignees').and.callFake(() => {}),
+        },
+        pulls: {
+          get: jasmine.createSpy('get').and.resolveTo({
+            data: pullRequest,
+          }),
+        },
       },
     };
 
     robot = createProbot({
-      id: 1,
-      cert: 'test',
-      githubToken: 'test',
+      overrides: {
+        githubToken: 'test',
+        secret: 'test',
+        logLevel: 'fatal',
+      },
     });
 
-    app = robot.load(oppiaBot);
-    spyOn(app, 'auth').and.resolveTo(github);
+    robot.load(oppiaBot);
+	    spyOn(robot.state.octokit, 'auth').and.resolveTo(github);
     spyOn(ciCheckModule, 'handleFailure').and.callThrough();
   });
 
@@ -88,8 +95,8 @@ describe('CI Checks', () => {
     });
 
     it('should fetch pull request data', () => {
-      expect(github.pulls.get).toHaveBeenCalled();
-      expect(github.pulls.get).toHaveBeenCalledWith({
+      expect(github.rest.pulls.get).toHaveBeenCalled();
+      expect(github.rest.pulls.get).toHaveBeenCalledWith({
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name,
         pull_number: pullRequest.number,
@@ -97,10 +104,10 @@ describe('CI Checks', () => {
     });
 
     it('should comment on pull request', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
 
       const prAuthor = pullRequest.user.login;
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name,
         issue_number: pullRequest.number,
@@ -115,10 +122,10 @@ describe('CI Checks', () => {
     });
 
     it('should assign PR author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
 
       const prAuthor = pullRequest.user.login;
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name,
         issue_number: pullRequest.number,
@@ -139,11 +146,11 @@ describe('CI Checks', () => {
 
 
     it('should not comment on pull request', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not assign PR author', () => {
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
 
@@ -159,11 +166,11 @@ describe('CI Checks', () => {
 
 
     it('should not comment on pull request', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not assign PR author', () => {
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
 
@@ -179,15 +186,15 @@ describe('CI Checks', () => {
     });
 
     it('should not fetch pull request data', () => {
-      expect(github.pulls.get).not.toHaveBeenCalled();
+      expect(github.rest.pulls.get).not.toHaveBeenCalled();
     });
 
     it('should not comment on pull request', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not assign PR author', () => {
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
 });

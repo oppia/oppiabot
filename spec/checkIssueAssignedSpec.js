@@ -46,20 +46,27 @@ describe('Check Issue Assignee Module', () => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.resolveTo({}),
-        removeAssignees: jasmine.createSpy('removeAssignees').and.resolveTo({}),
+	      hook: {
+	        before: jasmine.createSpy('before').and.callFake(() => {}),
+	      },
+      rest: {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.resolveTo({}),
+          removeAssignees: jasmine.createSpy('removeAssignees').and.resolveTo({}),
+        },
       },
     };
 
     robot = createProbot({
-      id: 1,
-      cert: 'test',
-      githubToken: 'test',
+      overrides: {
+        githubToken: 'test',
+        secret: 'test',
+        logLevel: 'fatal',
+      },
     });
 
-    app = robot.load(oppiaBot);
-    spyOn(app, 'auth').and.resolveTo(github);
+    robot.load(oppiaBot);
+	    spyOn(robot.state.octokit, 'auth').and.resolveTo(github);
 
     // Mock google auth
     Object.setPrototypeOf(OAuth2Client, function () {
@@ -81,7 +88,7 @@ describe('Check Issue Assignee Module', () => {
         },
       });
 
-      await app.receive(payloadData);
+      await robot.receive(payloadData);
     });
 
     it('should call checkAssignees', () => {
@@ -102,8 +109,8 @@ describe('Check Issue Assignee Module', () => {
           'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
         '#setting-things-up')
       );
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.issue.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name,
@@ -118,8 +125,8 @@ describe('Check Issue Assignee Module', () => {
     });
 
     it('should unassign user', () => {
-      expect(github.issues.removeAssignees).toHaveBeenCalled();
-      expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.removeAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.removeAssignees).toHaveBeenCalledWith({
         issue_number: payloadData.payload.issue.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name,
@@ -140,7 +147,7 @@ describe('Check Issue Assignee Module', () => {
         },
       });
 
-      await app.receive(payloadData);
+      await robot.receive(payloadData);
     });
 
     it('should call checkAssignees', () => {
@@ -152,11 +159,11 @@ describe('Check Issue Assignee Module', () => {
     });
 
     it('should not comment on issue', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not unassign user', () => {
-      expect(github.issues.removeAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.removeAssignees).not.toHaveBeenCalled();
     });
   });
 
@@ -172,7 +179,7 @@ describe('Check Issue Assignee Module', () => {
         },
       });
 
-      await app.receive(payloadData);
+      await robot.receive(payloadData);
     });
 
     it('should call checkAssignees', () => {
@@ -188,18 +195,18 @@ describe('Check Issue Assignee Module', () => {
     });
 
     it('should not comment on issue', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not unassign user', () => {
-      expect(github.issues.removeAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.removeAssignees).not.toHaveBeenCalled();
     });
   });
 
   describe('check non whitelisted repo', () => {
     beforeEach(async () => {
       payloadData.payload.repository.name = 'non-whitelisted-repo';
-      await app.receive(payloadData);
+      await robot.receive(payloadData);
     });
 
     it('should not be called for the payload', () => {
@@ -207,11 +214,11 @@ describe('Check Issue Assignee Module', () => {
     });
 
     it('should not comment on issue', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not unassign user', () => {
-      expect(github.issues.removeAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.removeAssignees).not.toHaveBeenCalled();
     });
   });
 });

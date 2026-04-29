@@ -270,12 +270,14 @@ describe('Utility module tests', () => {
       payload: {
         pull_request: { ...pullRequest, changed_files: 2 },
       },
-      github: {
-        pulls: {
-          listFiles: () => {
-            return {
-              data: [firstModelFileObj, firstJobFileObj],
-            };
+      octokit: {
+        rest: {
+          pulls: {
+            listFiles: () => {
+              return {
+                data: [firstModelFileObj, firstJobFileObj],
+              };
+            },
           },
         },
       },
@@ -298,16 +300,18 @@ describe('Utility module tests', () => {
 
   it('should get all open pull requests', async () => {
     const context = {
-      github: {
-        pulls: {
-          list: jasmine.createSpy('list').and.resolveTo({
-            data: [
-              {
-                number: 101,
-                body: 'sample pull request body',
-              },
-            ],
-          }),
+      octokit: {
+        rest: {
+          pulls: {
+            list: jasmine.createSpy('list').and.resolveTo({
+              data: [
+                {
+                  number: 101,
+                  body: 'sample pull request body',
+                },
+              ],
+            }),
+          },
         },
       },
       repo: jasmine.createSpy('repo').and.callFake((params) => {
@@ -322,15 +326,15 @@ describe('Utility module tests', () => {
     let openPRs = await utilityModule.getAllOpenPullRequests(context);
     expect(openPRs.length).toBe(1);
     expect(openPRs[0].number).toBe(101);
-    expect(context.github.pulls.list).toHaveBeenCalled();
-    expect(context.github.pulls.list).toHaveBeenCalledWith({
+    expect(context.octokit.rest.pulls.list).toHaveBeenCalled();
+    expect(context.octokit.rest.pulls.list).toHaveBeenCalledWith({
       repo: 'oppia',
       owner: 'oppia',
       per_page: 60,
       state: 'open',
     });
 
-    context.github.pulls.list = jasmine.createSpy('list').and.resolveTo({
+    context.octokit.rest.pulls.list = jasmine.createSpy('list').and.resolveTo({
       data: [
         {
           number: 101,
@@ -356,16 +360,18 @@ describe('Utility module tests', () => {
           full_name: 'oppia/oppia',
         },
       },
-      github: {
-        search: {
-          issuesAndPullRequests: jasmine
-            .createSpy('issuesAndPullRequests')
-            .and.resolveTo({
-              status: 200,
-              data: {
-                items: [pullRequest],
-              },
-            }),
+      octokit: {
+        rest: {
+          search: {
+            issuesAndPullRequests: jasmine
+              .createSpy('issuesAndPullRequests')
+              .and.resolveTo({
+                status: 200,
+                data: {
+                  items: [pullRequest],
+                },
+              }),
+          },
         },
       },
       repo: jasmine.createSpy('repo').and.callFake((params) => {
@@ -379,14 +385,14 @@ describe('Utility module tests', () => {
 
     let response = await utilityModule.hasPullRequestBeenApproved(context, 101);
     expect(response).toBe(true);
-    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalled();
-    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+    expect(context.octokit.rest.search.issuesAndPullRequests).toHaveBeenCalled();
+    expect(context.octokit.rest.search.issuesAndPullRequests).toHaveBeenCalledWith({
       repo: 'oppia',
       owner: 'oppia',
       q: 'repo:oppia/oppia review:approved 101',
     });
 
-    context.github.search.issuesAndPullRequests = jasmine
+    context.octokit.rest.search.issuesAndPullRequests = jasmine
       .createSpy('issuesAndPullRequests')
       .and.resolveTo({
         status: 200,
@@ -397,8 +403,8 @@ describe('Utility module tests', () => {
 
     response = await utilityModule.hasPullRequestBeenApproved(context, 102);
     expect(response).toBe(false);
-    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalled();
-    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+    expect(context.octokit.rest.search.issuesAndPullRequests).toHaveBeenCalled();
+    expect(context.octokit.rest.search.issuesAndPullRequests).toHaveBeenCalledWith({
       repo: 'oppia',
       owner: 'oppia',
       q: 'repo:oppia/oppia review:approved 102',
@@ -412,16 +418,18 @@ describe('Utility module tests', () => {
           full_name: 'oppia/oppia',
         },
       },
-      github: {
-        search: {
-          issuesAndPullRequests: jasmine
-            .createSpy('issuesAndPullRequests')
-            .and.resolveTo({
-              status: 200,
-              data: {
-                items: [pullRequest],
-              },
-            }),
+      octokit: {
+        rest: {
+          search: {
+            issuesAndPullRequests: jasmine
+              .createSpy('issuesAndPullRequests')
+              .and.resolveTo({
+                status: 200,
+                data: {
+                  items: [pullRequest],
+                },
+              }),
+          },
         },
       },
       repo: jasmine.createSpy('repo').and.callFake((params) => {
@@ -438,14 +446,14 @@ describe('Utility module tests', () => {
       101
     );
     expect(response).toBe(true);
-    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalled();
-    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+    expect(context.octokit.rest.search.issuesAndPullRequests).toHaveBeenCalled();
+    expect(context.octokit.rest.search.issuesAndPullRequests).toHaveBeenCalledWith({
       repo: 'oppia',
       owner: 'oppia',
       q: 'repo:oppia/oppia review:changes_requested 101',
     });
 
-    context.github.search.issuesAndPullRequests = jasmine
+    context.octokit.rest.search.issuesAndPullRequests = jasmine
       .createSpy('issuesAndPullRequests')
       .and.resolveTo({
         status: 200,
@@ -458,8 +466,8 @@ describe('Utility module tests', () => {
       102
     );
     expect(response).toBe(false);
-    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalled();
-    expect(context.github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+    expect(context.octokit.rest.search.issuesAndPullRequests).toHaveBeenCalled();
+    expect(context.octokit.rest.search.issuesAndPullRequests).toHaveBeenCalledWith({
       repo: 'oppia',
       owner: 'oppia',
       q: 'repo:oppia/oppia review:changes_requested 102',
@@ -468,11 +476,13 @@ describe('Utility module tests', () => {
 
   it('should check if a user is a member of the organisation', async () => {
     const context = {
-      github: {
-        orgs: {
-          checkMembership: jasmine.createSpy('checkMembership').and.resolveTo({
-            status: 204,
-          }),
+      octokit: {
+        rest: {
+          orgs: {
+            checkMembership: jasmine.createSpy('checkMembership').and.resolveTo({
+              status: 204,
+            }),
+          },
         },
       },
     };
@@ -482,13 +492,13 @@ describe('Utility module tests', () => {
       'testuser'
     );
     expect(response).toBe(true);
-    expect(context.github.orgs.checkMembership).toHaveBeenCalled();
-    expect(context.github.orgs.checkMembership).toHaveBeenCalledWith({
+    expect(context.octokit.rest.orgs.checkMembership).toHaveBeenCalled();
+    expect(context.octokit.rest.orgs.checkMembership).toHaveBeenCalledWith({
       org: 'oppia',
       username: 'testuser',
     });
 
-    context.github.orgs.checkMembership = jasmine
+    context.octokit.rest.orgs.checkMembership = jasmine
       .createSpy('checkMembership')
       .and.callFake(() => {
         throw new Error(
@@ -511,13 +521,15 @@ describe('Utility module tests', () => {
           repo: 'oppia'
         };
       },
-      github: {
-        repos: {
-          checkCollaborator: jasmine
-            .createSpy('checkCollaborator')
-            .and.resolveTo({
-              status: 204,
-            }),
+      octokit: {
+        rest: {
+          repos: {
+            checkCollaborator: jasmine
+              .createSpy('checkCollaborator')
+              .and.resolveTo({
+                status: 204,
+              }),
+          },
         },
       },
     };
@@ -527,14 +539,14 @@ describe('Utility module tests', () => {
       'testuser'
     );
     expect(response).toBe(true);
-    expect(context.github.repos.checkCollaborator).toHaveBeenCalled();
-    expect(context.github.repos.checkCollaborator).toHaveBeenCalledWith({
+    expect(context.octokit.rest.repos.checkCollaborator).toHaveBeenCalled();
+    expect(context.octokit.rest.repos.checkCollaborator).toHaveBeenCalledWith({
       owner: 'oppia',
       repo: 'oppia',
       username: 'testuser',
     });
 
-    context.github.repos.checkCollaborator = jasmine
+    context.octokit.rest.repos.checkCollaborator = jasmine
       .createSpy('checkCollaborator')
       .and.callFake(() => {
         throw new Error(

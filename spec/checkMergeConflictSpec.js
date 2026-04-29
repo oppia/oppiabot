@@ -57,22 +57,29 @@ describe('Merge Conflict Check', () => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
-      issues: {
-        addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
-        addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
-        createComment: jasmine.createSpy('createComment').and.resolveTo({}),
-        removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
+	      hook: {
+	        before: jasmine.createSpy('before').and.callFake(() => {}),
+	      },
+      rest: {
+        issues: {
+          addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
+          addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
+          createComment: jasmine.createSpy('createComment').and.resolveTo({}),
+          removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
+        },
       },
     };
 
     robot = createProbot({
-      id: 1,
-      cert: 'test',
-      githubToken: 'test',
+      overrides: {
+        githubToken: 'test',
+        secret: 'test',
+        logLevel: 'fatal',
+      },
     });
 
-    app = robot.load(oppiaBot);
-    spyOn(app, 'auth').and.resolveTo(github);
+    robot.load(oppiaBot);
+	    spyOn(robot.state.octokit, 'auth').and.resolveTo(github);
     spyOn(
       checkPullRequestJobModule, 'checkForModificationsToFiles'
     ).and.callFake(() => { });
@@ -104,7 +111,7 @@ describe('Merge Conflict Check', () => {
       // Simulate merge conflict in new PR.
       pullRequestToBeChecked.mergeable = false;
 
-      github.pulls = {
+      github.rest.pulls = {
         get: jasmine.createSpy('get').and.resolveTo({
           data: pullRequestToBeChecked,
         }),
@@ -130,7 +137,7 @@ describe('Merge Conflict Check', () => {
     });
 
     it('pings pr author regarding merge conflict', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
 
       const link = (
         'link'.link(
@@ -151,22 +158,22 @@ describe('Merge Conflict Check', () => {
           ' if you need help resolving the conflict, ' +
           'so that the PR can be merged. Thanks!',
       };
-      expect(github.issues.createComment).toHaveBeenCalledWith(params);
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith(params);
     });
 
     it('adds merge conflict label', () => {
-      expect(github.issues.addLabels).toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).toHaveBeenCalled();
       const params = {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
         labels: [mergeConflictLabel.name],
       };
-      expect(github.issues.addLabels).toHaveBeenCalledWith(params);
+      expect(github.rest.issues.addLabels).toHaveBeenCalledWith(params);
     });
 
     it('assigns pr author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
       const params = {
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -187,7 +194,7 @@ describe('Merge Conflict Check', () => {
       pullRequestToBeChecked.merged = false;
       pullRequestToBeChecked.mergeable = true;
 
-      github.pulls = {
+      github.rest.pulls = {
         get: jasmine.createSpy('get').and.resolveTo({
           data: pullRequestToBeChecked,
         }),
@@ -213,10 +220,10 @@ describe('Merge Conflict Check', () => {
     });
 
     it('should not ping pr author', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
     it('should not add merge conflict label', () => {
-      expect(github.issues.addLabels).not.toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).not.toHaveBeenCalled();
     });
   });
 
@@ -235,7 +242,7 @@ describe('Merge Conflict Check', () => {
         // Add merge conflict label to new pull request.
         pullRequestToBeChecked.labels.push(mergeConflictLabel);
 
-        github.pulls = {
+        github.rest.pulls = {
           get: jasmine.createSpy('get').and.resolveTo({
             data: pullRequestToBeChecked,
           }),
@@ -254,22 +261,22 @@ describe('Merge Conflict Check', () => {
       });
 
       it('should not ping pr author', () => {
-        expect(github.issues.createComment).not.toHaveBeenCalled();
+        expect(github.rest.issues.createComment).not.toHaveBeenCalled();
       });
 
       it('should not add merge conflict label', () => {
-        expect(github.issues.addLabels).not.toHaveBeenCalled();
+        expect(github.rest.issues.addLabels).not.toHaveBeenCalled();
       });
 
       it('removes merge conflict label', () => {
-        expect(github.issues.removeLabel).toHaveBeenCalled();
+        expect(github.rest.issues.removeLabel).toHaveBeenCalled();
         const params = {
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
           issue_number: payloadData.payload.pull_request.number,
           name: mergeConflictLabel.name,
         };
-        expect(github.issues.removeLabel).toHaveBeenCalledWith(params);
+        expect(github.rest.issues.removeLabel).toHaveBeenCalledWith(params);
       });
     });
 
@@ -288,7 +295,7 @@ describe('Merge Conflict Check', () => {
         // Add merge conflict label to new pull request.
         pullRequestToBeChecked.labels.push(mergeConflictLabel);
 
-        github.pulls = {
+        github.rest.pulls = {
           get: jasmine.createSpy('get').and.resolveTo({
             data: pullRequestToBeChecked,
           }),
@@ -307,12 +314,12 @@ describe('Merge Conflict Check', () => {
       });
 
       it('should not ping pr author', () => {
-        expect(github.issues.createComment).not.toHaveBeenCalled();
+        expect(github.rest.issues.createComment).not.toHaveBeenCalled();
       });
 
       it('should assign pr author', () => {
-        expect(github.issues.addAssignees).toHaveBeenCalled();
-        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+        expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
           issue_number: payloadData.payload.pull_request.number,
@@ -321,11 +328,11 @@ describe('Merge Conflict Check', () => {
       });
 
       it('should not add merge conflict label', () => {
-        expect(github.issues.addLabels).not.toHaveBeenCalled();
+        expect(github.rest.issues.addLabels).not.toHaveBeenCalled();
       });
 
       it('should not remove merge conflict label', () => {
-        expect(github.issues.removeLabel).not.toHaveBeenCalled();
+        expect(github.rest.issues.removeLabel).not.toHaveBeenCalled();
       });
     });
 
@@ -347,7 +354,7 @@ describe('Merge Conflict Check', () => {
         // Add author to list of assignees.
         pullRequestToBeChecked.assignees.push(pullRequestToBeChecked.user);
 
-        github.pulls = {
+        github.rest.pulls = {
           get: jasmine.createSpy('get').and.resolveTo({
             data: pullRequestToBeChecked,
           }),
@@ -366,19 +373,19 @@ describe('Merge Conflict Check', () => {
       });
 
       it('should not ping pr author', () => {
-        expect(github.issues.createComment).not.toHaveBeenCalled();
+        expect(github.rest.issues.createComment).not.toHaveBeenCalled();
       });
 
       it('should not add merge conflict label', () => {
-        expect(github.issues.addLabels).not.toHaveBeenCalled();
+        expect(github.rest.issues.addLabels).not.toHaveBeenCalled();
       });
 
       it('should not assign pr author', () => {
-        expect(github.issues.addAssignees).not.toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
       });
 
       it('should not remove merge conflict label', () => {
-        expect(github.issues.removeLabel).not.toHaveBeenCalled();
+        expect(github.rest.issues.removeLabel).not.toHaveBeenCalled();
       });
     });
 
@@ -408,7 +415,7 @@ describe('Merge Conflict Check', () => {
       payloadData.payload.pull_request.merged = true;
       payloadData.payload.action = 'closed';
 
-      github.pulls = {
+      github.rest.pulls = {
         list: jasmine.createSpy('list').and.resolveTo({
           data: [firstPullRequest, secondPullRequest],
         }),
@@ -432,12 +439,12 @@ describe('Merge Conflict Check', () => {
     });
 
     it('should fetch all pull request', () => {
-      expect(github.pulls.list).toHaveBeenCalled();
+      expect(github.rest.pulls.list).toHaveBeenCalled();
     });
 
     it('should comment on all open pull requests', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledTimes(2);
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledTimes(2);
       const linkToChange = (
         'new change'.link(
           payloadData.payload.pull_request.html_url)
@@ -447,7 +454,7 @@ describe('Merge Conflict Check', () => {
           'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#' +
         'instructions-for-making-a-code-change')
       );
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: firstPullRequest.number,
@@ -463,7 +470,7 @@ describe('Merge Conflict Check', () => {
           '. Thanks!',
       });
 
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: secondPullRequest.number,
@@ -481,17 +488,17 @@ describe('Merge Conflict Check', () => {
     });
 
     it('should assign PR author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledTimes(2);
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledTimes(2);
 
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: firstPullRequest.number,
         assignees: [firstPullRequest.user.login]
       });
 
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: secondPullRequest.number,
@@ -530,7 +537,7 @@ describe('Merge Conflict Check', () => {
       payloadData.payload.pull_request.merged = true;
       payloadData.payload.action = 'closed';
 
-      github.pulls = {
+      github.rest.pulls = {
         list: jasmine.createSpy('list').and.resolveTo({
           data: [firstPullRequest, secondPullRequest],
         }),
@@ -550,15 +557,15 @@ describe('Merge Conflict Check', () => {
     });
 
     it('should not fetch all pull request', () => {
-      expect(github.pulls.list).not.toHaveBeenCalled();
+      expect(github.rest.pulls.list).not.toHaveBeenCalled();
     });
 
     it('should not comment on all open pull requests', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not assign PR author', () => {
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
 });

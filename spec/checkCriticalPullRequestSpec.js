@@ -175,21 +175,28 @@ describe('Critical Pull Request Spec', () => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.returnValue({}),
-        addLabels: jasmine.createSpy('addLabels').and.returnValue({}),
-        addAssignees: jasmine.createSpy('addAssignees').and.returnValue({}),
+	      hook: {
+	        before: jasmine.createSpy('before').and.callFake(() => {}),
+	      },
+      rest: {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.returnValue({}),
+          addLabels: jasmine.createSpy('addLabels').and.returnValue({}),
+          addAssignees: jasmine.createSpy('addAssignees').and.returnValue({}),
+        },
       },
     };
 
     robot = createProbot({
-      id: 1,
-      cert: 'test',
-      githubToken: 'test',
+      overrides: {
+        githubToken: 'test',
+        secret: 'test',
+        logLevel: 'fatal',
+      },
     });
 
-    app = robot.load(oppiaBot);
-    spyOn(app, 'auth').and.resolveTo(github);
+    robot.load(oppiaBot);
+	    spyOn(robot.state.octokit, 'auth').and.resolveTo(github);
     spyOn(
       checkPullRequestJobModule, 'checkForModificationsToFiles'
     ).and.callFake(() => { });
@@ -207,7 +214,7 @@ describe('Critical Pull Request Spec', () => {
 
   describe('When a new model is created in a pull request', () => {
     beforeEach(async () => {
-      github.pulls = {
+      github.rest.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [newModelFileObj],
         }),
@@ -223,15 +230,15 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should get modified files', () => {
-      expect(github.pulls.listFiles).toHaveBeenCalled();
+      expect(github.rest.pulls.listFiles).toHaveBeenCalled();
     });
 
     it('should ping release coordinator', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
       const firstModel = (
         'OppiabotTestActivitiesModel'.link(newModelFileObj.blob_url)
       );
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
@@ -243,8 +250,8 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should assign the release coordinator', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
@@ -253,8 +260,8 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should add datastore label', () => {
-      expect(github.issues.addLabels).toHaveBeenCalled();
-      expect(github.issues.addLabels).toHaveBeenCalledWith({
+      expect(github.rest.issues.addLabels).toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
@@ -265,7 +272,7 @@ describe('Critical Pull Request Spec', () => {
 
   describe('When multiple models are created in a pull request', () => {
     beforeEach(async () => {
-      github.pulls = {
+      github.rest.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [newModelFileObj, modifiedModelFileObj],
         }),
@@ -281,11 +288,11 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should get modified files', () => {
-      expect(github.pulls.listFiles).toHaveBeenCalled();
+      expect(github.rest.pulls.listFiles).toHaveBeenCalled();
     });
 
     it('should ping release coordinator', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
       const firstModel = (
         'OppiabotTestActivitiesModel'.link(newModelFileObj.blob_url)
       );
@@ -293,7 +300,7 @@ describe('Critical Pull Request Spec', () => {
         'OppiabotSnapshotContentModel, OppiabotSnapshotTestingModel'
           .link(modifiedModelFileObj.blob_url)
       );
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
@@ -305,8 +312,8 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should assign the release coordinator', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
@@ -315,8 +322,8 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should add datastore label', () => {
-      expect(github.issues.addLabels).toHaveBeenCalled();
-      expect(github.issues.addLabels).toHaveBeenCalledWith({
+      expect(github.rest.issues.addLabels).toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).toHaveBeenCalledWith({
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
         issue_number: payloadData.payload.pull_request.number,
@@ -327,7 +334,7 @@ describe('Critical Pull Request Spec', () => {
 
   describe('When pull request does not add a new model', () => {
     beforeEach(async () => {
-      github.pulls = {
+      github.rest.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [modifiedModelFileWithNoNewModel],
         }),
@@ -344,21 +351,21 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should get modified files', () => {
-      expect(github.pulls.listFiles).toHaveBeenCalled();
+      expect(github.rest.pulls.listFiles).toHaveBeenCalled();
     });
 
     it('should not ping release coordinator', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not assign release coordinator', () => {
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
 
   describe('When pull request modifies a model test', () => {
     beforeEach(async () => {
-      github.pulls = {
+      github.rest.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [modelTestFileObj],
         }),
@@ -375,21 +382,21 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should get modified files', () => {
-      expect(github.pulls.listFiles).toHaveBeenCalled();
+      expect(github.rest.pulls.listFiles).toHaveBeenCalled();
     });
 
     it('should not ping release coordinator', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not assign release coordinator', () => {
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
 
   describe('When pull request does not modify a model file', () => {
     beforeEach(async () => {
-      github.pulls = {
+      github.rest.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [nonModelFile],
         }),
@@ -406,21 +413,21 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should get modified files', () => {
-      expect(github.pulls.listFiles).toHaveBeenCalled();
+      expect(github.rest.pulls.listFiles).toHaveBeenCalled();
     });
 
     it('should not ping release coordinator', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not assign release coordinator', () => {
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
 
   describe('When pull request already has datastore label', () => {
     beforeEach(async () => {
-      github.pulls = {
+      github.rest.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [newModelFileObj, modifiedModelFileObj],
         }),
@@ -441,15 +448,15 @@ describe('Critical Pull Request Spec', () => {
     });
 
     it('should not get modified files', () => {
-      expect(github.pulls.listFiles).not.toHaveBeenCalled();
+      expect(github.rest.pulls.listFiles).not.toHaveBeenCalled();
     });
 
     it('should not ping release coordinator', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not assign release coordinator', () => {
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
 });

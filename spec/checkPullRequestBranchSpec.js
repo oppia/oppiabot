@@ -57,20 +57,27 @@ describe('Pull Request Branch Check', () => {
       .and.callFake(() => { });
 
     github = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.returnValue({}),
-        update: jasmine.createSpy('update').and.resolveTo({}),
+	      hook: {
+	        before: jasmine.createSpy('before').and.callFake(() => {}),
+	      },
+      rest: {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.returnValue({}),
+          update: jasmine.createSpy('update').and.resolveTo({}),
+        },
       },
     };
 
     robot = createProbot({
-      id: 1,
-      cert: 'test',
-      githubToken: 'test',
+      overrides: {
+        githubToken: 'test',
+        secret: 'test',
+        logLevel: 'fatal',
+      },
     });
 
-    app = robot.load(oppiaBot);
-    spyOn(app, 'auth').and.resolveTo(github);
+    robot.load(oppiaBot);
+	    spyOn(robot.state.octokit, 'auth').and.resolveTo(github);
     spyOn(checkPullRequestBranchModule, 'checkBranch').and.callThrough();
   });
 
@@ -79,7 +86,7 @@ describe('Pull Request Branch Check', () => {
       beforeEach(async () => {
         pullRequestPayload.payload.pull_request.head.ref = 'develop';
         pullRequestPayload.payload.action = 'reopened';
-        await app.receive(pullRequestPayload);
+        await robot.receive(pullRequestPayload);
       });
 
       it('should call appropriate module', async () => {
@@ -87,7 +94,7 @@ describe('Pull Request Branch Check', () => {
       });
 
       it('should create appropriate comment', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
         const author = pullRequestPayload.payload.pull_request.user.login;
         const wiki = (
           'wiki'.link(
@@ -105,7 +112,7 @@ describe('Pull Request Branch Check', () => {
           'contributing to Oppia, take a look at our ' +
           wiki +
           ' (Rule 1 specifically). Thanks!';
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           issue_number: pullRequestPayload.payload.pull_request.number,
           owner: pullRequestPayload.payload.repository.owner.login,
           repo: pullRequestPayload.payload.repository.name,
@@ -114,8 +121,8 @@ describe('Pull Request Branch Check', () => {
       });
 
       it('should close pull request', () => {
-        expect(github.issues.update).toHaveBeenCalled();
-        expect(github.issues.update).toHaveBeenCalledWith({
+        expect(github.rest.issues.update).toHaveBeenCalled();
+        expect(github.rest.issues.update).toHaveBeenCalledWith({
           issue_number: pullRequestPayload.payload.pull_request.number,
           owner: pullRequestPayload.payload.repository.owner.login,
           repo: pullRequestPayload.payload.repository.name,
@@ -127,7 +134,7 @@ describe('Pull Request Branch Check', () => {
     describe('develop prefixed branch check', () => {
       beforeEach(async () => {
         pullRequestPayload.payload.pull_request.head.ref = 'develop-2';
-        await app.receive(pullRequestPayload);
+        await robot.receive(pullRequestPayload);
       });
 
       it('should call appropriate module', async () => {
@@ -135,7 +142,7 @@ describe('Pull Request Branch Check', () => {
       });
 
       it('should create appropriate comment', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
         const author = pullRequestPayload.payload.pull_request.user.login;
         const wiki = (
           'wiki'.link(
@@ -153,7 +160,7 @@ describe('Pull Request Branch Check', () => {
           'about contributing to Oppia, take a look at our ' +
           wiki +
           ' (Rule 1 specifically). Thanks!';
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           issue_number: pullRequestPayload.payload.pull_request.number,
           owner: pullRequestPayload.payload.repository.owner.login,
           repo: pullRequestPayload.payload.repository.name,
@@ -162,8 +169,8 @@ describe('Pull Request Branch Check', () => {
       });
 
       it('should close pull request', () => {
-        expect(github.issues.update).toHaveBeenCalled();
-        expect(github.issues.update).toHaveBeenCalledWith({
+        expect(github.rest.issues.update).toHaveBeenCalled();
+        expect(github.rest.issues.update).toHaveBeenCalledWith({
           issue_number: pullRequestPayload.payload.pull_request.number,
           owner: pullRequestPayload.payload.repository.owner.login,
           repo: pullRequestPayload.payload.repository.name,
@@ -176,7 +183,7 @@ describe('Pull Request Branch Check', () => {
     describe('release branch check', () => {
       beforeEach(async () => {
         pullRequestPayload.payload.pull_request.head.ref = 'release-2';
-        await app.receive(pullRequestPayload);
+        await robot.receive(pullRequestPayload);
       });
 
       it('should call appropriate module', async () => {
@@ -184,7 +191,7 @@ describe('Pull Request Branch Check', () => {
       });
 
       it('should create appropriate comment', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
         const author = pullRequestPayload.payload.pull_request.user.login;
         const wiki = (
           'wiki'.link(
@@ -202,7 +209,7 @@ describe('Pull Request Branch Check', () => {
           'about contributing to Oppia, take a look at our ' +
           wiki +
           ' (Rule 1 specifically). Thanks!';
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           issue_number: pullRequestPayload.payload.pull_request.number,
           owner: pullRequestPayload.payload.repository.owner.login,
           repo: pullRequestPayload.payload.repository.name,
@@ -211,8 +218,8 @@ describe('Pull Request Branch Check', () => {
       });
 
       it('should close pull request', () => {
-        expect(github.issues.update).toHaveBeenCalled();
-        expect(github.issues.update).toHaveBeenCalledWith({
+        expect(github.rest.issues.update).toHaveBeenCalled();
+        expect(github.rest.issues.update).toHaveBeenCalledWith({
           issue_number: pullRequestPayload.payload.pull_request.number,
           owner: pullRequestPayload.payload.repository.owner.login,
           repo: pullRequestPayload.payload.repository.name,
@@ -224,7 +231,7 @@ describe('Pull Request Branch Check', () => {
     describe('test branch check', () => {
       beforeEach(async () => {
         pullRequestPayload.payload.pull_request.head.ref = 'test-2';
-        await app.receive(pullRequestPayload);
+        await robot.receive(pullRequestPayload);
       });
 
       it('should call appropriate module', async () => {
@@ -232,7 +239,7 @@ describe('Pull Request Branch Check', () => {
       });
 
       it('should create appropriate comment', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
         const author = pullRequestPayload.payload.pull_request.user.login;
         const wiki = (
           'wiki'.link(
@@ -250,7 +257,7 @@ describe('Pull Request Branch Check', () => {
           'about contributing to Oppia, take a look at our ' +
           wiki +
           ' (Rule 1 specifically). Thanks!';
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           issue_number: pullRequestPayload.payload.pull_request.number,
           owner: pullRequestPayload.payload.repository.owner.login,
           repo: pullRequestPayload.payload.repository.name,
@@ -259,8 +266,8 @@ describe('Pull Request Branch Check', () => {
       });
 
       it('should close pull request', () => {
-        expect(github.issues.update).toHaveBeenCalled();
-        expect(github.issues.update).toHaveBeenCalledWith({
+        expect(github.rest.issues.update).toHaveBeenCalled();
+        expect(github.rest.issues.update).toHaveBeenCalledWith({
           issue_number: pullRequestPayload.payload.pull_request.number,
           owner: pullRequestPayload.payload.repository.owner.login,
           repo: pullRequestPayload.payload.repository.name,
@@ -273,7 +280,7 @@ describe('Pull Request Branch Check', () => {
   describe('Valid branch name', () => {
     beforeEach(async () => {
       pullRequestPayload.payload.pull_request.head.ref = 'valid-branch';
-      await app.receive(pullRequestPayload);
+      await robot.receive(pullRequestPayload);
     });
 
     it('should call appropriate module', async () => {
@@ -281,11 +288,11 @@ describe('Pull Request Branch Check', () => {
     });
 
     it('should not create comment', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not close pull request', () => {
-      expect(github.issues.update).not.toHaveBeenCalled();
+      expect(github.rest.issues.update).not.toHaveBeenCalled();
     });
   });
 });

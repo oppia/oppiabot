@@ -128,6 +128,24 @@ const checksWhitelist = {
     [pullRequestReviewEvent]: [pullRequestReviewCheck],
     [issueCommentCreatedEvent]: [respondToReviewCheck],
   },
+  // eslint-disable-next-line quote-props
+  'oppiabot-test': {
+    [openEvent]: [claCheck],
+    [reopenEvent]: [],
+    [openEventGithubActions]: [claCheckGithubAction, wipCheck],
+    [reopenEventGithubActions]: [claCheckGithubAction, wipCheck],
+    [editEventGithubActions]: [wipCheck],
+    [synchronizeEvent]: [mergeConflictCheck],
+    [closeEvent]: [allMergeConflictCheck],
+    [periodicCheckEvent]: [periodicCheck],
+    [editEvent]: [],
+    [issuesLabelEvent]: [issuesLabelCheck],
+    [issuesAssignedEvent]: [],
+    [pushEvent]: [],
+    [pullRequestReviewEvent]: [pullRequestReviewCheck],
+    [issueCommentCreatedEvent]: [respondToReviewCheck],
+    [PRLabelEvent]: [prLabelCheck],
+  },
 };
 
 const blacklistedAuthors = ['translatewiki'];

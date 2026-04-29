@@ -61,38 +61,45 @@ describe('Api For Sheets Module', () => {
       .and.callFake(() => { });
 
     github = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.returnValue({
-          params: {
-            number: 5139,
-            owner: 'oppia',
-            repo: 'oppia',
-            body:
-              'Hi! @tester7777. Welcome to Oppia! ' +
-              'Please could you follow the instructions' +
-              '<a href="https://github.com/oppia/oppia/wiki/' +
-              'Contributing-code-to-Oppia#setting-things-up">here</a>' +
-              "to get started ? You'll need to do this before" +
-              'we can accept your PR. Thanks!',
-          },
-        }),
-        update: jasmine.createSpy('update').and.resolveTo({}),
-      },
-      pulls: {
-        listCommits: jasmine.createSpy('listCommits').and.returnValue({
-          data: commitsData
-        }),
+	      hook: {
+	        before: jasmine.createSpy('before').and.callFake(() => {}),
+	      },
+      rest: {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.returnValue({
+            params: {
+              number: 5139,
+              owner: 'oppia',
+              repo: 'oppia',
+              body:
+                'Hi! @tester7777. Welcome to Oppia! ' +
+                'Please could you follow the instructions' +
+                '<a href="https://github.com/oppia/oppia/wiki/' +
+                'Contributing-code-to-Oppia#setting-things-up">here</a>' +
+                "to get started ? You'll need to do this before" +
+                'we can accept your PR. Thanks!',
+            },
+          }),
+          update: jasmine.createSpy('update').and.resolveTo({}),
+        },
+        pulls: {
+          listCommits: jasmine.createSpy('listCommits').and.returnValue({
+            data: commitsData
+          }),
+        },
       },
     };
 
     robot = createProbot({
-      id: 1,
-      cert: 'test',
-      githubToken: 'test',
+      overrides: {
+        githubToken: 'test',
+        secret: 'test',
+        logLevel: 'fatal',
+      },
     });
 
-    app = robot.load(oppiaBot);
-    spyOn(app, 'auth').and.resolveTo(github);
+    robot.load(oppiaBot);
+	    spyOn(robot.state.octokit, 'auth').and.resolveTo(github);
     // Mock google auth
     Object.setPrototypeOf(OAuth2Client, function () {
       return {};
@@ -222,8 +229,8 @@ describe('Api For Sheets Module', () => {
         pullRequestPayload.payload.pull_request.number,
         pullRequestPayload.payload.pull_request
       );
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.update).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.update).toHaveBeenCalledWith({
         issue_number: pullRequestPayload.payload.pull_request.number,
         owner: pullRequestPayload.payload.repository.owner.login,
         repo: pullRequestPayload.payload.repository.name,
@@ -238,8 +245,8 @@ describe('Api For Sheets Module', () => {
         pullRequestPayload.payload.pull_request.number,
         pullRequestPayload.payload.pull_request
       );
-      expect(github.issues.createComment).not.toHaveBeenCalled();
-      expect(github.issues.update).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.update).not.toHaveBeenCalled();
     });
 
     it('should close the PR if atleast one user has not signed cla and' +
@@ -259,7 +266,7 @@ describe('Api For Sheets Module', () => {
           'Oppia#setting-things-up'
       );
 
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         owner: pullRequestPayload.payload.repository.owner.login,
         repo: pullRequestPayload.payload.repository.name,
         number: pullRequestPayload.payload.pull_request.number,
@@ -270,7 +277,7 @@ describe('Api For Sheets Module', () => {
         ' now. Feel free to re-open it once you are done the' +
         ' above instructions. Thanks!',
       });
-      expect(github.issues.update).toHaveBeenCalledWith({
+      expect(github.rest.issues.update).toHaveBeenCalledWith({
         issue_number: pullRequestPayload.payload.pull_request.number,
         owner: pullRequestPayload.payload.repository.owner.login,
         repo: pullRequestPayload.payload.repository.name,
@@ -305,7 +312,7 @@ describe('Api For Sheets Module', () => {
             'onboarding-instructions'
           );
 
-          expect(github.issues.createComment).toHaveBeenCalledWith({
+          expect(github.rest.issues.createComment).toHaveBeenCalledWith({
             owner: pullRequestPayload.payload.repository.owner.login,
             repo: pullRequestPayload.payload.repository.name,
             number: pullRequestPayload.payload.pull_request.number,
@@ -316,7 +323,7 @@ describe('Api For Sheets Module', () => {
             'closing this PR for now. Feel free to re-open it once you ' +
             'are done with the above instructions. Thanks!',
           });
-          expect(github.issues.update).toHaveBeenCalledWith({
+          expect(github.rest.issues.update).toHaveBeenCalledWith({
             issue_number: pullRequestPayload.payload.pull_request.number,
             owner: pullRequestPayload.payload.repository.owner.login,
             repo: pullRequestPayload.payload.repository.name,
@@ -331,9 +338,9 @@ describe('Api For Sheets Module', () => {
         pullRequestPayload.payload.pull_request.number,
         pullRequestPayload.payload.pull_request
       );
-      expect(github.issues.createComment).not.toHaveBeenCalled();
-      expect(github.issues.createComment).not.toHaveBeenCalledWith({});
-      expect(github.issues.update).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalledWith({});
+      expect(github.rest.issues.update).not.toHaveBeenCalled();
     });
   });
 

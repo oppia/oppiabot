@@ -274,20 +274,27 @@ describe('Pull Request Template', () => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.returnValue({}),
-        addAssignees: jasmine.createSpy('addAssignees').and.returnValue({}),
+	      hook: {
+	        before: jasmine.createSpy('before').and.callFake(() => {}),
+	      },
+      rest: {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.returnValue({}),
+          addAssignees: jasmine.createSpy('addAssignees').and.returnValue({}),
+        },
       },
     };
 
     robot = createProbot({
-      id: 1,
-      cert: 'test',
-      githubToken: 'test',
+      overrides: {
+        githubToken: 'test',
+        secret: 'test',
+        logLevel: 'fatal',
+      },
     });
 
-    app = robot.load(oppiaBot);
-    spyOn(app, 'auth').and.resolveTo(github);
+    robot.load(oppiaBot);
+	    spyOn(robot.state.octokit, 'auth').and.resolveTo(github);
     spyOn(
       checkPullRequestJobModule, 'checkForModificationsToFiles'
     ).and.callFake(() => { });
@@ -313,8 +320,8 @@ describe('Pull Request Template', () => {
     });
 
     it('should ping PR author', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -330,8 +337,8 @@ describe('Pull Request Template', () => {
     });
 
     it('should assign PR author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -352,8 +359,8 @@ describe('Pull Request Template', () => {
     });
 
     it('should ping PR author', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -369,8 +376,8 @@ describe('Pull Request Template', () => {
     });
 
     it('should assign PR author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -391,8 +398,8 @@ describe('Pull Request Template', () => {
     });
 
     it('should ping PR author', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -407,8 +414,8 @@ describe('Pull Request Template', () => {
     });
 
     it('should assign PR author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -430,8 +437,8 @@ describe('Pull Request Template', () => {
     });
 
     it('should ping PR author', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -447,8 +454,8 @@ describe('Pull Request Template', () => {
     });
 
     it('should assign PR author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -469,8 +476,8 @@ describe('Pull Request Template', () => {
     });
 
     it('should ping PR author', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -485,8 +492,8 @@ describe('Pull Request Template', () => {
     });
 
     it('should assign PR author', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -508,8 +515,8 @@ describe('Pull Request Template', () => {
       });
 
       it('should ping PR author', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           issue_number: payloadData.payload.pull_request.number,
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
@@ -523,8 +530,8 @@ describe('Pull Request Template', () => {
       });
 
       it('should assign PR author', () => {
-        expect(github.issues.addAssignees).toHaveBeenCalled();
-        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+        expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
           issue_number: payloadData.payload.pull_request.number,
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
@@ -546,8 +553,8 @@ describe('Pull Request Template', () => {
       });
 
       it('should ping PR author', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           issue_number: payloadData.payload.pull_request.number,
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
@@ -560,8 +567,8 @@ describe('Pull Request Template', () => {
       });
 
       it('should assign PR author', () => {
-        expect(github.issues.addAssignees).toHaveBeenCalled();
-        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+        expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
           issue_number: payloadData.payload.pull_request.number,
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
@@ -584,8 +591,8 @@ describe('Pull Request Template', () => {
       });
 
       it('should ping PR author', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           issue_number: payloadData.payload.pull_request.number,
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
@@ -599,8 +606,8 @@ describe('Pull Request Template', () => {
       });
 
       it('should assign PR author', () => {
-        expect(github.issues.addAssignees).toHaveBeenCalled();
-        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+        expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
           issue_number: payloadData.payload.pull_request.number,
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
@@ -621,11 +628,11 @@ describe('Pull Request Template', () => {
     });
 
     it('should not ping PR author', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not assign PR author', () => {
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
   });
 
@@ -643,8 +650,8 @@ describe('Pull Request Template', () => {
     });
 
     it('should not comment about maintainers checklist', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,

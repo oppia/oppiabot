@@ -48,25 +48,32 @@ describe('Pull Request Review Module', () => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.returnValue({}),
-        addAssignees: jasmine.createSpy('addAssignees').and.returnValue({}),
-        removeAssignees: jasmine
-          .createSpy('removeAssignees')
-          .and.returnValue({}),
-        addLabels: jasmine.createSpy('addLabels').and.returnValue({}),
-        removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
+	      hook: {
+	        before: jasmine.createSpy('before').and.callFake(() => {}),
+	      },
+      rest: {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.returnValue({}),
+          addAssignees: jasmine.createSpy('addAssignees').and.returnValue({}),
+          removeAssignees: jasmine
+            .createSpy('removeAssignees')
+            .and.returnValue({}),
+          addLabels: jasmine.createSpy('addLabels').and.returnValue({}),
+          removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
+        },
       },
     };
 
     robot = createProbot({
-      id: 1,
-      cert: 'test',
-      githubToken: 'test',
+      overrides: {
+        githubToken: 'test',
+        secret: 'test',
+        logLevel: 'fatal',
+      },
     });
 
-    app = robot.load(oppiaBot);
-    spyOn(app, 'auth').and.resolveTo(github);
+    robot.load(oppiaBot);
+	    spyOn(robot.state.octokit, 'auth').and.resolveTo(github);
     spyOn(pullRequestReviewModule, 'handlePullRequestReview').
       and.callThrough();
     spyOn(pullRequestReviewModule, 'handleResponseToReview').and.callThrough();
@@ -75,7 +82,7 @@ describe('Pull Request Review Module', () => {
 
   describe('A reviewer requests changes to the PR', () => {
     beforeEach(() => {
-      github.pulls = {
+      github.rest.pulls = {
         get: jasmine.createSpy('get').and.resolveTo({
           data: reviewPayloadData.payload.pull_request,
         }),
@@ -122,12 +129,12 @@ describe('Pull Request Review Module', () => {
       });
 
       it('Should comment on PR', () => {
-        expect(github.issues.createComment)
+        expect(github.rest.issues.createComment)
           .toHaveBeenCalled();
       });
 
       it('Should Remove the LGTM Label', () => {
-        expect(github.issues.removeLabel).toHaveBeenCalled();
+        expect(github.rest.issues.removeLabel).toHaveBeenCalled();
       });
 
       afterAll(() => {
@@ -139,7 +146,7 @@ describe('Pull Request Review Module', () => {
     describe('When reviewer requests changes' +
           'and there is no label', () => {
       it('Should Remove the LGTM Label', () => {
-        expect(github.issues.removeLabel).not.toHaveBeenCalled();
+        expect(github.rest.issues.removeLabel).not.toHaveBeenCalled();
       });
     });
     describe('when reviewer is assigned and pr author is not assigned', () => {
@@ -160,16 +167,16 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should unassign reviewer', async () => {
-        expect(github.issues.removeAssignees).toHaveBeenCalled();
-        expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+        expect(github.rest.issues.removeAssignees).toHaveBeenCalled();
+        expect(github.rest.issues.removeAssignees).toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
           assignees: [reviewPayloadData.payload.review.user.login],
         });
 
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
@@ -181,16 +188,16 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should assign pr author', () => {
-        expect(github.issues.addAssignees).toHaveBeenCalled();
-        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+        expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
           assignees: [reviewPayloadData.payload.pull_request.user.login],
         });
 
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
@@ -230,16 +237,16 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should unassign reviewer', async () => {
-        expect(github.issues.removeAssignees).toHaveBeenCalled();
-        expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+        expect(github.rest.issues.removeAssignees).toHaveBeenCalled();
+        expect(github.rest.issues.removeAssignees).toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
           assignees: [reviewPayloadData.payload.review.user.login],
         });
 
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
@@ -251,11 +258,11 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should not assign pr author', () => {
-        expect(github.issues.addAssignees).not.toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
       });
 
       it('should not ping pr author', () => {
-        expect(github.issues.createComment).not.toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).not.toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
@@ -296,20 +303,20 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should not unassign reviewer', async () => {
-        expect(github.issues.removeAssignees).not.toHaveBeenCalled();
+        expect(github.rest.issues.removeAssignees).not.toHaveBeenCalled();
       });
 
       it('should assign pr author', () => {
-        expect(github.issues.addAssignees).toHaveBeenCalled();
-        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+        expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
           assignees: [reviewPayloadData.payload.pull_request.user.login],
         });
 
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
@@ -354,12 +361,12 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should not unassign reviewer', async () => {
-        expect(github.issues.removeAssignees).not.toHaveBeenCalled();
+        expect(github.rest.issues.removeAssignees).not.toHaveBeenCalled();
       });
 
       it('should not assign pr author', () => {
-        expect(github.issues.addAssignees).not.toHaveBeenCalled();
-        expect(github.issues.createComment).not.toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
+        expect(github.rest.issues.createComment).not.toHaveBeenCalled();
       });
 
       afterAll(() => {
@@ -391,15 +398,15 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should not unassign reviewer', async () => {
-          expect(github.issues.removeAssignees).not.toHaveBeenCalled();
+          expect(github.rest.issues.removeAssignees).not.toHaveBeenCalled();
         });
 
         it('should not assign pr author', () => {
-          expect(github.issues.addAssignees).not.toHaveBeenCalled();
+          expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
         });
 
         it('should not ping pr author', () => {
-          expect(github.issues.createComment).not.toHaveBeenCalled();
+          expect(github.rest.issues.createComment).not.toHaveBeenCalled();
         });
 
         afterAll(() => {
@@ -413,7 +420,7 @@ describe('Pull Request Review Module', () => {
       reviewPayloadData.payload.review.state = 'approved';
     });
     beforeEach(() => {
-      github.pulls = {
+      github.rest.pulls = {
         get: jasmine.createSpy('get').and.resolveTo({
           data: reviewPayloadData.payload.pull_request,
         }),
@@ -432,7 +439,7 @@ describe('Pull Request Review Module', () => {
           ];
         });
         beforeEach(async () => {
-          github.search = {
+          github.rest.search = {
             issuesAndPullRequests: jasmine
               .createSpy('issuesAndPullRequests')
               .and.resolveTo({
@@ -457,8 +464,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should unassign reviewer', async () => {
-          expect(github.issues.removeAssignees).toHaveBeenCalled();
-          expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+          expect(github.rest.issues.removeAssignees).toHaveBeenCalled();
+          expect(github.rest.issues.removeAssignees).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -467,8 +474,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should check if all reviewers have approved the PR', () => {
-          expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
-          expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+          expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalled();
+          expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             q:
@@ -478,8 +485,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should assign remaining reviewers', () => {
-          expect(github.issues.addAssignees).toHaveBeenCalled();
-          expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+          expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -488,8 +495,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should ping remaining reviewers', () => {
-          expect(github.issues.createComment).toHaveBeenCalled();
-          expect(github.issues.createComment).toHaveBeenCalledWith({
+          expect(github.rest.issues.createComment).toHaveBeenCalled();
+          expect(github.rest.issues.createComment).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -500,7 +507,7 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should not assign pr author', () => {
-          expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+          expect(github.rest.issues.addAssignees).not.toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -536,7 +543,7 @@ describe('Pull Request Review Module', () => {
         ];
       });
       beforeEach(async () => {
-        github.search = {
+        github.rest.search = {
           issuesAndPullRequests: jasmine
             .createSpy('issuesAndPullRequests')
             .and.resolveTo({
@@ -561,16 +568,16 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should unassign reviewer', async () => {
-        expect(github.issues.removeAssignees).toHaveBeenCalled();
-        expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+        expect(github.rest.issues.removeAssignees).toHaveBeenCalled();
+        expect(github.rest.issues.removeAssignees).toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
           assignees: [reviewPayloadData.payload.review.user.login],
         });
 
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
@@ -582,8 +589,8 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should check if all reviewers have approved the PR', () => {
-        expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
-        expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+        expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalled();
+        expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
           repo: reviewPayloadData.payload.repository.name,
           q:
@@ -593,13 +600,13 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should not assign remaining reviewers', () => {
-        expect(github.issues.addAssignees).not.toHaveBeenCalled();
-        expect(github.issues.createComment).not.toHaveBeenCalledTimes(2);
+        expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
+        expect(github.rest.issues.createComment).not.toHaveBeenCalledTimes(2);
       });
 
       it('should not assign pr author', () => {
-        expect(github.issues.addAssignees).not.toHaveBeenCalled();
-        expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+        expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).not.toHaveBeenCalledWith({
           owner: reviewPayloadData.payload.repository.owner.login,
           repo: reviewPayloadData.payload.repository.name,
           issue_number: reviewPayloadData.payload.pull_request.number,
@@ -636,7 +643,7 @@ describe('Pull Request Review Module', () => {
           ];
         });
         beforeEach(async () => {
-          github.search = {
+          github.rest.search = {
             issuesAndPullRequests: jasmine
               .createSpy('issuesAndPullRequests')
               .and.resolveTo({
@@ -661,8 +668,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should unassign reviewer', async () => {
-          expect(github.issues.removeAssignees).toHaveBeenCalled();
-          expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+          expect(github.rest.issues.removeAssignees).toHaveBeenCalled();
+          expect(github.rest.issues.removeAssignees).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -671,8 +678,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should check if all reviewers have approved the PR', () => {
-          expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
-          expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+          expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalled();
+          expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             q:
@@ -682,8 +689,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should assign remaining reviewers', () => {
-          expect(github.issues.addAssignees).toHaveBeenCalled();
-          expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+          expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -692,8 +699,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should ping remaining reviewers', () => {
-          expect(github.issues.createComment).toHaveBeenCalled();
-          expect(github.issues.createComment).toHaveBeenCalledWith({
+          expect(github.rest.issues.createComment).toHaveBeenCalled();
+          expect(github.rest.issues.createComment).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -702,7 +709,7 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should not assign pr author', () => {
-          expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+          expect(github.rest.issues.addAssignees).not.toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -740,7 +747,7 @@ describe('Pull Request Review Module', () => {
           spyOn(
             utilityModule, 'doesPullRequestHaveChangesRequested'
           ).and.resolveTo(false);
-          github.search = {
+          github.rest.search = {
             issuesAndPullRequests: jasmine
               .createSpy('issuesAndPullRequests')
               .and.resolveTo({
@@ -749,7 +756,7 @@ describe('Pull Request Review Module', () => {
                 },
               }),
           };
-          github.repos = {
+          github.rest.repos = {
             getCollaboratorPermissionLevel: jasmine
               .createSpy('getCollaboratorPermissionLevel')
               .and.callFake(() => {
@@ -775,12 +782,12 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should not unassign reviewer', async () => {
-          expect(github.issues.removeAssignees).not.toHaveBeenCalled();
+          expect(github.rest.issues.removeAssignees).not.toHaveBeenCalled();
         });
 
         it('should check if all reviewers have approved the PR', () => {
-          expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
-          expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+          expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalled();
+          expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             q:
@@ -790,8 +797,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should add LGTM label', () => {
-          expect(github.issues.addLabels).toHaveBeenCalled();
-          expect(github.issues.addLabels).toHaveBeenCalledWith({
+          expect(github.rest.issues.addLabels).toHaveBeenCalled();
+          expect(github.rest.issues.addLabels).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -800,9 +807,9 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should check if author can merge', () => {
-          expect(github.repos.getCollaboratorPermissionLevel)
+          expect(github.rest.repos.getCollaboratorPermissionLevel)
             .toHaveBeenCalled();
-          expect(github.repos.getCollaboratorPermissionLevel)
+          expect(github.rest.repos.getCollaboratorPermissionLevel)
             .toHaveBeenCalledWith({
               owner: reviewPayloadData.payload.repository.owner.login,
               repo: reviewPayloadData.payload.repository.name,
@@ -811,8 +818,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should assign the author', () => {
-          expect(github.issues.addAssignees).toHaveBeenCalled();
-          expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+          expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -821,8 +828,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should ping one of the reviewers to merge', () => {
-          expect(github.issues.createComment).toHaveBeenCalled();
-          expect(github.issues.createComment).toHaveBeenCalledWith({
+          expect(github.rest.issues.createComment).toHaveBeenCalled();
+          expect(github.rest.issues.createComment).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -858,7 +865,7 @@ describe('Pull Request Review Module', () => {
             utilityModule, 'doesPullRequestHaveChangesRequested'
           ).and.resolveTo(false);
 
-          github.search = {
+          github.rest.search = {
             issuesAndPullRequests: jasmine
               .createSpy('issuesAndPullRequests')
               .and.resolveTo({
@@ -867,7 +874,7 @@ describe('Pull Request Review Module', () => {
                 },
               }),
           };
-          github.repos = {
+          github.rest.repos = {
             getCollaboratorPermissionLevel: jasmine
               .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
@@ -893,8 +900,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should unassign reviewer', async () => {
-          expect(github.issues.removeAssignees).toHaveBeenCalled();
-          expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+          expect(github.rest.issues.removeAssignees).toHaveBeenCalled();
+          expect(github.rest.issues.removeAssignees).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -903,8 +910,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should check if all reviewers have approved the PR', () => {
-          expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
-          expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+          expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalled();
+          expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             q:
@@ -914,8 +921,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should add LGTM label', () => {
-          expect(github.issues.addLabels).toHaveBeenCalled();
-          expect(github.issues.addLabels).toHaveBeenCalledWith({
+          expect(github.rest.issues.addLabels).toHaveBeenCalled();
+          expect(github.rest.issues.addLabels).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -924,9 +931,9 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should check if author can merge', () => {
-          expect(github.repos.getCollaboratorPermissionLevel)
+          expect(github.rest.repos.getCollaboratorPermissionLevel)
             .toHaveBeenCalled();
-          expect(github.repos.getCollaboratorPermissionLevel)
+          expect(github.rest.repos.getCollaboratorPermissionLevel)
             .toHaveBeenCalledWith({
               owner: reviewPayloadData.payload.repository.owner.login,
               repo: reviewPayloadData.payload.repository.name,
@@ -935,8 +942,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should assign pr author', () => {
-          expect(github.issues.addAssignees).toHaveBeenCalled();
-          expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+          expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -945,8 +952,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should ping pr author', () => {
-          expect(github.issues.createComment).toHaveBeenCalled();
-          expect(github.issues.createComment).toHaveBeenCalledWith({
+          expect(github.rest.issues.createComment).toHaveBeenCalled();
+          expect(github.rest.issues.createComment).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -987,7 +994,7 @@ describe('Pull Request Review Module', () => {
           spyOn(
             utilityModule, 'doesPullRequestHaveChangesRequested'
           ).and.resolveTo(false);
-          github.search = {
+          github.rest.search = {
             issuesAndPullRequests: jasmine
               .createSpy('issuesAndPullRequests')
               .and.resolveTo({
@@ -996,7 +1003,7 @@ describe('Pull Request Review Module', () => {
                 },
               }),
           };
-          github.repos = {
+          github.rest.repos = {
             getCollaboratorPermissionLevel: jasmine
               .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
@@ -1022,8 +1029,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should unassign reviewer', async () => {
-          expect(github.issues.removeAssignees).toHaveBeenCalled();
-          expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+          expect(github.rest.issues.removeAssignees).toHaveBeenCalled();
+          expect(github.rest.issues.removeAssignees).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -1032,8 +1039,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should check if all reviewers have approved the PR', () => {
-          expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
-          expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+          expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalled();
+          expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             q:
@@ -1043,13 +1050,13 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should not add LGTM label', () => {
-          expect(github.issues.addLabels).not.toHaveBeenCalled();
+          expect(github.rest.issues.addLabels).not.toHaveBeenCalled();
         });
 
         it('should check if author can merge', () => {
-          expect(github.repos.getCollaboratorPermissionLevel)
+          expect(github.rest.repos.getCollaboratorPermissionLevel)
             .toHaveBeenCalled();
-          expect(github.repos.getCollaboratorPermissionLevel)
+          expect(github.rest.repos.getCollaboratorPermissionLevel)
             .toHaveBeenCalledWith({
               owner: reviewPayloadData.payload.repository.owner.login,
               repo: reviewPayloadData.payload.repository.name,
@@ -1058,8 +1065,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should assign pr author', () => {
-          expect(github.issues.addAssignees).toHaveBeenCalled();
-          expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+          expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -1092,7 +1099,7 @@ describe('Pull Request Review Module', () => {
             utilityModule,
             'doesPullRequestHaveChangesRequested'
           ).and.callThrough();
-          github.search = {
+          github.rest.search = {
             // This function will be called by the utility module when checking
             // if the pull request has changes requested.
             issuesAndPullRequests: jasmine
@@ -1103,7 +1110,7 @@ describe('Pull Request Review Module', () => {
                 },
               }),
           };
-          github.repos = {
+          github.rest.repos = {
             getCollaboratorPermissionLevel: jasmine
               .createSpy('getCollaboratorPermissionLevel')
               .and.resolveTo({
@@ -1130,8 +1137,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should unassign reviewer', async () => {
-          expect(github.issues.removeAssignees).toHaveBeenCalled();
-          expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+          expect(github.rest.issues.removeAssignees).toHaveBeenCalled();
+          expect(github.rest.issues.removeAssignees).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             issue_number: reviewPayloadData.payload.pull_request.number,
@@ -1143,8 +1150,8 @@ describe('Pull Request Review Module', () => {
           expect(
             utilityModule.doesPullRequestHaveChangesRequested
           ).toHaveBeenCalled();
-          expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
-          expect(github.search.issuesAndPullRequests).toHaveBeenCalledWith({
+          expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalled();
+          expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalledWith({
             owner: reviewPayloadData.payload.repository.owner.login,
             repo: reviewPayloadData.payload.repository.name,
             q:
@@ -1154,16 +1161,16 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should not add LGTM label', () => {
-          expect(github.issues.addLabels).not.toHaveBeenCalled();
+          expect(github.rest.issues.addLabels).not.toHaveBeenCalled();
         });
 
         it('should not check if author can merge', () => {
-          expect(github.repos.getCollaboratorPermissionLevel)
+          expect(github.rest.repos.getCollaboratorPermissionLevel)
             .not.toHaveBeenCalled();
         });
 
         it('should not assign pr author', () => {
-          expect(github.issues.addAssignees).not.toHaveBeenCalled();
+          expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
         });
 
         afterAll(() => {
@@ -1198,15 +1205,15 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should not unassign reviewer', async () => {
-          expect(github.issues.removeAssignees).not.toHaveBeenCalled();
+          expect(github.rest.issues.removeAssignees).not.toHaveBeenCalled();
         });
 
         it('should not add LGTM label', () => {
-          expect(github.issues.addLabels).not.toHaveBeenCalled();
+          expect(github.rest.issues.addLabels).not.toHaveBeenCalled();
         });
 
         it('should not assign pr author', () => {
-          expect(github.issues.addAssignees).not.toHaveBeenCalled();
+          expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
         });
 
         afterAll(() => {
@@ -1223,7 +1230,7 @@ describe('Pull Request Review Module', () => {
     });
 
     beforeEach(async () => {
-      github.pulls = {
+      github.rest.pulls = {
         get: jasmine.createSpy('get').and.resolveTo({
           data: reviewPayloadData.payload.pull_request,
         }),
@@ -1243,15 +1250,15 @@ describe('Pull Request Review Module', () => {
     });
 
     it('should not unassign reviewer', async () => {
-      expect(github.issues.removeAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.removeAssignees).not.toHaveBeenCalled();
     });
 
     it('should not add LGTM label', () => {
-      expect(github.issues.addLabels).not.toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).not.toHaveBeenCalled();
     });
 
     it('should not assign pr author', () => {
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
     });
 
     afterAll(() => {
@@ -1261,7 +1268,7 @@ describe('Pull Request Review Module', () => {
 
   describe('Pull request author comments on PR', () => {
     beforeEach(() => {
-      github.pulls = {
+      github.rest.pulls = {
         get: jasmine.createSpy('get').and.resolveTo({
           data: commentPayloadData.payload.issue,
         }),
@@ -1297,8 +1304,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should get the updated version of the pull request', () => {
-          expect(github.pulls.get).toHaveBeenCalled();
-          expect(github.pulls.get).toHaveBeenCalledWith({
+          expect(github.rest.pulls.get).toHaveBeenCalled();
+          expect(github.rest.pulls.get).toHaveBeenCalledWith({
             repo: commentPayloadData.payload.repository.name,
             owner: commentPayloadData.payload.repository.owner.login,
             pull_number: commentPayloadData.payload.issue.number,
@@ -1306,8 +1313,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should assign reviewers', () => {
-          expect(github.issues.addAssignees).toHaveBeenCalled();
-          expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+          expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
             repo: commentPayloadData.payload.repository.name,
             owner: commentPayloadData.payload.repository.owner.login,
             issue_number: commentPayloadData.payload.issue.number,
@@ -1316,16 +1323,16 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should unassign author', () => {
-          expect(github.issues.removeAssignees).toHaveBeenCalled();
-          expect(github.issues.removeAssignees).toHaveBeenCalledWith({
+          expect(github.rest.issues.removeAssignees).toHaveBeenCalled();
+          expect(github.rest.issues.removeAssignees).toHaveBeenCalledWith({
             repo: commentPayloadData.payload.repository.name,
             owner: commentPayloadData.payload.repository.owner.login,
             issue_number: commentPayloadData.payload.issue.number,
             assignees: [commentPayloadData.payload.issue.user.login],
           });
 
-          expect(github.issues.createComment).toHaveBeenCalled();
-          expect(github.issues.createComment).toHaveBeenCalledWith({
+          expect(github.rest.issues.createComment).toHaveBeenCalled();
+          expect(github.rest.issues.createComment).toHaveBeenCalledWith({
             repo: commentPayloadData.payload.repository.name,
             owner: commentPayloadData.payload.repository.owner.login,
             issue_number: commentPayloadData.payload.issue.number,
@@ -1370,8 +1377,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should get the updated version of the pull request', () => {
-          expect(github.pulls.get).toHaveBeenCalled();
-          expect(github.pulls.get).toHaveBeenCalledWith({
+          expect(github.rest.pulls.get).toHaveBeenCalled();
+          expect(github.rest.pulls.get).toHaveBeenCalledWith({
             repo: commentPayloadData.payload.repository.name,
             owner: commentPayloadData.payload.repository.owner.login,
             pull_number: commentPayloadData.payload.issue.number,
@@ -1379,8 +1386,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should assign remaining reviewers', () => {
-          expect(github.issues.addAssignees).toHaveBeenCalled();
-          expect(github.issues.addAssignees).toHaveBeenCalledWith({
+          expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+          expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
             repo: commentPayloadData.payload.repository.name,
             owner: commentPayloadData.payload.repository.owner.login,
             issue_number: commentPayloadData.payload.issue.number,
@@ -1424,8 +1431,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should get the updated version of the pull request', () => {
-          expect(github.pulls.get).toHaveBeenCalled();
-          expect(github.pulls.get).toHaveBeenCalledWith({
+          expect(github.rest.pulls.get).toHaveBeenCalled();
+          expect(github.rest.pulls.get).toHaveBeenCalledWith({
             repo: commentPayloadData.payload.repository.name,
             owner: commentPayloadData.payload.repository.owner.login,
             pull_number: commentPayloadData.payload.issue.number,
@@ -1433,8 +1440,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should not assign reviewers', () => {
-          expect(github.issues.addAssignees).not.toHaveBeenCalled();
-          expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+          expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
+          expect(github.rest.issues.addAssignees).not.toHaveBeenCalledWith({
             repo: commentPayloadData.payload.repository.name,
             owner: commentPayloadData.payload.repository.owner.login,
             issue_number: commentPayloadData.payload.issue.number,
@@ -1474,8 +1481,8 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should not get the updated version of the pull request', () => {
-        expect(github.pulls.get).not.toHaveBeenCalled();
-        expect(github.pulls.get).not.toHaveBeenCalledWith({
+        expect(github.rest.pulls.get).not.toHaveBeenCalled();
+        expect(github.rest.pulls.get).not.toHaveBeenCalledWith({
           repo: commentPayloadData.payload.repository.name,
           owner: commentPayloadData.payload.repository.owner.login,
           pull_number: commentPayloadData.payload.issue.number,
@@ -1483,8 +1490,8 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should not assign reviewers', () => {
-        expect(github.issues.addAssignees).not.toHaveBeenCalled();
-        expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+        expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).not.toHaveBeenCalledWith({
           repo: commentPayloadData.payload.repository.name,
           owner: commentPayloadData.payload.repository.owner.login,
           issue_number: commentPayloadData.payload.issue.number,
@@ -1531,8 +1538,8 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should not get the updated version of the pull request', () => {
-        expect(github.pulls.get).not.toHaveBeenCalled();
-        expect(github.pulls.get).not.toHaveBeenCalledWith({
+        expect(github.rest.pulls.get).not.toHaveBeenCalled();
+        expect(github.rest.pulls.get).not.toHaveBeenCalledWith({
           repo: commentPayloadData.payload.repository.name,
           owner: commentPayloadData.payload.repository.owner.login,
           pull_number: commentPayloadData.payload.issue.number,
@@ -1540,8 +1547,8 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should not assign reviewers', () => {
-        expect(github.issues.addAssignees).not.toHaveBeenCalled();
-        expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+        expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).not.toHaveBeenCalledWith({
           repo: commentPayloadData.payload.repository.name,
           owner: commentPayloadData.payload.repository.owner.login,
           issue_number: commentPayloadData.payload.issue.number,
@@ -1580,8 +1587,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should not get the updated version of the pull request', () => {
-          expect(github.pulls.get).not.toHaveBeenCalled();
-          expect(github.pulls.get).not.toHaveBeenCalledWith({
+          expect(github.rest.pulls.get).not.toHaveBeenCalled();
+          expect(github.rest.pulls.get).not.toHaveBeenCalledWith({
             repo: commentPayloadData.payload.repository.name,
             owner: commentPayloadData.payload.repository.owner.login,
             pull_number: commentPayloadData.payload.issue.number,
@@ -1589,8 +1596,8 @@ describe('Pull Request Review Module', () => {
         });
 
         it('should not assign reviewers', () => {
-          expect(github.issues.addAssignees).not.toHaveBeenCalled();
-          expect(github.issues.addAssignees).not.toHaveBeenCalledWith({
+          expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
+          expect(github.rest.issues.addAssignees).not.toHaveBeenCalledWith({
             repo: commentPayloadData.payload.repository.name,
             owner: commentPayloadData.payload.repository.owner.login,
             issue_number: commentPayloadData.payload.issue.number,
@@ -1615,7 +1622,7 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should not assign anyone to the PR', () => {
-        expect(github.issues.createComment).not.toHaveBeenCalled();
+        expect(github.rest.issues.createComment).not.toHaveBeenCalled();
       });
 
       afterAll(() => {
@@ -1634,7 +1641,7 @@ describe('Pull Request Review Module', () => {
       });
 
       it('should not assign commenter to the PR', () => {
-        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+        expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
           repo: commentPayloadData.payload.repository.name,
           owner: commentPayloadData.payload.repository.owner.login,
           issue_number: commentPayloadData.payload.issue.number,

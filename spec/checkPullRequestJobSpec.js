@@ -415,21 +415,28 @@ describe('Pull Request Job Spec', () => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => { });
 
     github = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.returnValue({}),
-        addLabels: jasmine.createSpy('addLabels').and.returnValue({}),
-        addAssignees: jasmine.createSpy('addAssignees').and.returnValue({})
+	      hook: {
+	        before: jasmine.createSpy('before').and.callFake(() => {}),
+	      },
+      rest: {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.returnValue({}),
+          addLabels: jasmine.createSpy('addLabels').and.returnValue({}),
+          addAssignees: jasmine.createSpy('addAssignees').and.returnValue({})
+        },
       },
     };
 
     robot = createProbot({
-      id: 1,
-      cert: 'test',
-      githubToken: 'test',
+      overrides: {
+        githubToken: 'test',
+        secret: 'test',
+        logLevel: 'fatal',
+      },
     });
 
-    app = robot.load(oppiaBot);
-    spyOn(app, 'auth').and.resolveTo(github);
+    robot.load(oppiaBot);
+	    spyOn(robot.state.octokit, 'auth').and.resolveTo(github);
     spyOn(
       checkPullRequestJobModule, 'checkForModificationsToFiles'
     ).and.callThrough();
@@ -446,7 +453,7 @@ describe('Pull Request Job Spec', () => {
 
   describe('When a new job file is created in a pull request', () => {
     beforeEach(async () => {
-      github.pulls = {
+      github.rest.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [nonJobFile, firstNewJobFileObj],
         }),
@@ -462,7 +469,7 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should get modified files', () => {
-      expect(github.pulls.listFiles).toHaveBeenCalled();
+      expect(github.rest.pulls.listFiles).toHaveBeenCalled();
     });
 
     it('should ping server jobs admin', () => {
@@ -478,7 +485,7 @@ describe('Pull Request Job Spec', () => {
         'FirstTestJob'.link(firstNewJobFileObj.blob_url)
       );
 
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @U8NWXD, @kevintab95, PTAL at this PR, ' +
@@ -494,8 +501,8 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should assign server jobs admin', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -504,8 +511,8 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should add datastore label', () => {
-      expect(github.issues.addLabels).toHaveBeenCalled();
-      expect(github.issues.addLabels).toHaveBeenCalledWith({
+      expect(github.rest.issues.addLabels).toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -516,7 +523,7 @@ describe('Pull Request Job Spec', () => {
 
   describe('When multiple job files are created in a pull request', () => {
     beforeEach(async () => {
-      github.pulls = {
+      github.rest.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
             nonJobFile,
@@ -537,11 +544,11 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should get modified files', () => {
-      expect(github.pulls.listFiles).toHaveBeenCalled();
+      expect(github.rest.pulls.listFiles).toHaveBeenCalled();
     });
 
     it('should ping server jobs admin', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
       const author = payloadData.payload.pull_request.user.login;
       const formText = (
         'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
@@ -559,7 +566,7 @@ describe('Pull Request Job Spec', () => {
       const secondJobNameLink = (
         'SecondTestJob'.link(secondNewJobFileObj.blob_url)
       );
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @U8NWXD, @kevintab95, PTAL at this PR, ' +
@@ -575,8 +582,8 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should assign server jobs admin', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -585,8 +592,8 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should add datastore label', () => {
-      expect(github.issues.addLabels).toHaveBeenCalled();
-      expect(github.issues.addLabels).toHaveBeenCalledWith({
+      expect(github.rest.issues.addLabels).toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -599,7 +606,7 @@ describe('Pull Request Job Spec', () => {
     'updated in a pull request',
   () => {
     beforeEach(async () => {
-      github.pulls = {
+      github.rest.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
             nonJobFile,
@@ -618,11 +625,11 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should get modified files', () => {
-      expect(github.pulls.listFiles).toHaveBeenCalled();
+      expect(github.rest.pulls.listFiles).toHaveBeenCalled();
     });
 
     it('should ping server jobs admin', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
       const author = payloadData.payload.pull_request.user.login;
       const formText = (
         'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
@@ -633,7 +640,7 @@ describe('Pull Request Job Spec', () => {
       const jobNameLink = (
         'FirstTestJob'.link(firstNewJobFileObj.blob_url)
       );
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
             'Hi @U8NWXD, @kevintab95, PTAL at this ' +
@@ -649,8 +656,8 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should assign server jobs admin', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -659,8 +666,8 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should add datastore label', () => {
-      expect(github.issues.addLabels).toHaveBeenCalled();
-      expect(github.issues.addLabels).toHaveBeenCalledWith({
+      expect(github.rest.issues.addLabels).toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -672,7 +679,7 @@ describe('Pull Request Job Spec', () => {
 
   describe('When a new job is added in an existing job file', () => {
     beforeEach(async () => {
-      github.pulls = {
+      github.rest.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
             modifiedExistingJobFileObj,
@@ -690,12 +697,12 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should get modified files', () => {
-      expect(github.pulls.listFiles).toHaveBeenCalled();
+      expect(github.rest.pulls.listFiles).toHaveBeenCalled();
     });
 
 
     it('should ping server jobs admin', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
       const author = payloadData.payload.pull_request.user.login;
       const formText = (
         'server jobs form'.link('https://goo.gl/forms/XIj00RJ2h5L55XzU2')
@@ -711,7 +718,7 @@ describe('Pull Request Job Spec', () => {
         'OppiabotContributionsJob'
           .link(modifiedExistingJobFileObj.blob_url)
       );
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         body:
           'Hi @U8NWXD, @kevintab95, PTAL at this PR, ' +
@@ -727,8 +734,8 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should assign server jobs admin', () => {
-      expect(github.issues.addAssignees).toHaveBeenCalled();
-      expect(github.issues.addAssignees).toHaveBeenCalledWith({
+      expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -737,8 +744,8 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should add datastore label', () => {
-      expect(github.issues.addLabels).toHaveBeenCalled();
-      expect(github.issues.addLabels).toHaveBeenCalledWith({
+      expect(github.rest.issues.addLabels).toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).toHaveBeenCalledWith({
         issue_number: payloadData.payload.pull_request.number,
         repo: payloadData.payload.repository.name,
         owner: payloadData.payload.repository.owner.login,
@@ -749,7 +756,7 @@ describe('Pull Request Job Spec', () => {
 
   describe('When no job file is modified in a pull request', () => {
     beforeEach(async () => {
-      github.pulls = {
+      github.rest.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
             nonJobFile
@@ -768,17 +775,17 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should not get modified files', () => {
-      expect(github.pulls.listFiles).toHaveBeenCalled();
+      expect(github.rest.pulls.listFiles).toHaveBeenCalled();
     });
 
     it('should not ping server job admin', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
   });
 
   describe('Does not comment on job from test dir', () => {
     beforeEach(async () => {
-      github.pulls = {
+      github.rest.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
             jobFromTestDir
@@ -797,17 +804,17 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should get modified files', () => {
-      expect(github.pulls.listFiles).toHaveBeenCalled();
+      expect(github.rest.pulls.listFiles).toHaveBeenCalled();
     });
 
     it('should not ping server job admin', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
   });
 
   describe('When job test file gets added', () => {
     beforeEach(async () => {
-      github.pulls = {
+      github.rest.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
             jobTestFile
@@ -826,11 +833,11 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should get modified files', () => {
-      expect(github.pulls.listFiles).toHaveBeenCalled();
+      expect(github.rest.pulls.listFiles).toHaveBeenCalled();
     });
 
     it('should not ping server job admin', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
   });
 
@@ -839,7 +846,7 @@ describe('Pull Request Job Spec', () => {
       payloadData.payload.pull_request.labels = [{
         name: 'PR: Affects datastore layer'
       }];
-      github.pulls = {
+      github.rest.pulls = {
         listFiles: jasmine.createSpy('listFiles').and.resolveTo({
           data: [
             nonJobFile, firstNewJobFileObj
@@ -858,11 +865,11 @@ describe('Pull Request Job Spec', () => {
     });
 
     it('should not get modified files', () => {
-      expect(github.pulls.listFiles).not.toHaveBeenCalled();
+      expect(github.rest.pulls.listFiles).not.toHaveBeenCalled();
     });
 
     it('should not ping server job admin', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
   });
 });

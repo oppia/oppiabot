@@ -41,29 +41,36 @@ describe('Force Push Check', () => {
     spyOn(scheduler, 'createScheduler').and.callFake(() => {});
 
     github = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.returnValue({}),
-        update: jasmine.createSpy('update').and.resolveTo({}),
-      },
-      search: {
-        issuesAndPullRequests: jasmine
-          .createSpy('issuesAndPullRequests')
-          .and.resolveTo({
-            data: {
-              items: [pullRequestPayload.payload.pull_request],
-            },
-          }),
+	      hook: {
+	        before: jasmine.createSpy('before').and.callFake(() => {}),
+	      },
+      rest: {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.returnValue({}),
+          update: jasmine.createSpy('update').and.resolveTo({}),
+        },
+        search: {
+          issuesAndPullRequests: jasmine
+            .createSpy('issuesAndPullRequests')
+            .and.resolveTo({
+              data: {
+                items: [pullRequestPayload.payload.pull_request],
+              },
+            }),
+        },
       },
     };
 
     robot = createProbot({
-      id: 1,
-      cert: 'test',
-      githubToken: 'test',
+      overrides: {
+        githubToken: 'test',
+        secret: 'test',
+        logLevel: 'fatal',
+      },
     });
 
-    app = robot.load(oppiaBot);
-    spyOn(app, 'auth').and.resolveTo(github);
+    robot.load(oppiaBot);
+	    spyOn(robot.state.octokit, 'auth').and.resolveTo(github);
     spyOn(checkBranchPushModule, 'handleForcePush').and.callThrough();
   });
 
@@ -77,17 +84,17 @@ describe('Force Push Check', () => {
     });
 
     it('should search for pull request', () => {
-      expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
+      expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalled();
     });
 
     it('should comment on pull request', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
       const link = (
         'here (point 5)'.link(
           'https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia' +
         '#instructions-for-making-a-code-change')
       );
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         repo: pushPayload.payload.repository.name,
         owner: pushPayload.payload.repository.owner.login,
         issue_number: pullRequestPayload.payload.pull_request.number,
@@ -99,8 +106,8 @@ describe('Force Push Check', () => {
     });
 
     it('should close the pull request', () => {
-      expect(github.issues.update).toHaveBeenCalled();
-      expect(github.issues.update).toHaveBeenCalledWith({
+      expect(github.rest.issues.update).toHaveBeenCalled();
+      expect(github.rest.issues.update).toHaveBeenCalledWith({
         repo: pushPayload.payload.repository.name,
         owner: pushPayload.payload.repository.owner.login,
         issue_number: pullRequestPayload.payload.pull_request.number,
@@ -120,15 +127,15 @@ describe('Force Push Check', () => {
     });
 
     it('should not search for pull request', () => {
-      expect(github.search.issuesAndPullRequests).not.toHaveBeenCalled();
+      expect(github.rest.search.issuesAndPullRequests).not.toHaveBeenCalled();
     });
 
     it('should not comment on pull request', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not close the pull request', () => {
-      expect(github.issues.update).not.toHaveBeenCalled();
+      expect(github.rest.issues.update).not.toHaveBeenCalled();
     });
   });
 
@@ -144,15 +151,15 @@ describe('Force Push Check', () => {
     });
 
     it('should not search for pull request', () => {
-      expect(github.search.issuesAndPullRequests).not.toHaveBeenCalled();
+      expect(github.rest.search.issuesAndPullRequests).not.toHaveBeenCalled();
     });
 
     it('should not comment on pull request', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not close the pull request', () => {
-      expect(github.issues.update).not.toHaveBeenCalled();
+      expect(github.rest.issues.update).not.toHaveBeenCalled();
     });
   });
 
@@ -168,15 +175,15 @@ describe('Force Push Check', () => {
     });
 
     it('should not search for pull request', () => {
-      expect(github.search.issuesAndPullRequests).not.toHaveBeenCalled();
+      expect(github.rest.search.issuesAndPullRequests).not.toHaveBeenCalled();
     });
 
     it('should not comment on pull request', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not close the pull request', () => {
-      expect(github.issues.update).not.toHaveBeenCalled();
+      expect(github.rest.issues.update).not.toHaveBeenCalled();
     });
   });
 
@@ -184,7 +191,7 @@ describe('Force Push Check', () => {
     beforeEach(async () => {
       pushPayload.payload.ref = 'refs/heads/some-weird-branch';
       pushPayload.payload.forced = true;
-      github.search = {
+      github.rest.search = {
         issuesAndPullRequests: jasmine
           .createSpy('issuesAndPullRequests')
           .and.resolveTo({
@@ -202,15 +209,15 @@ describe('Force Push Check', () => {
     });
 
     it('should search for pull request', () => {
-      expect(github.search.issuesAndPullRequests).toHaveBeenCalled();
+      expect(github.rest.search.issuesAndPullRequests).toHaveBeenCalled();
     });
 
     it('should not comment on pull request', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not close the pull request', () => {
-      expect(github.issues.update).not.toHaveBeenCalled();
+      expect(github.rest.issues.update).not.toHaveBeenCalled();
     });
   });
 });

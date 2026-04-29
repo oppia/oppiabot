@@ -56,31 +56,38 @@ describe('Pull Request Label Check', () => {
     spyOn(utilityModule, 'sleep').and.callFake(() => { });
 
     github = {
-      issues: {
-        createComment: jasmine.createSpy('createComment').and.returnValue({}),
-        addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
-        removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
-        addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
+	      hook: {
+	        before: jasmine.createSpy('before').and.callFake(() => {}),
+	      },
+      rest: {
+        issues: {
+          createComment: jasmine.createSpy('createComment').and.returnValue({}),
+          addAssignees: jasmine.createSpy('addAssignees').and.resolveTo({}),
+          removeLabel: jasmine.createSpy('removeLabel').and.resolveTo({}),
+          addLabels: jasmine.createSpy('addLabels').and.resolveTo({}),
+        },
+        repos: {
+          checkCollaborator: jasmine.createSpy('checkCollaborator').and.callFake(
+            (params) => {
+              if (params.username === 'newuser') {
+                throw new Error('User is not a collaborator.');
+              }
+              return { status: 204 };
+            })
+        },
       },
-      repos: {
-        checkCollaborator: jasmine.createSpy('checkCollaborator').and.callFake(
-          (params) => {
-            if (params.username === 'newuser') {
-              throw new Error('User is not a collaborator.');
-            }
-            return { status: 204 };
-          })
-      }
     };
 
     robot = createProbot({
-      id: 1,
-      cert: 'test',
-      githubToken: 'test',
+      overrides: {
+        githubToken: 'test',
+        secret: 'test',
+        logLevel: 'fatal',
+      },
     });
 
-    app = robot.load(oppiaBot);
-    spyOn(app, 'auth').and.resolveTo(github);
+    robot.load(oppiaBot);
+	    spyOn(robot.state.octokit, 'auth').and.resolveTo(github);
     spyOn(
       checkPullRequestJobModule, 'checkForModificationsToFiles'
     ).and.callFake(() => { });
@@ -108,13 +115,13 @@ describe('Pull Request Label Check', () => {
       });
 
       it('should not assign project owner', () => {
-        const arg = github.issues.addAssignees.calls.argsFor(0)[0];
+        const arg = github.rest.issues.addAssignees.calls.argsFor(0)[0];
         expect(arg.assignees.includes('kevintab95')).toBe(false);
       });
 
       it('should assign all reviewers', () => {
-        expect(github.issues.addAssignees).toHaveBeenCalled();
-        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+        expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
           issue_number: payloadData.payload.number,
@@ -143,8 +150,8 @@ describe('Pull Request Label Check', () => {
       });
 
       it('should assign pr author', () => {
-        expect(github.issues.addAssignees).toHaveBeenCalled();
-        expect(github.issues.addAssignees).toHaveBeenCalledWith({
+        expect(github.rest.issues.addAssignees).toHaveBeenCalled();
+        expect(github.rest.issues.addAssignees).toHaveBeenCalledWith({
           repo: payloadData.payload.repository.name,
           owner: payloadData.payload.repository.owner.login,
           issue_number: payloadData.payload.number,
@@ -153,8 +160,8 @@ describe('Pull Request Label Check', () => {
       });
 
       it('should ping pr author', () => {
-        expect(github.issues.createComment).toHaveBeenCalled();
-        expect(github.issues.createComment).toHaveBeenCalledWith({
+        expect(github.rest.issues.createComment).toHaveBeenCalled();
+        expect(github.rest.issues.createComment).toHaveBeenCalledWith({
           owner: payloadData.payload.repository.owner.login,
           repo: payloadData.payload.repository.name,
           issue_number: payloadData.payload.pull_request.number,
@@ -191,11 +198,11 @@ describe('Pull Request Label Check', () => {
       });
 
       it('does not comment on the PR', () => {
-        expect(github.issues.createComment).not.toHaveBeenCalled();
+        expect(github.rest.issues.createComment).not.toHaveBeenCalled();
       });
 
       it('does not remove the label', () => {
-        expect(github.issues.removeLabel).not.toHaveBeenCalled();
+        expect(github.rest.issues.removeLabel).not.toHaveBeenCalled();
       });
     });
 
@@ -209,8 +216,8 @@ describe('Pull Request Label Check', () => {
       await robot.receive(payloadData);
 
       expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
 
     it('should not assign when there are review comments', async () => {
@@ -222,8 +229,8 @@ describe('Pull Request Label Check', () => {
       await robot.receive(payloadData);
 
       expect(checkPullRequestLabelModule.checkAssignee).toHaveBeenCalled();
-      expect(github.issues.addAssignees).not.toHaveBeenCalled();
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.addAssignees).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
   });
 
@@ -251,20 +258,20 @@ describe('Pull Request Label Check', () => {
     });
 
     it('comments on the PR', () => {
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         body:
           'Hi @user, the issue label label should only be used on ' +
           'issues, and I’m removing the label. You can learn more about ' +
           'labels <a href="https://github.com/oppia/oppia/wiki/Contributing' +
           '-code-to-Oppia#labeling-issues-and-pull-requests">here</a>. Thanks!',
-        number: payloadData.payload.pull_request.number,
+	        issue_number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name
       });
     });
 
     it('removes the label', () => {
-      expect(github.issues.removeLabel).toHaveBeenCalled();
+      expect(github.rest.issues.removeLabel).toHaveBeenCalled();
     });
   });
 
@@ -291,25 +298,25 @@ describe('Pull Request Label Check', () => {
     });
 
     it('should comment on PR', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         body:
           'Hi @' + payloadData.payload.sender.login +
           ', only members of the release team ' +
           '/cc @oppia/release-coordinators ' +
           'are allowed to remove PR: Affects datastore layer labels. ' +
           'I will be adding it back. Thanks!',
-        number: payloadData.payload.pull_request.number,
+	        issue_number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name
       });
     });
 
     it('should add the datastore label', () => {
-      expect(github.issues.addLabels).toHaveBeenCalled();
-      expect(github.issues.addLabels).toHaveBeenCalledWith({
+      expect(github.rest.issues.addLabels).toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).toHaveBeenCalledWith({
         labels: ['PR: Affects datastore layer'],
-        number: payloadData.payload.pull_request.number,
+	        issue_number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name
       });
@@ -340,11 +347,11 @@ describe('Pull Request Label Check', () => {
     });
 
     it('does not add back the label', () => {
-      expect(github.issues.addLabels).not.toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).not.toHaveBeenCalled();
     });
 
     it('does not comment on the PR', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
   });
 
@@ -363,7 +370,7 @@ describe('Pull Request Label Check', () => {
       spyOn(
         checkPullRequestLabelModule, 'checkStaleBuildLabelRemoved',
       ).and.callThrough();
-      github.repos.getCommit = jasmine.createSpy('getCommit').and.resolveTo({
+      github.rest.repos.getCommit = jasmine.createSpy('getCommit').and.resolveTo({
         data: {
           commit: {
             author: {
@@ -381,8 +388,8 @@ describe('Pull Request Label Check', () => {
     });
 
     it('check if pr is stale', () => {
-      expect(github.repos.getCommit).toHaveBeenCalled();
-      expect(github.repos.getCommit).toHaveBeenCalledWith({
+      expect(github.rest.repos.getCommit).toHaveBeenCalled();
+      expect(github.rest.repos.getCommit).toHaveBeenCalledWith({
         owner: 'oppia',
         repo: 'oppia',
         ref: payloadData.payload.pull_request.head.sha
@@ -390,9 +397,9 @@ describe('Pull Request Label Check', () => {
     });
 
     it('should comment on PR', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
-        number: payloadData.payload.pull_request.number,
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
+	        issue_number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name,
         body:
@@ -403,10 +410,10 @@ describe('Pull Request Label Check', () => {
     });
 
     it('should add the stale build label', () => {
-      expect(github.issues.addLabels).toHaveBeenCalled();
-      expect(github.issues.addLabels).toHaveBeenCalledWith({
+      expect(github.rest.issues.addLabels).toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).toHaveBeenCalledWith({
         labels: [OLD_BUILD_LABEL],
-        number: payloadData.payload.pull_request.number,
+	        issue_number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name
       });
@@ -429,7 +436,7 @@ describe('Pull Request Label Check', () => {
       spyOn(
         checkPullRequestLabelModule, 'checkStaleBuildLabelRemoved'
       ).and.callThrough();
-      github.repos.getCommit = jasmine.createSpy('getCommit').and.resolveTo({
+      github.rest.repos.getCommit = jasmine.createSpy('getCommit').and.resolveTo({
         data: {
           commit: {
             author: {
@@ -447,8 +454,8 @@ describe('Pull Request Label Check', () => {
     });
 
     it('check if pr is stale', () => {
-      expect(github.repos.getCommit).toHaveBeenCalled();
-      expect(github.repos.getCommit).toHaveBeenCalledWith({
+      expect(github.rest.repos.getCommit).toHaveBeenCalled();
+      expect(github.rest.repos.getCommit).toHaveBeenCalledWith({
         repo: 'oppia',
         owner: 'oppia',
         ref: payloadData.payload.pull_request.head.sha
@@ -456,11 +463,11 @@ describe('Pull Request Label Check', () => {
     });
 
     it('does not add back the label', () => {
-      expect(github.issues.addLabels).not.toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).not.toHaveBeenCalled();
     });
 
     it('does not comment on the PR', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
   });
 
@@ -485,14 +492,14 @@ describe('Pull Request Label Check', () => {
     });
 
     it('should comment on PR', () => {
-      expect(github.issues.createComment).toHaveBeenCalled();
-      expect(github.issues.createComment).toHaveBeenCalledWith({
+      expect(github.rest.issues.createComment).toHaveBeenCalled();
+      expect(github.rest.issues.createComment).toHaveBeenCalledWith({
         body:
           'Hi, @oppia/release-coordinators flagging this pull request for ' +
           'for your attention since this is labelled as a hotfix PR. ' +
           'Please ensure that you add the "PR: for current release" ' +
           'label if the next release is in progress. Thanks!',
-        number: payloadData.payload.pull_request.number,
+	        issue_number: payloadData.payload.pull_request.number,
         owner: payloadData.payload.repository.owner.login,
         repo: payloadData.payload.repository.name
       });
@@ -522,11 +529,11 @@ describe('Pull Request Label Check', () => {
     });
 
     it('does not add back the label', () => {
-      expect(github.issues.addLabels).not.toHaveBeenCalled();
+      expect(github.rest.issues.addLabels).not.toHaveBeenCalled();
     });
 
     it('does not comment on the PR', () => {
-      expect(github.issues.createComment).not.toHaveBeenCalled();
+      expect(github.rest.issues.createComment).not.toHaveBeenCalled();
     });
   });
 });
