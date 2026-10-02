@@ -31,3 +31,7 @@ export {
 } from './plugin';
 export { PluginRegistry } from './pluginRegistry';
 export { CoreEngine } from './engine';
+export {
+  OppiabotGitHubClient,
+  OppiabotGitHubClientError
+} from './oppiabot_github_client';
