@@ -87,6 +87,12 @@ export interface Commit {
   sha: string;
   commit: {
     message: string;
+    /**
+     * Set by the GitHub API on every commit, so the fields are not nullable.
+     */
+    author: {
+      date: string;
+    };
     committer: {
       date: string;
     } | null;
@@ -103,6 +109,14 @@ export interface Issue {
   body: string | null;
   labels: GitHubLabel[];
   assignees: GitHubUser[];
+  /**
+   * Present only when the resource is a pull request. The GitHub issues
+   * endpoint returns both issues and pull requests, so callers that need only
+   * issues filter on this property.
+   */
+  pull_request?: {
+    html_url?: string;
+  };
 }
 
 /**
@@ -114,14 +128,6 @@ export interface SearchResult {
     number: number;
     title: string;
   }>;
-}
-
-/**
- * A file read from a repository, as returned by the GitHub API.
- */
-export interface RepositoryFile {
-  content: string;
-  encoding: string;
 }
 
 /**
@@ -147,7 +153,6 @@ const ROUTES = {
   updateIssue: 'PATCH /repos/{owner}/{repo}/issues/{issue_number}',
   searchIssuesAndPullRequests: 'GET /search/issues',
   getCommit: 'GET /repos/{owner}/{repo}/commits/{ref}',
-  getFileContent: 'GET /repos/{owner}/{repo}/contents/{path}',
 };
 
 /**
@@ -302,16 +307,32 @@ export class OppiabotGitHubClient {
   /**
    * Lists issues in the repository.
    *
+   * The GitHub API returns pull requests through this endpoint as well, so the
+   * returned list is not limited to issues. Every page is read because the
+   * repository-wide issue list is used by scheduled plugins that must see all
+   * open issues, and a single page would silently omit the remainder.
+   *
    * @param {ResourceState} [state] - State of the issues to list. Defaults to
    *   'open'.
-   * @returns {Promise<Issue[]>} The matching issues.
+   * @returns {Promise<Issue[]>} The matching issues, including any pull
+   *   requests returned by the endpoint.
    * @throws {OppiabotGitHubClientError} if the issues cannot be read.
    */
   async listIssues(state: ResourceState = 'open'): Promise<Issue[]> {
-    return this.request<Issue[]>(ROUTES.listIssues, {
-      state,
-      per_page: MAX_RESULTS_PER_PAGE
-    });
+    const issues: Issue[] = [];
+    let page = 1;
+    let pageCount: number;
+    do {
+      const issuesInPage = await this.request<Issue[]>(ROUTES.listIssues, {
+        state,
+        per_page: MAX_RESULTS_PER_PAGE,
+        page
+      });
+      issues.push(...issuesInPage);
+      pageCount = issuesInPage.length;
+      page++;
+    } while (pageCount === MAX_RESULTS_PER_PAGE);
+    return issues;
   }
 
   /**
@@ -339,27 +360,6 @@ export class OppiabotGitHubClient {
    */
   async getCommit(sha: string): Promise<Commit> {
     return this.request<Commit>(ROUTES.getCommit, {ref: sha});
-  }
-
-  /**
-   * Reads a file from the repository's default branch.
-   *
-   * @param {string} filePath - Repository-relative path of the file.
-   * @returns {Promise<string>} The decoded file contents.
-   * @throws {OppiabotGitHubClientError} if the file cannot be read or its
-   *   encoding is not supported.
-   */
-  async getFileContent(filePath: string): Promise<string> {
-    const file = await this.request<RepositoryFile>(
-      ROUTES.getFileContent,
-      {path: filePath, ref: this.repository.default_branch}
-    );
-    if (file.encoding !== 'base64') {
-      throw new OppiabotGitHubClientError(
-        `Unsupported encoding '${file.encoding}' for file '${filePath}'.`
-      );
-    }
-    return Buffer.from(file.content, 'base64').toString('utf-8');
   }
 
   /**

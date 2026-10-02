@@ -39,6 +39,9 @@ class FakeGitHubApiClient implements GitHubApiClient {
   /** Response returned for the listChangedFiles route, keyed by page number. */
   readonly changedFilesByPage: Map<number, ChangedFile[]> = new Map();
 
+  /** Response returned for the listIssues route, keyed by page number. */
+  readonly issuesByPage: Map<number, Issue[]> = new Map();
+
   async request<TData>(
     route: string,
     parameters: Record<string, unknown>
@@ -48,6 +51,13 @@ class FakeGitHubApiClient implements GitHubApiClient {
       return {
         status: 200,
         data: this.changedFilesByPage.get(Number(parameters.page)) || []
+      } as GitHubApiResponse<TData>;
+    }
+    if (route === 'GET /repos/{owner}/{repo}/issues') {
+      return {
+        status: 200,
+        data: this.issuesByPage.get(Number(parameters.page)) ||
+          [createIssue(1), createIssue(2)]
       } as GitHubApiResponse<TData>;
     }
     return {status: 200, data: this.responseFor(route, parameters)} as
@@ -83,13 +93,9 @@ class FakeGitHubApiClient implements GitHubApiClient {
           sha: String(parameters.ref),
           commit: {
             message: 'A commit message',
+            author: {date: '2026-10-01'},
             committer: {date: '2026-10-02'}
           }
-        };
-      case 'GET /repos/{owner}/{repo}/contents/{path}':
-        return {
-          content: Buffer.from('* @oppia', 'utf-8').toString('base64'),
-          encoding: 'base64'
         };
       default:
         return {};
@@ -221,6 +227,28 @@ describe('OppiabotGitHubClient', () => {
       assert.strictEqual(api.getLastParameters().state, 'open');
     });
 
+    it('requests a second page when the first page is full', async () => {
+      const {client, api} = createClient();
+      api.issuesByPage.set(1, Array.from(
+        {length: 100},
+        (_value, index) => createIssue(index + 1)
+      ));
+      api.issuesByPage.set(2, [createIssue(101)]);
+      const issues = await client.listIssues();
+      assert.strictEqual(issues.length, 101);
+      assert.deepStrictEqual(
+        api.requests.map((request) => request.parameters.page),
+        [1, 2]
+      );
+    });
+
+    it('requests each issue page exactly once', async () => {
+      const {client, api} = createClient();
+      api.issuesByPage.set(1, [createIssue(1)]);
+      await client.listIssues();
+      assert.strictEqual(api.requests.length, 1);
+    });
+
     it('scopes a search query to the repository', async () => {
       const {client, api} = createClient();
       const result = await client.searchIssuesAndPullRequests(
@@ -240,31 +268,49 @@ describe('OppiabotGitHubClient', () => {
       assert.strictEqual(commit.commit.message, 'A commit message');
     });
 
-    it('decodes a file read from the default branch', async () => {
-      const {client, api} = createClient();
-      const contents = await client.getFileContent('CODEOWNERS');
-      assert.strictEqual(contents, '* @oppia');
-      assert.deepStrictEqual(api.getLastParameters(), {
-        owner: 'oppia',
-        repo: 'oppiabot',
-        path: 'CODEOWNERS',
-        ref: 'develop'
-      });
+    it('exposes the author date a stale check compares against', async () => {
+      const {client} = createClient();
+      const commit = await client.getCommit('abc123');
+      assert.strictEqual(commit.commit.author.date, '2026-10-01');
     });
 
-    it('rejects a file with an unsupported encoding', async () => {
+    it('uses the expected route for each read operation', async () => {
+      const {client, api} = createClient();
+      await client.getPullRequest(1);
+      await client.listPullRequests();
+      await client.listPullRequestReviews(1);
+      await client.listIssues();
+      await client.searchIssuesAndPullRequests('is:issue');
+      await client.getCommit('abc123');
+      assert.deepStrictEqual(
+        api.requests.map((request) => request.route),
+        [
+          'GET /repos/{owner}/{repo}/pulls/{pull_number}',
+          'GET /repos/{owner}/{repo}/pulls',
+          'GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews',
+          'GET /repos/{owner}/{repo}/issues',
+          'GET /search/issues',
+          'GET /repos/{owner}/{repo}/commits/{ref}'
+        ]
+      );
+    });
+
+    it('exposes pull requests returned by the issues endpoint', async () => {
       const {client, api} = createClient();
       api.request = async <TData>() => ({
         status: 200,
-        data: {content: 'plain', encoding: 'utf-8'} as unknown as TData
+        data: [
+          {...createIssue(1)},
+          {
+            ...createIssue(2),
+            pull_request: {html_url: 'https://github.com/oppia/oppiabot/pull/2'}
+          }
+        ] as unknown as TData
       });
-      await assert.rejects(
-        () => client.getFileContent('CODEOWNERS'),
-        (err: Error) => (
-          err instanceof OppiabotGitHubClientError &&
-          err.message.includes("Unsupported encoding 'utf-8'")
-        )
-      );
+      const issues = await client.listIssues();
+      assert.strictEqual(issues.length, 2);
+      assert.ok(issues[1].pull_request);
+      assert.strictEqual(issues[0].pull_request, undefined);
     });
 
     it('wraps a failed read request in a client error', async () => {
