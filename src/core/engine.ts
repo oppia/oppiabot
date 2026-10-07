@@ -28,7 +28,7 @@ import { PluginRegistry } from './pluginRegistry';
  * A runtime entrypoint (a webhook handler or a scheduled workflow) builds an
  * ExecutionContext and passes it to `execute()`. The engine resolves the
  * registered plugins whose `supportedTriggers` match the context's trigger and
- * runs each of them once, in the order the plugins were registered.
+ * runs each of them once.
  *
  * The engine does not tell webhook executions and scheduled executions apart.
  * Both arrive as an ExecutionContext and take the same code path; the only
@@ -50,8 +50,8 @@ export class CoreEngine {
    * Executes the plugins applicable to the current execution.
    *
    * Resolves the plugins whose `supportedTriggers` match `context.trigger`,
-   * then awaits each of them in registration order. Every resolved plugin
-   * appears exactly once in the returned array, in the same order.
+   * then awaits each of them. Every resolved plugin appears exactly once in
+   * the returned array.
    *
    * Failures are isolated per plugin: a plugin that throws does not stop the
    * remaining plugins from running, and does not reject this promise. Its
@@ -61,8 +61,8 @@ export class CoreEngine {
    * @param {ExecutionContext} context - Execution context carrying the trigger,
    *   event payload, repository, and repository configuration. Must satisfy
    *   `ExecutionContext.validate()`.
-   * @returns {Promise<PluginResult[]>} One result per resolved plugin, ordered
-   *   as the plugins were registered. Empty if no plugin matches the trigger.
+   * @returns {Promise<PluginResult[]>} One result per resolved plugin. Empty
+   *   if no plugin matches the trigger.
    * @throws {ExecutionContextValidationError} if the execution context is
    *   invalid. No plugin is executed in that case.
    */
