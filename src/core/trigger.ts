@@ -34,10 +34,10 @@ export class Trigger {
      */
     public readonly event: string,
     /**
-     * The action or subtype of the event: 'opened' for `pull_request.opened`,
-     * or the scheduled job's name such as 'stale-sweep' when `event` is
-     * 'schedule'. Leave it undefined for events that carry no action, which
-     * makes this trigger match every action for `event`.
+     * The action name for a GitHub event, such as 'opened' for
+     * `pull_request.opened`. For a scheduled run, this is the scheduled
+     * workflow's name, such as 'stale-sweep'. If `action` is `undefined`, this
+     * trigger matches any action for the same event.
      */
     public readonly action?: string
   ) {}

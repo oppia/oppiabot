@@ -22,8 +22,7 @@ import { RepositoryConfiguration } from
   '../types/repository_configuration';
 
 /**
- * The raw event data for one execution, copied from what the entrypoint
- * received.
+ * The raw event data for one execution, as received by the entrypoint.
  *
  * A webhook entrypoint sets this to the GitHub webhook payload for the
  * delivered event, for example the `pull_request` object from a
@@ -44,9 +43,6 @@ export type RuntimeEventPayload = Record<string, unknown>;
  * so their properties cannot be reassigned through the typed API. The nested
  * objects they reference are not frozen, so plugins must treat them as
  * read-only and must not mutate them.
- *
- * Nothing is derived or computed here: every field is a value the entrypoint
- * already held when the run started.
  */
 export class ExecutionContext {
   constructor(
