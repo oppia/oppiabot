@@ -93,8 +93,7 @@ export class ExecutionContext {
   validate(): void {
     if (this.trigger === undefined || this.trigger === null) {
       throw new ExecutionContextValidationError(
-        'The execution context must define a trigger, and trigger.event ' +
-        'must be defined and non-empty.'
+        'The execution context must define a trigger.'
       );
     }
     try {

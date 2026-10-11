@@ -49,6 +49,11 @@ export class ConfigSchema {
   /**
    * Validates plugin configuration against the schema.
    *
+   * Every field named in `required` must be present, every field in `config`
+   * must be declared in `properties`, and each value must match its rule
+   * (`ConfigSchemaProperty`): the declared type, and, when the rule sets an
+   * enum, one of its allowed values.
+   *
    * @param {Record<string, unknown>} config - Plugin-specific configuration
    *   values to validate.
    * @throws {ConfigurationValidationError} if the configuration does not
