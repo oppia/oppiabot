@@ -22,24 +22,18 @@ import { PluginResult } from './plugin';
 import { PluginRegistry } from './pluginRegistry';
 
 /**
- * The Oppiabot Core Engine is the central orchestration layer responsible for
- * coordinating repository automation.
+ * The Oppiabot Core Engine runs the plugins that apply to one execution.
  *
- * A runtime entrypoint (a webhook handler or a scheduled workflow) builds an
- * ExecutionContext and passes it to `execute()`. The engine resolves the
- * registered plugins whose `supportedTriggers` match the context's trigger and
- * runs each of them once.
+ * A webhook handler or a scheduled workflow builds an `ExecutionContext` and
+ * passes it to `execute()`. The engine validates the context, finds the
+ * registered plugins whose `supportedTriggers` match the context's trigger,
+ * executes those plugins, and returns their results.
  *
  * The engine does not tell webhook executions and scheduled executions apart.
- * Both arrive as an ExecutionContext and take the same code path; the only
- * difference between them is which entrypoint built the context and what the
- * entrypoint put in `payload`.
- *
- * Responsibilities:
- * - Validate the execution context.
- * - Resolve plugins applicable to the execution trigger.
- * - Run each applicable plugin and isolate its failures.
- * - Aggregate the per-plugin results into a single return value.
+ * Both arrive as an `ExecutionContext` and take the same code path; the only
+ * difference is which entrypoint built the context and what it put in
+ * `payload`. If a plugin throws, the engine records a failed result for that
+ * plugin and continues with the other matching plugins.
  */
 export class CoreEngine {
   constructor(
@@ -49,9 +43,9 @@ export class CoreEngine {
   /**
    * Executes the plugins applicable to the current execution.
    *
-   * Resolves the plugins whose `supportedTriggers` match `context.trigger`,
-   * then awaits each of them. Every resolved plugin appears exactly once in
-   * the returned array.
+   * Resolves the plugins whose `supportedTriggers` match `context.trigger` and
+   * executes each of them. Every resolved plugin appears exactly once in the
+   * returned array.
    *
    * Failures are isolated per plugin: a plugin that throws does not stop the
    * remaining plugins from running, and does not reject this promise. Its

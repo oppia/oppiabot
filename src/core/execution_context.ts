@@ -22,8 +22,7 @@ import { RepositoryConfiguration } from
   '../types/repository_configuration';
 
 /**
- * The raw event data for one execution, copied from what the entrypoint
- * received.
+ * The raw event data for one execution, as received by the entrypoint.
  *
  * A webhook entrypoint sets this to the GitHub webhook payload for the
  * delivered event, for example the `pull_request` object from a
@@ -41,10 +40,9 @@ export type RuntimeEventPayload = Record<string, unknown>;
  * An entrypoint (a webhook handler or a scheduled workflow) constructs one
  * instance per triggered run and passes it to `CoreEngine.execute()`, which
  * passes the same instance to every resolved plugin. All fields are readonly,
- * so a plugin cannot change what the other plugins see.
- *
- * Nothing is derived or computed here: every field is a value the entrypoint
- * already held when the run started.
+ * so their properties cannot be reassigned through the typed API. The nested
+ * objects they reference are not frozen, so plugins must treat them as
+ * read-only and must not mutate them.
  */
 export class ExecutionContext {
   constructor(
@@ -82,13 +80,14 @@ export class ExecutionContext {
   /**
    * Checks that this execution context can be executed.
    *
-   * Verifies that `trigger` is present and that `trigger.event` is present and
-   * not the empty string, and that `repository` is present. `payload`,
-   * `configuration`, and `deliveryId` are not checked here; `configuration` in
-   * particular has not been loaded yet when an entrypoint builds the context.
+   * Requires `trigger` to be neither `undefined` nor `null`, `trigger.event`
+   * to be neither `undefined` nor `''`, and `repository` to be neither
+   * `undefined` nor `null`. `payload`, `configuration`, and `deliveryId` are
+   * not checked; `configuration` in particular has not been loaded yet when an
+   * entrypoint builds the context.
    *
-   * @throws {ExecutionContextValidationError} naming the first field that
-   *   fails, or returns without throwing if every required field is present.
+   * @throws {ExecutionContextValidationError} with a message naming the failed
+   *   field. Returns without throwing when every required field is present.
    */
   validate(): void {
     if (this.trigger === undefined || this.trigger === null) {

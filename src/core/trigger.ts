@@ -34,20 +34,23 @@ export class Trigger {
      */
     public readonly event: string,
     /**
-     * The action or subtype of the event: 'opened' for `pull_request.opened`,
-     * or the scheduled job's name such as 'stale-sweep' when `event` is
-     * 'schedule'. Leave it undefined for events that carry no action, which
-     * makes this trigger match every action for `event`.
+     * The action name for a GitHub event, such as 'opened' for
+     * `pull_request.opened`. For a scheduled run, this is the scheduled
+     * workflow's name, such as 'stale-sweep'. If `action` is `undefined`, this
+     * trigger matches any action for the same event.
      */
     public readonly action?: string
   ) {}
 
   /**
-   * Returns the key that identifies this trigger.
+   * Returns a string key that represents this trigger.
    *
    * The key is `event` when this trigger has no action, and `event.action`
-   * otherwise. Callers use it to report which trigger a plugin supports and to
-   * compare two triggers by name.
+   * otherwise. Use it to describe or log a trigger, or to compare two triggers
+   * for exact equality. Do not use it to decide whether a plugin supports a
+   * trigger: equal keys only identify identical triggers, so a key comparison
+   * misses a trigger without an action that supports every action of its event.
+   * Use `matches()` for that check.
    *
    * @returns {string} For example 'pull_request.opened', 'issues', or
    *   'schedule.stale-sweep'.
