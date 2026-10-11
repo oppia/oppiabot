@@ -183,8 +183,9 @@ export interface GitHubApiClient {
 /**
  * Maximum number of results GitHub returns per page for most list operations.
  *
- * getAllChangedFiles in the legacy implementation relies on this value, so the
- * client uses the same page size when reading a pull request's changed files.
+ * Used as the page size for the list operations; the changed-files and issues
+ * loops rely on it to detect a full page and request the next one, matching the
+ * page size the legacy implementations used.
  */
 const MAX_RESULTS_PER_PAGE = 100;
 
@@ -415,7 +416,10 @@ export class OppiabotGitHubClient {
    * @returns {Promise<number>} The HTTP status of the request.
    * @throws {OppiabotGitHubClientError} if the request fails.
    */
-  async addAssignees(issueNumber: number, assignees: string[]): Promise<number> {
+  async addAssignees(
+    issueNumber: number,
+    assignees: string[]
+  ): Promise<number> {
     return this.mutate(ROUTES.addAssignees, {
       issue_number: issueNumber,
       assignees
@@ -491,7 +495,8 @@ export class OppiabotGitHubClient {
    *
    * @param {string} route - GitHub REST route to request.
    * @param {Object} parameters - Route parameters and query parameters.
-   * @returns {Promise<Object>} The response from the GitHub API.
+   * @returns {Promise<GitHubApiResponse<TData>>} The GitHub API response, with
+   *   its status and data.
    * @throws {OppiabotGitHubClientError} if the request fails.
    */
   private async send<TData>(
