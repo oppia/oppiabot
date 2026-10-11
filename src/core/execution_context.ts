@@ -22,8 +22,7 @@ import { RepositoryConfiguration } from
   '../types/repository_configuration';
 
 /**
- * The raw event data for one execution, copied from what the entrypoint
- * received.
+ * The raw event data for one execution, as received by the entrypoint.
  *
  * A webhook entrypoint sets this to the GitHub webhook payload for the
  * delivered event, for example the `pull_request` object from a
@@ -41,10 +40,9 @@ export type RuntimeEventPayload = Record<string, unknown>;
  * An entrypoint (a webhook handler or a scheduled workflow) constructs one
  * instance per triggered run and passes it to `CoreEngine.execute()`, which
  * passes the same instance to every resolved plugin. All fields are readonly,
- * so a plugin cannot change what the other plugins see.
- *
- * Nothing is derived or computed here: every field is a value the entrypoint
- * already held when the run started.
+ * so their properties cannot be reassigned through the typed API. The nested
+ * objects they reference are not frozen, so plugins must treat them as
+ * read-only and must not mutate them.
  */
 export class ExecutionContext {
   constructor(
@@ -82,15 +80,15 @@ export class ExecutionContext {
   /**
    * Checks that this execution context can be executed.
    *
-   * Requires `trigger` and `repository` to be present and to satisfy their own
-   * `validate()` methods, and checks `configuration` too when one is provided.
-   * `configuration` may be absent, because an entrypoint does not have to load
-   * it before building the context. `payload` and `deliveryId` carry no
-   * constraints here, so they are not inspected.
+   * Requires `trigger` and `repository` to be present, then validates each by
+   * calling its own `validate()` method: `Trigger.validate()` rejects an empty
+   * event and an empty action, and `RepositoryContext.validate()` rejects an
+   * empty owner, name, or default branch. When `configuration` is provided its
+   * own `validate()` is called too. `payload` and `deliveryId` are not checked.
    *
-   * @throws {ExecutionContextValidationError} naming the first field that
-   *   fails, with that field's own validation message appended. Returns
-   *   without throwing if every check passes.
+   * @throws {ExecutionContextValidationError} naming the field that failed,
+   *   with that field's own validation message appended. Returns without
+   *   throwing when every check passes.
    */
   validate(): void {
     if (this.trigger === undefined || this.trigger === null) {
