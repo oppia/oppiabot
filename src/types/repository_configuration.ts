@@ -56,14 +56,14 @@ export class ConfigSchema {
    */
   validate(config: Record<string, unknown>): void {
     for (const field of this.required) {
-      if (!(field in config)) {
+      if (!Object.prototype.hasOwnProperty.call(config, field)) {
         throw new ConfigurationValidationError(
           `Missing required configuration field: ${field}.`
         );
       }
     }
     for (const [key, value] of Object.entries(config)) {
-      if (!(key in this.properties)) {
+      if (!Object.prototype.hasOwnProperty.call(this.properties, key)) {
         throw new ConfigurationValidationError(
           `Unsupported configuration field: ${key}.`
         );

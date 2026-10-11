@@ -93,6 +93,12 @@ export interface OppiabotPlugin extends PluginRegistrationMetadata {
   /**
    * Executes workflow-specific plugin logic for the given execution context.
    *
+   * A plugin should return a `PluginResult` describing its outcome. If
+   * `execute()` throws an error, `CoreEngine` catches it and creates a failed
+   * `PluginResult`. The error is not propagated to the caller of
+   * `CoreEngine.execute()`, and the engine continues executing the other
+   * matching plugins.
+   *
    * @param {ExecutionContext} context - Contains GitHub event information,
    *   repository details, configuration, and runtime execution state.
    * @returns {Promise<PluginResult>} Result of the plugin execution describing

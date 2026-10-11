@@ -22,13 +22,12 @@ import { RepositoryConfiguration } from
   '../types/repository_configuration';
 
 /**
- * The raw event data for one execution, copied from what the entrypoint
- * received.
+ * The raw event data for one execution, as received by the entrypoint.
  *
  * A webhook entrypoint sets this to the GitHub webhook payload for the
  * delivered event, for example the `pull_request` object from a
- * `pull_request.opened` delivery. A scheduled entrypoint sets this to the
- * input its workflow received, which is normally empty.
+ * `pull_request.opened` delivery. A scheduled entrypoint sets this to
+ * whatever input its scheduled workflow supplies.
  *
  * The Core Engine does not read this field; it is handed to each resolved
  * plugin, and the plugin decides which parts of it to use.
@@ -41,10 +40,9 @@ export type RuntimeEventPayload = Record<string, unknown>;
  * An entrypoint (a webhook handler or a scheduled workflow) constructs one
  * instance per triggered run and passes it to `CoreEngine.execute()`, which
  * passes the same instance to every resolved plugin. All fields are readonly,
- * so a plugin cannot change what the other plugins see.
- *
- * Nothing is derived or computed here: every field is a value the entrypoint
- * already held when the run started.
+ * so their properties cannot be reassigned through the typed API. The nested
+ * objects they reference are not frozen, so plugins must treat them as
+ * read-only and must not mutate them.
  */
 export class ExecutionContext {
   constructor(
@@ -83,10 +81,11 @@ export class ExecutionContext {
    * Checks that this execution context can be executed.
    *
    * Requires `trigger` and `repository` to be present and to satisfy their own
-   * `validate()` methods, and checks `configuration` too when one is provided.
-   * `configuration` may be absent, because an entrypoint does not have to load
-   * it before building the context. `payload` and `deliveryId` carry no
-   * constraints here, so they are not inspected.
+   * `validate()` methods: `Trigger.validate()` rejects an undefined, null, or
+   * empty event and an empty action, and `RepositoryContext.validate()`
+   * rejects an empty owner, name, or default branch. When `configuration` is
+   * provided its own `validate()` is called too. `payload` and `deliveryId`
+   * carry no constraints here, so they are not inspected.
    *
    * @throws {ExecutionContextValidationError} naming the first field that
    *   fails, with that field's own validation message appended. Returns
@@ -95,8 +94,7 @@ export class ExecutionContext {
   validate(): void {
     if (this.trigger === undefined || this.trigger === null) {
       throw new ExecutionContextValidationError(
-        'The execution context must define a trigger, and trigger.event ' +
-        'must be defined and non-empty.'
+        'The execution context must define a trigger.'
       );
     }
     try {
