@@ -11,7 +11,7 @@
     "start": "probot run ./index.js",
     "sheets-setup": "node ./sheetsSetup.js",
     "test": "node ./spec/setup.js",
-    "test:core": "tsc --project tsconfig.test.json && node --test dist/spec/core/",
+    "test:core": "rm -rf dist && tsc --project tsconfig.test.json && node --test dist/spec/core/",
     "typecheck": "tsc --project tsconfig.json",
     "actions-build": "ncc build actions/main.js -o actions_build",
     "update-actions-build": "node actions/build.js"
@@ -48,7 +48,7 @@
     "@types/node": "^20.14.0"
   },
   "engines": {
-    "node": ">= 14.0.0"
+    "node": ">= 18.0.0"
   },
   "standard": {
     "env": [
