@@ -49,6 +49,11 @@ export class ConfigSchema {
   /**
    * Validates plugin configuration against the schema.
    *
+   * Every field named in `required` must be present, every field in `config`
+   * must be declared in `properties`, and each value must match its rule
+   * (`ConfigSchemaProperty`): the declared type, and, when the rule sets an
+   * enum, one of its allowed values.
+   *
    * @param {Record<string, unknown>} config - Plugin-specific configuration
    *   values to validate.
    * @throws {ConfigurationValidationError} if the configuration does not
@@ -128,16 +133,146 @@ export class RepositoryConfiguration {
   ) {}
 
   /**
+   * Validates the repository configuration against the Oppiabot configuration
+   * schema.
+   *
+   * Every configured plugin must declare a boolean enabled flag, a boolean
+   * dry_run flag, and a settings object. When the caller supplies the schemas
+   * of the registered plugins, each enabled plugin's settings are additionally
+   * validated against that plugin's own ConfigSchema.
+   *
+   * @param {Record<string, ConfigSchema>} pluginConfigSchemas - Maps a plugin
+   *   name to the ConfigSchema declared by that plugin. The configuration
+   *   loader passes these so that plugin-specific rules are enforced. Defaults
+   *   to an empty null-prototype dictionary, so that a plugin named after an
+   *   Object property does not resolve to an inherited value.
+   * @throws {ConfigurationValidationError} if the version is empty, if a
+   *   plugin configuration is structurally invalid, or if an enabled plugin's
+   *   configuration does not satisfy the expected plugin configuration schema.
+   */
+  validate(
+    pluginConfigSchemas: Record<string, ConfigSchema> = Object.create(null)
+  ): void {
+    if (this.version === '') {
+      throw new ConfigurationValidationError(
+        'The repository configuration must define a version.'
+      );
+    }
+    for (const [pluginName, pluginConfiguration] of Object.entries(
+      this.plugins
+    )) {
+      this.validatePluginStructure(pluginName, pluginConfiguration);
+      if (!pluginConfiguration.enabled) {
+        continue;
+      }
+      this.validatePluginSettings(
+        pluginName,
+        pluginConfiguration,
+        pluginConfigSchemas[pluginName]
+      );
+    }
+  }
+
+  /**
+   * Validates the structure of a single plugin's configuration.
+   *
+   * @param {string} pluginName - The name of the plugin being validated.
+   * @param {PluginConfiguration} pluginConfiguration - The configuration
+   *   associated with the plugin.
+   * @throws {ConfigurationValidationError} if a required field is missing or
+   *   has the wrong type.
+   */
+  private validatePluginStructure(
+    pluginName: string,
+    pluginConfiguration: PluginConfiguration
+  ): void {
+    if (typeof pluginConfiguration.enabled !== 'boolean') {
+      throw new ConfigurationValidationError(
+        `The configuration for plugin ${pluginName} must define a boolean ` +
+        'enabled field.'
+      );
+    }
+    if (typeof pluginConfiguration.dry_run !== 'boolean') {
+      throw new ConfigurationValidationError(
+        `The configuration for plugin ${pluginName} must define a boolean ` +
+        'dry_run field.'
+      );
+    }
+    if (
+      typeof pluginConfiguration.settings !== 'object' ||
+      pluginConfiguration.settings === null
+    ) {
+      throw new ConfigurationValidationError(
+        `The configuration for plugin ${pluginName} must define a settings ` +
+        'object.'
+      );
+    }
+  }
+
+  /**
+   * Validates an enabled plugin's settings against the plugin's ConfigSchema.
+   *
+   * @param {string} pluginName - The name of the plugin being validated.
+   * @param {PluginConfiguration} pluginConfiguration - The configuration
+   *   associated with the plugin.
+   * @param {ConfigSchema} configSchema - The schema declared by the plugin, or
+   *   undefined when the plugin is not registered.
+   * @throws {ConfigurationValidationError} if the settings do not satisfy the
+   *   plugin's configuration schema.
+   */
+  private validatePluginSettings(
+    pluginName: string,
+    pluginConfiguration: PluginConfiguration,
+    configSchema?: ConfigSchema
+  ): void {
+    if (configSchema === undefined) {
+      return;
+    }
+    try {
+      configSchema.validate(pluginConfiguration.settings);
+    } catch (error) {
+      const errorMessage = (
+        error instanceof Error ? error.message : String(error)
+      );
+      throw new ConfigurationValidationError(
+        `The configuration for plugin ${pluginName} is invalid: ` +
+        errorMessage
+      );
+    }
+  }
+
+  /**
    * Returns the configuration associated with a specific plugin.
    *
    * @param {string} pluginName - Name of the plugin.
-   * @returns {PluginConfiguration | undefined} Configuration associated with
-   *   the requested plugin, or undefined if the plugin is not configured.
+   * @param {Record<string, ConfigSchema>} pluginConfigSchemas - Maps a plugin
+   *   name to the ConfigSchema declared by that plugin. The configuration
+   *   loader passes these so that plugin-specific rules are enforced. Defaults
+   *   to an empty null-prototype dictionary, so that a plugin named after an
+   *   Object property does not resolve to an inherited value.
+   * @returns {PluginConfiguration} Configuration associated with the requested
+   *   plugin.
+   * @throws {ConfigurationValidationError} if the plugin is not configured, or
+   *   if the plugin configuration does not satisfy the plugin's configuration
+   *   schema.
    */
   getPluginConfiguration(
-    pluginName: string
-  ): PluginConfiguration | undefined {
-    return this.plugins[pluginName];
+    pluginName: string,
+    pluginConfigSchemas: Record<string, ConfigSchema> = Object.create(null)
+  ): PluginConfiguration {
+    const pluginConfiguration = this.plugins[pluginName];
+    if (pluginConfiguration === undefined) {
+      throw new ConfigurationValidationError(
+        `The plugin ${pluginName} is not configured in this repository.`
+      );
+    }
+    this.validatePluginStructure(pluginName, pluginConfiguration);
+    this.validatePluginSettings(
+      pluginName,
+      pluginConfiguration,
+      pluginConfigSchemas[pluginName]
+    );
+    return pluginConfiguration;
   }
 }
 

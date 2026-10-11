@@ -84,7 +84,8 @@ export class ExecutionContext {
    * calling its own `validate()` method: `Trigger.validate()` rejects an
    * undefined, null, or empty event and an empty action, and
    * `RepositoryContext.validate()` rejects an empty owner, name, or default
-   * branch. `payload`, `configuration`, and `deliveryId` are not checked.
+   * branch. When `configuration` is provided its own `validate()` is called
+   * too. `payload` and `deliveryId` are not checked.
    *
    * @throws {ExecutionContextValidationError} naming the field that failed,
    *   with that field's own validation message appended. Returns without
@@ -120,6 +121,19 @@ export class ExecutionContext {
       throw new ExecutionContextValidationError(
         'The execution context contains an invalid repository: ' + errorMessage
       );
+    }
+    if (this.configuration !== undefined && this.configuration !== null) {
+      try {
+        this.configuration.validate();
+      } catch (error) {
+        const errorMessage = (
+          error instanceof Error ? error.message : String(error)
+        );
+        throw new ExecutionContextValidationError(
+          'The execution context contains an invalid configuration: ' +
+          errorMessage
+        );
+      }
     }
   }
 }

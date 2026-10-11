@@ -19,7 +19,11 @@ import {
   ExecutionContextValidationError,
   Trigger
 } from '../../src/core';
-import { RepositoryContext } from '../../src/types';
+import {
+  PluginConfiguration,
+  RepositoryConfiguration,
+  RepositoryContext
+} from '../../src/types';
 import { createExecutionContext } from './testHelpers';
 
 describe('ExecutionContext', () => {
@@ -106,6 +110,53 @@ describe('ExecutionContext', () => {
           err instanceof ExecutionContextValidationError &&
           err.message.includes('invalid repository') &&
           err.message.includes('owner')
+        )
+      );
+    });
+
+    it('rejects an execution context with an invalid configuration', () => {
+      const pluginConfiguration: PluginConfiguration = {
+        enabled: true,
+        dry_run: false,
+        settings: {}
+      };
+      const context = createExecutionContext(
+        new Trigger('pull_request', 'opened'),
+        {
+          configuration: new RepositoryConfiguration('', {
+            stale: pluginConfiguration
+          })
+        }
+      );
+      assert.throws(
+        () => context.validate(),
+        (err: Error) => (
+          err instanceof ExecutionContextValidationError &&
+          err.message.includes('invalid configuration') &&
+          err.message.includes('version')
+        )
+      );
+    });
+
+    it('rejects an execution context whose plugin configuration is malformed', () => {
+      const context = createExecutionContext(
+        new Trigger('pull_request', 'opened'),
+        {
+          configuration: new RepositoryConfiguration('1.0', {
+            stale: {
+              enabled: 'yes',
+              dry_run: false,
+              settings: {}
+            } as unknown as PluginConfiguration
+          })
+        }
+      );
+      assert.throws(
+        () => context.validate(),
+        (err: Error) => (
+          err instanceof ExecutionContextValidationError &&
+          err.message.includes('invalid configuration') &&
+          err.message.includes('stale')
         )
       );
     });
