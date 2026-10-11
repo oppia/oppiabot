@@ -26,8 +26,8 @@ import { RepositoryConfiguration } from
  *
  * A webhook entrypoint sets this to the GitHub webhook payload for the
  * delivered event, for example the `pull_request` object from a
- * `pull_request.opened` delivery. A scheduled entrypoint sets this to the
- * input its workflow received, which is normally empty.
+ * `pull_request.opened` delivery. A scheduled entrypoint sets this to
+ * whatever input its scheduled workflow supplies.
  *
  * The Core Engine does not read this field; it is handed to each resolved
  * plugin, and the plugin decides which parts of it to use.
@@ -81,10 +81,10 @@ export class ExecutionContext {
    * Checks that this execution context can be executed.
    *
    * Requires `trigger` to be neither `undefined` nor `null`, `trigger.event`
-   * to be neither `undefined` nor `''`, and `repository` to be neither
-   * `undefined` nor `null`. `payload`, `configuration`, and `deliveryId` are
-   * not checked; `configuration` in particular has not been loaded yet when an
-   * entrypoint builds the context.
+   * to be neither `undefined`, `null`, nor `''`, and `repository` to be
+   * neither `undefined` nor `null`. `payload`, `configuration`, and
+   * `deliveryId` are not checked; `configuration` in particular has not been
+   * loaded yet when an entrypoint builds the context.
    *
    * @throws {ExecutionContextValidationError} with a message naming the failed
    *   field. Returns without throwing when every required field is present.
@@ -94,6 +94,7 @@ export class ExecutionContext {
       this.trigger === undefined ||
       this.trigger === null ||
       this.trigger.event === undefined ||
+      this.trigger.event === null ||
       this.trigger.event === ''
     ) {
       throw new ExecutionContextValidationError(
