@@ -29,10 +29,9 @@ import { PluginRegistry } from './pluginRegistry';
  * registered plugins whose `supportedTriggers` match the context's trigger,
  * executes those plugins, and returns their results.
  *
- * The engine does not tell webhook executions and scheduled executions apart.
- * Both arrive as an `ExecutionContext` and take the same code path; the only
- * difference is which entrypoint built the context and what it put in
- * `payload`. If a plugin throws, the engine records a failed result for that
+ * Webhook and scheduled executions follow the same code path. Their triggers
+ * and payloads reflect the event or scheduled workflow that started each
+ * execution. If a plugin throws, the engine records a failed result for that
  * plugin and continues with the other matching plugins.
  */
 export class CoreEngine {
