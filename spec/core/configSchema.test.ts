@@ -83,4 +83,25 @@ describe('ConfigSchema', () => {
     const emptySchema = new ConfigSchema({}, []);
     assert.doesNotThrow(() => emptySchema.validate({}));
   });
+
+  it('rejects an inherited Object property as an unsupported field', () => {
+    assert.throws(
+      () => schema.validate({ stale_days: 7, toString: 'x' }),
+      (err) => (
+        err instanceof ConfigurationValidationError &&
+        err.message.includes('toString')
+      )
+    );
+  });
+
+  it('does not treat an inherited Object property as a required field', () => {
+    const requiredSchema = new ConfigSchema({}, ['constructor']);
+    assert.throws(
+      () => requiredSchema.validate({}),
+      (err) => (
+        err instanceof ConfigurationValidationError &&
+        err.message.includes('constructor')
+      )
+    );
+  });
 });

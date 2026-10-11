@@ -149,4 +149,18 @@ describe('CoreEngine', () => {
       (err) => err instanceof ExecutionContextValidationError
     );
   });
+
+  it('rejects a context whose trigger has a null event', async () => {
+    const registry = new PluginRegistry();
+    const engine = new CoreEngine(registry);
+
+    const context = createExecutionContext(
+      new Trigger(null as unknown as string)
+    );
+
+    await assert.rejects(
+      engine.execute(context),
+      (err) => err instanceof ExecutionContextValidationError
+    );
+  });
 });
