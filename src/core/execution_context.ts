@@ -41,7 +41,9 @@ export type RuntimeEventPayload = Record<string, unknown>;
  * An entrypoint (a webhook handler or a scheduled workflow) constructs one
  * instance per triggered run and passes it to `CoreEngine.execute()`, which
  * passes the same instance to every resolved plugin. All fields are readonly,
- * so a plugin cannot change what the other plugins see.
+ * so their properties cannot be reassigned through the typed API. The nested
+ * objects they reference are not frozen, so plugins must treat them as
+ * read-only and must not mutate them.
  *
  * Nothing is derived or computed here: every field is a value the entrypoint
  * already held when the run started.
