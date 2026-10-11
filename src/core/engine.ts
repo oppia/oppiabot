@@ -49,9 +49,9 @@ export class CoreEngine {
   /**
    * Executes the plugins applicable to the current execution.
    *
-   * Resolves the plugins whose `supportedTriggers` match `context.trigger`,
-   * then awaits each of them. Every resolved plugin appears exactly once in
-   * the returned array.
+   * Resolves the plugins whose `supportedTriggers` match `context.trigger` and
+   * executes each of them. Every resolved plugin appears exactly once in the
+   * returned array.
    *
    * Failures are isolated per plugin: a plugin that throws does not stop the
    * remaining plugins from running, and does not reject this promise. Its
