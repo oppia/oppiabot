@@ -17,9 +17,32 @@ import {
   Trigger
 } from '../../src/core';
 import {
+  PluginConfiguration,
   RepositoryConfiguration,
   RepositoryContext
 } from '../../src/types';
+
+/**
+ * Creates a repository configuration that enables the given plugins.
+ *
+ * @param {Record<string, Partial<PluginConfiguration>>} [plugins] - Plugin
+ *   configurations keyed by plugin name. A plugin entry defaults to enabled,
+ *   executing live, with no settings.
+ * @returns {RepositoryConfiguration} A repository configuration.
+ */
+export function createRepositoryConfiguration(
+  plugins: Record<string, Partial<PluginConfiguration>> = {}
+): RepositoryConfiguration {
+  const pluginConfigurations: Record<string, PluginConfiguration> = {};
+  for (const [pluginName, pluginConfiguration] of Object.entries(plugins)) {
+    pluginConfigurations[pluginName] = {
+      enabled: pluginConfiguration.enabled ?? true,
+      dry_run: pluginConfiguration.dry_run ?? false,
+      settings: pluginConfiguration.settings ?? {}
+    };
+  }
+  return new RepositoryConfiguration('1.0', pluginConfigurations);
+}
 
 /**
  * Creates an initialized ExecutionContext for use in tests.

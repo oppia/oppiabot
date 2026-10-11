@@ -25,9 +25,10 @@ import { PluginRegistry } from './pluginRegistry';
  * The Oppiabot Core Engine runs the plugins that apply to one execution.
  *
  * A webhook handler or a scheduled workflow builds an `ExecutionContext` and
- * passes it to `execute()`. The engine validates the context, finds the
- * registered plugins whose `supportedTriggers` match the context's trigger,
- * executes those plugins, and returns their results.
+ * passes it to `execute()`. The engine validates the context, asks the plugin
+ * registry for the registered plugins that both match the context's trigger
+ * and are enabled by the repository configuration, executes those plugins, and
+ * returns their results.
  *
  * Webhook and scheduled executions follow the same code path. Their triggers
  * and payloads reflect the event or scheduled workflow that started each
@@ -42,9 +43,9 @@ export class CoreEngine {
   /**
    * Executes the plugins applicable to the current execution.
    *
-   * Resolves the plugins whose `supportedTriggers` match `context.trigger` and
-   * executes each of them. Every resolved plugin appears exactly once in the
-   * returned array.
+   * Resolves the plugins that match `context.trigger` and are enabled by the
+   * repository configuration, then executes each of them. Every resolved
+   * plugin appears exactly once in the returned array.
    *
    * Failures are isolated per plugin: a plugin that throws does not stop the
    * remaining plugins from running, and does not reject this promise. Its
@@ -55,14 +56,16 @@ export class CoreEngine {
    *   event payload, repository, and repository configuration. Must satisfy
    *   `ExecutionContext.validate()`.
    * @returns {Promise<PluginResult[]>} One result per resolved plugin. Empty
-   *   if no plugin matches the trigger.
+   *   if no applicable plugin is enabled for the trigger.
    * @throws {ExecutionContextValidationError} if the execution context is
    *   invalid. No plugin is executed in that case.
+   * @throws {PluginResolutionError} if an enabled plugin's configuration
+   *   cannot be resolved. No plugin is executed in that case.
    */
   async execute(context: ExecutionContext): Promise<PluginResult[]> {
     context.validate();
 
-    const plugins = this.pluginRegistry.resolvePlugins(context.trigger);
+    const plugins = this.pluginRegistry.resolvePlugins(context);
     const results: PluginResult[] = [];
     for (const plugin of plugins) {
       results.push(await this.executePlugin(plugin, context));

@@ -13,13 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Plugin registration and resolution.
+ * @fileoverview Plugin registration and trigger-based resolution.
  */
 
 import { OppiabotPlugin, PluginResolutionError }
   from './plugin';
 import { PluginRegistrationMetadata } from './plugin';
 import { Trigger } from './trigger';
+import { ExecutionContext } from './execution_context';
+import { PluginConfiguration } from '../types/repository_configuration';
 
 /**
  * Maintains the list of available Oppiabot plugins and resolves the plugins
@@ -27,7 +29,14 @@ import { Trigger } from './trigger';
  *
  * Plugins are explicitly registered with the registry during application
  * initialization. Each registration provides the plugin metadata, supported
- * trigger keys, configuration schema, and execution handler.
+ * triggers, configuration schema, and execution handler.
+ *
+ * The Core Engine asks the registry which plugins apply to an execution by
+ * calling `resolvePlugins()`. Resolution is trigger-based: a plugin applies
+ * only when the trigger received by the Core Engine matches one of the
+ * triggers the plugin declares, and only when the repository's configuration
+ * enables it. A registered plugin is therefore never executed by omission:
+ * the repository has to opt in to it from `.github/oppiabot.yml`.
  */
 export class PluginRegistry {
   private readonly pluginsByName: Map<string, OppiabotPlugin>;
@@ -77,22 +86,107 @@ export class PluginRegistry {
   }
 
   /**
-   * Resolves the registered plugins whose supported triggers match the given
-   * trigger.
+   * Resolves the registered plugins applicable to the current execution.
    *
-   * A registered trigger with an explicitly specified action matches only the
-   * corresponding event and action. A registered trigger without an action
-   * matches all actions for the specified event.
+   * A plugin applies when both of these hold:
    *
-   * @param {Trigger} trigger - The trigger received by the Core Engine.
-   * @returns {OppiabotPlugin[]} The plugins applicable to the trigger.
+   * - The trigger received by the Core Engine matches one of the plugin's
+   *   supported triggers. A registered trigger with an explicitly specified
+   *   action matches only the corresponding event and action; a registered
+   *   trigger without an action matches every action for its event. Matching
+   *   uses `Trigger.matches()`, not a comparison of canonical keys, so that an
+   *   action-less trigger still matches the action-specific triggers it
+   *   supports.
+   * - The repository's configuration enables the plugin. When the execution
+   *   context carries no configuration, no plugin is enabled and nothing
+   *   resolves. A plugin that is absent from the configuration, or that is
+   *   configured with `enabled: false`, is not executed.
+   *
+   * Only registered plugins are considered. A repository may configure a
+   * plugin that this registry does not know about; such a plugin is ignored
+   * rather than reported, because the configuration loader intentionally
+   * tolerates declaring a plugin before it is registered.
+   *
+   * @param {ExecutionContext} context - Execution context carrying the
+   *   trigger to match and the repository configuration that enables plugins.
+   * @returns {OppiabotPlugin[]} The applicable plugins, in registration order.
+   * @throws {PluginResolutionError} if an enabled plugin's configuration
+   *   cannot be resolved against the schema the plugin registered.
    */
-  resolvePlugins(trigger: Trigger): OppiabotPlugin[] {
-    return this.getAllPlugins().filter(
-      (plugin) => plugin.supportedTriggers.some(
-        (supportedTrigger) => supportedTrigger.matches(trigger)
-      )
+  resolvePlugins(context: ExecutionContext): OppiabotPlugin[] {
+    const applicablePlugins: OppiabotPlugin[] = [];
+    for (const plugin of this.getAllPlugins()) {
+      if (!this.supportsTrigger(plugin, context.trigger)) {
+        continue;
+      }
+      if (!this.isEnabled(plugin, context)) {
+        continue;
+      }
+      applicablePlugins.push(plugin);
+    }
+    return applicablePlugins;
+  }
+
+  /**
+   * Returns whether a plugin declares support for the given trigger.
+   *
+   * @param {OppiabotPlugin} plugin - The registered plugin.
+   * @param {Trigger} trigger - The trigger received by the Core Engine.
+   * @returns {boolean} Whether any of the plugin's supported triggers match.
+   */
+  private supportsTrigger(plugin: OppiabotPlugin, trigger: Trigger): boolean {
+    return plugin.supportedTriggers.some(
+      (supportedTrigger) => supportedTrigger.matches(trigger)
     );
+  }
+
+  /**
+   * Returns whether the repository configuration enables a plugin.
+   *
+   * A plugin is enabled only when the configuration declares an entry for it
+   * with `enabled: true`. An unconfigured plugin is not enabled, so a
+   * repository never runs a plugin it has not opted in to. When the context
+   * carries no configuration, nothing is enabled.
+   *
+   * @param {OppiabotPlugin} plugin - The registered plugin.
+   * @param {ExecutionContext} context - The execution context.
+   * @returns {boolean} Whether the plugin is enabled for this execution.
+   * @throws {PluginResolutionError} if the plugin is enabled but its
+   *   configuration does not satisfy the schema the plugin registered.
+   */
+  private isEnabled(
+    plugin: OppiabotPlugin,
+    context: ExecutionContext
+  ): boolean {
+    const configuration = context.configuration;
+    if (configuration === undefined) {
+      return false;
+    }
+    if (
+      !Object.prototype.hasOwnProperty.call(configuration.plugins, plugin.name)
+    ) {
+      return false;
+    }
+    const declaredConfiguration = configuration.plugins[plugin.name];
+    if (declaredConfiguration.enabled !== true) {
+      return false;
+    }
+    let pluginConfiguration: PluginConfiguration;
+    try {
+      pluginConfiguration = configuration.getPluginConfiguration(
+        plugin.name,
+        { [plugin.name]: plugin.configSchema }
+      );
+    } catch (error) {
+      const errorMessage = (
+        error instanceof Error ? error.message : String(error)
+      );
+      throw new PluginResolutionError(
+        `Could not resolve plugin '${plugin.name}' for trigger ` +
+        `'${context.trigger.toKey()}': ${errorMessage}`
+      );
+    }
+    return pluginConfiguration.enabled;
   }
 
   /**

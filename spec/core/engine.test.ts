@@ -23,7 +23,10 @@ import {
   Trigger
 } from '../../src/core';
 import { ConfigSchema } from '../../src/types';
-import { createExecutionContext } from './testHelpers';
+import {
+  createExecutionContext,
+  createRepositoryConfiguration
+} from './testHelpers';
 
 /**
  * Creates a stub plugin that resolves to a configurable result.
@@ -62,7 +65,12 @@ describe('CoreEngine', () => {
 
     const engine = new CoreEngine(registry);
     const results = await engine.execute(
-      createExecutionContext(new Trigger('pull_request', 'opened'))
+      createExecutionContext(new Trigger('pull_request', 'opened'), {
+        configuration: createRepositoryConfiguration({
+          'plugin-a': { enabled: true },
+          'plugin-b': { enabled: true }
+        })
+      })
     );
 
     assert.strictEqual(results.length, 2);
@@ -80,7 +88,11 @@ describe('CoreEngine', () => {
 
     const engine = new CoreEngine(registry);
     const results = await engine.execute(
-      createExecutionContext(new Trigger('pull_request', 'opened'))
+      createExecutionContext(new Trigger('pull_request', 'opened'), {
+        configuration: createRepositoryConfiguration({
+          'stale-sweeper': { enabled: true }
+        })
+      })
     );
 
     assert.deepStrictEqual(results, []);
@@ -103,7 +115,12 @@ describe('CoreEngine', () => {
 
     const engine = new CoreEngine(registry);
     const results = await engine.execute(
-      createExecutionContext(new Trigger('pull_request', 'opened'))
+      createExecutionContext(new Trigger('pull_request', 'opened'), {
+        configuration: createRepositoryConfiguration({
+          'failing-plugin': { enabled: true },
+          'healthy-plugin': { enabled: true }
+        })
+      })
     );
 
     assert.strictEqual(results.length, 2);
@@ -125,7 +142,11 @@ describe('CoreEngine', () => {
 
     const engine = new CoreEngine(registry);
     const results = await engine.execute(
-      createExecutionContext(new Trigger('pull_request', 'opened'))
+      createExecutionContext(new Trigger('pull_request', 'opened'), {
+        configuration: createRepositoryConfiguration({
+          'stack-plugin': { enabled: true }
+        })
+      })
     );
 
     assert.strictEqual(results.length, 1);
