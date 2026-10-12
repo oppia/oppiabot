@@ -73,7 +73,7 @@ export interface RepositoryFileReader {
    *   a commit SHA.
    * @returns {Promise<string | undefined>} The file contents, or undefined when
    *   the repository does not contain the file at the given ref.
-   * @throws {Error} if the file exists but cannot be retrieved.
+   * @throws {Error} if the file cannot be read.
    */
   readRepositoryFile(
     repository: RepositoryContext,
@@ -90,8 +90,8 @@ export interface RepositoryFileReader {
  * never taken from the incoming event payload, so that a pull request cannot
  * change the configuration that Oppiabot applies to it.
  *
- * The configuration is loaded on every execution and is not cached, so that a
- * configuration change takes effect on the next supported execution.
+ * The loader performs no caching: every load call reads and parses the file
+ * again, so a configuration change is picked up on subsequent calls.
  *
  * Repositories opt in to Oppiabot by adding the configuration file. A
  * repository without the file has not opted in, so it resolves to a
@@ -454,7 +454,12 @@ export class ConfigurationLoader {
    * @returns {boolean} Whether the value is an object and not a list.
    */
   private isMapping(value: unknown): boolean {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      Object.prototype.toString.call(value) === '[object Object]'
+    );
   }
 }
 

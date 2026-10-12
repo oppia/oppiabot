@@ -374,6 +374,13 @@ describe('ConfigurationLoader', () => {
       );
     });
 
+    it('rejects plugins that YAML parses as a timestamp', async () => {
+      await assert.rejects(
+        () => createLoader('plugins: 2020-01-01').load(REPOSITORY),
+        /must define plugins as a mapping/
+      );
+    });
+
     it('rejects a plugin without a name', async () => {
       await assert.rejects(
         () => createLoader('plugins:\n  " ": \n    enabled: true')
@@ -419,6 +426,16 @@ describe('ConfigurationLoader', () => {
       await assert.rejects(
         () => createLoader(
           'plugins:\n  stale:\n    enabled: true\n    settings: 30'
+        ).load(REPOSITORY),
+        /must define a settings object/
+      );
+    });
+
+    it('rejects settings that YAML parses as a timestamp', async () => {
+      await assert.rejects(
+        () => createLoader(
+          'plugins:\n  stale:\n    enabled: true\n' +
+          '    settings: 2020-01-01'
         ).load(REPOSITORY),
         /must define a settings object/
       );
