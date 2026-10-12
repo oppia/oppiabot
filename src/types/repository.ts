@@ -54,17 +54,21 @@ export class RepositoryContext {
    * Validates the repository context domain object.
    *
    * @throws {RepositoryContextValidationError} if the owner, name, or default
-   *   branch is empty.
+   *   branch is undefined, null, or empty.
    */
   validate(): void {
     const invalidFields: string[] = [];
-    if (this.owner === '') {
+    if (this.owner === undefined || this.owner === null || this.owner === '') {
       invalidFields.push('owner');
     }
-    if (this.name === '') {
+    if (this.name === undefined || this.name === null || this.name === '') {
       invalidFields.push('name');
     }
-    if (this.default_branch === '') {
+    if (
+      this.default_branch === undefined ||
+      this.default_branch === null ||
+      this.default_branch === ''
+    ) {
       invalidFields.push('default_branch');
     }
     if (invalidFields.length > 0) {

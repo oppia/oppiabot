@@ -70,6 +70,45 @@ describe('RepositoryContext', () => {
       );
     });
 
+    it('rejects a repository with a null owner', () => {
+      const repository = new RepositoryContext(
+        null as unknown as string, 'oppiabot', 'develop'
+      );
+      assert.throws(
+        () => repository.validate(),
+        (err: Error) => (
+          err instanceof RepositoryContextValidationError &&
+          err.message.includes('owner')
+        )
+      );
+    });
+
+    it('rejects a repository with an undefined name', () => {
+      const repository = new RepositoryContext(
+        'oppia', undefined as unknown as string, 'develop'
+      );
+      assert.throws(
+        () => repository.validate(),
+        (err: Error) => (
+          err instanceof RepositoryContextValidationError &&
+          err.message.includes('name')
+        )
+      );
+    });
+
+    it('rejects a repository with a null default branch', () => {
+      const repository = new RepositoryContext(
+        'oppia', 'oppiabot', null as unknown as string
+      );
+      assert.throws(
+        () => repository.validate(),
+        (err: Error) => (
+          err instanceof RepositoryContextValidationError &&
+          err.message.includes('default_branch')
+        )
+      );
+    });
+
     it('lists all empty fields in the error message', () => {
       const repository = new RepositoryContext('', '', '');
       assert.throws(
@@ -122,6 +161,22 @@ describe('RepositoryConfiguration', () => {
         }
       );
     });
+
+    it('does not treat an inherited Object property as a configured plugin',
+      () => {
+        const configuration = createConfiguration('1.0', {});
+        assert.throws(
+          () => configuration.getPluginConfiguration('toString'),
+          (error: unknown) => {
+            assert.ok(error instanceof ConfigurationValidationError);
+            assert.match(
+              error.message, /plugin toString is not configured/
+            );
+            return true;
+          }
+        );
+      }
+    );
 
     it('does not resolve an inherited Object property as a plugin schema', () => {
       const pluginConfiguration = createPluginConfiguration(true, {
@@ -202,6 +257,45 @@ describe('RepositoryConfiguration', () => {
         (error: unknown) => {
           assert.ok(error instanceof ConfigurationValidationError);
           assert.match(error.message, /must define a version/);
+          return true;
+        }
+      );
+    });
+
+    it('rejects a configuration with a null version', () => {
+      assert.throws(
+        () => createConfiguration(
+          null as unknown as string, {}
+        ).validate(),
+        (error: unknown) => {
+          assert.ok(error instanceof ConfigurationValidationError);
+          assert.match(error.message, /must define a version/);
+          return true;
+        }
+      );
+    });
+
+    it('rejects a configuration with an undefined version', () => {
+      assert.throws(
+        () => createConfiguration(
+          undefined as unknown as string, {}
+        ).validate(),
+        (error: unknown) => {
+          assert.ok(error instanceof ConfigurationValidationError);
+          assert.match(error.message, /must define a version/);
+          return true;
+        }
+      );
+    });
+
+    it('rejects a plugin entry that is null', () => {
+      assert.throws(
+        () => createConfiguration('1.0', {
+          stale: null as unknown as PluginConfiguration
+        }).validate(),
+        (error: unknown) => {
+          assert.ok(error instanceof ConfigurationValidationError);
+          assert.match(error.message, /plugin stale must be an object/);
           return true;
         }
       );
