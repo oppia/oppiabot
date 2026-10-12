@@ -153,9 +153,18 @@ export class RepositoryConfiguration {
   validate(
     pluginConfigSchemas: Record<string, ConfigSchema> = Object.create(null)
   ): void {
-    if (this.version === '') {
+    if (
+      this.version === undefined ||
+      this.version === null ||
+      this.version === ''
+    ) {
       throw new ConfigurationValidationError(
         'The repository configuration must define a version.'
+      );
+    }
+    if (this.plugins === undefined || this.plugins === null) {
+      throw new ConfigurationValidationError(
+        'The repository configuration must define plugins.'
       );
     }
     for (const [pluginName, pluginConfiguration] of Object.entries(
@@ -168,9 +177,36 @@ export class RepositoryConfiguration {
       this.validatePluginSettings(
         pluginName,
         pluginConfiguration,
-        pluginConfigSchemas[pluginName]
+        this.getConfigSchema(pluginConfigSchemas, pluginName)
       );
     }
+  }
+
+  /**
+   * Returns the ConfigSchema registered for a plugin name, or undefined when
+   * the schemas dictionary does not own an entry for that name.
+   *
+   * A name without an own entry is treated as unregistered, so an inherited
+   * Object property such as `toString` or `constructor` is never resolved as
+   * a schema. This holds even for a caller-supplied dictionary built with the
+   * object-literal syntax, which inherits Object.prototype.
+   *
+   * @param {Record<string, ConfigSchema>} pluginConfigSchemas - Maps a plugin
+   *   name to its ConfigSchema.
+   * @param {string} pluginName - The plugin name to look up.
+   * @returns {ConfigSchema | undefined} The registered schema, or undefined
+   *   when the name is not registered.
+   */
+  private getConfigSchema(
+    pluginConfigSchemas: Record<string, ConfigSchema>,
+    pluginName: string
+  ): ConfigSchema | undefined {
+    if (
+      !Object.prototype.hasOwnProperty.call(pluginConfigSchemas, pluginName)
+    ) {
+      return undefined;
+    }
+    return pluginConfigSchemas[pluginName];
   }
 
   /**
@@ -186,6 +222,11 @@ export class RepositoryConfiguration {
     pluginName: string,
     pluginConfiguration: PluginConfiguration
   ): void {
+    if (pluginConfiguration === undefined || pluginConfiguration === null) {
+      throw new ConfigurationValidationError(
+        `The configuration for plugin ${pluginName} must be an object.`
+      );
+    }
     if (typeof pluginConfiguration.enabled !== 'boolean') {
       throw new ConfigurationValidationError(
         `The configuration for plugin ${pluginName} must define a boolean ` +
@@ -260,17 +301,21 @@ export class RepositoryConfiguration {
     pluginName: string,
     pluginConfigSchemas: Record<string, ConfigSchema> = Object.create(null)
   ): PluginConfiguration {
-    const pluginConfiguration = this.plugins[pluginName];
-    if (pluginConfiguration === undefined) {
+    if (
+      this.plugins === undefined ||
+      this.plugins === null ||
+      !Object.prototype.hasOwnProperty.call(this.plugins, pluginName)
+    ) {
       throw new ConfigurationValidationError(
         `The plugin ${pluginName} is not configured in this repository.`
       );
     }
+    const pluginConfiguration = this.plugins[pluginName];
     this.validatePluginStructure(pluginName, pluginConfiguration);
     this.validatePluginSettings(
       pluginName,
       pluginConfiguration,
-      pluginConfigSchemas[pluginName]
+      this.getConfigSchema(pluginConfigSchemas, pluginName)
     );
     return pluginConfiguration;
   }
