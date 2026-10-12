@@ -271,7 +271,7 @@ describe('OppiabotGitHubClient', () => {
     it('exposes the author date a stale check compares against', async () => {
       const {client} = createClient();
       const commit = await client.getCommit('abc123');
-      assert.strictEqual(commit.commit.author.date, '2026-10-01');
+      assert.strictEqual(commit.commit.author?.date, '2026-10-01');
     });
 
     it('uses the expected route for each read operation', async () => {

@@ -88,11 +88,16 @@ export interface Commit {
   commit: {
     message: string;
     /**
-     * Set by the GitHub API on every commit, so the fields are not nullable.
+     * The commit author as resolved by GitHub, or null when GitHub cannot
+     * associate the commit with an account.
      */
     author: {
       date: string;
-    };
+    } | null;
+    /**
+     * The commit committer as resolved by GitHub, or null when GitHub cannot
+     * associate the commit with an account.
+     */
     committer: {
       date: string;
     } | null;
@@ -183,9 +188,11 @@ export interface GitHubApiClient {
 /**
  * Maximum number of results GitHub returns per page for most list operations.
  *
- * Used as the page size for the list operations; the changed-files and issues
- * loops rely on it to detect a full page and request the next one, matching the
- * page size the legacy implementations used.
+ * Used as the page size by the loops that paginate (`listIssues` and
+ * `listChangedFiles`), to detect a full page and request the next one, and as
+ * the requested page size for `listPullRequests`. Operations that take only a
+ * single page (`listPullRequestReviews`, `searchIssuesAndPullRequests`) do not
+ * use it. The value matches the page size the legacy implementations used.
  */
 const MAX_RESULTS_PER_PAGE = 100;
 
@@ -236,7 +243,9 @@ export class OppiabotGitHubClient {
    *
    * @param {ResourceState} [state] - State of the pull requests to list.
    *   Defaults to 'open'.
-   * @returns {Promise<PullRequest[]>} The matching pull requests.
+   * @returns {Promise<PullRequest[]>} Up to one page (`MAX_RESULTS_PER_PAGE`)
+   *   of matching pull requests; a repository with more matching pull requests
+   *   than fit on one page is truncated.
    * @throws {OppiabotGitHubClientError} if the pull requests cannot be read.
    */
   async listPullRequests(
@@ -252,7 +261,9 @@ export class OppiabotGitHubClient {
    * Lists the reviews submitted on a pull request.
    *
    * @param {number} pullRequestNumber - Number of the pull request.
-   * @returns {Promise<PullRequestReview[]>} The reviews on the pull request.
+   * @returns {Promise<PullRequestReview[]>} Up to one page of the reviews on
+   *   the pull request; a pull request with more reviews than fit on one page
+   *   is truncated.
    * @throws {OppiabotGitHubClientError} if the reviews cannot be read.
    */
   async listPullRequestReviews(
@@ -339,8 +350,9 @@ export class OppiabotGitHubClient {
   /**
    * Searches issues and pull requests in the repository.
    *
-   * The query is scoped to the repository the client was constructed with, so
-   * a caller cannot search another repository by mistake.
+   * A `repo:` qualifier for the repository the client was constructed with is
+   * appended to the caller's query. The caller should not add its own `repo:`
+   * qualifier.
    *
    * @param {string} query - Search query, without the repository qualifier.
    * @returns {Promise<SearchResult>} The matching search results.
