@@ -80,16 +80,16 @@ export class ExecutionContext {
   /**
    * Checks that this execution context can be executed.
    *
-   * Requires `trigger` and `repository` to be present, then validates each by
-   * calling its own `validate()` method: `Trigger.validate()` rejects an
-   * undefined, null, or empty event and an empty action, and
-   * `RepositoryContext.validate()` rejects an empty owner, name, or default
-   * branch. When `configuration` is provided its own `validate()` is called
-   * too. `payload` and `deliveryId` are not checked.
+   * Requires `trigger` and `repository` to be present and to satisfy their own
+   * `validate()` methods: `Trigger.validate()` rejects an undefined, null, or
+   * empty event and a null or empty action, and `RepositoryContext.validate()`
+   * rejects an undefined, null, or empty owner, name, or default branch. When
+   * `configuration` is provided its own `validate()` is called too. `payload`
+   * and `deliveryId` carry no constraints here, so they are not inspected.
    *
-   * @throws {ExecutionContextValidationError} naming the field that failed,
-   *   with that field's own validation message appended. Returns without
-   *   throwing when every check passes.
+   * @throws {ExecutionContextValidationError} naming the first field that
+   *   fails, with that field's own validation message appended. Returns
+   *   without throwing if every check passes.
    */
   validate(): void {
     if (this.trigger === undefined || this.trigger === null) {
