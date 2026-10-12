@@ -19,20 +19,32 @@
 /**
  * Represents repository information required during Oppiabot execution.
  *
- * default_branch is populated by the runtime entrypoint or repository
- * metadata lookup before repository configuration is loaded.
+ * The runtime entrypoint populates `default_branch` from the event or from a
+ * repository metadata lookup before repository configuration is loaded; when
+ * the event does not carry it, the entrypoint reads it through the GitHub API.
  */
 export class RepositoryContext {
   constructor(
+    /**
+     * The account or organization that owns the repository, as used in GitHub
+     * API paths.
+     */
     public readonly owner: string,
+    /**
+     * The repository name, without the owner prefix.
+     */
     public readonly name: string,
+    /**
+     * The repository's default branch, such as 'master' or 'main'.
+     */
     public readonly default_branch: string
   ) {}
 
   /**
-   * Returns the repository identifier.
+   * Returns the repository's full name in `owner/name` form.
    *
-   * @returns {string} The repository identifier. Example: "owner/name".
+   * @returns {string} The repository identifier used in GitHub API paths and
+   *   log messages, for example 'oppia/oppia'.
    */
   getFullName(): string {
     return `${this.owner}/${this.name}`;
@@ -42,17 +54,21 @@ export class RepositoryContext {
    * Validates the repository context domain object.
    *
    * @throws {RepositoryContextValidationError} if the owner, name, or default
-   *   branch is empty.
+   *   branch is undefined, null, or empty.
    */
   validate(): void {
     const invalidFields: string[] = [];
-    if (this.owner === '') {
+    if (this.owner === undefined || this.owner === null || this.owner === '') {
       invalidFields.push('owner');
     }
-    if (this.name === '') {
+    if (this.name === undefined || this.name === null || this.name === '') {
       invalidFields.push('name');
     }
-    if (this.default_branch === '') {
+    if (
+      this.default_branch === undefined ||
+      this.default_branch === null ||
+      this.default_branch === ''
+    ) {
       invalidFields.push('default_branch');
     }
     if (invalidFields.length > 0) {

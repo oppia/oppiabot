@@ -92,5 +92,16 @@ describe('Trigger', () => {
         )
       );
     });
+
+    it('rejects a trigger with a null action', () => {
+      const trigger = new Trigger('pull_request', null as unknown as string);
+      assert.throws(
+        () => trigger.validate(),
+        (err: Error) => (
+          err instanceof TriggerValidationError &&
+          err.message.includes('non-empty')
+        )
+      );
+    });
   });
 });

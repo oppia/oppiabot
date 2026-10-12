@@ -87,7 +87,7 @@ export class Trigger {
    * Validates the trigger domain object.
    *
    * @throws {TriggerValidationError} if the event is undefined, null, or empty,
-   *   or the optional action is provided but empty.
+   *   or the optional action is provided but null or empty.
    */
   validate(): void {
     if (
@@ -99,7 +99,10 @@ export class Trigger {
         'The trigger event must be a non-empty string.'
       );
     }
-    if (this.action !== undefined && this.action === '') {
+    if (
+      this.action !== undefined &&
+      (this.action === null || this.action === '')
+    ) {
       throw new TriggerValidationError(
         'The trigger action must be a non-empty string when provided.'
       );
