@@ -24,6 +24,8 @@ import {
 } from '../../src/core';
 import {
   ConfigSchema,
+  PluginConfiguration,
+  RepositoryConfiguration,
   RepositoryContext
 } from '../../src/types';
 import {
@@ -287,6 +289,25 @@ describe('PluginRegistry', () => {
           err.message.includes('schedule.stale-sweep')
         )
       );
+    });
+
+    it('does not resolve a plugin whose configuration entry is null', () => {
+      const registry = new PluginRegistry();
+      registry.register(
+        createStubPlugin('opened-check', [
+          new Trigger('pull_request', 'opened'),
+        ])
+      );
+
+      const context = new ExecutionContext(
+        new Trigger('pull_request', 'opened'),
+        {},
+        new RepositoryContext('oppia', 'oppiabot', 'develop'),
+        new RepositoryConfiguration('1.0', {
+          'opened-check': null as unknown as PluginConfiguration
+        })
+      );
+      assert.deepStrictEqual(registry.resolvePlugins(context), []);
     });
   });
 });

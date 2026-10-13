@@ -35,8 +35,8 @@ import { PluginConfiguration } from '../types/repository_configuration';
  * calling `resolvePlugins()`. Resolution is trigger-based: a plugin applies
  * only when the trigger received by the Core Engine matches one of the
  * triggers the plugin declares, and only when the repository's configuration
- * enables it. A registered plugin is therefore never executed by omission:
- * the repository has to opt in to it from `.github/oppiabot.yml`.
+ * enables it. A registered plugin therefore runs only when the repository
+ * explicitly opts in to it from `.github/oppiabot.yml`.
  */
 export class PluginRegistry {
   private readonly pluginsByName: Map<string, OppiabotPlugin>;
@@ -152,7 +152,8 @@ export class PluginRegistry {
    * @param {ExecutionContext} context - The execution context.
    * @returns {boolean} Whether the plugin is enabled for this execution.
    * @throws {PluginResolutionError} if the plugin is enabled but its
-   *   configuration does not satisfy the schema the plugin registered.
+   *   configuration is structurally invalid or does not satisfy the schema
+   *   the plugin registered.
    */
   private isEnabled(
     plugin: OppiabotPlugin,
@@ -167,8 +168,13 @@ export class PluginRegistry {
     ) {
       return false;
     }
-    const declaredConfiguration = configuration.plugins[plugin.name];
-    if (declaredConfiguration.enabled !== true) {
+    const declaredConfiguration = configuration.plugins[plugin.name] as
+      PluginConfiguration | null | undefined;
+    if (
+      declaredConfiguration === null ||
+      declaredConfiguration === undefined ||
+      declaredConfiguration.enabled !== true
+    ) {
       return false;
     }
     let pluginConfiguration: PluginConfiguration;
