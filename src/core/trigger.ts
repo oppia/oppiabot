@@ -19,18 +19,15 @@
 /**
  * The event that caused an Oppiabot execution.
  *
- * A webhook entrypoint builds one from the event and action names GitHub sent
- * with the delivery; a scheduled entrypoint builds one from its workflow's
- * schedule name. The entrypoint passes it to `CoreEngine.execute`, which uses
- * it to decide which registered plugins run.
+ * A webhook entrypoint builds one from the event and action names GitHub
+ * sent; a scheduled entrypoint builds one from its workflow's schedule name.
  */
 export class Trigger {
   constructor(
     /**
      * The event name, without an action: 'pull_request' for a
      * `pull_request.opened` delivery, 'issues' for `issues.assigned`, or
-     * 'schedule' for a scheduled run. Pass the name the platform reported;
-     * there is nothing to normalize first.
+     * 'schedule' for a scheduled run.
      */
     public readonly event: string,
     /**
@@ -43,14 +40,8 @@ export class Trigger {
   ) {}
 
   /**
-   * Returns a string key that represents this trigger.
-   *
-   * The key is `event` when this trigger has no action, and `event.action`
-   * otherwise. Use it to describe or log a trigger, or to compare two triggers
-   * for exact equality. Do not use it to decide whether a plugin supports a
-   * trigger: equal keys only identify identical triggers, so a key comparison
-   * misses a trigger without an action that supports every action of its event.
-   * Use `matches()` for that check.
+   * Returns a string key for this trigger: the event, or `event.action` when
+   * an action is set. Do not use it to test plugin support; use `matches()`.
    *
    * @returns {string} For example 'pull_request.opened', 'issues', or
    *   'schedule.stale-sweep'.
@@ -63,12 +54,8 @@ export class Trigger {
   }
 
   /**
-   * Returns whether this trigger matches another trigger.
-   *
-   * A trigger matches another trigger when the event names are equal and
-   * either this trigger has no action or its action equals the other trigger's
-   * action. A registered trigger without an action therefore matches all
-   * actions for its event.
+   * Returns whether this trigger matches another: the events are equal, and
+   * this trigger has no action or the same action.
    *
    * @param {Trigger} other - The trigger to compare against.
    * @returns {boolean} Whether this trigger matches the other trigger.

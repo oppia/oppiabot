@@ -47,10 +47,7 @@ export type RuntimeEventPayload = Record<string, unknown>;
 export class ExecutionContext {
   constructor(
     /**
-     * The event that caused this run. The entrypoint builds it from the
-     * webhook's event and action names, or from the scheduled workflow's
-     * names, and the Core Engine passes it to `PluginRegistry.resolvePlugins`
-     * to decide which plugins run.
+     * The event that caused this run; see `Trigger`.
      */
     public readonly trigger: Trigger,
     /**
@@ -80,12 +77,9 @@ export class ExecutionContext {
   /**
    * Checks that this execution context can be executed.
    *
-   * Requires `trigger` and `repository` to be present and to satisfy their own
-   * `validate()` methods: `Trigger.validate()` rejects an undefined, null, or
-   * empty event and a null or empty action, and `RepositoryContext.validate()`
-   * rejects an undefined, null, or empty owner, name, or default branch. When
-   * `configuration` is provided its own `validate()` is called too. `payload`
-   * and `deliveryId` carry no constraints here, so they are not inspected.
+   * `trigger` and `repository` must be present and satisfy their own
+   * `validate()` methods, and `configuration` is validated when present.
+   * `payload` and `deliveryId` carry no constraints.
    *
    * @throws {ExecutionContextValidationError} naming the first field that
    *   fails, with that field's own validation message appended. Returns

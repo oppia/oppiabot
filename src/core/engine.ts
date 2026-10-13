@@ -26,14 +26,11 @@ import { PluginRegistry } from './pluginRegistry';
  *
  * A webhook handler or a scheduled workflow builds an `ExecutionContext` and
  * passes it to `execute()`. The engine validates the context, asks the plugin
- * registry for the registered plugins that both match the context's trigger
- * and are enabled by the repository configuration, executes those plugins, and
- * returns their results.
+ * registry for the plugins that match the trigger and are enabled by the
+ * repository configuration, executes them, and returns their results.
  *
- * Webhook and scheduled executions follow the same code path. Their triggers
- * and payloads reflect the event or scheduled workflow that started each
- * execution. If a plugin throws, the engine records a failed result for that
- * plugin and continues with the other matching plugins.
+ * If a plugin throws, the engine records a failed result for it and continues
+ * with the other matching plugins.
  */
 export class CoreEngine {
   constructor(
@@ -47,10 +44,9 @@ export class CoreEngine {
    * repository configuration, then executes each of them. Every resolved
    * plugin appears exactly once in the returned array.
    *
-   * Failures are isolated per plugin: a plugin that throws does not stop the
-   * remaining plugins from running, and does not reject this promise. Its
-   * failure is reported as a `PluginResult` with `success: false`, and the
-   * original error's stack trace is preserved in that result's `message`.
+   * Failures are isolated per plugin: a throwing plugin does not stop the
+   * remaining plugins or reject this promise; it yields a `PluginResult` with
+   * `success: false`.
    *
    * @param {ExecutionContext} context - Execution context carrying the trigger,
    *   event payload, repository, and repository configuration. Must satisfy
@@ -77,9 +73,8 @@ export class CoreEngine {
    * Executes a single plugin, converting any thrown error into a failed
    * result.
    *
-   * The error's stack trace is kept: it is appended to the returned `message`
-   * after the summary line, so a failure that reaches a log or a comment can
-   * still be traced back to where it was thrown.
+   * The error's stack trace is appended to `message` so the failure can be
+   * traced.
    *
    * @param {OppiabotPlugin} plugin - The plugin to execute.
    * @param {ExecutionContext} context - The execution context passed unchanged

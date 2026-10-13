@@ -27,16 +27,12 @@ import { PluginConfiguration } from '../types/repository_configuration';
  * Maintains the list of available Oppiabot plugins and resolves the plugins
  * applicable to a given execution.
  *
- * Plugins are explicitly registered with the registry during application
- * initialization. Each registration provides the plugin metadata, supported
- * triggers, configuration schema, and execution handler.
+ * Plugins are explicitly registered during application initialization, each
+ * with a name, supported triggers, configuration schema, and execute handler.
  *
- * The Core Engine asks the registry which plugins apply to an execution by
- * calling `resolvePlugins()`. Resolution is trigger-based: a plugin applies
- * only when the trigger received by the Core Engine matches one of the
- * triggers the plugin declares, and only when the repository's configuration
- * enables it. A registered plugin therefore runs only when the repository
- * explicitly opts in to it from `.github/oppiabot.yml`.
+ * The Core Engine asks the registry which plugins apply to an execution via
+ * `resolvePlugins()`: a plugin applies only when a registered trigger matches
+ * the received trigger and the repository configuration enables it.
  */
 export class PluginRegistry {
   private readonly pluginsByName: Map<string, OppiabotPlugin>;
@@ -90,22 +86,16 @@ export class PluginRegistry {
    *
    * A plugin applies when both of these hold:
    *
-   * - The trigger received by the Core Engine matches one of the plugin's
-   *   supported triggers. A registered trigger with an explicitly specified
-   *   action matches only the corresponding event and action; a registered
-   *   trigger without an action matches every action for its event. Matching
-   *   uses `Trigger.matches()`, not a comparison of canonical keys, so that an
-   *   action-less trigger still matches the action-specific triggers it
-   *   supports.
-   * - The repository's configuration enables the plugin. When the execution
-   *   context carries no configuration, no plugin is enabled and nothing
-   *   resolves. A plugin that is absent from the configuration, or that is
-   *   configured with `enabled: false`, is not executed.
+   * - The received trigger matches a supported trigger, using
+   *   `Trigger.matches()` (an action-less registered trigger matches every
+   *   action of its event), not a canonical-key comparison.
+   * - The repository configuration enables the plugin. A context without a
+   *   configuration enables nothing; a plugin that is absent from the
+   *   configuration, or configured with `enabled: false`, is not executed.
    *
-   * Only registered plugins are considered. A repository may configure a
-   * plugin that this registry does not know about; such a plugin is ignored
-   * rather than reported, because the configuration loader intentionally
-   * tolerates declaring a plugin before it is registered.
+   * Only registered plugins are considered. A configured plugin the registry
+   * does not know about is ignored, so configuration may declare a plugin
+   * before it is registered.
    *
    * @param {ExecutionContext} context - Execution context carrying the
    *   trigger to match and the repository configuration that enables plugins.
@@ -143,10 +133,8 @@ export class PluginRegistry {
   /**
    * Returns whether the repository configuration enables a plugin.
    *
-   * A plugin is enabled only when the configuration declares an entry for it
-   * with `enabled: true`. An unconfigured plugin is not enabled, so a
-   * repository never runs a plugin it has not opted in to. When the context
-   * carries no configuration, nothing is enabled.
+   * A plugin is enabled only when the configuration declares it with
+   * `enabled: true`. A context without a configuration enables nothing.
    *
    * @param {OppiabotPlugin} plugin - The registered plugin.
    * @param {ExecutionContext} context - The execution context.
