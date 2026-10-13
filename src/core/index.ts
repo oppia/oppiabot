@@ -38,3 +38,7 @@ export {
   OPPIABOT_CONFIG_PATH,
   RepositoryFileReader
 } from './configurationLoader';
+export {
+  OppiabotGitHubClient,
+  OppiabotGitHubClientError
+} from './oppiabot_github_client';
