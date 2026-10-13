@@ -17,10 +17,10 @@
  */
 
 /**
- * Represents the validation rule for a single configuration field.
+ * The validation rule for one configuration field.
  *
- * A property descriptor defines the expected type and, when provided, the
- * allowed values for a configuration field.
+ * `type` is the JavaScript type the value must have. When `enum` is set, the
+ * value must also be one of its entries.
  */
 export interface ConfigSchemaProperty {
   type: 'string' | 'number' | 'boolean' | 'object';
@@ -28,8 +28,10 @@ export interface ConfigSchemaProperty {
 }
 
 /**
- * Represents the validation schema used by a plugin to validate its
- * repository-specific configuration.
+ * The validation rules a plugin declares for its own configuration entries.
+ *
+ * `properties` maps each allowed setting name to its rule, and `required`
+ * lists the setting names that must be present.
  */
 export class ConfigSchema {
   constructor(
@@ -110,7 +112,11 @@ export class ConfigSchema {
 export interface PluginConfiguration {
   /** Whether the plugin is enabled for the repository. */
   enabled: boolean;
-  /** Whether the plugin should execute in Dry-Run mode. */
+  /**
+   * Whether GitHub write operations are suppressed for this plugin. When
+   * true, the plugin still runs, but its write calls are intercepted and
+   * recorded as intended actions instead of being applied.
+   */
   dry_run: boolean;
   /** Plugin-specific configuration values. */
   settings: Record<string, unknown>;
@@ -183,13 +189,11 @@ export class RepositoryConfiguration {
   }
 
   /**
-   * Returns the ConfigSchema registered for a plugin name, or undefined when
-   * the schemas dictionary does not own an entry for that name.
+   * Returns the schema registered for `pluginName`, or `undefined` when the
+   * caller's dictionary has no own entry for it.
    *
-   * A name without an own entry is treated as unregistered, so an inherited
-   * Object property such as `toString` or `constructor` is never resolved as
-   * a schema. This holds even for a caller-supplied dictionary built with the
-   * object-literal syntax, which inherits Object.prototype.
+   * Only own entries are read, so an inherited Object property such as
+   * `toString` is never treated as a registered schema.
    *
    * @param {Record<string, ConfigSchema>} pluginConfigSchemas - Maps a plugin
    *   name to its ConfigSchema.
@@ -256,8 +260,9 @@ export class RepositoryConfiguration {
    * @param {string} pluginName - The name of the plugin being validated.
    * @param {PluginConfiguration} pluginConfiguration - The configuration
    *   associated with the plugin.
-   * @param {ConfigSchema} configSchema - The schema declared by the plugin, or
-   *   undefined when the plugin is not registered.
+   * @param {ConfigSchema | undefined} configSchema - The schema declared by
+   *   the plugin, or `undefined` when the plugin is not registered, in which
+   *   case the settings are not schema-checked.
    * @throws {ConfigurationValidationError} if the settings do not satisfy the
    *   plugin's configuration schema.
    */
@@ -294,8 +299,8 @@ export class RepositoryConfiguration {
    * @returns {PluginConfiguration} Configuration associated with the requested
    *   plugin.
    * @throws {ConfigurationValidationError} if the plugin is not configured, or
-   *   if the plugin configuration does not satisfy the plugin's configuration
-   *   schema.
+   *   its configuration is structurally invalid, or its settings do not
+   *   satisfy the plugin's schema.
    */
   getPluginConfiguration(
     pluginName: string,

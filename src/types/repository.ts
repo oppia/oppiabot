@@ -17,17 +17,17 @@
  */
 
 /**
- * Represents repository information required during Oppiabot execution.
+ * Identifies the repository an execution operates on.
  *
- * The runtime entrypoint populates `default_branch` from the event or from a
- * repository metadata lookup before repository configuration is loaded; when
- * the event does not carry it, the entrypoint reads it through the GitHub API.
+ * The entrypoint populates `default_branch` from the event, or reads it from
+ * the GitHub API when the event omits it, before any repository configuration
+ * is loaded.
  */
 export class RepositoryContext {
   constructor(
     /**
-     * The account or organization that owns the repository, as used in GitHub
-     * API paths.
+     * The GitHub login of the account or organization that owns the
+     * repository, without a leading `@`.
      */
     public readonly owner: string,
     /**
@@ -43,18 +43,19 @@ export class RepositoryContext {
   /**
    * Returns the repository's full name in `owner/name` form.
    *
-   * @returns {string} The repository identifier used in GitHub API paths and
-   *   log messages, for example 'oppia/oppia'.
+   * @returns {string} The identifier used in GitHub API paths, for example
+   *   'oppia/oppia'.
    */
   getFullName(): string {
     return `${this.owner}/${this.name}`;
   }
 
   /**
-   * Validates the repository context domain object.
+   * Validates that this context has all required fields.
    *
-   * @throws {RepositoryContextValidationError} if the owner, name, or default
-   *   branch is undefined, null, or empty.
+   * @throws {RepositoryContextValidationError} if `owner`, `name`, or
+   *   `default_branch` is `undefined`, `null`, or empty. The message names
+   *   every empty field.
    */
   validate(): void {
     const invalidFields: string[] = [];

@@ -17,34 +17,43 @@
  */
 
 /**
- * The event that caused an Oppiabot execution.
+ * The event that caused one Oppiabot execution.
  *
- * A webhook entrypoint builds one from the event and action names GitHub
- * sent; a scheduled entrypoint builds one from its workflow's schedule name.
+ * A trigger pairs an event name with an optional action. A webhook entrypoint
+ * builds one from the names GitHub reports (`pull_request` + `opened`); a
+ * scheduled entrypoint builds one from `'schedule'` and the workflow's name.
+ * A plugin lists the triggers it handles in `supportedTriggers`, and the
+ * registry selects a plugin when one of those triggers matches the incoming
+ * trigger (see `matches`).
  */
 export class Trigger {
   constructor(
     /**
-     * The event name, without an action: 'pull_request' for a
-     * `pull_request.opened` delivery, 'issues' for `issues.assigned`, or
-     * 'schedule' for a scheduled run.
+     * The event name, without an action: `'pull_request'` for a
+     * `pull_request` delivery, `'issues'` for `issues`, or `'schedule'` for a
+     * scheduled run. Must be a non-empty string (enforced by `validate`).
      */
     public readonly event: string,
     /**
-     * The action name for a GitHub event, such as 'opened' for
-     * `pull_request.opened`. For a scheduled run, this is the scheduled
-     * workflow's name, such as 'stale-sweep'. If `action` is `undefined`, this
-     * trigger matches any action for the same event.
+     * The action within the event, or `undefined`. For a webhook this is the
+     * GitHub action (`'opened'`, `'assigned'`); for a scheduled run it is the
+     * workflow's schedule name (`'stale-sweep'`). `undefined` means "every
+     * action of this event"; when defined it must be non-empty (enforced by
+     * `validate`).
      */
     public readonly action?: string
   ) {}
 
   /**
-   * Returns a string key for this trigger: the event, or `event.action` when
-   * an action is set. Do not use it to test plugin support; use `matches()`.
+   * Returns this trigger's string key: `event` when `action` is `undefined`,
+   * otherwise `event.action`.
    *
-   * @returns {string} For example 'pull_request.opened', 'issues', or
-   *   'schedule.stale-sweep'.
+   * Two triggers share a key only when they are identical. A key therefore
+   * cannot express that one trigger covers several actions, so use `matches`
+   * to decide whether a plugin supports a trigger.
+   *
+   * @returns {string} The key, e.g. `'issues'`, `'pull_request.opened'`, or
+   *   `'schedule.stale-sweep'`.
    */
   toKey(): string {
     if (this.action === undefined) {
@@ -54,11 +63,18 @@ export class Trigger {
   }
 
   /**
-   * Returns whether this trigger matches another: the events are equal, and
-   * this trigger has no action or the same action.
+   * Returns whether `other` is covered by this trigger.
    *
-   * @param {Trigger} other - The trigger to compare against.
-   * @returns {boolean} Whether this trigger matches the other trigger.
+   * It is covered when both triggers have the same `event`, and either this
+   * trigger has no `action` (so it covers every action) or its `action` equals
+   * `other.action`.
+   *
+   * The relation is not symmetric when exactly one trigger has an action: an
+   * action-less trigger matches an action-specific one but not vice versa.
+   * Call it as `supportedTrigger.matches(incomingTrigger)`.
+   *
+   * @param {Trigger} other - The trigger to test against.
+   * @returns {boolean} Whether `other` is covered by this trigger.
    */
   matches(other: Trigger): boolean {
     if (this.event !== other.event) {
@@ -71,10 +87,10 @@ export class Trigger {
   }
 
   /**
-   * Validates the trigger domain object.
+   * Validates that this trigger represents a usable event.
    *
-   * @throws {TriggerValidationError} if the event is undefined, null, or empty,
-   *   or the optional action is provided but null or empty.
+   * @throws {TriggerValidationError} if `event` is `undefined`, `null`, or
+   *   empty, or if `action` is defined and is `null` or empty.
    */
   validate(): void {
     if (

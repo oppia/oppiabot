@@ -21,15 +21,11 @@ import { ConfigSchema } from '../types/repository_configuration';
 import { ExecutionContext } from './execution_context';
 
 /**
- * The GitHub operations a plugin performed while handling an execution.
+ * A GitHub operation a plugin reported performing during an execution.
  *
- * A plugin reports what it did by returning these values in
- * `PluginResult.actions`, so a run can be described as a list of concrete
- * GitHub changes instead of free text.
- *
- * The names are chosen for the operations the existing Oppiabot workflows
- * perform. They are not taken from the legacy implementation, which called the
- * same operations by different names.
+ * A plugin lists the operations it performed in `PluginResult.actions`, so a
+ * run's effects can be described as concrete GitHub operations rather than
+ * free text.
  */
 export enum PluginAction {
   /** Post a comment on the relevant GitHub resource. */
@@ -49,61 +45,53 @@ export enum PluginAction {
 }
 
 /**
- * Represents the outcome of plugin execution returned by an Oppiabot plugin
- * after processing an execution context.
+ * The outcome a plugin reports for one execution.
  */
 export interface PluginResult {
-  /** GitHub operations performed during execution. */
+  /** The GitHub operations the plugin performed; empty if it performed none. */
   actions: PluginAction[];
-  /** Human-readable explanation of the plugin execution result. */
+  /** Human-readable description of what happened, for logs and comments. */
   message: string;
-  /** Whether plugin execution completed successfully. */
+  /** Whether the plugin completed the work it intended to do. */
   success: boolean;
 }
 
 /**
- * Represents the registration information provided by a plugin to the Plugin
- * Registry during application initialization.
+ * The information a plugin supplies to `PluginRegistry.register()`.
  */
 export interface PluginRegistrationMetadata {
-  /** Unique identifier of the plugin. */
+  /** Unique identifier; used as both the registry key and configuration key. */
   name: string;
   /**
-   * Execution triggers supported by the plugin. The cadence of scheduled
-   * executions is defined by the GitHub Actions workflow cron configuration
-   * rather than plugin metadata; supportedTriggers identifies which scheduled
-   * execution a plugin supports.
+   * The triggers this plugin handles. The plugin runs when one of these
+   * matches the execution's trigger (see `Trigger.matches`). A scheduled
+   * trigger sets only the schedule name it handles; the cadence lives in the
+   * GitHub Actions workflow, not here.
    */
   supportedTriggers: Trigger[];
-  /** Schema definition used to validate plugin-specific configuration. */
+  /** Schema used to validate this plugin's entry in the configuration. */
   configSchema: ConfigSchema;
 }
 
 /**
- * Represents an isolated workflow implementation that can be executed by the
- * Core Engine for supported execution triggers, including GitHub events and
- * scheduled executions.
+ * A self-contained Oppiabot workflow that the Core Engine can run.
  *
- * New Oppiabot workflows are implemented as independent plugins implementing
- * this contract, allowing workflow logic to evolve without modifying the Core
- * Engine. Plugins are explicitly registered with the Plugin Registry during
- * application initialization.
+ * Implement this interface once per workflow. Plugins are registered with the
+ * `PluginRegistry` during initialization, and the registry resolves them per
+ * execution by their `supportedTriggers` and configuration. Keeping workflows
+ * behind this interface lets them change without modifying the Core Engine.
  */
 export interface OppiabotPlugin extends PluginRegistrationMetadata {
   /**
-   * Executes this plugin for the given execution context.
+   * Runs this plugin for `context` and reports the outcome.
    *
-   * A plugin returns a `PluginResult` describing its outcome. A thrown error
-   * is caught by `CoreEngine`, which records a failed result and continues
-   * with the other matching plugins.
-   *
-   * @param {ExecutionContext} context - Contains GitHub event information,
-   *   repository details, configuration, and runtime execution state.
-   * @returns {Promise<PluginResult>} Result of the plugin execution describing
-   *   the actions performed, message, and execution status.
-   * @throws {PluginConfigurationError} if required plugin configuration is
+   * @param {ExecutionContext} context - The execution context, containing the
+   *   trigger, event payload, repository, and configuration for this run.
+   * @returns {Promise<PluginResult>} The operations performed, a message, and
+   *   whether the plugin succeeded.
+   * @throws {PluginConfigurationError} if configuration this plugin requires is
    *   missing or invalid.
-   * @throws {PluginExecutionError} if plugin execution fails.
+   * @throws {PluginExecutionError} if the plugin fails while running.
    */
   execute(context: ExecutionContext): Promise<PluginResult>;
 }
