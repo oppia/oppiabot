@@ -26,7 +26,8 @@ import { PluginRegistry } from './pluginRegistry';
  * Call `execute()` with a valid `ExecutionContext`, whose repository
  * configuration is expected to be loaded already. The engine validates the
  * context, asks its `PluginRegistry` for the plugins that match the trigger
- * and are enabled by the configuration, and runs each one. A plugin that
+ * and are enabled by the configuration, and runs each one. It reports the
+ * aggregated results and does not return them to the caller. A plugin that
  * throws does not stop the others; see `execute`.
  */
 export class CoreEngine {
@@ -38,20 +39,21 @@ export class CoreEngine {
    * Executes the plugins applicable to `context`.
    *
    * Resolves the applicable plugins through the registry and awaits each one
-   * in turn. Each resolved plugin contributes exactly one result.
+   * in turn. Each resolved plugin contributes exactly one result, which is
+   * reported once all plugins have run.
    *
    * @param {ExecutionContext} context - The execution context. Must satisfy
    *   `ExecutionContext.validate()`.
-   * @returns {Promise<PluginResult[]>} One result per resolved plugin, in the
-   *   order the registry returned them, or an empty array when none applies. A
-   *   plugin that throws, or resolves to a value that is not a `PluginResult`,
-   *   yields a `success: false` result rather than rejecting.
+   * @returns {Promise<void>} Resolves after every applicable plugin has run and
+   *   the aggregated results have been reported. A plugin that throws, or
+   *   resolves to a value that is not a `PluginResult`, yields a
+   *   `success: false` result in the report rather than rejecting.
    * @throws {ExecutionContextValidationError} if `context` is invalid; no
    *   plugin is run.
    * @throws {PluginResolutionError} if an enabled plugin's configuration is
    *   invalid; no plugin is run.
    */
-  async execute(context: ExecutionContext): Promise<PluginResult[]> {
+  async execute(context: ExecutionContext): Promise<void> {
     context.validate();
 
     const plugins = this.pluginRegistry.resolvePlugins(context);
@@ -59,7 +61,30 @@ export class CoreEngine {
     for (const plugin of plugins) {
       results.push(await this.executePlugin(plugin, context));
     }
-    return results;
+    this.reportResults(results);
+  }
+
+  /**
+   * Reports the aggregated results of one execution.
+   *
+   * The engine owns execution reporting. It logs how many plugins ran and how
+   * many succeeded, followed by the failure detail for each plugin that failed.
+   *
+   * @param {readonly PluginResult[]} results - The results collected for the
+   *   execution, one per resolved plugin.
+   */
+  private reportResults(results: readonly PluginResult[]): void {
+    const succeeded = results.filter((result) => result.success).length;
+    const failed = results.length - succeeded;
+    console.log(
+      `[CoreEngine] Executed ${results.length} plugin(s): ` +
+        `${succeeded} succeeded, ${failed} failed.`
+    );
+    for (const result of results) {
+      if (!result.success) {
+        console.log(`[CoreEngine] ${result.message}`);
+      }
+    }
   }
 
   /**
