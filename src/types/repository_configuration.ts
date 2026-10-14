@@ -89,10 +89,13 @@ export class ConfigSchema {
    */
   private validateFieldValue(key: string, value: unknown): void {
     const property = this.properties[key] as ConfigSchemaProperty;
-    if (
-      property.type !== undefined &&
-      (value === null || typeof value !== property.type)
-    ) {
+    if (property.type === 'object' && value === null) {
+      throw new ConfigurationValidationError(
+        `Configuration field ${key} must be of type ${property.type}, ` +
+        'received null.'
+      );
+    }
+    if (property.type !== undefined && typeof value !== property.type) {
       throw new ConfigurationValidationError(
         `Configuration field ${key} must be of type ${property.type}, ` +
         `received ${value === null ? 'null' : typeof value}.`
@@ -116,9 +119,8 @@ export interface PluginConfiguration {
   /** Whether the plugin is enabled for the repository. */
   enabled: boolean;
   /**
-   * Whether GitHub write operations are suppressed for this plugin. When
-   * true, the plugin still runs, but its write calls are intercepted and
-   * recorded as intended actions instead of being applied.
+   * Whether the plugin should execute in Dry-Run mode. When true, the plugin
+   * reports the GitHub operations it would perform without applying them.
    */
   dry_run: boolean;
   /** Plugin-specific configuration values. */
@@ -155,23 +157,24 @@ export class RepositoryConfiguration {
    *   loader passes these so that plugin-specific rules are enforced. Defaults
    *   to an empty null-prototype dictionary, so that a plugin named after an
    *   Object property does not resolve to an inherited value.
-   * @throws {ConfigurationValidationError} if the version is empty, if a
+   * @throws {ConfigurationValidationError} if the version is missing, empty,
+   *   or not a string, if plugins is missing or is not a plugin mapping, if a
    *   plugin configuration is structurally invalid, or if an enabled plugin's
    *   configuration does not satisfy the expected plugin configuration schema.
    */
   validate(
     pluginConfigSchemas: Record<string, ConfigSchema> = Object.create(null)
   ): void {
-    if (
-      this.version === undefined ||
-      this.version === null ||
-      this.version === ''
-    ) {
+    if (typeof this.version !== 'string' || this.version === '') {
       throw new ConfigurationValidationError(
         'The repository configuration must define a version.'
       );
     }
-    if (this.plugins === undefined || this.plugins === null) {
+    if (
+      typeof this.plugins !== 'object' ||
+      this.plugins === null ||
+      Array.isArray(this.plugins)
+    ) {
       throw new ConfigurationValidationError(
         'The repository configuration must define plugins.'
       );
@@ -248,7 +251,8 @@ export class RepositoryConfiguration {
     }
     if (
       typeof pluginConfiguration.settings !== 'object' ||
-      pluginConfiguration.settings === null
+      pluginConfiguration.settings === null ||
+      Array.isArray(pluginConfiguration.settings)
     ) {
       throw new ConfigurationValidationError(
         `The configuration for plugin ${pluginName} must define a settings ` +

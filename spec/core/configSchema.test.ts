@@ -70,16 +70,13 @@ describe('ConfigSchema', () => {
     );
   });
 
-  it('rejects null for an object-typed field', () => {
-    const objectSchema = new ConfigSchema(
-      { options: { type: 'object' } },
-      []
-    );
+  it('throws when an object-typed field is null', () => {
+    const objectSchema = new ConfigSchema({ extra: { type: 'object' } }, []);
     assert.throws(
-      () => objectSchema.validate({ options: null }),
+      () => objectSchema.validate({ extra: null }),
       (err) => (
         err instanceof ConfigurationValidationError &&
-        err.message.includes('options')
+        err.message.includes('extra')
       )
     );
   });

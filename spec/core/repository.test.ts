@@ -187,7 +187,7 @@ describe('RepositoryConfiguration', () => {
       });
 
       assert.strictEqual(
-        configuration.getPluginConfiguration('constructor'),
+        configuration.getPluginConfiguration('constructor', {}),
         pluginConfiguration
       );
     });
@@ -248,7 +248,7 @@ describe('RepositoryConfiguration', () => {
     it('does not resolve an inherited Object property as a plugin schema', () => {
       createConfiguration('1.0', {
         constructor: createPluginConfiguration(true, {stale_days: 'thirty'})
-      }).validate();
+      }).validate({});
     });
 
     it('rejects a configuration with an empty version', () => {
@@ -283,6 +283,33 @@ describe('RepositoryConfiguration', () => {
         (error: unknown) => {
           assert.ok(error instanceof ConfigurationValidationError);
           assert.match(error.message, /must define a version/);
+          return true;
+        }
+      );
+    });
+
+    it('rejects a configuration whose version is not a string', () => {
+      assert.throws(
+        () => createConfiguration(
+          123 as unknown as string, {}
+        ).validate(),
+        (error: unknown) => {
+          assert.ok(error instanceof ConfigurationValidationError);
+          assert.match(error.message, /must define a version/);
+          return true;
+        }
+      );
+    });
+
+    it('rejects a configuration whose plugins are an array', () => {
+      assert.throws(
+        () => new RepositoryConfiguration(
+          '1.0',
+          [] as unknown as Record<string, PluginConfiguration>
+        ).validate(),
+        (error: unknown) => {
+          assert.ok(error instanceof ConfigurationValidationError);
+          assert.match(error.message, /must define plugins/);
           return true;
         }
       );
@@ -348,6 +375,23 @@ describe('RepositoryConfiguration', () => {
             enabled: true,
             dry_run: false,
             settings: null
+          }
+        } as unknown as Record<string, PluginConfiguration>).validate(),
+        (error: unknown) => {
+          assert.ok(error instanceof ConfigurationValidationError);
+          assert.match(error.message, /settings object/);
+          return true;
+        }
+      );
+    });
+
+    it('rejects a plugin whose settings are an array', () => {
+      assert.throws(
+        () => createConfiguration('1.0', {
+          stale: {
+            enabled: true,
+            dry_run: false,
+            settings: []
           }
         } as unknown as Record<string, PluginConfiguration>).validate(),
         (error: unknown) => {

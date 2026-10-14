@@ -23,7 +23,8 @@ import { PluginRegistry } from './pluginRegistry';
 /**
  * Runs the plugins that apply to one execution.
  *
- * Call `execute()` with a valid `ExecutionContext`. The engine validates the
+ * Call `execute()` with a valid `ExecutionContext`, whose repository
+ * configuration is expected to be loaded already. The engine validates the
  * context, asks its `PluginRegistry` for the plugins that match the trigger
  * and are enabled by the configuration, and runs each one. A plugin that
  * throws does not stop the others; see `execute`.
@@ -80,7 +81,7 @@ export class CoreEngine {
       if (!isPluginResult(result)) {
         return this.failureResult(
           plugin.name,
-          'the plugin returned a value that is not a PluginResult.'
+          'it returned a value that is not a PluginResult.'
         );
       }
       return result;
@@ -98,14 +99,15 @@ export class CoreEngine {
    * Builds a failed result for `pluginName`.
    *
    * @param {string} pluginName - The name of the plugin that failed.
-   * @param {string} detail - Why the plugin failed, usually an error's stack.
+   * @param {string} reason - Why the plugin failed; a stack trace for a thrown
+   *   error, or a description of an invalid return value.
    * @returns {PluginResult} A result with `success: false` and no actions.
    */
-  private failureResult(pluginName: string, detail: string): PluginResult {
+  private failureResult(pluginName: string, reason: string): PluginResult {
     return {
       actions: [],
       success: false,
-      message: `Plugin '${pluginName}' failed to execute:\n${detail}`,
+      message: `Plugin '${pluginName}' failed:\n${reason}`,
     };
   }
 }
