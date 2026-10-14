@@ -156,6 +156,118 @@ describe('CoreEngine', () => {
     assert.match(results[0].message, /at .*engine\.test/);
   });
 
+  it('isolates a plugin that throws a non-Error value', async () => {
+    const registry = new PluginRegistry();
+    registry.register(createStubPlugin(
+      'string-thrower',
+      [new Trigger('pull_request', 'opened')],
+      async () => {
+        throw 'boom';
+      }
+    ));
+
+    const engine = new CoreEngine(registry);
+    const results = await engine.execute(
+      createExecutionContext(new Trigger('pull_request', 'opened'), {
+        configuration: createRepositoryConfiguration({
+          'string-thrower': { enabled: true }
+        })
+      })
+    );
+
+    assert.strictEqual(results.length, 1);
+    assert.strictEqual(results[0].success, false);
+    assert.match(results[0].message, /string-thrower/);
+    assert.match(results[0].message, /boom/);
+  });
+
+  it('isolates a plugin that throws synchronously', async () => {
+    const registry = new PluginRegistry();
+    const syncThrower = (() => {
+      throw new Error('sync boom');
+    }) as () => Promise<PluginResult>;
+    registry.register(createStubPlugin(
+      'sync-thrower',
+      [new Trigger('pull_request', 'opened')],
+      syncThrower
+    ));
+
+    const engine = new CoreEngine(registry);
+    const results = await engine.execute(
+      createExecutionContext(new Trigger('pull_request', 'opened'), {
+        configuration: createRepositoryConfiguration({
+          'sync-thrower': { enabled: true }
+        })
+      })
+    );
+
+    assert.strictEqual(results.length, 1);
+    assert.strictEqual(results[0].success, false);
+    assert.match(results[0].message, /sync-thrower/);
+    assert.match(results[0].message, /sync boom/);
+  });
+
+  it('keeps running after several plugins fail', async () => {
+    const registry = new PluginRegistry();
+    registry.register(createStubPlugin(
+      'fail-one',
+      [new Trigger('pull_request', 'opened')],
+      async () => {
+        throw new Error('one');
+      }
+    ));
+    registry.register(createStubPlugin(
+      'fail-two',
+      [new Trigger('pull_request', 'opened')],
+      async () => {
+        throw new Error('two');
+      }
+    ));
+    registry.register(createStubPlugin(
+      'healthy-three',
+      [new Trigger('pull_request', 'opened')],
+      async () => ({ actions: [], message: 'ok', success: true })
+    ));
+
+    const engine = new CoreEngine(registry);
+    const results = await engine.execute(
+      createExecutionContext(new Trigger('pull_request', 'opened'), {
+        configuration: createRepositoryConfiguration({
+          'fail-one': { enabled: true },
+          'fail-two': { enabled: true },
+          'healthy-three': { enabled: true }
+        })
+      })
+    );
+
+    assert.deepStrictEqual(
+      results.map((result) => result.success),
+      [false, false, true]
+    );
+  });
+
+  it('treats a value that is not a PluginResult as a failed result', async () => {
+    const registry = new PluginRegistry();
+    registry.register(createStubPlugin(
+      'invalid-result-plugin',
+      [new Trigger('pull_request', 'opened')],
+      async () => undefined as unknown as PluginResult
+    ));
+
+    const engine = new CoreEngine(registry);
+    const results = await engine.execute(
+      createExecutionContext(new Trigger('pull_request', 'opened'), {
+        configuration: createRepositoryConfiguration({
+          'invalid-result-plugin': { enabled: true }
+        })
+      })
+    );
+
+    assert.strictEqual(results.length, 1);
+    assert.strictEqual(results[0].success, false);
+    assert.match(results[0].message, /not a PluginResult/);
+  });
+
   it('rejects an invalid execution context', async () => {
     const registry = new PluginRegistry();
     const engine = new CoreEngine(registry);

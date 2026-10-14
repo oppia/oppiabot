@@ -17,8 +17,7 @@
  */
 
 import { ExecutionContext } from './execution_context';
-import { OppiabotPlugin } from './plugin';
-import { PluginResult } from './plugin';
+import { OppiabotPlugin, PluginResult } from './plugin';
 import { PluginRegistry } from './pluginRegistry';
 
 /**
@@ -26,8 +25,8 @@ import { PluginRegistry } from './pluginRegistry';
  *
  * Call `execute()` with a valid `ExecutionContext`. The engine validates the
  * context, asks its `PluginRegistry` for the plugins that match the trigger
- * and are enabled by the configuration, and runs them in that order. A plugin
- * that throws does not stop the others; see `execute`.
+ * and are enabled by the configuration, and runs each one. A plugin that
+ * throws does not stop the others; see `execute`.
  */
 export class CoreEngine {
   constructor(
@@ -42,9 +41,10 @@ export class CoreEngine {
    *
    * @param {ExecutionContext} context - The execution context. Must satisfy
    *   `ExecutionContext.validate()`.
-   * @returns {Promise<PluginResult[]>} One result per resolved plugin, in
-   *   resolution order, or an empty array when none applies. A plugin that
-   *   throws yields a `success: false` result rather than rejecting.
+   * @returns {Promise<PluginResult[]>} One result per resolved plugin, in the
+   *   order the registry returned them, or an empty array when none applies. A
+   *   plugin that throws, or resolves to a value that is not a `PluginResult`,
+   *   yields a `success: false` result rather than rejecting.
    * @throws {ExecutionContextValidationError} if `context` is invalid; no
    *   plugin is run.
    * @throws {PluginResolutionError} if an enabled plugin's configuration is
@@ -62,33 +62,72 @@ export class CoreEngine {
   }
 
   /**
-   * Runs one plugin, turning a thrown error into a failed result.
+   * Runs one plugin, turning a thrown error or an invalid return value into a
+   * failed result.
    *
    * @param {OppiabotPlugin} plugin - The plugin to run.
    * @param {ExecutionContext} context - Passed unchanged to the plugin.
-   * @returns {Promise<PluginResult>} The plugin's result, or, if it throws, a
-   *   result with `success: false`, no actions, and the error's stack in
-   *   `message`. Never rejects.
+   * @returns {Promise<PluginResult>} The plugin's result, or, if it throws or
+   *   resolves to something that is not a `PluginResult`, a failed result
+   *   describing what went wrong. Never rejects.
    */
   private async executePlugin(
     plugin: OppiabotPlugin,
     context: ExecutionContext
   ): Promise<PluginResult> {
     try {
-      return await plugin.execute(context);
+      const result = await plugin.execute(context);
+      if (!isPluginResult(result)) {
+        return this.failureResult(
+          plugin.name,
+          'the plugin returned a value that is not a PluginResult.'
+        );
+      }
+      return result;
     } catch (err) {
       const failure = (
         err instanceof Error && err.stack !== undefined
           ? err.stack
           : String(err)
       );
-      return {
-        actions: [],
-        success: false,
-        message: (
-          `Plugin '${plugin.name}' failed to execute:\n${failure}`
-        ),
-      };
+      return this.failureResult(plugin.name, failure);
     }
   }
+
+  /**
+   * Builds a failed result for `pluginName`.
+   *
+   * @param {string} pluginName - The name of the plugin that failed.
+   * @param {string} detail - Why the plugin failed, usually an error's stack.
+   * @returns {PluginResult} A result with `success: false` and no actions.
+   */
+  private failureResult(pluginName: string, detail: string): PluginResult {
+    return {
+      actions: [],
+      success: false,
+      message: `Plugin '${pluginName}' failed to execute:\n${detail}`,
+    };
+  }
+}
+
+/**
+ * Returns whether `result` satisfies the PluginResult shape.
+ *
+ * A plugin's `execute` is typed to return a `PluginResult`, but at runtime it
+ * may resolve to something else, such as `undefined`. The engine treats such a
+ * value as an isolated plugin failure rather than aggregating it.
+ *
+ * @param {unknown} result - The value a plugin resolved to.
+ * @returns {boolean} Whether the value is a usable PluginResult.
+ */
+function isPluginResult(result: unknown): result is PluginResult {
+  if (typeof result !== 'object' || result === null) {
+    return false;
+  }
+  const candidate = result as Partial<PluginResult>;
+  return (
+    Array.isArray(candidate.actions) &&
+    typeof candidate.message === 'string' &&
+    typeof candidate.success === 'boolean'
+  );
 }
