@@ -11,6 +11,8 @@
     "start": "probot run ./index.js",
     "sheets-setup": "node ./sheetsSetup.js",
     "test": "node ./spec/setup.js",
+    "test:core": "rm -rf dist && tsc --project tsconfig.test.json && node --test dist/spec/core/",
+    "typecheck": "tsc --project tsconfig.json",
     "actions-build": "ncc build actions/main.js -o actions_build",
     "update-actions-build": "node actions/build.js"
   },
@@ -41,10 +43,12 @@
     "nodemon": "^2.0.22",
     "nyc": "^15.1.0",
     "smee-client": "^1.2.3",
-    "standard": "^17.0.0"
+    "standard": "^17.0.0",
+    "typescript": "^5.5.0",
+    "@types/node": "^20.14.0"
   },
   "engines": {
-    "node": ">= 14.0.0"
+    "node": ">= 18.0.0"
   },
   "standard": {
     "env": [
