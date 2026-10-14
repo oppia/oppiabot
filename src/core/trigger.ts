@@ -43,14 +43,11 @@ export class Trigger {
   ) {}
 
   /**
-   * Returns a string key that represents this trigger.
+   * Returns the canonical key that represents this trigger.
    *
    * The key is `event` when this trigger has no action, and `event.action`
-   * otherwise. Use it to describe or log a trigger, or to compare two triggers
-   * for exact equality. Do not use it to decide whether a plugin supports a
-   * trigger: equal keys only identify identical triggers, so a key comparison
-   * misses a trigger without an action that supports every action of its event.
-   * Use `matches()` for that check.
+   * otherwise. Equal keys mean identical triggers; use `matches()` to decide
+   * whether a plugin supports a trigger.
    *
    * @returns {string} For example 'pull_request.opened', 'issues', or
    *   'schedule.stale-sweep'.
