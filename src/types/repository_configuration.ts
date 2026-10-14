@@ -87,10 +87,13 @@ export class ConfigSchema {
    */
   private validateFieldValue(key: string, value: unknown): void {
     const property = this.properties[key] as ConfigSchemaProperty;
-    if (property.type !== undefined && typeof value !== property.type) {
+    if (
+      property.type !== undefined &&
+      (value === null || typeof value !== property.type)
+    ) {
       throw new ConfigurationValidationError(
         `Configuration field ${key} must be of type ${property.type}, ` +
-        `received ${typeof value}.`
+        `received ${value === null ? 'null' : typeof value}.`
       );
     }
     if (

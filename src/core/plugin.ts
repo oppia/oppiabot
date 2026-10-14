@@ -26,10 +26,6 @@ import { ExecutionContext } from './execution_context';
  * A plugin reports what it did by returning these values in
  * `PluginResult.actions`, so a run can be described as a list of concrete
  * GitHub changes instead of free text.
- *
- * The names are chosen for the operations the existing Oppiabot workflows
- * perform. They are not taken from the legacy implementation, which called the
- * same operations by different names.
  */
 export enum PluginAction {
   /** Post a comment on the relevant GitHub resource. */
