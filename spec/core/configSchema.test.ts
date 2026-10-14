@@ -16,7 +16,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   ConfigSchema,
-  ConfigurationValidationError
+  ConfigurationValidationError,
+  RepositoryConfiguration
 } from '../../src/types';
 
 describe('ConfigSchema', () => {
@@ -69,6 +70,20 @@ describe('ConfigSchema', () => {
     );
   });
 
+  it('rejects null for an object-typed field', () => {
+    const objectSchema = new ConfigSchema(
+      { options: { type: 'object' } },
+      []
+    );
+    assert.throws(
+      () => objectSchema.validate({ options: null }),
+      (err) => (
+        err instanceof ConfigurationValidationError &&
+        err.message.includes('options')
+      )
+    );
+  });
+
   it('throws when a field value is not in the allowed enum', () => {
     assert.throws(
       () => schema.validate({ stale_days: 7, stale_label: 'urgent' }),
@@ -102,6 +117,20 @@ describe('ConfigSchema', () => {
         err instanceof ConfigurationValidationError &&
         err.message.includes('constructor')
       )
+    );
+  });
+});
+
+describe('RepositoryConfiguration', () => {
+  it('does not return an inherited Object property as a plugin config', () => {
+    const configuration = new RepositoryConfiguration('1.0', {});
+    assert.equal(
+      configuration.getPluginConfiguration('constructor'),
+      undefined
+    );
+    assert.equal(
+      configuration.getPluginConfiguration('toString'),
+      undefined
     );
   });
 });
