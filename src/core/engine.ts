@@ -27,7 +27,9 @@ import { PluginRegistry } from './pluginRegistry';
  * A webhook handler or a scheduled workflow builds an `ExecutionContext` and
  * passes it to `execute()`. The engine validates the context, asks the plugin
  * registry for the plugins that match the trigger and are enabled by the
- * repository configuration, executes them, and returns their results.
+ * repository configuration, executes them, and reports their results. The
+ * engine coordinates execution; it does not return a result summary to its
+ * caller.
  *
  * If a plugin throws, the engine records a failed result for it and continues
  * with the other matching plugins.
@@ -41,24 +43,26 @@ export class CoreEngine {
    * Executes the plugins applicable to the current execution.
    *
    * Resolves the plugins that match `context.trigger` and are enabled by the
-   * repository configuration, then executes each of them. Produces exactly one
-   * result per resolved plugin, in registration order.
+   * repository configuration, then executes each of them and reports the
+   * aggregated results. Produces exactly one result per resolved plugin, in
+   * registration order, for reporting.
    *
    * Failures are isolated per plugin: a throwing plugin does not stop the
-   * remaining plugins or reject this promise; it yields a `PluginResult` with
-   * `success: false`.
+   * remaining plugins or reject this promise; it is reported as a result with
+   * `success: false`, and the original error's stack trace is preserved in the
+   * report.
    *
    * @param {ExecutionContext} context - Execution context carrying the trigger,
    *   event payload, repository, and repository configuration. Must satisfy
    *   `ExecutionContext.validate()`.
-   * @returns {Promise<PluginResult[]>} One result per resolved plugin. Empty
-   *   if no applicable plugin is enabled for the trigger.
+   * @returns {Promise<void>} Resolves after every applicable plugin has run and
+   *   the aggregated results have been reported.
    * @throws {ExecutionContextValidationError} if the execution context is
    *   invalid. No plugin is executed in that case.
    * @throws {PluginResolutionError} if an enabled plugin's configuration
    *   cannot be resolved. No plugin is executed in that case.
    */
-  async execute(context: ExecutionContext): Promise<PluginResult[]> {
+  async execute(context: ExecutionContext): Promise<void> {
     context.validate();
 
     const plugins = this.pluginRegistry.resolvePlugins(context);
@@ -66,7 +70,30 @@ export class CoreEngine {
     for (const plugin of plugins) {
       results.push(await this.executePlugin(plugin, context));
     }
-    return results;
+    this.reportResults(results);
+  }
+
+  /**
+   * Reports the aggregated results of one execution.
+   *
+   * The engine owns execution reporting. It logs how many plugins ran and how
+   * many succeeded, followed by the failure detail for each plugin that failed.
+   *
+   * @param {readonly PluginResult[]} results - The results collected for the
+   *   execution, one per resolved plugin.
+   */
+  private reportResults(results: readonly PluginResult[]): void {
+    const succeeded = results.filter((result) => result.success).length;
+    const failed = results.length - succeeded;
+    console.log(
+      `[CoreEngine] Executed ${results.length} plugin(s): ` +
+        `${succeeded} succeeded, ${failed} failed.`
+    );
+    for (const result of results) {
+      if (!result.success) {
+        console.log(`[CoreEngine] ${result.message}`);
+      }
+    }
   }
 
   /**
