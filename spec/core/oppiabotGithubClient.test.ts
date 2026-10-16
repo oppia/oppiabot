@@ -202,8 +202,9 @@ describe('OppiabotGitHubClient', () => {
     });
 
     it('lists the reviews on a pull request', async () => {
-      const {client} = createClient();
+      const {client, api} = createClient();
       const reviews = await client.listPullRequestReviews(42);
+      assert.strictEqual(api.getLastParameters().per_page, 100);
       assert.deepStrictEqual(reviews, [
         {state: 'APPROVED', user: {login: 'reviewer'}}
       ]);
@@ -255,6 +256,7 @@ describe('OppiabotGitHubClient', () => {
         'is:pr review:approved'
       );
       assert.strictEqual(result.total_count, 1);
+      assert.strictEqual(api.getLastParameters().per_page, 100);
       assert.strictEqual(
         api.getLastParameters().q,
         'is:pr review:approved repo:oppia/oppiabot'

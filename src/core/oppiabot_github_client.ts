@@ -203,9 +203,9 @@ export interface GitHubApiClient {
  *
  * Used as the page size by the loops that paginate (`listIssues` and
  * `listChangedFiles`), to detect a full page and request the next one, and as
- * the requested page size for `listPullRequests`. Operations that take only a
- * single page (`listPullRequestReviews`, `searchIssuesAndPullRequests`) do not
- * use it. The value matches the page size the legacy implementations used.
+ * the requested page size for the single-page operations (`listPullRequests`,
+ * `listPullRequestReviews`, and `searchIssuesAndPullRequests`). The value
+ * matches the page size the legacy implementations used.
  */
 const MAX_RESULTS_PER_PAGE = 100;
 
@@ -284,7 +284,7 @@ export class OppiabotGitHubClient {
   ): Promise<PullRequestReview[]> {
     return this.request<PullRequestReview[]>(
       ROUTES.listPullRequestReviews,
-      {pull_number: pullRequestNumber}
+      {pull_number: pullRequestNumber, per_page: MAX_RESULTS_PER_PAGE}
     );
   }
 
@@ -368,12 +368,15 @@ export class OppiabotGitHubClient {
    * qualifier.
    *
    * @param {string} query - Search query, without the repository qualifier.
-   * @returns {Promise<SearchResult>} The matching search results.
+   * @returns {Promise<SearchResult>} Up to `MAX_RESULTS_PER_PAGE` of the
+   *   matching search results; `total_count` counts all matching issues and
+   *   pull requests in the repository, not just the returned page.
    * @throws {OppiabotGitHubClientError} if the search cannot be performed.
    */
   async searchIssuesAndPullRequests(query: string): Promise<SearchResult> {
     return this.request<SearchResult>(ROUTES.searchIssuesAndPullRequests, {
-      q: `${query} repo:${this.repository.getFullName()}`
+      q: `${query} repo:${this.repository.getFullName()}`,
+      per_page: MAX_RESULTS_PER_PAGE
     });
   }
 
@@ -537,7 +540,7 @@ export class OppiabotGitHubClient {
       });
     } catch (error) {
       throw new OppiabotGitHubClientError(
-        'The GitHub API request failed: ' + (
+        `The GitHub API request to ${route} failed: ` + (
           error instanceof Error ? error.message : String(error)
         ),
         error
