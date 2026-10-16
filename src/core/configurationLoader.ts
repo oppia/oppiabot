@@ -35,9 +35,11 @@ import {
 export const OPPIABOT_CONFIG_PATH = '.github/oppiabot.yml';
 
 /**
- * Version applied when the configuration file does not declare one. Repositories
- * do not need to declare a version until the configuration schema changes in a
- * way that requires one.
+ * Version applied when the configuration file does not declare one.
+ *
+ * A declared version is only checked to be a non-empty string. No schema
+ * version compatibility is enforced, and no migration between versions is
+ * performed.
  */
 export const DEFAULT_CONFIGURATION_VERSION = '1.0';
 
@@ -91,26 +93,30 @@ export interface RepositoryFileReader {
  * change the configuration that Oppiabot applies to it.
  *
  * The loader performs no caching: every load call reads and parses the file
- * again, so a configuration change is picked up on subsequent calls.
+ * again. Whether a configuration change is visible to subsequent calls also
+ * depends on the reader, which may serve previously fetched contents.
  *
  * Repositories opt in to Oppiabot by adding the configuration file. A
  * repository without the file has not opted in, so it resolves to a
  * configuration with no enabled plugins rather than to a load failure.
  *
- * The loader applies a strict schema to the fields Oppiabot owns, and a
- * migration-tolerant schema to the plugins themselves:
+ * The loader applies strict validation to the fields Oppiabot core owns while
+ * allowing forward-compatible plugin declarations:
  *
- * - The supported top-level fields, and the supported fields of a plugin
- *   configuration, are fixed by Oppiabot core. Any other field is rejected, so
- *   that a mistyped field such as plugin instead of plugins cannot silently
- *   leave the repository with no enabled plugins.
- * - Plugin names are not rejected when no such plugin is registered. A
+ * - The supported top-level fields and plugin configuration fields are fixed
+ *   by Oppiabot core. Any unsupported field is rejected, so a typo such as
+ *   plugin instead of plugins cannot silently leave the repository with no
+ *   enabled plugins.
+ * - Plugin names are not rejected solely because they are unregistered. A
  *   repository may declare a plugin before Oppiabot registers it, and only
- *   registered plugins are executed. The shape of the configuration of an
- *   unregistered plugin is still validated, but its settings are not validated
- *   against any plugin configuration schema.
- * - Plugin-specific settings are validated against the configuration schema
- *   declared by the registered plugin, which rejects unsupported settings.
+ *   registered plugins are executed. The configuration structure of an
+ *   unregistered plugin is still validated, but its settings are not
+ *   validated against a plugin-specific schema.
+ * - Settings for enabled, registered plugins are validated against the
+ *   configuration schema declared by each plugin, rejecting unsupported
+ *   settings. Disabled and unregistered plugins do not undergo
+ *   plugin-specific settings validation. The configuration structure of
+ *   every declared plugin is validated regardless.
  */
 export class ConfigurationLoader {
   constructor(
