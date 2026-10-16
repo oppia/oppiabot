@@ -133,15 +133,21 @@ export class PluginRegistry {
   /**
    * Returns whether the repository configuration enables a plugin.
    *
-   * A plugin is enabled only when the configuration declares it with
-   * `enabled: true`. A context without a configuration enables nothing.
+   * A plugin is enabled only when the configuration declares it with the
+   * literal value `enabled: true`. Any other value, including a malformed one
+   * such as a string, is not treated as enabled; malformed configuration is
+   * rejected upstream by `ExecutionContext.validate()`. A context without a
+   * configuration enables nothing.
+   *
+   * When the context has been validated, a present configuration is already
+   * structurally valid, so this method only validates the plugin's own
+   * settings against the schema the plugin registered.
    *
    * @param {OppiabotPlugin} plugin - The registered plugin.
    * @param {ExecutionContext} context - The execution context.
    * @returns {boolean} Whether the plugin is enabled for this execution.
-   * @throws {PluginResolutionError} if the plugin is enabled but its
-   *   configuration is structurally invalid or does not satisfy the schema
-   *   the plugin registered.
+   * @throws {PluginResolutionError} if the plugin is enabled but its settings
+   *   do not satisfy the schema the plugin registered.
    */
   private isEnabled(
     plugin: OppiabotPlugin,
@@ -165,9 +171,8 @@ export class PluginRegistry {
     ) {
       return false;
     }
-    let pluginConfiguration: PluginConfiguration;
     try {
-      pluginConfiguration = configuration.getPluginConfiguration(
+      configuration.getPluginConfiguration(
         plugin.name,
         { [plugin.name]: plugin.configSchema }
       );
@@ -180,7 +185,7 @@ export class PluginRegistry {
         `'${context.trigger.toKey()}': ${errorMessage}`
       );
     }
-    return pluginConfiguration.enabled;
+    return true;
   }
 
   /**
