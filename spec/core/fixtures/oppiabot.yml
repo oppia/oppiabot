@@ -1,6 +1,6 @@
 # Configuration file in the format a repository maintains.
-# This file is loaded by spec/core/configurationLoader.test.ts to verify that
-# the loader accepts the repository format, including its comments.
+# This file is loaded by spec/core/configurationValidation.test.ts to verify
+# that the loader accepts the repository format, including its comments.
 
 version: "1.0"
 

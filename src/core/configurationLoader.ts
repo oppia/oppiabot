@@ -44,17 +44,16 @@ export const OPPIABOT_CONFIG_PATH = '.github/oppiabot.yml';
 export const DEFAULT_CONFIGURATION_VERSION = '1.0';
 
 /**
- * Fields supported at the top level of the Oppiabot configuration schema. These
- * fields are owned by Oppiabot core, so any other field is rejected rather than
- * ignored.
+ * Fields supported at the top level of the Oppiabot configuration schema. Any
+ * other top-level field is rejected rather than ignored.
  */
 const SUPPORTED_CONFIGURATION_FIELDS = ['version', 'plugins'];
 
 /**
- * Fields supported for the configuration of a single plugin. These fields are
- * owned by Oppiabot core, so any other field is rejected rather than ignored.
- * Plugin-specific values belong under the settings field, where the
- * configuration schema declared by the plugin governs them.
+ * Fields supported for the configuration of a single plugin. Any other field
+ * is rejected rather than ignored. Plugin-specific values belong under the
+ * settings field, where the configuration schema declared by the plugin
+ * governs them.
  */
 const SUPPORTED_PLUGIN_FIELDS = ['enabled', 'dry_run', 'settings'];
 
@@ -100,8 +99,8 @@ export interface RepositoryFileReader {
  * repository without the file has not opted in, so it resolves to a
  * configuration with no enabled plugins rather than to a load failure.
  *
- * The loader applies strict validation to the fields Oppiabot core owns while
- * allowing forward-compatible plugin declarations:
+ * The loader validates the supported fields strictly while accepting plugin
+ * declarations for plugins that are not registered:
  *
  * - The supported top-level fields and plugin configuration fields are fixed
  *   by Oppiabot core. Any unsupported field is rejected, so a typo such as
