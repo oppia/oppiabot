@@ -18,6 +18,7 @@ import {
   CoreEngine,
   ExecutionContextValidationError,
   OppiabotPlugin,
+  PluginResolutionError,
   PluginResult,
   PluginRegistry,
   Trigger
@@ -365,6 +366,101 @@ describe('CoreEngine', () => {
       assert.ok(
         logs.some((line) => line.includes('not a PluginResult'))
       );
+    } finally {
+      restore();
+    }
+  });
+
+  it('rejects when an enabled plugin has invalid configuration', async () => {
+    const executed: string[] = [];
+    const registry = new PluginRegistry();
+    registry.register({
+      name: 'needs-settings',
+      supportedTriggers: [new Trigger('pull_request', 'opened')],
+      configSchema: new ConfigSchema(
+        { stale_days: { type: 'number' } },
+        ['stale_days']
+      ),
+      execute: async () => {
+        executed.push('needs-settings');
+        return successfulResult('ok');
+      }
+    });
+
+    const engine = new CoreEngine(registry);
+    await assert.rejects(
+      engine.execute(
+        createExecutionContext(new Trigger('pull_request', 'opened'), {
+          configuration: createRepositoryConfiguration({
+            'needs-settings': { enabled: true }
+          })
+        })
+      ),
+      (err) => err instanceof PluginResolutionError
+    );
+    assert.deepStrictEqual(executed, []);
+  });
+
+  it('names the plugin when reporting a failure it reported itself', async () => {
+    const { logs, restore } = captureLogs();
+    try {
+      const registry = new PluginRegistry();
+      registry.register(createStubPlugin(
+        'self-reporting',
+        [new Trigger('pull_request', 'opened')],
+        async () => ({
+          actions: [],
+          message: 'could not find the upstream file',
+          success: false
+        })
+      ));
+
+      const engine = new CoreEngine(registry);
+      await engine.execute(
+        createExecutionContext(new Trigger('pull_request', 'opened'), {
+          configuration: createRepositoryConfiguration({
+            'self-reporting': { enabled: true }
+          })
+        })
+      );
+
+      assert.ok(
+        logs.some(
+          (line) =>
+            line.includes("Plugin 'self-reporting' failed") &&
+            line.includes('could not find the upstream file')
+        )
+      );
+    } finally {
+      restore();
+    }
+  });
+
+  it('describes a plugin that throws a non-Error object', async () => {
+    const { logs, restore } = captureLogs();
+    try {
+      const registry = new PluginRegistry();
+      registry.register(createStubPlugin(
+        'object-thrower',
+        [new Trigger('pull_request', 'opened')],
+        async () => {
+          throw { reason: 'custom failure', code: 42 };
+        }
+      ));
+
+      const engine = new CoreEngine(registry);
+      await engine.execute(
+        createExecutionContext(new Trigger('pull_request', 'opened'), {
+          configuration: createRepositoryConfiguration({
+            'object-thrower': { enabled: true }
+          })
+        })
+      );
+
+      const failure = logs.find((line) => line.includes('object-thrower'));
+      assert.ok(failure !== undefined);
+      assert.match(failure, /"reason":"custom failure"/);
+      assert.match(failure, /"code":42/);
     } finally {
       restore();
     }

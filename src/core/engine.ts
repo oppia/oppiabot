@@ -61,28 +61,39 @@ export class CoreEngine {
     for (const plugin of plugins) {
       results.push(await this.executePlugin(plugin, context));
     }
-    this.reportResults(results);
+    this.reportResults(plugins, results);
   }
 
   /**
    * Reports the aggregated results of one execution.
    *
-   * The engine owns execution reporting. It logs how many plugins ran and how
-   * many succeeded, followed by the failure detail for each plugin that failed.
+   * The engine reports results by logging them: a one-line summary of how many
+   * plugins ran and how many succeeded, followed by one line per failed plugin.
+   * Each failure line names the plugin, so a failure is always attributable
+   * even when the plugin supplied only its own `message`.
    *
-   * @param {readonly PluginResult[]} results - The results collected for the
-   *   execution, one per resolved plugin.
+   * @param {readonly OppiabotPlugin[]} plugins - The plugins that were run, in
+   *   the same order as `results`.
+   * @param {readonly PluginResult[]} results - The result of each plugin, one
+   *   per entry of `plugins`.
    */
-  private reportResults(results: readonly PluginResult[]): void {
+  private reportResults(
+    plugins: readonly OppiabotPlugin[],
+    results: readonly PluginResult[]
+  ): void {
     const succeeded = results.filter((result) => result.success).length;
     const failed = results.length - succeeded;
     console.log(
       `[CoreEngine] Executed ${results.length} plugin(s): ` +
         `${succeeded} succeeded, ${failed} failed.`
     );
-    for (const result of results) {
+    for (let index = 0; index < results.length; index++) {
+      const result = results[index];
       if (!result.success) {
-        console.log(`[CoreEngine] ${result.message}`);
+        console.log(
+          `[CoreEngine] Plugin '${plugins[index].name}' failed: ` +
+            `${result.message}`
+        );
       }
     }
   }
@@ -105,34 +116,31 @@ export class CoreEngine {
       const result = await plugin.execute(context);
       if (!isPluginResult(result)) {
         return this.failureResult(
-          plugin.name,
           'it returned a value that is not a PluginResult.'
         );
       }
       return result;
     } catch (err) {
-      const failure = (
-        err instanceof Error && err.stack !== undefined
-          ? err.stack
-          : String(err)
-      );
-      return this.failureResult(plugin.name, failure);
+      return this.failureResult(describeError(err));
     }
   }
 
   /**
-   * Builds a failed result for `pluginName`.
+   * Builds a failed result carrying `reason` as its message.
    *
-   * @param {string} pluginName - The name of the plugin that failed.
+   * The plugin's name is not included here. `reportResults` attaches it when it
+   * logs the failure, so engine-detected and self-reported failures are
+   * attributed in the same way.
+   *
    * @param {string} reason - Why the plugin failed; a stack trace for a thrown
    *   error, or a description of an invalid return value.
    * @returns {PluginResult} A result with `success: false` and no actions.
    */
-  private failureResult(pluginName: string, reason: string): PluginResult {
+  private failureResult(reason: string): PluginResult {
     return {
       actions: [],
       success: false,
-      message: `Plugin '${pluginName}' failed:\n${reason}`,
+      message: reason,
     };
   }
 }
@@ -145,7 +153,7 @@ export class CoreEngine {
  * value as an isolated plugin failure rather than aggregating it.
  *
  * @param {unknown} result - The value a plugin resolved to.
- * @returns {boolean} Whether the value is a usable PluginResult.
+ * @returns {boolean} Whether `result` is a PluginResult.
  */
 function isPluginResult(result: unknown): result is PluginResult {
   if (typeof result !== 'object' || result === null) {
@@ -157,4 +165,34 @@ function isPluginResult(result: unknown): result is PluginResult {
     typeof candidate.message === 'string' &&
     typeof candidate.success === 'boolean'
   );
+}
+
+/**
+ * Describes a thrown value for a failed result message.
+ *
+ * An `Error` is described by its stack trace, or by its string form when it has
+ * no stack. A thrown string is used as-is. Any other value, such as a plain
+ * object, is serialized with `JSON.stringify` so its contents are not lost; if
+ * serialization is impossible or yields nothing, the value's string form is
+ * used instead.
+ *
+ * @param {unknown} thrown - The value a plugin threw.
+ * @returns {string} A description of the thrown value.
+ */
+function describeError(thrown: unknown): string {
+  if (thrown instanceof Error) {
+    return thrown.stack ?? String(thrown);
+  }
+  if (typeof thrown === 'string') {
+    return thrown;
+  }
+  try {
+    const serialized = JSON.stringify(thrown);
+    if (serialized !== undefined) {
+      return serialized;
+    }
+  } catch {
+    // Not serializable (for example, a circular reference); use String below.
+  }
+  return String(thrown);
 }

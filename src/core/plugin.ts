@@ -74,7 +74,7 @@ export interface PluginRegistrationMetadata {
 }
 
 /**
- * A self-contained Oppiabot workflow that the Core Engine can run.
+ * An Oppiabot workflow that the Core Engine can run.
  *
  * Implement this interface once per workflow. Plugins are registered with the
  * `PluginRegistry` during initialization, and the registry resolves them per
