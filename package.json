@@ -23,6 +23,7 @@
     "dotenv": "^16.1.4",
     "google-auth-library": "^8.8.0",
     "googleapis": "^118.0.0",
+    "js-yaml": "^4.3.2",
     "newrelic": "^10.0.0",
     "probot": "^9.11.3",
     "probot-config": "^1.1.0",
@@ -35,6 +36,7 @@
     ]
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@vercel/ncc": "^0.38.3",
     "eslint": "^8.41.0",
     "husky": "^8.0.3",

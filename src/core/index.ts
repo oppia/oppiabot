@@ -32,6 +32,13 @@ export {
 export { PluginRegistry } from './pluginRegistry';
 export { CoreEngine } from './engine';
 export {
+  ConfigurationLoader,
+  ConfigurationLoadError,
+  DEFAULT_CONFIGURATION_VERSION,
+  OPPIABOT_CONFIG_PATH,
+  RepositoryFileReader
+} from './configurationLoader';
+export {
   OppiabotGitHubClient,
   OppiabotGitHubClientError
 } from './oppiabot_github_client';

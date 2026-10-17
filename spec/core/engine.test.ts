@@ -23,7 +23,10 @@ import {
   Trigger
 } from '../../src/core';
 import { ConfigSchema } from '../../src/types';
-import { createExecutionContext } from './testHelpers';
+import {
+  createExecutionContext,
+  createRepositoryConfiguration
+} from './testHelpers';
 
 /**
  * Captures console.log output for the duration of one test.
@@ -103,7 +106,12 @@ describe('CoreEngine', () => {
 
       const engine = new CoreEngine(registry);
       await engine.execute(
-        createExecutionContext(new Trigger('pull_request', 'opened'))
+        createExecutionContext(new Trigger('pull_request', 'opened'), {
+          configuration: createRepositoryConfiguration({
+            'plugin-a': { enabled: true },
+            'plugin-b': { enabled: true }
+          })
+        })
       );
 
       assert.deepStrictEqual(executed, ['plugin-a', 'plugin-b']);
@@ -131,7 +139,11 @@ describe('CoreEngine', () => {
 
       const engine = new CoreEngine(registry);
       await engine.execute(
-        createExecutionContext(new Trigger('pull_request', 'opened'))
+        createExecutionContext(new Trigger('pull_request', 'opened'), {
+          configuration: createRepositoryConfiguration({
+            'stale-sweeper': { enabled: true }
+          })
+        })
       );
 
       assert.deepStrictEqual(executed, []);
@@ -167,7 +179,12 @@ describe('CoreEngine', () => {
 
       const engine = new CoreEngine(registry);
       await engine.execute(
-        createExecutionContext(new Trigger('pull_request', 'opened'))
+        createExecutionContext(new Trigger('pull_request', 'opened'), {
+          configuration: createRepositoryConfiguration({
+            'failing-plugin': { enabled: true },
+            'healthy-plugin': { enabled: true }
+          })
+        })
       );
 
       assert.deepStrictEqual(executed, ['failing-plugin', 'healthy-plugin']);
@@ -198,7 +215,11 @@ describe('CoreEngine', () => {
 
       const engine = new CoreEngine(registry);
       await engine.execute(
-        createExecutionContext(new Trigger('pull_request', 'opened'))
+        createExecutionContext(new Trigger('pull_request', 'opened'), {
+          configuration: createRepositoryConfiguration({
+            'stack-plugin': { enabled: true }
+          })
+        })
       );
 
       const failure = logs.find((line) => line.includes('stack-plugin'));
