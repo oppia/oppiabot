@@ -202,8 +202,9 @@ describe('OppiabotGitHubClient', () => {
     });
 
     it('lists the reviews on a pull request', async () => {
-      const {client} = createClient();
+      const {client, api} = createClient();
       const reviews = await client.listPullRequestReviews(42);
+      assert.strictEqual(api.getLastParameters().per_page, 100);
       assert.deepStrictEqual(reviews, [
         {state: 'APPROVED', user: {login: 'reviewer'}}
       ]);
@@ -255,6 +256,7 @@ describe('OppiabotGitHubClient', () => {
         'is:pr review:approved'
       );
       assert.strictEqual(result.total_count, 1);
+      assert.strictEqual(api.getLastParameters().per_page, 100);
       assert.strictEqual(
         api.getLastParameters().q,
         'is:pr review:approved repo:oppia/oppiabot'
@@ -268,13 +270,13 @@ describe('OppiabotGitHubClient', () => {
       assert.strictEqual(commit.commit.message, 'A commit message');
     });
 
-    it('exposes the author date a stale check compares against', async () => {
+    it('exposes the author date of a commit', async () => {
       const {client} = createClient();
       const commit = await client.getCommit('abc123');
       assert.strictEqual(commit.commit.author?.date, '2026-10-01');
     });
 
-    it('uses the expected route for each read operation', async () => {
+    it('sends each read operation to its GitHub REST route', async () => {
       const {client, api} = createClient();
       await client.getPullRequest(1);
       await client.listPullRequests();
@@ -442,7 +444,7 @@ describe('OppiabotGitHubClient', () => {
       });
     });
 
-    it('uses the expected route for each mutation', async () => {
+    it('sends each mutation to its GitHub REST route', async () => {
       const {client, api} = createClient();
       await client.createComment(7, 'A comment');
       await client.addLabels(7, ['bug']);

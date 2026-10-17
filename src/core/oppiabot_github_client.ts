@@ -40,8 +40,8 @@ export interface GitHubLabel {
 /**
  * A GitHub pull request as returned by the GitHub API.
  *
- * Only the fields required by the migrated workflows are represented, so that
- * plugins depend on a stable shape rather than the full API response.
+ * Declares only the fields the migrated workflows read; the runtime object is
+ * the full GitHub API response and may carry additional fields.
  */
 export interface PullRequest {
   number: number;
@@ -169,16 +169,29 @@ export interface GitHubApiResponse<TData> {
 }
 
 /**
- * The GitHub API operations required by the migrated workflows.
+ * The GitHub API client that OppiabotGitHubClient sends requests through.
  *
- * Octokit exposes these through its request method, which is the one part of
- * its API surface that is identical across the versions used by the legacy
- * runtimes: the endpoint-method helpers differ between Octokit releases, but
- * request accepts a route and parameters in all of them. Declaring this
- * interface lets the client be constructed with an Octokit instance from
- * either runtime without an adapter, and lets tests provide a fake.
+ * This is the `request` method of an Octokit instance, which has the same
+ * signature across the Octokit versions used by the webhook and scheduled
+ * runtimes, so a runtime can construct OppiabotGitHubClient with the Octokit
+ * version it already uses without an adapter. Tests substitute a fake.
  */
 export interface GitHubApiClient {
+  /**
+   * Sends a request to a GitHub REST route.
+   *
+   * @param {string} route - Route in the form 'METHOD /path', with `{owner}`,
+   *   `{repo}`, and any other path placeholders left for GitHub to resolve.
+   * @param {Record<string, unknown>} parameters - Path parameters, query
+   *   parameters, and request body fields. OppiabotGitHubClient supplies
+   *   `owner` and `repo` from the repository it was constructed with.
+   * @returns {Promise<GitHubApiResponse<TData>>} The HTTP status of the
+   *   response and its body.
+   * @throws {Error} if the request does not succeed. Octokit rejects with a
+   *   RequestError for a non-2xx response; OppiabotGitHubClient relies on that
+   *   rejection, so a client that resolves for error responses would surface
+   *   failed operations as successes.
+   */
   request<TData>(
     route: string,
     parameters: Record<string, unknown>
@@ -190,25 +203,25 @@ export interface GitHubApiClient {
  *
  * Used as the page size by the loops that paginate (`listIssues` and
  * `listChangedFiles`), to detect a full page and request the next one, and as
- * the requested page size for `listPullRequests`. Operations that take only a
- * single page (`listPullRequestReviews`, `searchIssuesAndPullRequests`) do not
- * use it. The value matches the page size the legacy implementations used.
+ * the requested page size for the single-page operations (`listPullRequests`,
+ * `listPullRequestReviews`, and `searchIssuesAndPullRequests`). The value
+ * matches the page size the legacy implementations used.
  */
 const MAX_RESULTS_PER_PAGE = 100;
 
 /**
- * Provides a common interface for GitHub API operations performed by Oppiabot
- * plugins.
+ * Performs GitHub API operations for Oppiabot plugins.
  *
- * Plugins use this abstraction instead of accessing Octokit or
- * runtime-specific GitHub clients directly. The client is runtime-independent:
- * it is constructed with a repository and a GitHub API client, so the same
- * client works for webhook executions and scheduled executions.
+ * Plugins use this client instead of calling Octokit or a runtime-specific
+ * GitHub client directly. It is constructed with a GitHubApiClient and the
+ * RepositoryContext it operates on, so the same class works in every runtime.
  *
- * Every operation is scoped to the repository the client was constructed with,
- * matching the scoping the legacy implementations performed through
- * context.repo(). Read operations return the response data directly, so
- * plugins do not need to know how the underlying client wraps results.
+ * Every route is scoped to the client's repository: the owner and repo from
+ * the RepositoryContext are added to the parameters of each request. Read
+ * methods resolve with the response body; mutation methods resolve with the
+ * HTTP status of the successful response. When a request fails, the injected
+ * GitHubApiClient rejects, and the method raises OppiabotGitHubClientError
+ * with that rejection as its cause.
  */
 export class OppiabotGitHubClient {
   constructor(
@@ -261,9 +274,9 @@ export class OppiabotGitHubClient {
    * Lists the reviews submitted on a pull request.
    *
    * @param {number} pullRequestNumber - Number of the pull request.
-   * @returns {Promise<PullRequestReview[]>} Up to one page of the reviews on
-   *   the pull request; a pull request with more reviews than fit on one page
-   *   is truncated.
+   * @returns {Promise<PullRequestReview[]>} At most `MAX_RESULTS_PER_PAGE`
+   *   reviews; a pull request with more reviews than that is truncated,
+   *   because this method reads a single page.
    * @throws {OppiabotGitHubClientError} if the reviews cannot be read.
    */
   async listPullRequestReviews(
@@ -271,7 +284,7 @@ export class OppiabotGitHubClient {
   ): Promise<PullRequestReview[]> {
     return this.request<PullRequestReview[]>(
       ROUTES.listPullRequestReviews,
-      {pull_number: pullRequestNumber}
+      {pull_number: pullRequestNumber, per_page: MAX_RESULTS_PER_PAGE}
     );
   }
 
@@ -355,12 +368,15 @@ export class OppiabotGitHubClient {
    * qualifier.
    *
    * @param {string} query - Search query, without the repository qualifier.
-   * @returns {Promise<SearchResult>} The matching search results.
+   * @returns {Promise<SearchResult>} Up to `MAX_RESULTS_PER_PAGE` of the
+   *   matching search results; `total_count` counts all matching issues and
+   *   pull requests in the repository, not just the returned page.
    * @throws {OppiabotGitHubClientError} if the search cannot be performed.
    */
   async searchIssuesAndPullRequests(query: string): Promise<SearchResult> {
     return this.request<SearchResult>(ROUTES.searchIssuesAndPullRequests, {
-      q: `${query} repo:${this.repository.getFullName()}`
+      q: `${query} repo:${this.repository.getFullName()}`,
+      per_page: MAX_RESULTS_PER_PAGE
     });
   }
 
@@ -380,7 +396,7 @@ export class OppiabotGitHubClient {
    *
    * @param {number} issueNumber - Number of the issue or pull request.
    * @param {string} body - Comment body in Markdown.
-   * @returns {Promise<number>} The HTTP status of the request.
+   * @returns {Promise<number>} The HTTP status of the successful response.
    * @throws {OppiabotGitHubClientError} if the request fails.
    */
   async createComment(issueNumber: number, body: string): Promise<number> {
@@ -395,7 +411,7 @@ export class OppiabotGitHubClient {
    *
    * @param {number} issueNumber - Number of the issue or pull request.
    * @param {string[]} labels - Labels to add.
-   * @returns {Promise<number>} The HTTP status of the request.
+   * @returns {Promise<number>} The HTTP status of the successful response.
    * @throws {OppiabotGitHubClientError} if the request fails.
    */
   async addLabels(issueNumber: number, labels: string[]): Promise<number> {
@@ -410,7 +426,7 @@ export class OppiabotGitHubClient {
    *
    * @param {number} issueNumber - Number of the issue or pull request.
    * @param {string} label - Label to remove.
-   * @returns {Promise<number>} The HTTP status of the request.
+   * @returns {Promise<number>} The HTTP status of the successful response.
    * @throws {OppiabotGitHubClientError} if the request fails.
    */
   async removeLabel(issueNumber: number, label: string): Promise<number> {
@@ -425,7 +441,7 @@ export class OppiabotGitHubClient {
    *
    * @param {number} issueNumber - Number of the issue or pull request.
    * @param {string[]} assignees - Usernames to assign.
-   * @returns {Promise<number>} The HTTP status of the request.
+   * @returns {Promise<number>} The HTTP status of the successful response.
    * @throws {OppiabotGitHubClientError} if the request fails.
    */
   async addAssignees(
@@ -443,7 +459,7 @@ export class OppiabotGitHubClient {
    *
    * @param {number} issueNumber - Number of the issue or pull request.
    * @param {string[]} assignees - Usernames to unassign.
-   * @returns {Promise<number>} The HTTP status of the request.
+   * @returns {Promise<number>} The HTTP status of the successful response.
    * @throws {OppiabotGitHubClientError} if the request fails.
    */
   async removeAssignees(
@@ -460,7 +476,7 @@ export class OppiabotGitHubClient {
    * Closes an issue or pull request.
    *
    * @param {number} issueNumber - Number of the issue or pull request.
-   * @returns {Promise<number>} The HTTP status of the request.
+   * @returns {Promise<number>} The HTTP status of the successful response.
    * @throws {OppiabotGitHubClientError} if the request fails.
    */
   async closeIssue(issueNumber: number): Promise<number> {
@@ -491,7 +507,7 @@ export class OppiabotGitHubClient {
    *
    * @param {string} route - GitHub REST route to request.
    * @param {Object} [parameters] - Route parameters and request body.
-   * @returns {Promise<number>} The HTTP status of the request.
+   * @returns {Promise<number>} The HTTP status of the successful response.
    * @throws {OppiabotGitHubClientError} if the request fails.
    */
   private async mutate(
@@ -509,7 +525,8 @@ export class OppiabotGitHubClient {
    * @param {Object} parameters - Route parameters and query parameters.
    * @returns {Promise<GitHubApiResponse<TData>>} The GitHub API response, with
    *   its status and data.
-   * @throws {OppiabotGitHubClientError} if the request fails.
+   * @throws {OppiabotGitHubClientError} if the request fails, wrapping the
+   *   error raised by the GitHub API client.
    */
   private async send<TData>(
     route: string,
@@ -523,7 +540,7 @@ export class OppiabotGitHubClient {
       });
     } catch (error) {
       throw new OppiabotGitHubClientError(
-        'The GitHub API request failed: ' + (
+        `The GitHub API request to ${route} failed: ` + (
           error instanceof Error ? error.message : String(error)
         ),
         error
