@@ -17,6 +17,7 @@
  */
 
 import { Trigger } from './trigger';
+import type { OppiabotGitHubClient } from './oppiabot_github_client';
 import { RepositoryContext } from '../types/repository';
 import { RepositoryConfiguration } from
   '../types/repository_configuration';
@@ -65,6 +66,12 @@ export class ExecutionContext {
      */
     public readonly configuration?: RepositoryConfiguration,
     /**
+     * The GitHub API abstraction plugins use to perform repository operations,
+     * or `undefined` when the entrypoint did not provide one. Plugins that
+     * perform GitHub operations must handle `undefined`.
+     */
+    public readonly githubClient?: OppiabotGitHubClient,
+    /**
      * The GitHub webhook delivery ID, or `undefined` for a scheduled run. Use
      * it to correlate a run with the delivery that started it.
      */
@@ -76,7 +83,8 @@ export class ExecutionContext {
    *
    * Requires `trigger` and `repository` to be present and to pass their own
    * `validate()`, and, when `configuration` is present, requires it to pass
-   * `configuration.validate()`. `payload` and `deliveryId` are not checked.
+   * `configuration.validate()`. `payload`, `githubClient`, and `deliveryId` are
+   * not checked.
    *
    * @throws {ExecutionContextValidationError} if `trigger` or `repository` is
    *   `undefined` or `null`, or fails its own `validate()`, or if

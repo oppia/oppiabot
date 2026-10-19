@@ -42,3 +42,4 @@ export {
   OppiabotGitHubClient,
   OppiabotGitHubClientError
 } from './oppiabot_github_client';
+export type { GitHubApiClient } from './oppiabot_github_client';
