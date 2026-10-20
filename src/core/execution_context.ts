@@ -87,9 +87,10 @@ export class ExecutionContext {
    * `configuration` is provided its own `validate()` is called too. `payload`
    * and `deliveryId` carry no constraints here, so they are not inspected.
    *
-   * @throws {ExecutionContextValidationError} naming the first field that
-   *   fails, with that field's own validation message appended. Returns
-   *   without throwing if every check passes.
+   * @throws {ExecutionContextValidationError} if the trigger, repository,
+   *   or provided configuration is invalid. The error identifies the
+   *   invalid component and includes its validation error message.
+   *   Returns without throwing if every check passes.
    */
   validate(): void {
     if (this.trigger === undefined || this.trigger === null) {
