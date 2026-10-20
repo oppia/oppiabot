@@ -19,32 +19,20 @@
 /**
  * Represents repository information required during Oppiabot execution.
  *
- * The runtime entrypoint populates `default_branch` from the event or from a
- * repository metadata lookup before repository configuration is loaded; when
- * the event does not carry it, the entrypoint reads it through the GitHub API.
+ * default_branch is populated by the runtime entrypoint or repository
+ * metadata lookup before repository configuration is loaded.
  */
 export class RepositoryContext {
   constructor(
-    /**
-     * The account or organization that owns the repository, as used in GitHub
-     * API paths.
-     */
     public readonly owner: string,
-    /**
-     * The repository name, without the owner prefix.
-     */
     public readonly name: string,
-    /**
-     * The repository's default branch, such as 'master' or 'main'.
-     */
     public readonly default_branch: string
   ) {}
 
   /**
-   * Returns the repository's full name in `owner/name` form.
+   * Returns the repository identifier.
    *
-   * @returns {string} The repository identifier used in GitHub API paths and
-   *   log messages, for example 'oppia/oppia'.
+   * @returns {string} The repository identifier. Example: "owner/name".
    */
   getFullName(): string {
     return `${this.owner}/${this.name}`;
