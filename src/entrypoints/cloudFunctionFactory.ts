@@ -54,7 +54,10 @@ interface RepositoryContents {
  *
  * The configuration loader reads `.github/oppiabot.yml` through this reader.
  * A missing file resolves to `undefined`, which the loader treats as a
- * repository that has not opted in to Oppiabot.
+ * repository that has not opted in to Oppiabot. GitHub also answers `404`
+ * for repositories the credentials cannot see, so a file `404` is only
+ * treated as a missing file after the repository itself proves readable;
+ * otherwise the error propagates as a configuration load failure.
  */
 export class ApiRepositoryFileReader implements RepositoryFileReader {
   constructor(
@@ -92,6 +95,7 @@ export class ApiRepositoryFileReader implements RepositoryFileReader {
       data = response.data;
     } catch (error) {
       if (isNotFoundError(error)) {
+        await this.verifyRepositoryAccessible(repository, api, error);
         return undefined;
       }
       throw error;
@@ -104,6 +108,41 @@ export class ApiRepositoryFileReader implements RepositoryFileReader {
     }
     const encoding = data.encoding === 'base64' ? 'base64' : 'utf8';
     return Buffer.from(data.content, encoding).toString('utf8');
+  }
+
+  /**
+   * Confirms the repository is accessible before a `404` is treated as a
+   * missing file.
+   *
+   * GitHub also returns `404` when the credentials cannot see the repository
+   * at all. Silently mapping that to a missing configuration file would make
+   * the loader treat an access problem as a repository that has not opted in,
+   * so an inaccessible repository rethrows the original error instead, which
+   * the loader reports as a configuration load failure.
+   *
+   * @param {RepositoryContext} repository - Repository containing the file.
+   * @param {GitHubApiClient} api - Authenticated GitHub API client.
+   * @param {unknown} originalError - The `404` error raised while reading the
+   *   file, rethrown when the repository turns out to be inaccessible.
+   * @returns {Promise<void>} Resolves once repository access is confirmed.
+   * @throws {unknown} The original `404` error if the repository itself cannot
+   *   be read with the same credentials.
+   */
+  private async verifyRepositoryAccessible(
+    repository: RepositoryContext,
+    api: GitHubApiClient,
+    originalError: unknown
+  ): Promise<void> {
+    try {
+      await api.request('GET /repos/{owner}/{repo}', {
+        owner: repository.owner,
+        repo: repository.name
+      });
+    } catch {
+      throw originalError instanceof Error
+        ? originalError
+        : new Error(String(originalError));
+    }
   }
 }
 

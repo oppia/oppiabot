@@ -41,3 +41,8 @@ export {
   createTokenApiClient,
   createWebhookFunction
 } from './cloudFunctionFactory';
+export {
+  GITHUB_TOKEN_ENV,
+  getWebhookHandler,
+  webhookHandler
+} from './deployedHandler';

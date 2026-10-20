@@ -165,6 +165,24 @@ describe('verifyGitHubSignature', () => {
       false
     );
   });
+
+  it('rejects a valid digest followed by trailing characters', () => {
+    const body = JSON.stringify(createPayload());
+    const signature = signBody(WEBHOOK_SECRET, body) + 'zz';
+    assert.strictEqual(
+      verifyGitHubSignature(WEBHOOK_SECRET, body, signature),
+      false
+    );
+  });
+
+  it('rejects a digest that is not exactly 64 hexadecimal characters', () => {
+    const body = JSON.stringify(createPayload());
+    const signature = signBody(WEBHOOK_SECRET, body).slice(0, -1);
+    assert.strictEqual(
+      verifyGitHubSignature(WEBHOOK_SECRET, body, signature),
+      false
+    );
+  });
 });
 
 describe('normalizeWebhook', () => {

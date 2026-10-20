@@ -142,17 +142,14 @@ export function verifyGitHubSignature(
   rawBody: string | Buffer,
   signatureHeader: string | undefined
 ): boolean {
-  const prefix = 'sha256=';
-  if (
-    signatureHeader === undefined ||
-    !signatureHeader.startsWith(prefix)
-  ) {
+  const match =
+    signatureHeader === undefined
+      ? null
+      : /^sha256=([0-9a-fA-F]{64})$/.exec(signatureHeader);
+  if (match === null) {
     return false;
   }
-  const providedSignature = Buffer.from(
-    signatureHeader.slice(prefix.length),
-    'hex'
-  );
+  const providedSignature = Buffer.from(match[1], 'hex');
   const expectedSignature = createHmac('sha256', secret)
     .update(rawBody)
     .digest();
