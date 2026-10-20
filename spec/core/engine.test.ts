@@ -17,7 +17,6 @@ import assert from 'node:assert/strict';
 import {
   CoreEngine,
   ExecutionContextValidationError,
-  OppiabotPlugin,
   PluginResolutionError,
   PluginResult,
   PluginRegistry,
@@ -28,59 +27,11 @@ import {
   createExecutionContext,
   createRepositoryConfiguration
 } from './testHelpers';
-
-/**
- * Captures console.log output for the duration of one test.
- *
- * The engine reports execution results through the log rather than a return
- * value, so tests read that output.
- *
- * @returns {object} The captured `logs` array and a `restore` callback.
- */
-function captureLogs(): {logs: string[]; restore: () => void} {
-  const logs: string[] = [];
-  const original = console.log;
-  console.log = (...args: unknown[]) => {
-    logs.push(args.map((arg) => String(arg)).join(' '));
-  };
-  return {
-    logs: logs,
-    restore: () => {
-      console.log = original;
-    },
-  };
-}
-
-/**
- * Creates a stub plugin that resolves to a configurable result.
- *
- * @param {string} name - The plugin name.
- * @param {Trigger[]} supportedTriggers - The supported triggers.
- * @param {() => Promise<PluginResult>} execute - The execution handler.
- * @returns {OppiabotPlugin} A stub plugin.
- */
-function createStubPlugin(
-  name: string,
-  supportedTriggers: Trigger[],
-  execute: () => Promise<PluginResult>
-): OppiabotPlugin {
-  return {
-    name: name,
-    supportedTriggers: supportedTriggers,
-    configSchema: new ConfigSchema({}, []),
-    execute: execute,
-  };
-}
-
-/**
- * Returns a successful plugin result with the given message.
- *
- * @param {string} message - The result message.
- * @returns {PluginResult} A successful result.
- */
-function successfulResult(message: string): PluginResult {
-  return { actions: [], message: message, success: true };
-}
+import {
+  captureLogs,
+  createStubPlugin,
+  successfulResult
+} from './engineTestHelpers';
 
 describe('CoreEngine', () => {
   it('executes all applicable plugins and reports their results', async () => {
