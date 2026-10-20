@@ -55,9 +55,12 @@ interface RepositoryContents {
  * The configuration loader reads `.github/oppiabot.yml` through this reader.
  * A missing file resolves to `undefined`, which the loader treats as a
  * repository that has not opted in to Oppiabot. GitHub also answers `404`
- * for repositories the credentials cannot see, so a file `404` is only
- * treated as a missing file after the repository itself proves readable;
- * otherwise the error propagates as a configuration load failure.
+ * for repositories and refs the credentials cannot read, so a file `404` is
+ * only treated as a missing file after a contents listing at the same ref
+ * proves the contents are readable with the same credentials; otherwise the
+ * error propagates as a configuration load failure. Unexpected responses,
+ * such as the path resolving to a directory, also propagate as errors rather
+ * than opt-outs.
  */
 export class ApiRepositoryFileReader implements RepositoryFileReader {
   constructor(
@@ -74,7 +77,8 @@ export class ApiRepositoryFileReader implements RepositoryFileReader {
    * @param {string} ref - Git ref to read the file at.
    * @returns {Promise<string | undefined>} The file contents, or undefined
    *   when the repository does not contain the file at the given ref.
-   * @throws {Error} if the file cannot be read for any other reason.
+   * @throws {Error} if the file cannot be read, the ref is invalid, or the
+   *   path resolves to something other than a file with usable content.
    */
   async readRepositoryFile(
     repository: RepositoryContext,
@@ -95,48 +99,60 @@ export class ApiRepositoryFileReader implements RepositoryFileReader {
       data = response.data;
     } catch (error) {
       if (isNotFoundError(error)) {
-        await this.verifyRepositoryAccessible(repository, api, error);
+        await this.verifyContentsReadable(repository, ref, api, error);
         return undefined;
       }
       throw error;
     }
     if (Array.isArray(data) || data.type !== 'file') {
-      return undefined;
+      throw new Error(
+        `Expected ${filePath} at ref ${ref} in ` +
+          `${repository.owner}/${repository.name} to be a file.`
+      );
     }
     if (typeof data.content !== 'string') {
-      return undefined;
+      throw new Error(
+        `The file ${filePath} at ref ${ref} in ` +
+          `${repository.owner}/${repository.name} was returned without ` +
+          `usable content.`
+      );
     }
     const encoding = data.encoding === 'base64' ? 'base64' : 'utf8';
     return Buffer.from(data.content, encoding).toString('utf8');
   }
 
   /**
-   * Confirms the repository is accessible before a `404` is treated as a
-   * missing file.
+   * Confirms the repository contents are readable before a `404` is treated
+   * as a missing file.
    *
-   * GitHub also returns `404` when the credentials cannot see the repository
-   * at all. Silently mapping that to a missing configuration file would make
-   * the loader treat an access problem as a repository that has not opted in,
-   * so an inaccessible repository rethrows the original error instead, which
-   * the loader reports as a configuration load failure.
+   * GitHub answers `404` both for a missing path and for repositories or
+   * refs the credentials cannot read, so a file `404` is only mapped to a
+   * missing file after a contents listing at the same ref succeeds with the
+   * same credentials. That listing requires the same Contents read
+   * permission as the file read itself and also fails for an invalid ref.
+   * When it fails, the original error is rethrown, which the loader reports
+   * as a configuration load failure rather than an opt-out.
    *
    * @param {RepositoryContext} repository - Repository containing the file.
+   * @param {string} ref - Git ref the file was requested at.
    * @param {GitHubApiClient} api - Authenticated GitHub API client.
    * @param {unknown} originalError - The `404` error raised while reading the
-   *   file, rethrown when the repository turns out to be inaccessible.
-   * @returns {Promise<void>} Resolves once repository access is confirmed.
-   * @throws {unknown} The original `404` error if the repository itself cannot
-   *   be read with the same credentials.
+   *   file, rethrown when the contents turn out to be unreadable.
+   * @returns {Promise<void>} Resolves once contents access is confirmed.
+   * @throws {unknown} The original `404` error if the repository contents
+   *   cannot be listed with the same credentials at the same ref.
    */
-  private async verifyRepositoryAccessible(
+  private async verifyContentsReadable(
     repository: RepositoryContext,
+    ref: string,
     api: GitHubApiClient,
     originalError: unknown
   ): Promise<void> {
     try {
-      await api.request('GET /repos/{owner}/{repo}', {
+      await api.request('GET /repos/{owner}/{repo}/contents', {
         owner: repository.owner,
-        repo: repository.name
+        repo: repository.name,
+        ref: ref
       });
     } catch {
       throw originalError instanceof Error

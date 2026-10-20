@@ -72,7 +72,7 @@ function createPayload(): Record<string, unknown> {
 }
 
 const CONTENTS_ROUTE = 'GET /repos/{owner}/{repo}/contents/{path}';
-const REPOSITORY_ROUTE = 'GET /repos/{owner}/{repo}';
+const REPOSITORY_CONTENTS_ROUTE = 'GET /repos/{owner}/{repo}/contents';
 
 /**
  * One request recorded by `createRecordingApi`.
@@ -139,7 +139,7 @@ describe('ApiRepositoryFileReader', () => {
       if (route === CONTENTS_ROUTE) {
         throw Object.assign(new Error('Not Found'), { status: 404 });
       }
-      return { status: 200, data: {} };
+      return { status: 200, data: [] };
     });
     const reader = new ApiRepositoryFileReader(() => api);
     const contents = await reader.readRepositoryFile(
@@ -150,16 +150,17 @@ describe('ApiRepositoryFileReader', () => {
     assert.strictEqual(contents, undefined);
     assert.deepStrictEqual(
       requests.map((request) => request.route),
-      [CONTENTS_ROUTE, REPOSITORY_ROUTE]
+      [CONTENTS_ROUTE, REPOSITORY_CONTENTS_ROUTE]
     );
     assert.deepStrictEqual(requests[1].parameters, {
       owner: 'oppia',
-      repo: 'oppiabot'
+      repo: 'oppiabot',
+      ref: 'develop'
     });
   });
 
-  it('throws when a file 404 shows the repository is inaccessible', async () => {
-    const { api } = createRecordingApi(() => {
+  it('throws when a file 404 shows the contents are inaccessible', async () => {
+    const { api, requests } = createRecordingApi(() => {
       throw Object.assign(new Error('Not Found'), { status: 404 });
     });
     const reader = new ApiRepositoryFileReader(() => api);
@@ -170,6 +171,32 @@ describe('ApiRepositoryFileReader', () => {
         'develop'
       ),
       /Not Found/
+    );
+    assert.deepStrictEqual(
+      requests.map((request) => request.route),
+      [CONTENTS_ROUTE, REPOSITORY_CONTENTS_ROUTE]
+    );
+    assert.deepStrictEqual(requests[1].parameters, {
+      owner: 'oppia',
+      repo: 'oppiabot',
+      ref: 'develop'
+    });
+  });
+
+  it('throws when a file 404 is caused by an invalid ref', async () => {
+    const { api } = createRecordingApi(() => {
+      throw Object.assign(new Error('No commit found for ref'), {
+        status: 404
+      });
+    });
+    const reader = new ApiRepositoryFileReader(() => api);
+    await assert.rejects(
+      reader.readRepositoryFile(
+        new RepositoryContext('oppia', 'oppiabot', 'develop'),
+        '.github/oppiabot.yml',
+        'bad-ref'
+      ),
+      /No commit found for ref/
     );
   });
 
@@ -190,7 +217,7 @@ describe('ApiRepositoryFileReader', () => {
     );
   });
 
-  it('returns undefined when the path is a directory', async () => {
+  it('throws when the path resolves to a directory', async () => {
     const api = {
       request: async () => ({
         status: 200,
@@ -198,12 +225,32 @@ describe('ApiRepositoryFileReader', () => {
       })
     } as unknown as GitHubApiClient;
     const reader = new ApiRepositoryFileReader(() => api);
-    const contents = await reader.readRepositoryFile(
-      new RepositoryContext('oppia', 'oppiabot', 'develop'),
-      '.github',
-      'develop'
+    await assert.rejects(
+      reader.readRepositoryFile(
+        new RepositoryContext('oppia', 'oppiabot', 'develop'),
+        '.github',
+        'develop'
+      ),
+      /to be a file/
     );
-    assert.strictEqual(contents, undefined);
+  });
+
+  it('throws when a file response has no usable content', async () => {
+    const api = {
+      request: async () => ({
+        status: 200,
+        data: { type: 'file', encoding: 'base64' }
+      })
+    } as unknown as GitHubApiClient;
+    const reader = new ApiRepositoryFileReader(() => api);
+    await assert.rejects(
+      reader.readRepositoryFile(
+        new RepositoryContext('oppia', 'oppiabot', 'develop'),
+        '.github/oppiabot.yml',
+        'develop'
+      ),
+      /without usable content/
+    );
   });
 });
 
