@@ -11,7 +11,7 @@
     "start": "probot run ./index.js",
     "sheets-setup": "node ./sheetsSetup.js",
     "test": "node ./spec/setup.js",
-    "test:core": "rm -rf dist && tsc --project tsconfig.test.json && node --test dist/spec/core/",
+    "test:core": "rm -rf dist && tsc --project tsconfig.test.json && node --test dist/spec/core/ dist/spec/entrypoints/",
     "typecheck": "tsc --project tsconfig.json",
     "actions-build": "ncc build actions/main.js -o actions_build",
     "update-actions-build": "node actions/build.js"
