@@ -40,8 +40,9 @@ export interface GitHubLabel {
 /**
  * A GitHub pull request as returned by the GitHub API.
  *
- * Declares only the fields the migrated workflows read; the runtime object is
- * the full GitHub API response and may carry additional fields.
+ * Declares the fields the currently planned plugins read; the runtime object
+ * is the full GitHub API response and may carry additional fields, which are
+ * added here as later plugins need them.
  */
 export interface PullRequest {
   number: number;
@@ -50,6 +51,16 @@ export interface PullRequest {
   body: string | null;
   draft: boolean;
   merged: boolean;
+  /**
+   * The account that opened the pull request, or null when GitHub cannot
+   * associate it with an account.
+   */
+  user: GitHubUser | null;
+  /**
+   * Whether the pull request can be merged. Null while GitHub is still
+   * computing mergeability.
+   */
+  mergeable: boolean | null;
   labels: GitHubLabel[];
   assignees: GitHubUser[];
   requested_reviewers: GitHubUser[];
@@ -82,25 +93,42 @@ export interface ChangedFile {
 
 /**
  * A GitHub commit as returned by the GitHub API.
+ *
+ * The top-level `author` and `committer` are the GitHub accounts associated
+ * with the commit; the nested `commit.author` and `commit.committer` are the
+ * author and committer metadata recorded in the commit itself, which GitHub
+ * does not associate with accounts.
  */
 export interface Commit {
   sha: string;
+  /**
+   * The GitHub account associated with the commit's author, or null when
+   * GitHub cannot associate the commit with an account.
+   */
+  author: GitHubUser | null;
+  /**
+   * The GitHub account associated with the commit's committer, or null when
+   * GitHub cannot associate the commit with an account.
+   */
+  committer: GitHubUser | null;
   commit: {
     message: string;
     /**
-     * The commit author as resolved by GitHub, or null when GitHub cannot
-     * associate the commit with an account.
+     * The author metadata recorded in the commit itself, as pushed.
      */
     author: {
+      name: string;
+      email: string;
       date: string;
-    } | null;
+    };
     /**
-     * The commit committer as resolved by GitHub, or null when GitHub cannot
-     * associate the commit with an account.
+     * The committer metadata recorded in the commit itself, as pushed.
      */
     committer: {
+      name: string;
+      email: string;
       date: string;
-    } | null;
+    };
   };
 }
 
@@ -116,8 +144,9 @@ export interface Issue {
   assignees: GitHubUser[];
   /**
    * Present only when the resource is a pull request. The GitHub issues
-   * endpoint returns both issues and pull requests, so callers that need only
-   * issues filter on this property.
+   * endpoint returns pull requests as well as issues, so `getIssue` can
+   * return a pull request when the number refers to one. `listIssues` filters
+   * these results out, so they are never observed there.
    */
   pull_request?: {
     html_url?: string;
@@ -201,11 +230,12 @@ export interface GitHubApiClient {
 /**
  * Maximum number of results GitHub returns per page for most list operations.
  *
- * Used as the page size by the loops that paginate (`listIssues` and
+ * Used as the page size by the operations that read every matching record
+ * (`listIssues`, `listPullRequests`, `listPullRequestReviews`, and
  * `listChangedFiles`), to detect a full page and request the next one, and as
- * the requested page size for the single-page operations (`listPullRequests`,
- * `listPullRequestReviews`, and `searchIssuesAndPullRequests`). The value
- * matches the page size the legacy implementations used.
+ * the requested page size for the single-page search operation
+ * (`searchIssuesAndPullRequests`). The value matches the page size the legacy
+ * implementations used.
  */
 const MAX_RESULTS_PER_PAGE = 100;
 
@@ -254,68 +284,57 @@ export class OppiabotGitHubClient {
   /**
    * Lists pull requests in the repository.
    *
+   * Every page is read because scheduled plugins sweep the repository's open
+   * pull requests (for example the stale pull request sweeper and the
+   * unassigned mergeable pull request allocator), and a single page would
+   * silently omit the remainder.
+   *
    * @param {ResourceState} [state] - State of the pull requests to list.
    *   Defaults to 'open'.
-   * @returns {Promise<PullRequest[]>} Up to one page (`MAX_RESULTS_PER_PAGE`)
-   *   of matching pull requests; a repository with more matching pull requests
-   *   than fit on one page is truncated.
+   * @returns {Promise<PullRequest[]>} All matching pull requests.
    * @throws {OppiabotGitHubClientError} if the pull requests cannot be read.
    */
   async listPullRequests(
     state: ResourceState = 'open'
   ): Promise<PullRequest[]> {
-    return this.request<PullRequest[]>(ROUTES.listPullRequests, {
-      state,
-      per_page: MAX_RESULTS_PER_PAGE
-    });
+    return this.listAllPages<PullRequest>(ROUTES.listPullRequests, {state});
   }
 
   /**
    * Lists the reviews submitted on a pull request.
    *
+   * Every page is read because plugins evaluate the complete review state of
+   * a pull request (for example the reviewer lag monitor), and a truncated
+   * review list would misrepresent that state.
+   *
    * @param {number} pullRequestNumber - Number of the pull request.
-   * @returns {Promise<PullRequestReview[]>} At most `MAX_RESULTS_PER_PAGE`
-   *   reviews; a pull request with more reviews than that is truncated,
-   *   because this method reads a single page.
+   * @returns {Promise<PullRequestReview[]>} All reviews on the pull request.
    * @throws {OppiabotGitHubClientError} if the reviews cannot be read.
    */
   async listPullRequestReviews(
     pullRequestNumber: number
   ): Promise<PullRequestReview[]> {
-    return this.request<PullRequestReview[]>(
+    return this.listAllPages<PullRequestReview>(
       ROUTES.listPullRequestReviews,
-      {pull_number: pullRequestNumber, per_page: MAX_RESULTS_PER_PAGE}
+      {pull_number: pullRequestNumber}
     );
   }
 
   /**
    * Lists the files changed in a pull request.
    *
-   * The GitHub API returns at most 100 files per page, so all pages are read
-   * to return the complete list.
+   * Every page is read because plugins evaluate the complete changed-file set
+   * (for example review dismissal for late file changes), and a truncated
+   * file list would miss files that require action.
    *
    * @param {number} pullRequestNumber - Number of the pull request.
    * @returns {Promise<ChangedFile[]>} All files changed in the pull request.
    * @throws {OppiabotGitHubClientError} if the changed files cannot be read.
    */
   async listChangedFiles(pullRequestNumber: number): Promise<ChangedFile[]> {
-    const changedFiles: ChangedFile[] = [];
-    let page = 1;
-    let pageCount: number;
-    do {
-      const filesInPage = await this.request<ChangedFile[]>(
-        ROUTES.listChangedFiles,
-        {
-          pull_number: pullRequestNumber,
-          per_page: MAX_RESULTS_PER_PAGE,
-          page
-        }
-      );
-      changedFiles.push(...filesInPage);
-      pageCount = filesInPage.length;
-      page++;
-    } while (pageCount === MAX_RESULTS_PER_PAGE);
-    return changedFiles;
+    return this.listAllPages<ChangedFile>(ROUTES.listChangedFiles, {
+      pull_number: pullRequestNumber
+    });
   }
 
   /**
@@ -332,32 +351,22 @@ export class OppiabotGitHubClient {
   /**
    * Lists issues in the repository.
    *
-   * The GitHub API returns pull requests through this endpoint as well, so the
-   * returned list is not limited to issues. Every page is read because the
-   * repository-wide issue list is used by scheduled plugins that must see all
-   * open issues, and a single page would silently omit the remainder.
+   * The GitHub issues endpoint returns pull requests as well as issues, so
+   * pull requests are filtered out of the result, matching the behavior of
+   * the legacy `getAllOpenIssues()` helper that migrated plugins are used to;
+   * plugins that need pull requests call `listPullRequests`. Every page is
+   * read because the repository-wide issue list is used by scheduled plugins
+   * that must see all open issues, and a single page would silently omit the
+   * remainder.
    *
    * @param {ResourceState} [state] - State of the issues to list. Defaults to
    *   'open'.
-   * @returns {Promise<Issue[]>} The matching issues, including any pull
-   *   requests returned by the endpoint.
+   * @returns {Promise<Issue[]>} All matching issues, excluding pull requests.
    * @throws {OppiabotGitHubClientError} if the issues cannot be read.
    */
   async listIssues(state: ResourceState = 'open'): Promise<Issue[]> {
-    const issues: Issue[] = [];
-    let page = 1;
-    let pageCount: number;
-    do {
-      const issuesInPage = await this.request<Issue[]>(ROUTES.listIssues, {
-        state,
-        per_page: MAX_RESULTS_PER_PAGE,
-        page
-      });
-      issues.push(...issuesInPage);
-      pageCount = issuesInPage.length;
-      page++;
-    } while (pageCount === MAX_RESULTS_PER_PAGE);
-    return issues;
+    const issues = await this.listAllPages<Issue>(ROUTES.listIssues, {state});
+    return issues.filter((issue) => issue.pull_request === undefined);
   }
 
   /**
@@ -516,6 +525,38 @@ export class OppiabotGitHubClient {
   ): Promise<number> {
     const response = await this.send(route, parameters);
     return response.status;
+  }
+
+  /**
+   * Reads every page of a list route scoped to the client's repository.
+   *
+   * Requests `MAX_RESULTS_PER_PAGE` results per page and keeps requesting the
+   * next page while a returned page is full.
+   *
+   * @param {string} route - GitHub REST route to request.
+   * @param {Object} parameters - Route parameters and query parameters, other
+   *   than the page size and page number.
+   * @returns {Promise<TData[]>} Every matching record across all pages.
+   * @throws {OppiabotGitHubClientError} if any page cannot be read.
+   */
+  private async listAllPages<TData>(
+    route: string,
+    parameters: Record<string, unknown>
+  ): Promise<TData[]> {
+    const results: TData[] = [];
+    let page = 1;
+    let pageCount: number;
+    do {
+      const resultsInPage = await this.request<TData[]>(route, {
+        ...parameters,
+        per_page: MAX_RESULTS_PER_PAGE,
+        page
+      });
+      results.push(...resultsInPage);
+      pageCount = resultsInPage.length;
+      page++;
+    } while (pageCount === MAX_RESULTS_PER_PAGE);
+    return results;
   }
 
   /**

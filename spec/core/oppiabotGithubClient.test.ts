@@ -21,7 +21,8 @@ import {
   Issue,
   OppiabotGitHubClient,
   OppiabotGitHubClientError,
-  PullRequest
+  PullRequest,
+  PullRequestReview
 } from '../../src/core/oppiabot_github_client';
 import { RepositoryContext } from '../../src/types';
 
@@ -42,6 +43,12 @@ class FakeGitHubApiClient implements GitHubApiClient {
   /** Response returned for the listIssues route, keyed by page number. */
   readonly issuesByPage: Map<number, Issue[]> = new Map();
 
+  /** Response returned for the listPullRequests route, keyed by page number. */
+  readonly pullRequestsByPage: Map<number, PullRequest[]> = new Map();
+
+  /** Response returned for the list-reviews route, keyed by page number. */
+  readonly reviewsByPage: Map<number, PullRequestReview[]> = new Map();
+
   async request<TData>(
     route: string,
     parameters: Record<string, unknown>
@@ -51,6 +58,22 @@ class FakeGitHubApiClient implements GitHubApiClient {
       return {
         status: 200,
         data: this.changedFilesByPage.get(Number(parameters.page)) || []
+      } as GitHubApiResponse<TData>;
+    }
+    if (route === 'GET /repos/{owner}/{repo}/pulls') {
+      const page = Number(parameters.page);
+      return {
+        status: 200,
+        data: this.pullRequestsByPage.get(page) ||
+          (page === 1 ? [createPullRequest(101), createPullRequest(102)] : [])
+      } as GitHubApiResponse<TData>;
+    }
+    if (route === 'GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews') {
+      const page = Number(parameters.page);
+      return {
+        status: 200,
+        data: this.reviewsByPage.get(page) ||
+          (page === 1 ? [createReview()] : [])
       } as GitHubApiResponse<TData>;
     }
     if (route === 'GET /repos/{owner}/{repo}/issues') {
@@ -78,23 +101,27 @@ class FakeGitHubApiClient implements GitHubApiClient {
     switch (route) {
       case 'GET /repos/{owner}/{repo}/pulls/{pull_number}':
         return createPullRequest(Number(parameters.pull_number));
-      case 'GET /repos/{owner}/{repo}/pulls':
-        return [createPullRequest(101), createPullRequest(102)];
-      case 'GET /repos/{owner}/{repo}/pulls/{pull_number}/reviews':
-        return [{state: 'APPROVED', user: {login: 'reviewer'}}];
       case 'GET /repos/{owner}/{repo}/issues/{issue_number}':
         return createIssue(Number(parameters.issue_number));
-      case 'GET /repos/{owner}/{repo}/issues':
-        return [createIssue(1), createIssue(2)];
       case 'GET /search/issues':
         return {total_count: 1, items: [{number: 7, title: 'A pull request'}]};
       case 'GET /repos/{owner}/{repo}/commits/{ref}':
         return {
           sha: String(parameters.ref),
+          author: {login: 'octocat'},
+          committer: null,
           commit: {
             message: 'A commit message',
-            author: {date: '2026-10-01'},
-            committer: {date: '2026-10-02'}
+            author: {
+              name: 'Octo Cat',
+              email: 'octocat@example.com',
+              date: '2026-10-01'
+            },
+            committer: {
+              name: 'Octo Cat',
+              email: 'octocat@example.com',
+              date: '2026-10-02'
+            }
           }
         };
       default:
@@ -126,12 +153,23 @@ function createPullRequest(number: number): PullRequest {
     body: 'A pull request body',
     draft: false,
     merged: false,
+    user: {login: 'author'},
+    mergeable: true,
     labels: [{name: 'bug'}],
     assignees: [{login: 'assignee'}],
     requested_reviewers: [{login: 'reviewer'}],
     head: {sha: 'abc123'},
     base: {ref: 'develop'}
   };
+}
+
+/**
+ * Creates a pull request review for use in tests.
+ *
+ * @returns {PullRequestReview} The review under test.
+ */
+function createReview(): PullRequestReview {
+  return {state: 'APPROVED', user: {login: 'reviewer'}};
 }
 
 /**
@@ -181,6 +219,8 @@ describe('OppiabotGitHubClient', () => {
       const {client, api} = createClient();
       const pullRequest = await client.getPullRequest(42);
       assert.strictEqual(pullRequest.number, 42);
+      assert.strictEqual(pullRequest.user?.login, 'author');
+      assert.strictEqual(pullRequest.mergeable, true);
       assert.deepStrictEqual(api.getLastParameters(), {
         owner: 'oppia',
         repo: 'oppiabot',
@@ -201,6 +241,21 @@ describe('OppiabotGitHubClient', () => {
       assert.strictEqual(api.getLastParameters().state, 'closed');
     });
 
+    it('requests every pull request page when a page is full', async () => {
+      const {client, api} = createClient();
+      api.pullRequestsByPage.set(1, Array.from(
+        {length: 100},
+        (_value, index) => createPullRequest(index + 1)
+      ));
+      api.pullRequestsByPage.set(2, [createPullRequest(101)]);
+      const pullRequests = await client.listPullRequests();
+      assert.strictEqual(pullRequests.length, 101);
+      assert.deepStrictEqual(
+        api.requests.map((request) => request.parameters.page),
+        [1, 2]
+      );
+    });
+
     it('lists the reviews on a pull request', async () => {
       const {client, api} = createClient();
       const reviews = await client.listPullRequestReviews(42);
@@ -208,6 +263,21 @@ describe('OppiabotGitHubClient', () => {
       assert.deepStrictEqual(reviews, [
         {state: 'APPROVED', user: {login: 'reviewer'}}
       ]);
+    });
+
+    it('requests every review page when a page is full', async () => {
+      const {client, api} = createClient();
+      api.reviewsByPage.set(1, Array.from(
+        {length: 100},
+        (_value, index) => ({state: 'COMMENTED', user: {login: `user-${index}`}})
+      ));
+      api.reviewsByPage.set(2, [createReview()]);
+      const reviews = await client.listPullRequestReviews(42);
+      assert.strictEqual(reviews.length, 101);
+      assert.deepStrictEqual(
+        api.requests.map((request) => request.parameters.page),
+        [1, 2]
+      );
     });
 
     it('retrieves an issue scoped to the repository', async () => {
@@ -270,10 +340,21 @@ describe('OppiabotGitHubClient', () => {
       assert.strictEqual(commit.commit.message, 'A commit message');
     });
 
-    it('exposes the author date of a commit', async () => {
+    it('exposes the author metadata recorded in a commit', async () => {
       const {client} = createClient();
       const commit = await client.getCommit('abc123');
-      assert.strictEqual(commit.commit.author?.date, '2026-10-01');
+      assert.deepStrictEqual(commit.commit.author, {
+        name: 'Octo Cat',
+        email: 'octocat@example.com',
+        date: '2026-10-01'
+      });
+    });
+
+    it('exposes the GitHub accounts associated with a commit', async () => {
+      const {client} = createClient();
+      const commit = await client.getCommit('abc123');
+      assert.deepStrictEqual(commit.author, {login: 'octocat'});
+      assert.strictEqual(commit.committer, null);
     });
 
     it('sends each read operation to its GitHub REST route', async () => {
@@ -297,7 +378,7 @@ describe('OppiabotGitHubClient', () => {
       );
     });
 
-    it('exposes pull requests returned by the issues endpoint', async () => {
+    it('excludes pull requests from the listed issues', async () => {
       const {client, api} = createClient();
       api.request = async <TData>() => ({
         status: 200,
@@ -310,9 +391,8 @@ describe('OppiabotGitHubClient', () => {
         ] as unknown as TData
       });
       const issues = await client.listIssues();
-      assert.strictEqual(issues.length, 2);
-      assert.ok(issues[1].pull_request);
-      assert.strictEqual(issues[0].pull_request, undefined);
+      assert.strictEqual(issues.length, 1);
+      assert.strictEqual(issues[0].number, 1);
     });
 
     it('wraps a failed read request in a client error', async () => {
