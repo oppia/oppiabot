@@ -1,0 +1,22 @@
+# Configuration file in the format a repository maintains.
+# This file is loaded by spec/core/configurationLoader.test.ts to verify that
+# the loader accepts the repository format, including its comments.
+
+version: "1.0"
+
+plugins:
+  stale-pr-notifier:
+    enabled: true
+    dry_run: true
+    settings:
+      stale_days: 30
+      stale_label: "status: stale"
+
+  cla-signature-check:
+    enabled: true
+    settings:
+      fail_action: close
+
+  # A plugin that is not registered still has its shape validated.
+  pr-template-check:
+    enabled: false
