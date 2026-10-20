@@ -20,6 +20,7 @@ import { Trigger } from './trigger';
 import { RepositoryContext } from '../types/repository';
 import { RepositoryConfiguration } from
   '../types/repository_configuration';
+import { DeferredExecutionRequest } from './deferredExecution';
 
 /**
  * The raw event data for one execution, as supplied by the entrypoint.
@@ -68,21 +69,31 @@ export class ExecutionContext {
      * The GitHub webhook delivery ID, or `undefined` for a scheduled run. Use
      * it to correlate a run with the delivery that started it.
      */
-    public readonly deliveryId?: string
+    public readonly deliveryId?: string,
+    /**
+     * The deferral request that produced this run, or `undefined` for a run
+     * an entrypoint started directly. The Core Engine sets it on the
+     * follow-up execution it schedules for a plugin that requested deferral
+     * (see `DeferredExecutionRequest`), which is how the plugin tells an
+     * initial run from a follow-up run: on the follow-up it re-fetches the
+     * current GitHub state instead of trusting the original delivery payload.
+     */
+    public readonly deferredRequest?: DeferredExecutionRequest
   ) {}
 
   /**
    * Validates that this context is ready to execute.
    *
    * Requires `trigger` and `repository` to be present and to pass their own
-   * `validate()`, and, when `configuration` is present, requires it to pass
-   * `configuration.validate()`. `payload` and `deliveryId` are not checked.
+   * `validate()`, and, when `configuration` or `deferredRequest` is present,
+   * requires them to pass their own `validate()`. `payload` and `deliveryId`
+   * are not checked.
    *
    * @throws {ExecutionContextValidationError} if `trigger` or `repository` is
    *   `undefined` or `null`, or fails its own `validate()`, or if
-   *   `configuration` is present and fails `validate()`. The message names the
-   *   offending field and includes the underlying error message. Returns
-   *   without throwing when every check passes.
+   *   `configuration` or `deferredRequest` is present and fails `validate()`.
+   *   The message names the offending field and includes the underlying
+   *   error message. Returns without throwing when every check passes.
    */
   validate(): void {
     if (this.trigger === undefined || this.trigger === null) {
@@ -125,6 +136,22 @@ export class ExecutionContext {
         throw new ExecutionContextValidationError(
           'The execution context contains an invalid configuration: ' +
           errorMessage
+        );
+      }
+    }
+    if (
+      this.deferredRequest !== undefined &&
+      this.deferredRequest !== null
+    ) {
+      try {
+        this.deferredRequest.validate();
+      } catch (error) {
+        const errorMessage = (
+          error instanceof Error ? error.message : String(error)
+        );
+        throw new ExecutionContextValidationError(
+          'The execution context contains an invalid deferred execution ' +
+          'request: ' + errorMessage
         );
       }
     }

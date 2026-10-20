@@ -15,6 +15,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  DeferredExecutionRequest,
   ExecutionContext,
   ExecutionContextValidationError,
   Trigger
@@ -157,6 +158,37 @@ describe('ExecutionContext', () => {
           err instanceof ExecutionContextValidationError &&
           err.message.includes('invalid configuration') &&
           err.message.includes('stale')
+        )
+      );
+    });
+
+    it('accepts an execution context with a valid deferred request', () => {
+      const context = new ExecutionContext(
+        new Trigger('pull_request_review', 'submitted'),
+        {},
+        new RepositoryContext('oppia', 'oppiabot', 'develop'),
+        undefined,
+        undefined,
+        new DeferredExecutionRequest(180000)
+      );
+      assert.doesNotThrow(() => context.validate());
+    });
+
+    it('rejects an execution context with an invalid deferred request', () => {
+      const context = new ExecutionContext(
+        new Trigger('pull_request_review', 'submitted'),
+        {},
+        new RepositoryContext('oppia', 'oppiabot', 'develop'),
+        undefined,
+        undefined,
+        new DeferredExecutionRequest(0)
+      );
+      assert.throws(
+        () => context.validate(),
+        (err: Error) => (
+          err instanceof ExecutionContextValidationError &&
+          err.message.includes('invalid deferred execution request') &&
+          err.message.includes('greater than zero')
         )
       );
     });
