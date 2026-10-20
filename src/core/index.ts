@@ -32,6 +32,12 @@ export {
 export { PluginRegistry } from './pluginRegistry';
 export { CoreEngine } from './engine';
 export {
+  DeferredExecutionRequest,
+  DeferredExecutionScheduler,
+  DeferredExecutionValidationError,
+  TimeoutDeferredExecutionScheduler
+} from './deferredExecution';
+export {
   ConfigurationLoader,
   ConfigurationLoadError,
   DEFAULT_CONFIGURATION_VERSION,
