@@ -8,4 +8,5 @@ newrelic_agent.log
 coverage
 .vscode
 .prettierrc
+dist
 *.pem:Zone.Identifier
