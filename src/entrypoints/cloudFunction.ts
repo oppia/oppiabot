@@ -449,7 +449,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  * @param {unknown} error - The thrown value.
  * @returns {string} A description of the value.
  */
-function describeError(error: unknown): string {
+export function describeError(error: unknown): string {
   if (error instanceof Error) {
     return error.stack ?? error.message;
   }

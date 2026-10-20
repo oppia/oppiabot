@@ -25,7 +25,8 @@
 import { PluginRegistry } from '../core';
 import {
   CloudFunctionHandler,
-  WEBHOOK_SECRET_ENV
+  WEBHOOK_SECRET_ENV,
+  describeError
 } from './cloudFunction';
 import {
   createTokenApiClient,
@@ -42,6 +43,13 @@ let cachedHandler: CloudFunctionHandler | undefined;
 
 /**
  * Creates the plugin registry the Core Engine executes.
+ *
+ * Plugins are registered during application initialization, as required by
+ * the TDD. No plugins are registered in this milestone: the registry exists
+ * so the engine and configuration loader can be constructed, and later
+ * milestones register migrated plugins here. An event arriving now therefore
+ * reaches the engine, which resolves no plugins and completes without side
+ * effects.
  *
  * @returns {PluginRegistry} A registry holding the plugins the deployment
  *   exposes to the Core Engine.
@@ -80,7 +88,24 @@ export function getWebhookHandler(): CloudFunctionHandler {
 
 /**
  * The configured Cloud Function handler for GitHub webhook deliveries.
+ *
+ * The Cloud Function callable must never reject: initialization failures are
+ * logged and answered with the same JSON 500 the inner handler produces for
+ * request failures, so the runtime always receives a complete response.
  */
 export const webhookHandler: CloudFunctionHandler = async (req, res) => {
-  await getWebhookHandler()(req, res);
+  let handler: CloudFunctionHandler;
+  try {
+    handler = getWebhookHandler();
+  } catch (error) {
+    console.error(
+      '[deployedHandler] Failed to initialize the webhook handler: ' +
+        describeError(error)
+    );
+    res.statusCode = 500;
+    res.setHeader('content-type', 'application/json');
+    res.end(JSON.stringify({ message: 'Internal server error.' }));
+    return;
+  }
+  await handler(req, res);
 };
