@@ -1,3 +1,0 @@
-command: npm run test
-attempts: 3
-timeout: 10m
